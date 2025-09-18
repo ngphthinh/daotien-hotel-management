@@ -18,11 +18,12 @@ public class Order {
     private List<Surcharge> surcharges;
     private List<OrderDetail> orderDetails;
     private Payment payment;
+    private LocalDate createdAt;
 
     public Order() {
     }
 
-    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, Booking booking, List<Surcharge> surcharges, List<OrderDetail> orderDetails, Payment payment) {
+    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, Booking booking, List<Surcharge> surcharges, List<OrderDetail> orderDetails, Payment payment, LocalDate createdAt) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
@@ -33,6 +34,7 @@ public class Order {
         this.surcharges = surcharges;
         this.orderDetails = orderDetails;
         this.payment = payment;
+        this.createdAt = createdAt;
     }
 
     public Order(BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, Booking booking, Payment payment) {
@@ -124,6 +126,14 @@ public class Order {
         this.payment = payment;
     }
 
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -137,6 +147,7 @@ public class Order {
                 ", surcharges=" + surcharges +
                 ", orderDetails=" + orderDetails +
                 ", payment=" + payment +
+                ", createdAt=" + createdAt +
                 '}';
     }
 
