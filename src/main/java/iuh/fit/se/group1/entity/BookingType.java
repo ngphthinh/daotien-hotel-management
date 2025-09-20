@@ -1,4 +1,4 @@
 package iuh.fit.se.group1.entity;
 
-public class PaymentType {
+public class BookingType {
 }
