@@ -14,35 +14,28 @@ public class Order {
     private Employee employee;
     private OrderType orderType;
     private Promotion promotion;
-    private Booking booking;
-    private List<Surcharge> surcharges;
-    private List<OrderDetail> orderDetails;
     private Payment payment;
     private LocalDate createdAt;
 
     public Order() {
     }
 
-    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, Booking booking, List<Surcharge> surcharges, List<OrderDetail> orderDetails, Payment payment, LocalDate createdAt) {
+    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion,  Payment payment, LocalDate createdAt) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
         this.employee = employee;
         this.orderType = orderType;
         this.promotion = promotion;
-        this.booking = booking;
-        this.surcharges = surcharges;
-        this.orderDetails = orderDetails;
         this.payment = payment;
         this.createdAt = createdAt;
     }
 
-    public Order(BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, Booking booking, Payment payment) {
+    public Order(BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, Payment payment) {
         this.totalAmount = totalAmount;
         this.employee = employee;
         this.orderType = orderType;
         this.promotion = promotion;
-        this.booking = booking;
         this.payment = payment;
     }
 
@@ -94,29 +87,6 @@ public class Order {
         this.promotion = promotion;
     }
 
-    public Booking getBooking() {
-        return booking;
-    }
-
-    public void setBooking(Booking booking) {
-        this.booking = booking;
-    }
-
-    public List<Surcharge> getSurcharges() {
-        return surcharges;
-    }
-
-    public void setSurcharges(List<Surcharge> surcharges) {
-        this.surcharges = surcharges;
-    }
-
-    public List<OrderDetail> getOrderDetails() {
-        return orderDetails;
-    }
-
-    public void setOrderDetails(List<OrderDetail> orderDetails) {
-        this.orderDetails = orderDetails;
-    }
 
     public Payment getPayment() {
         return payment;
@@ -143,44 +113,11 @@ public class Order {
                 ", employee=" + employee +
                 ", orderType=" + orderType +
                 ", promotion=" + promotion +
-                ", booking=" + booking +
-                ", surcharges=" + surcharges +
-                ", orderDetails=" + orderDetails +
                 ", payment=" + payment +
                 ", createdAt=" + createdAt +
                 '}';
     }
 
-    public void addOrderDetail(OrderDetail orderDetail) {
-        if (this.orderDetails == null) {
-            this.orderDetails = new java.util.ArrayList<>();
-        }
-        if (orderDetail == null) {
-            throw new IllegalArgumentException("OrderDetail cannot be null");
-        }
-        this.orderDetails.add(orderDetail);
-    }
-
-    public void addSurcharge(Surcharge surcharge) {
-        if (this.surcharges == null) {
-            this.surcharges = new java.util.ArrayList<>();
-        }
-        if (surcharge == null) {
-            throw new IllegalArgumentException("Surcharge cannot be null");
-        }
-        this.surcharges.add(surcharge);
-    }
-
-    public void removeOrderDetail(OrderDetail orderDetail) {
-        if (this.orderDetails != null && orderDetail != null) {
-            this.orderDetails.remove(orderDetail);
-        }
-    }
-    public void removeSurcharge(Surcharge surcharge) {
-        if (this.surcharges != null && surcharge != null) {
-            this.surcharges.remove(surcharge);
-        }
-    }
 
     @Override
     public boolean equals(Object o) {

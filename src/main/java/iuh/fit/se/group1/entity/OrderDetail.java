@@ -59,14 +59,19 @@ public class OrderDetail {
         this.createdAt = createdAt;
     }
 
-    public OrderDetail(BigDecimal unitPrice, Amenity amenity, int quantity, LocalDate createdAt) {
+    public OrderDetail(BigDecimal unitPrice, Amenity amenity, int quantity) {
         this.unitPrice = unitPrice;
         this.amenity = amenity;
         this.quantity = quantity;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDate.now();
     }
 
     public OrderDetail() {
+    }
+
+    public BigDecimal calcUnitPrice() {
+        //todo:
+        return null;
     }
 
     @Override

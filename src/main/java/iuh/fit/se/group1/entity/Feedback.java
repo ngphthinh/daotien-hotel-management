@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Feedback {
     private Long feedbackId;
@@ -47,6 +48,18 @@ public class Feedback {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Feedback feedback)) return false;
+        return Objects.equals(feedbackId, feedback.feedbackId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(feedbackId);
+    }
+
     @Override
     public String toString() {
         return "Feedback [feedbackId=" + feedbackId + ", content=" + content + ", customer=" + customer + ", rating="

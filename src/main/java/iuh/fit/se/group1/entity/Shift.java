@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Shift {
     private Long shiftId;
@@ -31,6 +32,18 @@ public class Shift {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Shift shift)) return false;
+        return Objects.equals(shiftId, shift.shiftId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(shiftId);
+    }
+
     @Override
     public String toString() {
         return "Shift [shiftId=" + shiftId + ", name=" + name + ", createdAt=" + createdAt + "]";

@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Role {
     private String roleId;
@@ -38,6 +39,17 @@ public class Role {
 
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Role role)) return false;
+        return Objects.equals(roleId, role.roleId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(roleId);
     }
 
     @Override

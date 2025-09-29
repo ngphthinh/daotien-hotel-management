@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Account {
     private Long accountId;
@@ -47,6 +48,18 @@ public class Account {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Account account)) return false;
+        return Objects.equals(accountId, account.accountId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(accountId);
+    }
+
     @Override
     public String toString() {
         return "Account [accountId=" + accountId + ", username=" + username + ", password=" + password + ", createdAt="

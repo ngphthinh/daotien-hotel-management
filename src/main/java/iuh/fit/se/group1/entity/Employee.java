@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Employee {
     private Long employeeId;
@@ -80,6 +81,18 @@ public class Employee {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Employee employee)) return false;
+        return Objects.equals(employeeId, employee.employeeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(employeeId);
+    }
+
     @Override
     public String toString() {
         return "Employee [employeeId=" + employeeId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email
