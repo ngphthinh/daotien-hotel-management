@@ -1,4 +1,98 @@
 package iuh.fit.se.group1.entity;
 
+import iuh.fit.se.group1.enums.RoomStatus;
+import java.time.LocalDate;
+
 public class Room {
+
+    private long roomId;
+    private String roomNumber;
+    private RoomType roomType;
+    private LocalDate createdAt;
+    private RoomStatus roomStatus;
+
+    public Room(long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus) {
+        this.roomId = roomId;
+        this.roomNumber = roomNumber;
+        this.roomType = roomType;
+        this.createdAt = createdAt;
+        this.roomStatus = roomStatus;
+    }
+
+    public Room() {
+    }
+
+    public Room(String roomNumber, RoomType roomType, RoomStatus roomStatus) {
+        this.roomNumber = roomNumber;
+        this.roomType = roomType;
+        this.roomStatus = roomStatus;
+    }
+
+    public long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(long roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    public LocalDate getCreateAt() {
+        return createdAt;
+    }
+
+    public void setCreateAt(LocalDate createAt) {
+        this.createdAt = createdAt;
+    }
+
+    public RoomStatus getRoomStatus() {
+        return roomStatus;
+    }
+
+    public void setRoomStatus(RoomStatus roomStatus) {
+        this.roomStatus = roomStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (int) (this.roomId ^ (this.roomId >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Room other = (Room) obj;
+        return this.roomId == other.roomId;
+    }
+
+    @Override
+    public String toString() {
+        return "Room{" + "roomId=" + roomId + ", roomNumber=" + roomNumber + ", roomType=" + roomType + ", createAt=" + createdAt + ", roomStatus=" + roomStatus + '}';
+    }
+    
 }
