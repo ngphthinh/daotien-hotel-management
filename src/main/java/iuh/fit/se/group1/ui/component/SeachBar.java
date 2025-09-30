@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 /**
  *
@@ -21,6 +23,7 @@ public class SeachBar extends javax.swing.JPanel {
     public SeachBar() {
         initComponents();
         setOpaque(false);
+        iconSearch.setIcon(FontIcon.of(FontAwesomeSolid.SEARCH, 20, Color.GRAY));
     }
 
     /**
@@ -46,7 +49,6 @@ public class SeachBar extends javax.swing.JPanel {
         });
 
         iconSearch.setBackground(new java.awt.Color(255, 255, 255));
-        iconSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/search.png"))); // NOI18N
         iconSearch.setMaximumSize(new java.awt.Dimension(20, 20));
         iconSearch.setMinimumSize(new java.awt.Dimension(20, 20));
         iconSearch.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -58,9 +60,9 @@ public class SeachBar extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(iconSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

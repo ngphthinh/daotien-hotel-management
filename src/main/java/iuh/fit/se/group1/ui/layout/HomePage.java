@@ -5,6 +5,9 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.util.Constants;
+import java.awt.Graphics;
+import javax.swing.ImageIcon;
+import java.awt.Image;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -17,9 +20,17 @@ public class HomePage extends javax.swing.JPanel {
     /**
      * Creates new form HomePage
      */
+    private Image backgroundImage;
     public HomePage() {
         initComponents();
         setSize(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME);
+        backgroundImage = new ImageIcon(getClass().getResource("/images/background.png")).getImage();
+    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // Vẽ hình nền full panel
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -50,23 +61,23 @@ public class HomePage extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(522, Short.MAX_VALUE)
+                .addContainerGap(739, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lblTitle)
-                        .addGap(488, 488, 488))
+                        .addGap(451, 451, 451))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lblXinChao)
-                        .addGap(570, 570, 570))))
+                        .addGap(525, 525, 525))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(384, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(391, Short.MAX_VALUE)
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblXinChao)
-                .addGap(433, 433, 433))
+                .addGap(399, 399, 399))
         );
     }// </editor-fold>//GEN-END:initComponents
 
