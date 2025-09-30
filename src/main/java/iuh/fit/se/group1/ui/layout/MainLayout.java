@@ -7,6 +7,7 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.util.Constants;
 
 import java.awt.*;
+import javax.swing.border.MatteBorder;
 
 /**
  * @author THIS PC
@@ -18,10 +19,22 @@ public class MainLayout extends javax.swing.JFrame {
      */
     public MainLayout() {
         initComponents();
+        footer1.setBorder(new MatteBorder(new Insets(1,0,0,0),Color.BLACK));
         setSize(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME);
-        menu.setMenuEvent((index, subIndex) -> System.out.println(index + " : " + subIndex));
+        menu.setMenuEvent((index, subIndex) -> {
+            if (index == 0) {
+                pnlContent.removeAll();
+                pnlContent.add(homePage);
+            } else if (index == 1) {
+                pnlContent.removeAll();
+                pnlContent.add(new RoomManagement());
+            }
+            pnlContent.repaint();
+            pnlContent.revalidate();
+        });
         pnlMain.setSize(new Dimension(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME));
         setResizable(false);
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -36,7 +49,9 @@ public class MainLayout extends javax.swing.JFrame {
         pnlMain = new javax.swing.JPanel();
         scrollPaneWin11 = new iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11();
         menu = new iuh.fit.se.group1.ui.component.menu.Menu();
-        logo1 = new iuh.fit.se.group1.ui.component.menu.Logo();
+        logo = new iuh.fit.se.group1.ui.component.menu.Logo();
+        pnlContent = new javax.swing.JPanel();
+        homePage = new iuh.fit.se.group1.ui.layout.HomePage();
         footer1 = new iuh.fit.se.group1.ui.component.menu.Footer();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -47,38 +62,60 @@ public class MainLayout extends javax.swing.JFrame {
         scrollPaneWin11.setBackground(new java.awt.Color(255, 255, 255));
         scrollPaneWin11.setViewportView(menu);
 
+        pnlContent.setBackground(new java.awt.Color(255, 255, 255));
+
+        homePage.setPreferredSize(new java.awt.Dimension(1200, 853));
+
+        javax.swing.GroupLayout pnlContentLayout = new javax.swing.GroupLayout(pnlContent);
+        pnlContent.setLayout(pnlContentLayout);
+        pnlContentLayout.setHorizontalGroup(
+            pnlContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1414, Short.MAX_VALUE)
+            .addGroup(pnlContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(homePage, javax.swing.GroupLayout.DEFAULT_SIZE, 1307, Short.MAX_VALUE))
+        );
+        pnlContentLayout.setVerticalGroup(
+            pnlContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 813, Short.MAX_VALUE)
+            .addGroup(pnlContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(homePage, javax.swing.GroupLayout.DEFAULT_SIZE, 813, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout pnlMainLayout = new javax.swing.GroupLayout(pnlMain);
         pnlMain.setLayout(pnlMainLayout);
         pnlMainLayout.setHorizontalGroup(
             pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMainLayout.createSequentialGroup()
-                .addGroup(pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(scrollPaneWin11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(logo1, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE))
-                    .addComponent(footer1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 1045, Short.MAX_VALUE))
+                .addGroup(pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(scrollPaneWin11, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(footer1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
+                    .addComponent(logo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlContent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlMainLayout.setVerticalGroup(
-            pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            pnlMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(pnlMainLayout.createSequentialGroup()
-                .addComponent(logo1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPaneWin11, javax.swing.GroupLayout.PREFERRED_SIZE, 408, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(scrollPaneWin11, javax.swing.GroupLayout.PREFERRED_SIZE, 477, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(footer1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addComponent(footer1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(pnlMainLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(pnlContent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1312, Short.MAX_VALUE)
+            .addComponent(pnlMain, javax.swing.GroupLayout.DEFAULT_SIZE, 1723, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlMain, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, 753, Short.MAX_VALUE)
         );
 
         pack();
@@ -122,8 +159,10 @@ public class MainLayout extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.menu.Footer footer1;
-    private iuh.fit.se.group1.ui.component.menu.Logo logo1;
+    private iuh.fit.se.group1.ui.layout.HomePage homePage;
+    private iuh.fit.se.group1.ui.component.menu.Logo logo;
     private iuh.fit.se.group1.ui.component.menu.Menu menu;
+    private javax.swing.JPanel pnlContent;
     private javax.swing.JPanel pnlMain;
     private iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11 scrollPaneWin11;
     // End of variables declaration//GEN-END:variables

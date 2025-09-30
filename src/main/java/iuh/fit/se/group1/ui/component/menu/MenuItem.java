@@ -22,7 +22,7 @@ public class MenuItem extends JButton {
 
     public MenuItem(String name, int index, boolean subMenuAble) {
         super(name);
-        this.setFont( new Font("Poppins", Font.BOLD, 14));
+        this.setFont( new Font("Poppins", Font.BOLD, 15));
         this.index = index;
         this.subMenuAble = subMenuAble;
         setContentAreaFilled(false);

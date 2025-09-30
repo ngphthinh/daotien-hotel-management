@@ -13,5 +13,5 @@ public class Constants {
     public static final Color LINE_SUBMENU = new Color(181, 181, 181);
 
     public static final int HEIGHT_FRAME = 800;
-    public static final int WIDTH_FRAME = 1300;
+    public static final int WIDTH_FRAME = 1400;
 }

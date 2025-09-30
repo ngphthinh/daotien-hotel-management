@@ -5,6 +5,11 @@
 package iuh.fit.se.group1.ui.component.menu;
 
 import iuh.fit.se.group1.util.Constants;
+import java.awt.Color;
+import java.awt.Cursor;
+import javax.swing.border.EmptyBorder;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 /**
  *
@@ -19,6 +24,11 @@ public class ProfileButton extends javax.swing.JPanel {
         initComponents();
         lblRoleName.setForeground(Constants.FOREGROUND_COLOR_MENU);
         lblFullName.setForeground(Constants.FOREGROUND_COLOR_MENU);
+        button1.setText("");
+        button1.setIcon(FontIcon.of(FontAwesomeSolid.SIGN_OUT_ALT, 18, Constants.FOREGROUND_COLOR_MENU));
+        button1.setBackground(Constants.BACKGROUND_COLOR_MENU);
+        button1.setBorder(new EmptyBorder(10,0,0,0));
+        button1.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     /**
@@ -33,6 +43,7 @@ public class ProfileButton extends javax.swing.JPanel {
         lblRoleName = new javax.swing.JLabel();
         lblAvartar = new iuh.fit.se.group1.ui.component.custom.CircleLabel();
         lblFullName = new javax.swing.JLabel();
+        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -53,10 +64,12 @@ public class ProfileButton extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(lblAvartar, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblRoleName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblFullName, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblFullName, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -64,16 +77,19 @@ public class ProfileButton extends javax.swing.JPanel {
                 .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblAvartar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRoleName)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblFullName)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(button1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(lblFullName))))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.custom.Button button1;
     private iuh.fit.se.group1.ui.component.custom.CircleLabel lblAvartar;
     private javax.swing.JLabel lblFullName;
     private javax.swing.JLabel lblRoleName;

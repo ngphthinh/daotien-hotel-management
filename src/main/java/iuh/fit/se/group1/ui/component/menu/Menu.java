@@ -52,15 +52,15 @@ public class Menu extends JComponent {
 
     private Icon getIcon(int index) {
         return switch (index) {
-            case 0 -> FontIcon.of(FontAwesomeSolid.HOME, 18, Constants.COLOR_ICON_MENU);
-            case 1 -> FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 18, Constants.COLOR_ICON_MENU);
-            case 2 -> FontIcon.of(FontAwesomeSolid.USERS, 16, Constants.COLOR_ICON_MENU);
-            case 3 -> FontIcon.of(FontAwesomeSolid.USER, 18, Constants.COLOR_ICON_MENU);
-            case 4 -> FontIcon.of(FontAwesomeSolid.CONCIERGE_BELL, 18, Constants.COLOR_ICON_MENU);
-            case 5 -> FontIcon.of(FontAwesomeSolid.GIFT, 18, Constants.COLOR_ICON_MENU);
-            case 6 -> FontIcon.of(FontAwesomeSolid.BED, 18, Constants.COLOR_ICON_MENU);
-            case 7 -> FontIcon.of(FontAwesomeSolid.CHART_BAR, 18, Constants.COLOR_ICON_MENU);
-            case 8 -> FontIcon.of(FontAwesomeSolid.QUESTION_CIRCLE, 18, Constants.COLOR_ICON_MENU);
+            case 0 -> FontIcon.of(FontAwesomeSolid.HOME, 16, Constants.COLOR_ICON_MENU);
+            case 1 -> FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 16, Constants.COLOR_ICON_MENU);
+            case 2 -> FontIcon.of(FontAwesomeSolid.USERS, 14, Constants.COLOR_ICON_MENU);
+            case 3 -> FontIcon.of(FontAwesomeSolid.USER, 16, Constants.COLOR_ICON_MENU);
+            case 4 -> FontIcon.of(FontAwesomeSolid.CONCIERGE_BELL, 16, Constants.COLOR_ICON_MENU);
+            case 5 -> FontIcon.of(FontAwesomeSolid.GIFT, 16, Constants.COLOR_ICON_MENU);
+            case 6 -> FontIcon.of(FontAwesomeSolid.BED, 16, Constants.COLOR_ICON_MENU);
+            case 7 -> FontIcon.of(FontAwesomeSolid.CHART_BAR, 16, Constants.COLOR_ICON_MENU);
+            case 8 -> FontIcon.of(FontAwesomeSolid.QUESTION_CIRCLE, 16, Constants.COLOR_ICON_MENU);
             default -> null;
         };
     }

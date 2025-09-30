@@ -25,11 +25,13 @@
               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
               <Component id="lblAvartar" min="-2" pref="61" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="lblRoleName" max="32767" attributes="0"/>
-                  <Component id="lblFullName" pref="165" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lblFullName" min="-2" pref="165" max="-2" attributes="0"/>
+                  <Component id="lblRoleName" min="-2" pref="159" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="18" max="32767" attributes="0"/>
+              <EmptySpace pref="20" max="32767" attributes="0"/>
+              <Component id="button1" min="-2" pref="49" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -39,13 +41,16 @@
               <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lblAvartar" min="-2" max="-2" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Component id="lblRoleName" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lblFullName" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="button1" max="32767" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Component id="lblRoleName" min="-2" pref="20" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="lblFullName" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
-              <EmptySpace pref="23" max="32767" attributes="0"/>
+              <EmptySpace pref="24" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -74,6 +79,8 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Nguy&#x1ec5;n Ph&#x1b0;&#x1edb;c Th&#x1ecb;nh"/>
       </Properties>
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
     </Component>
   </SubComponents>
 </Form>

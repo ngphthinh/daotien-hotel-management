@@ -29,6 +29,11 @@ public class Button extends JButton{
         
     }
 
+
+    /**
+     * Set border radius
+     * @param radius bán kính bo góc
+     */
     public void setBorderRadius(int radius) {
         this.borderRadius = radius;
         repaint();
@@ -47,6 +52,11 @@ public class Button extends JButton{
         super.paintComponent(g);
     }
 
+    /**
+     * Set icon and position of text
+     * @param icon
+     * @param textPosition lấy từ {@link SwingConstants}
+     */
     public void setIcon (Icon icon, int textPosition) {
         super.setIcon(icon);
         setHorizontalTextPosition(textPosition);
