@@ -14,4 +14,7 @@ public class Constants {
 
     public static final int HEIGHT_FRAME = 800;
     public static final int WIDTH_FRAME = 1400;
+    
+    public static final int HEIGHT_TABLE= 540;
+    public static final int WIDTH_TABLE=1034;
 }
