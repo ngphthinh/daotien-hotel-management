@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.util.Constants;
 import java.awt.Cursor;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -35,7 +36,7 @@ public class Logo extends javax.swing.JPanel {
         lblLogo = new javax.swing.JLabel();
         lblTitle = new javax.swing.JLabel();
         lblNameHotel = new javax.swing.JLabel();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnCloseSideBar = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(247, 169));
@@ -49,7 +50,7 @@ public class Logo extends javax.swing.JPanel {
 
         lblNameHotel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblNameHotel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblNameHotel.setText("Khách sạn đào tiên");
+        lblNameHotel.setText("Khách sạn Đào Tiên");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -61,7 +62,7 @@ public class Logo extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(49, 49, 49)
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnCloseSideBar, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -70,7 +71,7 @@ public class Logo extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnCloseSideBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -81,7 +82,7 @@ public class Logo extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
+    private iuh.fit.se.group1.ui.component.custom.Button btnCloseSideBar;
     private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel lblNameHotel;
     private javax.swing.JLabel lblTitle;
@@ -90,9 +91,14 @@ public class Logo extends javax.swing.JPanel {
     private void customUI() {
         lblTitle.setForeground(Constants.FOREGROUND_COLOR_MENU);
         lblNameHotel.setForeground(Constants.FOREGROUND_COLOR_MENU);
-        button1.setText("");
-         button1.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Constants.FOREGROUND_COLOR_MENU));
-         button1.setBackground(Constants.BACKGROUND_COLOR_MENU);
-                 button1.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCloseSideBar.setText("");
+         btnCloseSideBar.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Constants.FOREGROUND_COLOR_MENU));
+         btnCloseSideBar.setBackground(Constants.BACKGROUND_COLOR_MENU);
+                 btnCloseSideBar.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
+
+    public Button getBtnCloseSideBar() {
+        return btnCloseSideBar;
+    }
+    
 }

@@ -36,6 +36,7 @@ public class Button extends JButton{
      */
     public void setBorderRadius(int radius) {
         this.borderRadius = radius;
+        
         repaint();
     }
 
@@ -73,4 +74,6 @@ public class Button extends JButton{
 //
 //        g2.dispose();
 //    }
+
+
 }
