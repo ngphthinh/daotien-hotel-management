@@ -4,8 +4,6 @@
  */
 package iuh.fit.se.group1.ui.component.table;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -78,16 +76,6 @@ public class OrderTable extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Test OrderTable");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(new OrderTable());
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        });
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblOrder;

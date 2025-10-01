@@ -3,10 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package iuh.fit.se.group1.ui.component.table;
-
-import iuh.fit.se.group1.ui.component.table.PanelAction;
 import java.awt.Component;
-import java.awt.GridBagLayout;
+import java.awt.FlowLayout;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -19,15 +17,15 @@ public class TableActionCellRender extends DefaultTableCellRenderer{
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        Component com = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
         PanelAction action = new PanelAction();
         action.setOpaque(false);
-        if (isSelected) {
-            action.setBackground(table.getSelectionBackground());
-        } else {
-            action.setBackground(table.getBackground());
-        }
-        return action;
+
+        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        wrapper.setOpaque(true);
+        wrapper.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+        wrapper.add(action);
+
+        return wrapper;
     }
     
 }

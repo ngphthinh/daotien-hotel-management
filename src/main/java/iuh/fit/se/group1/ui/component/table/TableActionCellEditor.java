@@ -5,8 +5,10 @@
 package iuh.fit.se.group1.ui.component.table;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 
 /**
@@ -21,12 +23,22 @@ public class TableActionCellEditor extends DefaultCellEditor{
     }
 
     
-    @Override
+     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        PanelAction action= new PanelAction();
+        PanelAction action = new PanelAction();
         action.initEvent(event, row);
-        action.setBackground(table.getBackground());
-        return action;
+        action.setOpaque(false);
+         JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        wrapper.setOpaque(true);
+        wrapper.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+        wrapper.add(action);
+
+        return wrapper;
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+        return null;
     }
     
 }
