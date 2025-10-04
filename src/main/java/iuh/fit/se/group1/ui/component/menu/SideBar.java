@@ -4,6 +4,8 @@
  */
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
+
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
@@ -19,14 +21,25 @@ public class SideBar extends javax.swing.JPanel {
     public SideBar() {
         initComponents();
         footer1.setBorder(new MatteBorder(new Insets(1, 0, 0, 0), Color.BLACK));
-        menu1.setMenuEvent(new MenuEvent() {
-            @Override
-            public void selected(int index, int subIndex) {
-                System.out.println("Index: " + index + ", SubIndex: " + subIndex);
-            }
-        });
+
     }
-    
+
+    public Footer getFooter1() {
+        return footer1;
+    }
+
+    public Logo getLogo1() {
+        return logo1;
+    }
+
+    public Menu getMenu1() {
+        return menu1;
+    }
+
+    public ScrollPaneWin11 getScrollPaneWin111() {
+        return scrollPaneWin111;
+    }
+
     public JButton getCloseSideBar(){
         return logo1.getBtnCloseSideBar();
     }

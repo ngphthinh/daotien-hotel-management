@@ -8,12 +8,12 @@ package iuh.fit.se.group1.ui.layout;
  *
  * @author THIS PC
  */
-public class RoomManagement extends javax.swing.JPanel {
+public class RoomOccupancyStatistics extends javax.swing.JPanel {
 
     /**
-     * Creates new form RoomManagement
+     * Creates new form RoomOccupancyStatistics
      */
-    public RoomManagement() {
+    public RoomOccupancyStatistics() {
         initComponents();
     }
 
@@ -28,21 +28,23 @@ public class RoomManagement extends javax.swing.JPanel {
 
         cardLiquid1 = new iuh.fit.se.group1.ui.component.chart.CardLiquid();
 
+        setBackground(new java.awt.Color(248, 247, 248));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(176, 176, 176)
+                .addGap(92, 92, 92)
                 .addComponent(cardLiquid1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(311, Short.MAX_VALUE))
+                .addContainerGap(405, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(93, 93, 93)
+                .addGap(243, 243, 243)
                 .addComponent(cardLiquid1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(422, Short.MAX_VALUE))
+                .addContainerGap(260, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
