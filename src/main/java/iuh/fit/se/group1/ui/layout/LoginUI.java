@@ -5,10 +5,7 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.components.RoundedBorder;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+
 
 
 /**
