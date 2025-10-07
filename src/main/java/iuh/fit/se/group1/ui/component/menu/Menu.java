@@ -74,7 +74,7 @@ public class Menu extends JComponent {
         if (icon != null) {
             item.setIcon(icon);
         }
-        item.addActionListener(_ -> {
+        item.addActionListener(e -> {
             if (subMenuAble) {
                 if (!item.isSelected()) {
                     item.setSelected(true);
@@ -103,7 +103,7 @@ public class Menu extends JComponent {
         panel.setBackground(Constants.BACKGROUND_COLOR_MENU);
         for (int i = 1; i < length; i++) {
             MenuItem subItem = new MenuItem(menuItems[index][i], i, false);
-            subItem.addActionListener(_ -> {
+            subItem.addActionListener(e -> {
                 if (menuEvent != null) {
                     menuEvent.selected(index, subItem.getIndex());
                 }
