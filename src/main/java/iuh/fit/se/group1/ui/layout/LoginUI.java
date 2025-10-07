@@ -141,10 +141,10 @@ public class LoginUI extends javax.swing.JFrame {
                 .addGap(32, 32, 32))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 70, 350, 360));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 50, 350, 360));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/background.png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 800, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-60, -60, 800, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
