@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package iuh.fit.se.group1.ui.component;
+package iuh.fit.se.group1.ui.layout;
 
 /**
  *
- * @author hoxuy
+ * @author THIS PC
  */
-public class CustomerModel extends javax.swing.JPanel {
+public class RoomOccupancyStatistics extends javax.swing.JPanel {
 
     /**
-     * Creates new form CustomerModel
+     * Creates new form RoomOccupancyStatistics
      */
-    public CustomerModel() {
+    public RoomOccupancyStatistics() {
         initComponents();
     }
 
@@ -26,27 +26,30 @@ public class CustomerModel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        seviceModel1 = new iuh.fit.se.group1.ui.component.ServiceModal();
+        cardLiquid1 = new iuh.fit.se.group1.ui.component.chart.CardLiquid();
+
+        setBackground(new java.awt.Color(248, 247, 248));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(seviceModel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addGap(92, 92, 92)
+                .addComponent(cardLiquid1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(405, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(seviceModel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 166, Short.MAX_VALUE))
+                .addGap(243, 243, 243)
+                .addComponent(cardLiquid1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(260, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.ServiceModal seviceModel1;
+    private iuh.fit.se.group1.ui.component.chart.CardLiquid cardLiquid1;
     // End of variables declaration//GEN-END:variables
 }

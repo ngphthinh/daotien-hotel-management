@@ -4,9 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.custom;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import javax.swing.*;
 
 /**
@@ -21,12 +19,13 @@ public class Button extends JButton{
     public Button() {
         super("Button"); 
         setContentAreaFilled(false); // để tự vẽ nền
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     public Button(String text) {
         super(text);
         setContentAreaFilled(false);
-        
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
 
@@ -43,7 +42,6 @@ public class Button extends JButton{
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
         // Vẽ nền bo góc
         g2.setColor(getBackground());
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius);
@@ -73,4 +71,6 @@ public class Button extends JButton{
 //
 //        g2.dispose();
 //    }
+
+
 }

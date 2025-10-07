@@ -8,28 +8,41 @@ public class TextField extends JTextField {
     private int borderRadius = 15;
 
     public TextField() {
-        super();
-        setOpaque(false); // để tự vẽ nền
-        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // padding bên trong
+        init();
     }
 
     public TextField(String text) {
         super(text);
-        setOpaque(false);
-        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        init();
     }
 
+    private void init() {
+        setOpaque(false); // để tự vẽ nền
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // padding bên trong
+        setBackground(Color.WHITE); // đảm bảo nền trắng
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Vẽ nền bo góc
+        // 🌕 Nền trắng bo góc
         g2.setColor(getBackground());
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius);
 
-        g2.dispose();
+        // Vẽ text và caret (phải sau khi vẽ nền)
         super.paintComponent(g);
+
+        // ⚫ Viền đen bo góc (vẽ SAU CÙNG để không bị đè)
+        g2.setColor(Color.BLACK);
+        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, borderRadius, borderRadius);
+
+        g2.dispose();
+    }
+
+    public void setBorderRadius(int borderRadius) {
+        this.borderRadius = borderRadius;
+        repaint();
     }
 }

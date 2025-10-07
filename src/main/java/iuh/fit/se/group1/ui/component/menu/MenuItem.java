@@ -28,7 +28,7 @@ public class MenuItem extends JButton {
         setContentAreaFilled(false);
         setForeground(Constants.FOREGROUND_COLOR_MENU);
         setHorizontalAlignment(SwingConstants.LEFT);
-        setBorder(new EmptyBorder(12, 16, 12, 16));
+        setBorder(new EmptyBorder(12, 30, 12, 16));
         setIconTextGap(10);
         rippleEffect = new RippleEffect(this);
         rippleEffect.setRippleColor(new Color(220, 220, 220));
@@ -38,7 +38,7 @@ public class MenuItem extends JButton {
     public void initSubMenu(int subMenuIndex, int length) {
         this.subMenuIndex = subMenuIndex;
         this.length = length;
-        setBorder(new EmptyBorder(9, 35, 9, 10));
+        setBorder(new EmptyBorder(9, 45, 9, 10));
         setOpaque(false);
     }
 
@@ -51,11 +51,11 @@ public class MenuItem extends JButton {
             g2.setColor(Constants.LINE_SUBMENU);
             if (subMenuIndex == length - 1) {
                 //  Last Index
-                g2.drawLine(18, 0, 18, getHeight() / 2);
-                g2.drawLine(18, getHeight() / 2, 26, getHeight() / 2);
+                g2.drawLine(33, 0, 33, getHeight() / 2);
+                g2.drawLine(33, getHeight() / 2, 39, getHeight() / 2);
             } else {
-                g2.drawLine(18, 0, 18, getHeight());
-                g2.drawLine(18, getHeight() / 2, 26, getHeight() / 2);
+                g2.drawLine(33, 0, 33, getHeight());
+                g2.drawLine(33, getHeight() / 2, 39, getHeight() / 2);
             }
 
         }else if (subMenuAble) {

@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.custom;
 
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
@@ -15,11 +16,12 @@ import javax.swing.border.EmptyBorder;
  */
 public class ActionButton extends JButton{
     private boolean mousePress;
+
     public ActionButton(){
         setContentAreaFilled(false);
         setOpaque(false);
         setBorder(new EmptyBorder(3,3,3,3));
-//        setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)); 
+        setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         addMouseListener(new MouseAdapter(){
              @Override
             public void mouseEntered(MouseEvent e) {
@@ -28,7 +30,7 @@ public class ActionButton extends JButton{
 
             @Override
             public void mouseExited(MouseEvent e) {
-                setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+                setCursor(new java.awt.Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
@@ -42,6 +44,7 @@ public class ActionButton extends JButton{
             }
              
         });
+
     }
 
 //    @Override

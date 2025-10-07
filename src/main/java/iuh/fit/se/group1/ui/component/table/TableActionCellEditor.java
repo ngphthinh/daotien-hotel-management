@@ -12,23 +12,23 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 
 /**
- *
  * @author vietn
  */
-public class TableActionCellEditor extends DefaultCellEditor{
+public class TableActionCellEditor extends DefaultCellEditor {
     private TableActionEvent event;
+
     public TableActionCellEditor(TableActionEvent event) {
         super(new JCheckBox());
-        this.event=event;
+        this.event = event;
     }
 
-    
-     @Override
+
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         PanelAction action = new PanelAction();
         action.initEvent(event, row);
         action.setOpaque(false);
-         JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         wrapper.setOpaque(true);
         wrapper.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
         wrapper.add(action);
@@ -40,5 +40,5 @@ public class TableActionCellEditor extends DefaultCellEditor{
     public Object getCellEditorValue() {
         return null;
     }
-    
+
 }

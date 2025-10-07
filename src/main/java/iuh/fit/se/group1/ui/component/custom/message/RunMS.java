@@ -66,7 +66,7 @@ public class RunMS extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Massage obj = new Massage();
+        Message obj = new Message();
         obj.eventOK(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent ae) {
