@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import javax.swing.event.DocumentListener;
 
 /**
  *
@@ -55,7 +56,10 @@ public class HeaderCustom extends javax.swing.JPanel {
         g2.dispose();
         super.paintComponent(g);
     }
- 
+
+    public String getSearchText(){
+        return seachBar1.getTextSearch();
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -100,6 +104,9 @@ public class HeaderCustom extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+      public void handleSeacrh (DocumentListener listener){
+        seachBar1.handleSearch(listener);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

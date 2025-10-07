@@ -10,6 +10,7 @@ import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import iuh.fit.se.group1.util.Constants;
 
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -19,6 +20,7 @@ import raven.glasspanepopup.GlassPanePopup;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.DocumentListener;
 
 /**
  * @author THIS PC
@@ -72,7 +74,25 @@ public class AmenityManagement extends javax.swing.JPanel {
                 }
             }
         });
+        headerCustom1.handleSeacrh(new DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                String text = headerCustom1.getSearchText();
+                System.out.println("Search text in amenity search: " + text);
+            }
 
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+
+
+        });
     }
 
     /**
@@ -152,8 +172,9 @@ public class AmenityManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                modal.getjLabel1().setText("HIihihi");
+//                modal.getjLabel1().setText("HIihihi");
 //                GlassPanePopup.closePopupLast();
+                modal.getLblErrorPrice().setForeground(Color.red);
                 System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
             }
         });
