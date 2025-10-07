@@ -26,7 +26,7 @@ public class CustomerModel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        seviceModel1 = new iuh.fit.se.group1.ui.component.SeviceModel();
+        seviceModel1 = new iuh.fit.se.group1.ui.component.ServiceModal();
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -47,6 +47,6 @@ public class CustomerModel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.SeviceModel seviceModel1;
+    private iuh.fit.se.group1.ui.component.ServiceModal seviceModel1;
     // End of variables declaration//GEN-END:variables
 }

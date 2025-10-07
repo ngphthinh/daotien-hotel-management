@@ -4,9 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.custom;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import javax.swing.*;
 
 /**
@@ -21,12 +19,13 @@ public class Button extends JButton{
     public Button() {
         super("Button"); 
         setContentAreaFilled(false); // để tự vẽ nền
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     public Button(String text) {
         super(text);
         setContentAreaFilled(false);
-        
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
 
@@ -36,7 +35,6 @@ public class Button extends JButton{
      */
     public void setBorderRadius(int radius) {
         this.borderRadius = radius;
-        
         repaint();
     }
 

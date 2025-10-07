@@ -58,8 +58,8 @@ public class SeachBar extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(iconSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(17, Short.MAX_VALUE))
@@ -85,11 +85,11 @@ public class SeachBar extends javax.swing.JPanel {
 
         // Nền bo góc
         g2.setColor(getBackground());
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
 
         // Viền bo góc
         g2.setColor(Color.LIGHT_GRAY);
-        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 25, 25);
+        g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 50, 50);
 
         g2.dispose();
 

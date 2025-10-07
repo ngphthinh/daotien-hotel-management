@@ -4,6 +4,7 @@ package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.menu.*;
 import iuh.fit.se.group1.util.Constants;
+import raven.glasspanepopup.GlassPanePopup;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +16,8 @@ public class MainLayout extends JFrame {
     private JPanel pnlContent;
 
     public MainLayout() {
-       init();
+        init();
+        GlassPanePopup.install(this);
 
     }
 
@@ -42,9 +44,18 @@ public class MainLayout extends JFrame {
                     pnlMain.add(sideBar, BorderLayout.WEST);
                     pnlMain.revalidate();
                     pnlMain.repaint();
+                }
+                if (index == 0) {
+                    setMainContent(new HomePage());
+                } else if (index == 1) {
+                    setMainContent(new RoomManagement());
+                } else if (index == 7 && subIndex == 3) {
+                    setMainContent(new RoomOccupancyStatistics());
+                } else if (index == 6) {
+                    setMainContent(new AmenityManagement());
                 } else {
                     // Xử lý sự kiện khi một mục menu được chọn
-                    System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon" );
+                    System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                 }
             }
         });
@@ -74,9 +85,10 @@ public class MainLayout extends JFrame {
                     setMainContent(new RoomManagement());
                 } else if (index == 7 && subIndex == 3) {
                     setMainContent(new RoomOccupancyStatistics());
-                }
-                else {
-                    System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar" );
+                } else if (index == 4) {
+                    setMainContent(new AmenityManagement());
+                } else {
+                    System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar");
                 }
 
             }

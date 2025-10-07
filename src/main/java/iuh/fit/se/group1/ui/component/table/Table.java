@@ -4,7 +4,10 @@
  */
 package iuh.fit.se.group1.ui.component.table;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
 /**
  *
@@ -17,25 +20,40 @@ public class Table extends javax.swing.JPanel {
      */
     public Table() {
         initComponents();
+
+        // Tạo event bên ngoài
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row:"+row);
+                System.out.println("Edit row: " + row);
             }
 
             @Override
             public void onDelete(int row) {
-                if(tblOrder.isEditing()){
-                    tblOrder.getCellEditor().stopCellEditing();
+                if (tbl.isEditing()) {
+                    tbl.getCellEditor().stopCellEditing();
                 }
-                DefaultTableModel model= (DefaultTableModel) tblOrder.getModel();
+                DefaultTableModel model = (DefaultTableModel) tbl.getModel();
                 model.removeRow(row);
             }
         };
-        tblOrder.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender());
-        tblOrder.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(event));
+
+        setTableActionColumn(tbl, 4, event);
+
+        tbl.getTableHeader().setPreferredSize(new Dimension(tbl.getTableHeader().getWidth(), 35));
+        tbl.getTableHeader().setBackground(Color.decode("#B9B9B9"));
+        tbl.setShowGrid(true);
+        tbl.setGridColor(Color.LIGHT_GRAY); // màu đường kẻ ô
+    }
+    public void setTableActionColumn(JTable table, int columnIndex, TableActionEvent event) {
+        table.getColumnModel().getColumn(columnIndex)
+                .setCellRenderer(new TableActionCellRender());
+        table.getColumnModel().getColumn(columnIndex)
+                .setCellEditor(new TableActionCellEditor(event));
+
     }
 
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -45,10 +63,15 @@ public class Table extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblOrder = new javax.swing.JTable();
+        scr = new javax.swing.JScrollPane();
+        tbl = new javax.swing.JTable();
 
-        tblOrder.setModel(new javax.swing.table.DefaultTableModel(
+        setBackground(new java.awt.Color(241, 241, 241));
+
+        scr.setBackground(new java.awt.Color(255, 255, 255));
+
+        tbl.setBackground(new java.awt.Color(241, 241, 241));
+        tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -61,23 +84,42 @@ public class Table extends javax.swing.JPanel {
                 "Mã hoá đơn", "Họ tên khách", "Ngày tạo", "Số điện thoại", "Giá", "Loại phòng", "Chức năng"
             }
         ));
-        tblOrder.setRowHeight(40);
-        jScrollPane1.setViewportView(tblOrder);
+        tbl.setRowHeight(40);
+        scr.setViewportView(tbl);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1034, Short.MAX_VALUE)
+            .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 1034, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    public JScrollPane getScr() {
+        return scr;
+    }
+
+    public void setScr(JScrollPane scr) {
+        this.scr = scr;
+    }
+
+    public JTable getTbl() {
+        return tbl;
+    }
+
+    public void setTbl(JTable tbl) {
+        this.tbl = tbl;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblOrder;
+    private javax.swing.JScrollPane scr;
+    private javax.swing.JTable tbl;
     // End of variables declaration//GEN-END:variables
 }

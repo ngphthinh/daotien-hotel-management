@@ -14,12 +14,12 @@ import raven.glasspanepopup.GlassPanePopup;
 
 /**
  *
- * @author Windows
+ * @author Vien Thieu
  */
-public class Massage extends javax.swing.JPanel {
+public class Message extends javax.swing.JPanel {
 
 
-    public Massage() {
+    public Message() {
         initComponents();
         setOpaque(false);
         txt.setBackground(new Color(0,0,0,0)); 

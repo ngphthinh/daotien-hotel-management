@@ -33,7 +33,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="iuh.fit.se.group1.ui.component.SeviceModel" name="seviceModel1">
+    <Component class="iuh.fit.se.group1.ui.component.ServiceModal" name="seviceModel1">
     </Component>
   </SubComponents>
 </Form>
