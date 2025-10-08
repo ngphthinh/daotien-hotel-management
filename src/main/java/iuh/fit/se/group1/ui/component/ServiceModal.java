@@ -152,7 +152,6 @@ public class ServiceModal extends javax.swing.JPanel {
         lblTitle.setText("Thêm dịch vụ");
 
         btnClose.setBackground(new java.awt.Color(217, 217, 217));
-        btnClose.setForeground(new java.awt.Color(0, 0, 0));
         btnClose.setText("X");
 
         lblName.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
