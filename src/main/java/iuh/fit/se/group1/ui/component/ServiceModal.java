@@ -52,14 +52,15 @@ public class ServiceModal extends javax.swing.JPanel {
         this.btnSave = btnSave;
     }
 
-    public JLabel getjLabel2() {
-        return jLabel2;
+    public JLabel getLblErrorPrice() {
+        return lblErrorPrice;
     }
 
-    public void setjLabel2(JLabel jLabel2) {
-        this.jLabel2 = jLabel2;
+    public void setLblErrorPrice(JLabel lblErrorPrice) {
+        this.lblErrorPrice = lblErrorPrice;
     }
 
+   
     public JLabel getLblErrorName() {
         return lblErrorName;
     }
@@ -141,7 +142,7 @@ public class ServiceModal extends javax.swing.JPanel {
         txtName = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtPrice = new iuh.fit.se.group1.ui.component.custom.TextField();
         lblErrorName = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lblErrorPrice = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -185,8 +186,8 @@ public class ServiceModal extends javax.swing.JPanel {
         lblErrorName.setText("Không được để trống trường này");
         lblErrorName.setPreferredSize(new java.awt.Dimension(20, 0));
 
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("Giá không được bỏ trống");
+        lblErrorPrice.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrorPrice.setText("Giá không được bỏ trống");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -212,7 +213,7 @@ public class ServiceModal extends javax.swing.JPanel {
                     .addComponent(lblErrorName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE))
+                    .addComponent(lblErrorPrice, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -233,7 +234,7 @@ public class ServiceModal extends javax.swing.JPanel {
                     .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(13, 13, 13)
-                .addComponent(jLabel2)
+                .addComponent(lblErrorPrice)
                 .addGap(28, 28, 28)
                 .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27))
@@ -252,8 +253,8 @@ public class ServiceModal extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;
     private iuh.fit.se.group1.ui.component.custom.Button btnSave;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblErrorName;
+    private javax.swing.JLabel lblErrorPrice;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblPrice;
     private javax.swing.JLabel lblTitle;

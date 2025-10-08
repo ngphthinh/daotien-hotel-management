@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import javax.swing.event.DocumentListener;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -96,6 +97,15 @@ public class SeachBar extends javax.swing.JPanel {
         // Quan trọng: vẽ các component con (text field, label, ...)
         super.paintComponent(g);
     }
+    
+    public void handleSearch(DocumentListener listener){
+        txtSearch.getDocument().addDocumentListener(listener);
+    }
+
+    public String getTextSearch(){
+        return txtSearch.getText().trim();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel iconSearch;
     private javax.swing.JTextField txtSearch;
