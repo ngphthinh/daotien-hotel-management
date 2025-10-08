@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.menu.*;
+import iuh.fit.se.group1.ui.swing.Login;
 import iuh.fit.se.group1.util.Constants;
 import raven.glasspanepopup.GlassPanePopup;
 
@@ -16,6 +17,7 @@ public class MainLayout extends JPanel {
         init();
         setOpaque(false);
     }
+
     public void setAlpha(float alpha) {
         this.alpha = alpha;
         repaint();
@@ -23,12 +25,14 @@ public class MainLayout extends JPanel {
 
     private float alpha = 1f;
     private SideBar sideBar;
+
     @Override
     public void paint(Graphics grphcs) {
         Graphics2D g2 = (Graphics2D) grphcs;
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         super.paint(grphcs);
     }
+
     private void init() {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME));
@@ -88,6 +92,10 @@ public class MainLayout extends JPanel {
                     setMainContent(new RoomOccupancyStatistics());
                 } else if (index == 4) {
                     setMainContent(new AmenityManagement());
+                } else if (index == 2 && subIndex == 1) {
+                    setMainContent(new ShiftManagement());
+                } else if (index == 2 && subIndex == 2) {
+                    setMainContent(new EmployeeManagement());
                 } else {
                     System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar");
                 }
@@ -101,17 +109,38 @@ public class MainLayout extends JPanel {
         pnlContent.revalidate();
         pnlContent.repaint();
     }
-    public JButton getBtnSignOut(){
+
+    public JButton getBtnSignOut() {
         return sideBar.getBtnSignOut();
     }
+
+
     public static void main(String args[]) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Main Layout");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME);
-            frame.setLocationRelativeTo(null);
-            frame.setContentPane(new MainLayout());
-            frame.setVisible(true);
-        });
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> {
+                    JFrame frame = new JFrame("Main Layout");
+                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    frame.setSize(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME);
+                    frame.setLocationRelativeTo(null);
+                    frame.setContentPane(new MainLayout());
+                    frame.setVisible(true);
+                }
+        );
     }
 }

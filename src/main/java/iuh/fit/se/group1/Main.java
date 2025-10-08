@@ -2,7 +2,7 @@ package iuh.fit.se.group1;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 
-import iuh.fit.se.group1.ui.layout.LoginUI;
+
 import javax.swing.SwingUtilities;
 
 
