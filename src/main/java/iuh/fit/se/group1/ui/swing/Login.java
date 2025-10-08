@@ -21,7 +21,7 @@ import raven.glasspanepopup.GlassPanePopup;
  * @author Administrator
  */
 public class Login extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());
 
     /**
@@ -31,20 +31,35 @@ public class Login extends javax.swing.JFrame {
     private Animator animatorBody;
     private boolean signIn;
     JButton btnEye = new JButton();
+
     public Login() {
         initComponents();
-        background1.setLayout(new javax.swing.OverlayLayout(background1));
-        panelLogin.setAlignmentX(0.5f); // căn giữa theo X
-        panelLogin.setAlignmentY(0.5f); // căn giữa theo Y
+        // ⚙️ Bỏ layout mặc định để điều khiển vị trí thủ công
+        background1.setLayout(null);
+
+// Thêm hai panel chính
         background1.add(panelLogin);
         background1.add(panelBody);
-        this.addComponentListener(new java.awt.event.ComponentAdapter() {
+
+// Ẩn body khi chưa đăng nhập
+        panelBody.setVisible(false);
+
+// Căn giữa và tự co giãn theo frame
+        addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
-                panelLogin.setLocation(
-                    (getWidth() - panelLogin.getWidth()) / 2,
-                    (getHeight() - panelLogin.getHeight()) / 2
-                );
+                int w = getWidth();
+                int h = getHeight();
+
+                // Căn giữa panelLogin
+                int pw = panelLogin.getPreferredSize().width;
+                int ph = panelLogin.getPreferredSize().height;
+                int x = (w - pw) / 2;
+                int y = (h - ph) / 2;
+                panelLogin.setBounds(x, y, pw, ph);
+
+                // Panel body luôn full frame
+                panelBody.setBounds(0, 0, w, h);
             }
         });
         btnEye.setIcon(FontIcon.of(FontAwesomeSolid.EYE, 20)); // 20px, to hơn mặc định
@@ -66,7 +81,7 @@ public class Login extends javax.swing.JFrame {
         // Bật/tắt mật khẩu
         btnEye.addActionListener(e -> {
             if (txtPass.getEchoChar() != '\u0000') {
-                txtPass.setEchoChar((char)0);
+                txtPass.setEchoChar((char) 0);
                 btnEye.setIcon(FontIcon.of(FontAwesomeSolid.EYE_SLASH, 20));
             } else {
                 txtPass.setEchoChar('•');
@@ -76,12 +91,12 @@ public class Login extends javax.swing.JFrame {
         GlassPanePopup.install(this);
         getContentPane().setBackground(new Color(245, 245, 245));
         handleSignOut();
-        
+
         jButton1.setBorderPainted(false); // tắt viền
         jButton1.setContentAreaFilled(false); // tắt nền mặc định
         jButton1.setFocusPainted(false); // tắt viền focus khi nhấn
         jButton1.setOpaque(false); // trong suốt
-        
+
         TimingTarget targetLogin = new TimingTargetAdapter() {
             @Override
             public void timingEvent(float fraction) {
@@ -131,7 +146,7 @@ public class Login extends javax.swing.JFrame {
         animatorBody = new Animator(10, targetBody);
         animatorLogin.setResolution(0);
         animatorBody.setResolution(0);
-        
+
     }
 
     /**
@@ -296,17 +311,19 @@ public class Login extends javax.swing.JFrame {
         txtPass.setEditable(action);
         btnSignIn.setEnabled(action);
     }
-    private void handleSignOut(){
+
+    private void handleSignOut() {
         panelBody.getBtnSignOut().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 signIn = false;
                 clearLogin();
                 animatorBody.start();
-                System.err.println("VietDEPTRAI");
             }
         });
-    };
+    }
+
+    ;
 //    private void cmdSignOutActionPerformed(java.awt.event.ActionEvent evt) {                                          
 //            signIn = false;
 //            clearLogin();
@@ -318,6 +335,7 @@ public class Login extends javax.swing.JFrame {
         txtUser.setHelperText("");
         txtPass.setHelperText("");
     }
+
     /**
      * @param args the command line arguments
      */

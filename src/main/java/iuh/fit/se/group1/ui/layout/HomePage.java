@@ -25,7 +25,38 @@ public class HomePage extends javax.swing.JPanel {
         initComponents();
         setSize(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME);
         backgroundImage = new ImageIcon(getClass().getResource("/images/background.png")).getImage();
+       setLayout(null);
+
+// Cho phép Swing tính lại kích thước thật sau khi font render xong
+SwingUtilities.invokeLater(() -> {
+    // Lấy kích thước thật sau khi render
+    lblTitle.setSize(lblTitle.getPreferredSize());
+    lblXinChao.setSize(lblXinChao.getPreferredSize());
+    centerLabels();
+});
+
+// Lắng nghe khi resize frame/panel để tự căn giữa lại
+addComponentListener(new java.awt.event.ComponentAdapter() {
+    @Override
+    public void componentResized(java.awt.event.ComponentEvent e) {
+        centerLabels();
     }
+});
+    }
+    private void centerLabels() {
+    int parentWidth = getWidth();
+    int parentHeight = getHeight();
+
+    int totalHeight = lblTitle.getHeight() + 10 + lblXinChao.getHeight();
+
+    int startY = (parentHeight - totalHeight) / 2;
+
+    int xTitle = (parentWidth - lblTitle.getWidth()) / 2;
+    int xXinChao = (parentWidth - lblXinChao.getWidth()) / 2;
+
+    lblTitle.setLocation(xTitle, startY);
+    lblXinChao.setLocation(xXinChao, startY + lblTitle.getHeight() + 10);
+}
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
