@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.util.Constants;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -24,13 +25,22 @@ public class ProfileButton extends javax.swing.JPanel {
         initComponents();
         lblRoleName.setForeground(Constants.FOREGROUND_COLOR_MENU);
         lblFullName.setForeground(Constants.FOREGROUND_COLOR_MENU);
-        button1.setText("");
-        button1.setIcon(FontIcon.of(FontAwesomeSolid.SIGN_OUT_ALT, 18, Constants.FOREGROUND_COLOR_MENU));
-        button1.setBackground(Constants.BACKGROUND_COLOR_MENU);
-        button1.setBorder(new EmptyBorder(10,0,0,0));
-        button1.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSignOut.setText("");
+        btnSignOut.setIcon(FontIcon.of(FontAwesomeSolid.SIGN_OUT_ALT, 18, Constants.FOREGROUND_COLOR_MENU));
+        btnSignOut.setBackground(Constants.BACKGROUND_COLOR_MENU);
+        btnSignOut.setBorder(new EmptyBorder(10,0,0,0));
+        btnSignOut.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+    
+    public Button getBtnSignOut() {
+        return btnSignOut;
+    }
+
+    public void setBtnSignOut(Button btnSignOut) {
+        this.btnSignOut = btnSignOut;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -43,7 +53,7 @@ public class ProfileButton extends javax.swing.JPanel {
         lblRoleName = new javax.swing.JLabel();
         lblAvartar = new iuh.fit.se.group1.ui.component.custom.CircleLabel();
         lblFullName = new javax.swing.JLabel();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnSignOut = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -68,7 +78,7 @@ public class ProfileButton extends javax.swing.JPanel {
                     .addComponent(lblFullName, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnSignOut, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -78,7 +88,7 @@ public class ProfileButton extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblAvartar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(button1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSignOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -89,7 +99,7 @@ public class ProfileButton extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
+    private iuh.fit.se.group1.ui.component.custom.Button btnSignOut;
     private iuh.fit.se.group1.ui.component.custom.CircleLabel lblAvartar;
     private javax.swing.JLabel lblFullName;
     private javax.swing.JLabel lblRoleName;

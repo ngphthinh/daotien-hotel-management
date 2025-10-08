@@ -1,4 +1,4 @@
-package iuh.fit.se.group1.swing;
+package iuh.fit.se.group1.ui.swing;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,13 +12,13 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTarget;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
 
-public class PasswordField extends JPasswordField {
+public class TextField extends JTextField {
 
     public String getHelperText() {
         return helperText;
@@ -55,7 +55,7 @@ public class PasswordField extends JPasswordField {
     private int spaceHelperText = 15;
     private Color lineColor = new Color(3, 155, 216);
 
-    public PasswordField() {
+    public TextField() {
         setBorder(new EmptyBorder(20, 3, 23, 3));
         setSelectionColor(new Color(76, 204, 255));
         addMouseListener(new MouseAdapter() {

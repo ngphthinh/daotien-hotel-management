@@ -152,7 +152,7 @@ public class AmenityManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                modal.getjLabel1().setText("HIihihi");
+//                modal.getjLabel1().setText("HIihihi");
 //                GlassPanePopup.closePopupLast();
                 System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
             }

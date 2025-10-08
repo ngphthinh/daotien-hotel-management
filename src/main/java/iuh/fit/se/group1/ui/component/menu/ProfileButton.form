@@ -30,7 +30,7 @@
                   <Component id="lblRoleName" min="-2" pref="159" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="20" max="32767" attributes="0"/>
-              <Component id="button1" min="-2" pref="49" max="-2" attributes="0"/>
+              <Component id="btnSignOut" min="-2" pref="49" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -42,7 +42,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lblAvartar" min="-2" max="-2" attributes="0"/>
                   <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="button1" max="32767" attributes="0"/>
+                      <Component id="btnSignOut" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Component id="lblRoleName" min="-2" pref="20" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -80,7 +80,7 @@
         <Property name="text" type="java.lang.String" value="Nguy&#x1ec5;n Ph&#x1b0;&#x1edb;c Th&#x1ecb;nh"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnSignOut">
     </Component>
   </SubComponents>
 </Form>

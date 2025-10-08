@@ -1,4 +1,4 @@
-package iuh.fit.se.group1.swing;
+package iuh.fit.se.group1.ui.swing;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

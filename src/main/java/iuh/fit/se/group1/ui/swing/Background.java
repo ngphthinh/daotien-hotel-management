@@ -1,4 +1,4 @@
-package iuh.fit.se.group1.swing;
+package iuh.fit.se.group1.ui.swing;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -60,9 +60,10 @@ public class Background extends JPanel {
         g2.setColor(new Color(157, 153, 255));
         g2.fill(createShape(height, 70, 20, 60, 20, 70));
         int bgHeight = (int) (getHeight() * (1f - easeInOutCirc(animate)));
-        bgHeight += header;
+        if (bgHeight < 0) bgHeight = 0;
         g2.setColor(new Color(245, 245, 245));
-        g2.fillRect(0, bgHeight, getWidth(), getHeight());
+        g2.fillRect(0, bgHeight, getWidth(), getHeight() - bgHeight);
+
         g2.dispose();
         if (showPaint) {
             super.paint(grphcs);
