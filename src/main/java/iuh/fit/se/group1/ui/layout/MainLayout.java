@@ -86,7 +86,7 @@ public class MainLayout extends JPanel {
             public void selected(int index, int subIndex) {
                 if (index == 0) {
                     setMainContent(homePage);
-                } else if (index == 1) {
+                } else if (index == 6) {
                     setMainContent(new RoomManagement());
                 } else if (index == 7 && subIndex == 3) {
                     setMainContent(new RoomOccupancyStatistics());

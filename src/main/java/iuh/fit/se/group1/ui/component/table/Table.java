@@ -10,7 +10,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 /**
- *
  * @author vietn
  */
 public class Table extends javax.swing.JPanel {
@@ -38,22 +37,29 @@ public class Table extends javax.swing.JPanel {
             }
         };
 
-        setTableActionColumn(tbl, 4, event);
+        setTableActionColumn(tbl, 4, event, false);
 
         tbl.getTableHeader().setPreferredSize(new Dimension(tbl.getTableHeader().getWidth(), 35));
         tbl.getTableHeader().setBackground(Color.decode("#B9B9B9"));
         tbl.setShowGrid(true);
         tbl.setGridColor(Color.LIGHT_GRAY); // màu đường kẻ ô
     }
-    public void setTableActionColumn(JTable table, int columnIndex, TableActionEvent event) {
-        table.getColumnModel().getColumn(columnIndex)
-                .setCellRenderer(new TableActionCellRender());
-        table.getColumnModel().getColumn(columnIndex)
-                .setCellEditor(new TableActionCellEditor(event));
 
+    //    public void setTableActionColumn(JTable table, int columnIndex, TableActionEvent event, boolean isView ) {
+//        table.getColumnModel().getColumn(columnIndex)
+//                .setCellRenderer(new TableActionCellRender());
+//        table.getColumnModel().getColumn(columnIndex)
+//                .setCellEditor(new TableActionCellEditor(event));
+//
+//    }
+    public void setTableActionColumn(JTable table, int columnIndex, TableActionEvent event, boolean isView) {
+        table.getColumnModel().getColumn(columnIndex)
+                .setCellRenderer(new TableActionCellRender(isView));
+        table.getColumnModel().getColumn(columnIndex)
+                .setCellEditor(new TableActionCellEditor(event, isView));
     }
 
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -72,17 +78,17 @@ public class Table extends javax.swing.JPanel {
 
         tbl.setBackground(new java.awt.Color(241, 241, 241));
         tbl.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Mã hoá đơn", "Họ tên khách", "Ngày tạo", "Số điện thoại", "Giá", "Loại phòng", "Chức năng"
-            }
+                new Object[][]{
+                        {null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null}
+                },
+                new String[]{
+                        "Mã hoá đơn", "Họ tên khách", "Ngày tạo", "Số điện thoại", "Giá", "Loại phòng", "Chức năng"
+                }
         ));
         tbl.setRowHeight(40);
         scr.setViewportView(tbl);
@@ -90,15 +96,15 @@ public class Table extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 1034, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 1034, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(17, 17, 17)
+                                .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
