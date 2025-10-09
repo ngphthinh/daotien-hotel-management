@@ -57,7 +57,7 @@ public class RoomManagement extends javax.swing.JPanel {
                 model.removeRow(row);
             }
         };
-        tblRoom.setTableActionColumn(tblRoom.getTbl(), 4, event);
+        tblRoom.setTableActionColumn(tblRoom.getTbl(), 4, event,false);
         tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(250);  // chiều rộng mong muốn
         tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(250);
         tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(250);
@@ -131,7 +131,7 @@ public class RoomManagement extends javax.swing.JPanel {
         });
 
 
-        headerCustom.handleSeacrh(new DocumentListener() {
+        headerCustom.handleSearch(new DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
                 String text = headerCustom.getSearchText();

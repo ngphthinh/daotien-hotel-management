@@ -9,6 +9,7 @@ package iuh.fit.se.group1.ui.component.table;
  * @author vietn
  */
 public interface TableActionEvent {
-    public void onEdit(int row);
-    public void onDelete(int row);
+    void onEdit(int row);
+    void onDelete(int row);
+    default void onView(int row) {}
 }
