@@ -145,6 +145,7 @@ public class ShiftCard extends javax.swing.JPanel {
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMinimumSize(new java.awt.Dimension(500, 300));
+        setPreferredSize(new java.awt.Dimension(450, 275));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
@@ -154,7 +155,7 @@ public class ShiftCard extends javax.swing.JPanel {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel2.setText("13H-18H");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 460, 50));
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 410, 50));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel3.setText("Nguyễn Chí Tâm");
@@ -166,13 +167,13 @@ public class ShiftCard extends javax.swing.JPanel {
 
         jButton1.setText("jButton1");
         jButton1.setPreferredSize(new java.awt.Dimension(60, 60));
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(385, 180, 70, 70));
+        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 180, 70, 70));
     }// </editor-fold>//GEN-END:initComponents
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Test ShiftCard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 300);
+        frame.setSize(450, 275);
         frame.setLocationRelativeTo(null);
 
         ShiftCard card = new ShiftCard();
