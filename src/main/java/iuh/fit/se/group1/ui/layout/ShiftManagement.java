@@ -62,41 +62,34 @@ public class ShiftManagement extends javax.swing.JPanel {
         });
         centerPanel();
 
-        // Khi resize thì căn lại
         addComponentListener(new java.awt.event.ComponentAdapter() {
-            @Override
-            public void componentResized(java.awt.event.ComponentEvent e) {
-                centerPanel();
-            }
-        });
+        @Override
+        public void componentResized(java.awt.event.ComponentEvent e) {
+            centerPanel();
+        }
+    });
 
-        // Khi layout bị cập nhật (VD: đóng/mở menu, thay đổi view, v.v.)
-        addHierarchyListener(e -> {
-            if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0
-                    || (e.getChangeFlags() & java.awt.event.HierarchyEvent.DISPLAYABILITY_CHANGED) != 0) {
-                javax.swing.SwingUtilities.invokeLater(() -> centerPanel());
-            }
-        });
+    // Chỉ căn lại khi panel hiển thị lần đầu
+    addHierarchyListener(e -> {
+        if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0 && isShowing()) {
+            javax.swing.SwingUtilities.invokeLater(this::centerPanel);
+        }
+    });
     }
-
     private void centerPanel() {
-    removeAll(); // Xóa hết component cũ
-    setLayout(null); // Freelayout hoàn toàn
+    if (panelShiftCard == null) return;
+    int parentWidth = getWidth();
+    int parentHeight = getHeight();
+    int panelWidth = panelShiftCard.getWidth();
+    int panelHeight = panelShiftCard.getHeight();
+    if (parentWidth == 0 || parentHeight == 0) return;
 
-    // Header vẫn để top
-    headerShift1.setBounds(0, 0, getWidth(), 80);
-    add(headerShift1);
+    int x = (parentWidth - panelWidth) / 2;
+    int y = (parentHeight - panelHeight) / 2 + 30;
 
-    // Tính vị trí căn giữa cho panelShiftCard
-    int panelWidth = panelShiftCard.getPreferredSize().width;
-    int panelHeight = panelShiftCard.getPreferredSize().height;
-
-    int x = (getWidth() - panelWidth) / 2;
-    int y = 80 + (getHeight() - 80 - panelHeight) / 2; // 80 là height header
-
-    panelShiftCard.setBounds(x, y, panelWidth, panelHeight);
-    add(panelShiftCard);
-
+    // Cập nhật lại vị trí theo AbsoluteConstraints
+    ((org.netbeans.lib.awtextra.AbsoluteLayout)getLayout())
+        .addLayoutComponent(panelShiftCard, new org.netbeans.lib.awtextra.AbsoluteConstraints(x, y, panelWidth, panelHeight));
     revalidate();
     repaint();
 }
@@ -160,7 +153,7 @@ public class ShiftManagement extends javax.swing.JPanel {
                         .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(iconDate, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelShiftCardLayout.setVerticalGroup(
             panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,7 +184,7 @@ public class ShiftManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(headerShift1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(0, 0, 0)
                 .addComponent(panelShiftCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
