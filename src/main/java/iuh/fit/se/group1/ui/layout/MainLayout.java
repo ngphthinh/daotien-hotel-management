@@ -63,7 +63,7 @@ public class MainLayout extends JPanel {
                     setMainContent(new RoomOccupancyStatistics());
                 } else if (index == 6) {
                     setMainContent(new AmenityManagement());
-                } else {
+                }  else {
                     System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                 }
             }
@@ -96,7 +96,13 @@ public class MainLayout extends JPanel {
                     setMainContent(new ShiftManagement());
                 } else if (index == 2 && subIndex == 2) {
                     setMainContent(new EmployeeManagement());
-                } else {
+                } else if (index == 3) {
+                    setMainContent(new CustomerManagement());
+                }else if (index == 5) {
+                    setMainContent(new PromotionManagement());
+                }else 
+                    
+                {
                     System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar");
                 }
             }
@@ -136,6 +142,7 @@ public class MainLayout extends JPanel {
         java.awt.EventQueue.invokeLater(() -> {
                     JFrame frame = new JFrame("Main Layout");
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    GlassPanePopup.install(frame);
                     frame.setSize(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME);
                     frame.setLocationRelativeTo(null);
                     frame.setContentPane(new MainLayout());

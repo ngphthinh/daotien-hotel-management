@@ -4,34 +4,77 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import com.raven.datechooser.DateChooser;
+import com.raven.datechooser.SelectedAction;
+import com.raven.datechooser.SelectedDate;
+import iuh.fit.se.group1.util.Constants;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagLayout;
+import java.text.SimpleDateFormat;
+import javax.swing.JButton;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
+import java.util.Date;
+import javax.swing.JPanel;
+
+
+
 /**
  *
  * @author THIS PC
  */
 public class ShiftManagement extends javax.swing.JPanel {
 
+    private DateChooser dateChooser;
+
     /**
      * Creates new form ShiftManagement
      */
     public ShiftManagement() {
         initComponents();
+
+
+        txtDate.setEditable(false);
+        txtDate.setFocusable(false);
+        txtDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        iconDate.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
+        iconDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        dateChooser = new DateChooser();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        txtDate.setText(sdf.format(new Date()));
+        dateChooser.setDateFormat("dd/MM/yyyy");
+        dateChooser.toDay();
+        dateChooser.setForeground(Constants.COLOR_ICON_MENU);
+        dateChooser.addEventDateChooser((action, date) -> {
+            if (action.getAction() == SelectedAction.DAY_SELECTED) {
+                dateChooser.hidePopup();
+            }
+        });
+        dateChooser.setTextRefernce(txtDate);
+        iconDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                dateChooser.showPopup(txtDate, 0, txtDate.getHeight());
+            }
+        });
         centerPanel();
 
-    // Khi resize thì căn lại
-    addComponentListener(new java.awt.event.ComponentAdapter() {
-        @Override
-        public void componentResized(java.awt.event.ComponentEvent e) {
-            centerPanel();
-        }
-    });
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                centerPanel();
+            }
+        });
 
-    // Khi layout bị cập nhật (VD: đóng/mở menu, thay đổi view, v.v.)
-    addHierarchyListener(e -> {
-        if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0
-                || (e.getChangeFlags() & java.awt.event.HierarchyEvent.DISPLAYABILITY_CHANGED) != 0) {
-            javax.swing.SwingUtilities.invokeLater(() -> centerPanel());
-        }
-    });
+        // Chỉ căn lại khi panel hiển thị lần đầu
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0 && isShowing()) {
+                javax.swing.SwingUtilities.invokeLater(this::centerPanel);
+            }
+        });
     }
     private void centerPanel() {
         if (panelShiftCard == null) return;
@@ -39,16 +82,18 @@ public class ShiftManagement extends javax.swing.JPanel {
         int parentHeight = getHeight();
         int panelWidth = panelShiftCard.getWidth();
         int panelHeight = panelShiftCard.getHeight();
-
         if (parentWidth == 0 || parentHeight == 0) return;
 
         int x = (parentWidth - panelWidth) / 2;
         int y = (parentHeight - panelHeight) / 2 + 30;
 
-        panelShiftCard.setLocation(x, y);
+        // Cập nhật lại vị trí theo AbsoluteConstraints
+        ((org.netbeans.lib.awtextra.AbsoluteLayout)getLayout())
+                .addLayoutComponent(panelShiftCard, new org.netbeans.lib.awtextra.AbsoluteConstraints(x, y, panelWidth, panelHeight));
+        revalidate();
+        repaint();
     }
 
-   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,52 +103,110 @@ public class ShiftManagement extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        headerShift1 = new iuh.fit.se.group1.ui.component.HeaderShift();
         panelShiftCard = new javax.swing.JPanel();
-        shiftCard1 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
-        shiftCard6 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
-        shiftCard7 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
-        shiftCard2 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        shiftCard3 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        shiftCard4 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        shiftCard5 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        shiftCard8 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        jLabel1 = new javax.swing.JLabel();
+        txtDate = new javax.swing.JTextField();
+        iconDate = new javax.swing.JLabel();
 
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setBackground(new java.awt.Color(241, 241, 241));
+        setOpaque(false);
+
+        panelShiftCard.setBackground(new java.awt.Color(241, 241, 241));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel1.setText("Danh sách ca làm");
+
+        txtDate.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtDate.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        txtDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDateActionPerformed(evt);
+            }
+        });
+
+        iconDate.setText(" ");
 
         javax.swing.GroupLayout panelShiftCardLayout = new javax.swing.GroupLayout(panelShiftCard);
         panelShiftCard.setLayout(panelShiftCardLayout);
         panelShiftCardLayout.setHorizontalGroup(
-            panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelShiftCardLayout.createSequentialGroup()
-                .addGap(77, 77, 77)
-                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(shiftCard7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(shiftCard1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(35, 35, 35)
-                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(shiftCard6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(shiftCard2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(78, Short.MAX_VALUE))
+                panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelShiftCardLayout.createSequentialGroup()
+                                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(panelShiftCardLayout.createSequentialGroup()
+                                                .addGap(84, 84, 84)
+                                                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(shiftCard3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(shiftCard4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGroup(panelShiftCardLayout.createSequentialGroup()
+                                                .addGap(36, 36, 36)
+                                                .addComponent(jLabel1)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(shiftCard5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(shiftCard8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShiftCardLayout.createSequentialGroup()
+                                                .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(iconDate, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelShiftCardLayout.setVerticalGroup(
-            panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelShiftCardLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(shiftCard1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .addComponent(shiftCard6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(shiftCard7, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .addComponent(shiftCard2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShiftCardLayout.createSequentialGroup()
+                                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                                        .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(iconDate, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(shiftCard5, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(shiftCard3, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(shiftCard8, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(shiftCard4, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(34, 34, 34))
         );
 
-        add(panelShiftCard, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 1150, 620));
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(headerShift1, javax.swing.GroupLayout.DEFAULT_SIZE, 1165, Short.MAX_VALUE)
+                        .addComponent(panelShiftCard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(headerShift1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addComponent(panelShiftCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
+        );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDateActionPerformed
+
+    }//GEN-LAST:event_txtDateActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.HeaderShift headerShift1;
+    private javax.swing.JLabel iconDate;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel panelShiftCard;
-    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard1;
-    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard2;
-    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard6;
-    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard7;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard3;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard4;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard5;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard8;
+    private javax.swing.JTextField txtDate;
     // End of variables declaration//GEN-END:variables
 }
