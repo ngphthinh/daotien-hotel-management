@@ -33,8 +33,8 @@ public class PromotionManagement extends javax.swing.JPanel {
         button1.setBorderRadius(40);
         button1.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         headerCustom1.getjLabel1().setText(
-        "<html><span style='color:white;'>Quản lí khuyến mãi</span>");
-        headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 25));
+        "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
+        headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
         String cols[] = {"Mã khuyến mãi", "Tên khuyến mãi", "Giá khuyến mãi", "Ngày tạo","Ngày hết hạn","Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 10);
         tblPromotion.getTbl().setModel(model);
@@ -108,8 +108,8 @@ public class PromotionManagement extends javax.swing.JPanel {
         });
 
         jLabel1.setBackground(new java.awt.Color(131, 131, 131));
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(131, 131, 131));
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
         jLabel1.setText("Danh sách khuyến mãi");
 
         tblPromotion.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
@@ -119,7 +119,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
+                .addGap(36, 36, 36)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -139,7 +139,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                     .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addGap(18, 18, 18)
-                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
+                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 608, Short.MAX_VALUE)
                 .addGap(31, 31, 31))
         );
     }// </editor-fold>//GEN-END:initComponents

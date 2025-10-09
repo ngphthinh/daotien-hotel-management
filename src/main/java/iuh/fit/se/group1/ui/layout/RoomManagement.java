@@ -32,7 +32,7 @@ public class RoomManagement extends javax.swing.JPanel {
      */
     public RoomManagement() {
         initComponents();
-        headerCustom.getjLabel1().setText("Quản lí phòng");
+        headerCustom.getjLabel1().setText("Quản lý phòng");
         btnAddRoom.setBackground(new Color(108, 165, 200));
         btnAddRoom.setForeground(Color.WHITE);
         btnAddRoom.setBorderRadius(40);
@@ -170,8 +170,8 @@ public class RoomManagement extends javax.swing.JPanel {
         setBackground(new java.awt.Color(241, 241, 241));
 
         lblTitle.setBackground(new java.awt.Color(131, 131, 131));
-        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblTitle.setForeground(new java.awt.Color(131, 131, 131));
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(102, 102, 102));
         lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTitle.setText("Danh sách phòng");
 
@@ -192,7 +192,8 @@ public class RoomManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(headerCustom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(36, 36, 36)
+                .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(86, 86, 86))
@@ -208,7 +209,7 @@ public class RoomManagement extends javax.swing.JPanel {
                     .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(tblRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

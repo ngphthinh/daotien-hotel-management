@@ -32,8 +32,8 @@ public class CustomerManagement extends javax.swing.JPanel {
         button1.setBorderRadius(40);
         button1.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         headerCustom1.getjLabel1().setText(
-    "<html><span style='color:white;'>Quản lí khách hàng</span>");
-        headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 25));
+        "<html><span style='color:white;'>Quản lý khách hàng</span>");
+        headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
         
          String cols[] = {"Mã khách hàng", "Họ tên", "Số điện thoại", "Email","Số CCCD","Giới tính","Địa chỉ","Ngày sinh","Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 10);
@@ -101,9 +101,9 @@ public class CustomerManagement extends javax.swing.JPanel {
 
         setBackground(new java.awt.Color(241, 241, 241));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(131, 131, 131));
-        jLabel1.setText("Quản lí khách hàng");
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel1.setText("Quản lý khách hàng");
 
         button1.setText("Thêm khách hàng");
         button1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -121,8 +121,8 @@ public class CustomerManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(headerCustom1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1212, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(36, 36, 36)
+                .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(87, 87, 87))
