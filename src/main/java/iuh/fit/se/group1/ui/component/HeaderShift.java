@@ -4,6 +4,11 @@
  */
 package iuh.fit.se.group1.ui.component;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
 /**
  *
  * @author Administrator
@@ -15,8 +20,8 @@ public class HeaderShift extends javax.swing.JPanel {
      */
     public HeaderShift() {
         initComponents();
+        
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
