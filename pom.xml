@@ -63,5 +63,10 @@
     <artifactId>glasspane-popup</artifactId>
     <version>2.0.1</version>
 </dependency>
+<dependency>
+    <groupId>com.raven.datechooser</groupId>
+  <artifactId>datechooser</artifactId>
+  <version>0.0.1</version>
+</dependency>
     </dependencies>
 </project>
