@@ -9,6 +9,9 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+
+import iuh.fit.se.group1.ui.component.modal.SendResetCodeModal;
+import iuh.fit.se.group1.ui.component.modal.VerifyIdentityModal;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTarget;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
@@ -92,10 +95,10 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setBackground(new Color(245, 245, 245));
         handleSignOut();
 
-        jButton1.setBorderPainted(false); // tắt viền
-        jButton1.setContentAreaFilled(false); // tắt nền mặc định
-        jButton1.setFocusPainted(false); // tắt viền focus khi nhấn
-        jButton1.setOpaque(false); // trong suốt
+        btnForgotPass.setBorderPainted(false); // tắt viền
+        btnForgotPass.setContentAreaFilled(false); // tắt nền mặc định
+        btnForgotPass.setFocusPainted(false); // tắt viền focus khi nhấn
+        btnForgotPass.setOpaque(false); // trong suốt
 
         TimingTarget targetLogin = new TimingTargetAdapter() {
             @Override
@@ -165,7 +168,7 @@ public class Login extends javax.swing.JFrame {
         txtUser = new iuh.fit.se.group1.ui.swing.TextField();
         txtPass = new iuh.fit.se.group1.ui.swing.PasswordField();
         btnSignIn = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        btnForgotPass = new javax.swing.JButton();
         panelBody = new iuh.fit.se.group1.ui.layout.MainLayout();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -195,13 +198,13 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setBackground(new java.awt.Color(245, 245, 245));
-        jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.setLabel("Quên mật khẩu?");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnForgotPass.setBackground(new java.awt.Color(245, 245, 245));
+        btnForgotPass.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        btnForgotPass.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnForgotPass.setLabel("Quên mật khẩu?");
+        btnForgotPass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnForgotPassActionPerformed(evt);
             }
         });
 
@@ -225,7 +228,7 @@ public class Login extends javax.swing.JFrame {
                                 .addComponent(btnSignIn, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(95, 95, 95))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jButton1)
+                                .addComponent(btnForgotPass)
                                 .addGap(26, 26, 26))))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -238,7 +241,7 @@ public class Login extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(btnForgotPass)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                 .addComponent(btnSignIn, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(47, 47, 47))
@@ -303,9 +306,32 @@ public class Login extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSignInActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnForgotPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnForgotPassActionPerformed
+        var modal = new VerifyIdentityModal();
+        var sendCodeModal = new SendResetCodeModal();
+        modal.closeModal(e -> {
+            GlassPanePopup.closePopupLast();
+        });
+        modal.sendRestCode(e -> {
+            GlassPanePopup.closePopupLast();
+            GlassPanePopup.showPopup(sendCodeModal);
+
+        });
+
+        sendCodeModal.sendResetCode(e -> {
+            GlassPanePopup.closePopupLast();
+        });
+
+        sendCodeModal.sendResetCode(e -> {
+            // Xử lý gửi mã xác nhận
+            System.out.println("Gửi mã xác nhận");
+        });
+
+
+        GlassPanePopup.showPopup(modal);
+
+
+    }//GEN-LAST:event_btnForgotPassActionPerformed
     private void enableLogin(boolean action) {
         txtUser.setEditable(action);
         txtPass.setEditable(action);
@@ -324,7 +350,7 @@ public class Login extends javax.swing.JFrame {
     }
 
     ;
-//    private void cmdSignOutActionPerformed(java.awt.event.ActionEvent evt) {                                          
+//    private void cmdSignOutActionPerformed(java.awt.event.ActionEvent evt) {
 //            signIn = false;
 //            clearLogin();
 //            animatorBody.start();
@@ -343,7 +369,7 @@ public class Login extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -363,8 +389,8 @@ public class Login extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.swing.Background background1;
+    private javax.swing.JButton btnForgotPass;
     private javax.swing.JButton btnSignIn;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private iuh.fit.se.group1.ui.layout.MainLayout panelBody;

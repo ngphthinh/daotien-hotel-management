@@ -34,19 +34,19 @@ public class ShiftManagement extends javax.swing.JPanel {
     });
     }
     private void centerPanel() {
-    if (panelShiftCard == null) return;
-    int parentWidth = getWidth();
-    int parentHeight = getHeight();
-    int panelWidth = panelShiftCard.getWidth();
-    int panelHeight = panelShiftCard.getHeight();
+        if (panelShiftCard == null) return;
+        int parentWidth = getWidth();
+        int parentHeight = getHeight();
+        int panelWidth = panelShiftCard.getWidth();
+        int panelHeight = panelShiftCard.getHeight();
 
-    if (parentWidth == 0 || parentHeight == 0) return;
+        if (parentWidth == 0 || parentHeight == 0) return;
 
-    int x = (parentWidth - panelWidth) / 2;
-    int y = (parentHeight - panelHeight) / 2 + 30;
+        int x = (parentWidth - panelWidth) / 2;
+        int y = (parentHeight - panelHeight) / 2 + 30;
 
-    panelShiftCard.setLocation(x, y);
-}
+        panelShiftCard.setLocation(x, y);
+    }
 
    
     /**
