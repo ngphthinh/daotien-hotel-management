@@ -22,7 +22,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace pref="98" max="32767" attributes="0"/>
+              <EmptySpace pref="99" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="lblTitle" min="-2" pref="238" max="-2" attributes="0"/>
@@ -65,7 +65,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="txtGioiTinh" alignment="1" max="32767" attributes="0"/>
                           <Component id="txtSDT" max="32767" attributes="0"/>
-                          <Component id="txtEmail" pref="268" max="32767" attributes="0"/>
+                          <Component id="txtEmail" pref="269" max="32767" attributes="0"/>
                           <Component id="txtMaNV" alignment="1" max="32767" attributes="0"/>
                           <Component id="txtChucVu" max="32767" attributes="0"/>
                           <Component id="txtTen" alignment="1" max="32767" attributes="0"/>
@@ -127,8 +127,8 @@
                   <Component id="lblNgayBatDau" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="btnLuu" max="32767" attributes="0"/>
-              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+              <Component id="btnLuu" min="-2" pref="39" max="-2" attributes="0"/>
+              <EmptySpace pref="17" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
