@@ -114,9 +114,6 @@ public class HeaderCustom extends javax.swing.JPanel {
         seachBar1.handleSearch(listener);
     }
 
-    public JLabel getjLabel1() {
-        return jLabel1;
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private iuh.fit.se.group1.ui.component.SeachBar seachBar1;

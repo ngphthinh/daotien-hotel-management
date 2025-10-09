@@ -32,11 +32,11 @@ public class AmenityManagement extends javax.swing.JPanel {
      */
     public AmenityManagement() {
         initComponents();
-        button1.setBackground(new Color(108, 165, 200));
-        button1.setForeground(Color.WHITE);
-        button1.setBorderRadius(40);
+        btn1.setBackground(new Color(108, 165, 200));
+        btn1.setForeground(Color.WHITE);
+        btn1.setBorderRadius(40);
 
-        button1.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
+        btn1.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         String cols[] = {"Mã dịch vụ", "Tên dịch vụ", "Giá dịch vụ", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 5);
         tblAmenity.getTbl().setModel(model);
@@ -105,26 +105,26 @@ public class AmenityManagement extends javax.swing.JPanel {
     private void initComponents() {
 
         headerCustom1 = new iuh.fit.se.group1.ui.component.HeaderCustom();
-        jLabel1 = new javax.swing.JLabel();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
+        lblTiTle = new javax.swing.JLabel();
+        btn1 = new iuh.fit.se.group1.ui.component.custom.Button();
         tblAmenity = new iuh.fit.se.group1.ui.component.table.Table();
 
         setBackground(new java.awt.Color(241, 242, 241));
 
         headerCustom1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 30, 1, 10));
 
-        jLabel1.setBackground(new java.awt.Color(241, 241, 241));
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(131, 131, 131));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Danh sách dịch vụ");
+        lblTiTle.setBackground(new java.awt.Color(241, 241, 241));
+        lblTiTle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTiTle.setForeground(new java.awt.Color(131, 131, 131));
+        lblTiTle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTiTle.setText("Danh sách dịch vụ");
 
-        button1.setText("Thêm dịch vụ");
-        button1.setToolTipText("");
-        button1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        button1.addActionListener(new java.awt.event.ActionListener() {
+        btn1.setText("Thêm dịch vụ");
+        btn1.setToolTipText("");
+        btn1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btn1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button1ActionPerformed(evt);
+                btn1ActionPerformed(evt);
             }
         });
 
@@ -137,9 +137,9 @@ public class AmenityManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(headerCustom1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblTiTle, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btn1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(112, 112, 112))
             .addComponent(tblAmenity, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -150,15 +150,15 @@ public class AmenityManagement extends javax.swing.JPanel {
                 .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblTiTle, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tblAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(59, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
+    private void btn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn1ActionPerformed
 
         ServiceModal modal = new ServiceModal();
         modal.closeModel(new ActionListener() {
@@ -178,13 +178,13 @@ public class AmenityManagement extends javax.swing.JPanel {
             }
         });
         GlassPanePopup.showPopup(modal);
-    }//GEN-LAST:event_button1ActionPerformed
+    }//GEN-LAST:event_btn1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
+    private iuh.fit.se.group1.ui.component.custom.Button btn1;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblTiTle;
     private iuh.fit.se.group1.ui.component.table.Table tblAmenity;
     // End of variables declaration//GEN-END:variables
 }

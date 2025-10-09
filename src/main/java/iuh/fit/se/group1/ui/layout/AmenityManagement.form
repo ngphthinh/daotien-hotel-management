@@ -23,9 +23,9 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="headerCustom1" max="32767" attributes="0"/>
           <Group type="102" alignment="1" attributes="0">
-              <Component id="jLabel1" min="-2" pref="262" max="-2" attributes="0"/>
+              <Component id="lblTiTle" min="-2" pref="262" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="button1" min="-2" pref="175" max="-2" attributes="0"/>
+              <Component id="btn1" min="-2" pref="175" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="112" max="-2" attributes="0"/>
           </Group>
           <Component id="tblAmenity" alignment="1" max="32767" attributes="0"/>
@@ -38,8 +38,8 @@
               <Component id="headerCustom1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel1" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
-                  <Component id="button1" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
+                  <Component id="lblTiTle" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
+                  <Component id="btn1" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tblAmenity" min="-2" pref="571" max="-2" attributes="0"/>
@@ -58,7 +58,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="lblTiTle">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="f1" green="f1" red="f1" type="rgb"/>
@@ -73,7 +73,7 @@
         <Property name="text" type="java.lang.String" value="Danh s&#xe1;ch d&#x1ecb;ch v&#x1ee5;"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btn1">
       <Properties>
         <Property name="text" type="java.lang.String" value="Th&#xea;m d&#x1ecb;ch v&#x1ee5;"/>
         <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -82,7 +82,7 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn1ActionPerformed"/>
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.table.Table" name="tblAmenity">
