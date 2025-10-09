@@ -56,7 +56,27 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 model.removeRow(row);
             }
         };
-        tblEmployee.setTableActionColumn(tblEmployee.getTbl(), 5, event);
+        tblEmployee.setTableActionColumn(tblEmployee.getTbl(), 5, new TableActionEvent() {
+            @Override
+            public void onEdit(int row) {
+                System.out.println("Edit row " + row);
+            }
+
+            @Override
+            public void onDelete(int row) {
+                if (tblEmployee.getTbl().isEditing()) {
+                    tblEmployee.getTbl().getCellEditor().stopCellEditing();
+                }
+                DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
+                model.removeRow(row);
+            }
+
+            @Override
+            public void onView(int row) {
+                System.out.println("View row " + row);
+            }
+        }, true);
+
         tblEmployee.getTbl().getColumnModel().getColumn(0).setPreferredWidth(120);  // chiều rộng mong muốn
         tblEmployee.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
         tblEmployee.getTbl().getColumnModel().getColumn(2).setPreferredWidth(70);
@@ -78,7 +98,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 }
             }
         });
-        headerCustom2.handleSeacrh(new DocumentListener() {
+        headerCustom2.handleSearch(new DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
                 String text = headerCustom2.getSearchText();
@@ -98,27 +118,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         });
     }
-    private void button2ActionPerformed(java.awt.event.ActionEvent evt) {                                        
-
-        ServiceModal modal = new ServiceModal();
-        modal.closeModel(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                GlassPanePopup.closePopupLast();
-            }
-
-        });
-        modal.saveData(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-//                modal.getjLabel1().setText("HIihihi");
-//                GlassPanePopup.closePopupLast();
-                modal.getLblErrorPrice().setForeground(Color.red);
-                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
-            }
-        });
-        GlassPanePopup.showPopup(modal);
-    }                                       
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -179,7 +178,24 @@ public class EmployeeManagement extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
-        // TODO add your handling code here:
+        ServiceModal modal = new ServiceModal();
+        modal.closeModel(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                GlassPanePopup.closePopupLast();
+            }
+
+        });
+        modal.saveData(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+//                modal.getjLabel1().setText("HIihihi");
+//                GlassPanePopup.closePopupLast();
+                modal.getLblErrorPrice().setForeground(Color.red);
+                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
+            }
+        });
+        GlassPanePopup.showPopup(modal);
     }//GEN-LAST:event_button1ActionPerformed
 
 

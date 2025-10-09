@@ -1,33 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package iuh.fit.se.group1.ui.component.table;
 
-import java.awt.Component;
-import java.awt.FlowLayout;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.*;
+import java.awt.*;
 
-/**
- * @author vietn
- */
 public class TableActionCellEditor extends DefaultCellEditor {
-    private TableActionEvent event;
+    private final TableActionEvent event;
+    private final boolean isView;
 
-    public TableActionCellEditor(TableActionEvent event) {
+    public TableActionCellEditor(TableActionEvent event, boolean isView) {
         super(new JCheckBox());
         this.event = event;
+        this.isView = isView;
     }
 
-
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                 int row, int column) {
         PanelAction action = new PanelAction();
+        if (!isView) action.remove(0); // ẩn con mắt nếu không cần
         action.initEvent(event, row);
         action.setOpaque(false);
+
         JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         wrapper.setOpaque(true);
         wrapper.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
@@ -40,5 +33,4 @@ public class TableActionCellEditor extends DefaultCellEditor {
     public Object getCellEditorValue() {
         return null;
     }
-
 }

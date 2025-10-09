@@ -55,7 +55,7 @@ public class AmenityManagement extends javax.swing.JPanel {
                 model.removeRow(row);
             }
         };
-        tblAmenity.setTableActionColumn(tblAmenity.getTbl(), 3, event);
+        tblAmenity.setTableActionColumn(tblAmenity.getTbl(), 3, event,false);
         tblAmenity.getTbl().getColumnModel().getColumn(0).setPreferredWidth(200);  // chiều rộng mong muốn
         tblAmenity.getTbl().getColumnModel().getColumn(1).setPreferredWidth(500);
         tblAmenity.getTbl().getColumnModel().getColumn(2).setPreferredWidth(200);
@@ -74,7 +74,7 @@ public class AmenityManagement extends javax.swing.JPanel {
                 }
             }
         });
-        headerCustom1.handleSeacrh(new DocumentListener() {
+        headerCustom1.handleSearch(new DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
                 String text = headerCustom1.getSearchText();
