@@ -61,6 +61,11 @@ public class HeaderCustom extends javax.swing.JPanel {
     public String getSearchText(){
         return seachBar1.getTextSearch();
     }
+
+    public JLabel getjLabel1() {
+        return jLabel1;
+    }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.

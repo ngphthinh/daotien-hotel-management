@@ -15,8 +15,40 @@ public class ShiftManagement extends javax.swing.JPanel {
      */
     public ShiftManagement() {
         initComponents();
-    }
+        centerPanel();
 
+    // Khi resize thì căn lại
+    addComponentListener(new java.awt.event.ComponentAdapter() {
+        @Override
+        public void componentResized(java.awt.event.ComponentEvent e) {
+            centerPanel();
+        }
+    });
+
+    // Khi layout bị cập nhật (VD: đóng/mở menu, thay đổi view, v.v.)
+    addHierarchyListener(e -> {
+        if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0
+                || (e.getChangeFlags() & java.awt.event.HierarchyEvent.DISPLAYABILITY_CHANGED) != 0) {
+            javax.swing.SwingUtilities.invokeLater(() -> centerPanel());
+        }
+    });
+    }
+    private void centerPanel() {
+    if (panelShiftCard == null) return;
+    int parentWidth = getWidth();
+    int parentHeight = getHeight();
+    int panelWidth = panelShiftCard.getWidth();
+    int panelHeight = panelShiftCard.getHeight();
+
+    if (parentWidth == 0 || parentHeight == 0) return;
+
+    int x = (parentWidth - panelWidth) / 2;
+    int y = (parentHeight - panelHeight) / 2 + 30;
+
+    panelShiftCard.setLocation(x, y);
+}
+
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,19 +58,52 @@ public class ShiftManagement extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        panelShiftCard = new javax.swing.JPanel();
+        shiftCard1 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        shiftCard6 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        shiftCard7 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+        shiftCard2 = new iuh.fit.se.group1.ui.component.shift.ShiftCard();
+
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        javax.swing.GroupLayout panelShiftCardLayout = new javax.swing.GroupLayout(panelShiftCard);
+        panelShiftCard.setLayout(panelShiftCardLayout);
+        panelShiftCardLayout.setHorizontalGroup(
+            panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelShiftCardLayout.createSequentialGroup()
+                .addGap(77, 77, 77)
+                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(shiftCard7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(shiftCard1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(35, 35, 35)
+                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(shiftCard6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(shiftCard2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(78, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        panelShiftCardLayout.setVerticalGroup(
+            panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelShiftCardLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(shiftCard1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                    .addComponent(shiftCard6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelShiftCardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(shiftCard7, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                    .addComponent(shiftCard2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
+
+        add(panelShiftCard, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 170, 1150, 620));
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel panelShiftCard;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard1;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard2;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard6;
+    private iuh.fit.se.group1.ui.component.shift.ShiftCard shiftCard7;
     // End of variables declaration//GEN-END:variables
 }
