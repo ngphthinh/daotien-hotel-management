@@ -6,6 +6,7 @@ package iuh.fit.se.group1.ui.component.booking;
 
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
+import iuh.fit.se.group1.ui.component.custom.date.DateTimePicker;
 import iuh.fit.se.group1.util.Constants;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -33,6 +34,10 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         btnClose.setText("");
         btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES_CIRCLE,20,Constants.COLOR_ICON_MENU));
         btnClose.setBackground(Color.white);
+        DateTimePicker.attachTo(txtStartDate);
+        DateTimePicker.attachTo(txtEndDate);
+        cboRoomType.addItem("Phòng đơn");
+        cboRoomType.addItem("Phòng đôi");
     }
     
      @Override
@@ -73,13 +78,7 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         this.lblTitle = lblTitle;
     }
 
-    public TextField getTextField1() {
-        return textField1;
-    }
-
-    public void setTextField1(TextField textField1) {
-        this.textField1 = textField1;
-    }
+   
 
     public TextField getTxtEndDate() {
         return txtEndDate;
@@ -134,7 +133,6 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         lblTitle = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         lblTypeRoom = new javax.swing.JLabel();
-        textField1 = new iuh.fit.se.group1.ui.component.custom.TextField();
         lblStartDate = new javax.swing.JLabel();
         lblEndDate = new javax.swing.JLabel();
         txtStartDate = new iuh.fit.se.group1.ui.component.custom.TextField();
@@ -146,6 +144,7 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         txtPrice = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtRoomId = new iuh.fit.se.group1.ui.component.custom.TextField();
         btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
+        cboRoomType = new iuh.fit.se.group1.ui.component.custom.Combobox();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(new java.awt.Color(217, 217, 217));
@@ -158,13 +157,6 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         lblTypeRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblTypeRoom.setForeground(new java.awt.Color(0, 0, 0));
         lblTypeRoom.setText("Loại phòng");
-
-        textField1.setBorderRadius(4);
-        textField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textField1ActionPerformed(evt);
-            }
-        });
 
         lblStartDate.setBackground(new java.awt.Color(0, 0, 0));
         lblStartDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -233,6 +225,8 @@ public class InfoRoomPanel extends javax.swing.JPanel {
             }
         });
 
+        cboRoomType.setBackground(new java.awt.Color(255, 255, 255));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -248,9 +242,9 @@ public class InfoRoomPanel extends javax.swing.JPanel {
                                 .addComponent(lblStartDate))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(textField1, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
                                     .addComponent(lblRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtRoomId, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(txtRoomId, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+                                    .addComponent(cboRoomType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(27, 27, 27)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -286,9 +280,9 @@ public class InfoRoomPanel extends javax.swing.JPanel {
                     .addComponent(lblEndDate))
                 .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboRoomType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRoomId)
@@ -302,10 +296,6 @@ public class InfoRoomPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void textField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_textField1ActionPerformed
 
     private void txtStartDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtStartDateActionPerformed
         // TODO add your handling code here:
@@ -346,6 +336,7 @@ public class InfoRoomPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cboRoomType;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lblEndDate;
     private javax.swing.JLabel lblPrice;
@@ -354,7 +345,6 @@ public class InfoRoomPanel extends javax.swing.JPanel {
     private javax.swing.JLabel lblStartDate;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblTypeRoom;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField1;
     private iuh.fit.se.group1.ui.component.custom.TextField txtEndDate;
     private iuh.fit.se.group1.ui.component.custom.TextField txtPrice;
     private iuh.fit.se.group1.ui.component.custom.TextField txtRoomId;

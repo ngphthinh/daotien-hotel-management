@@ -22,7 +22,7 @@ import javax.swing.JPopupMenu;
  * @author Windows
  */
 public class InfoCustomerModal extends javax.swing.JPanel {
-private DateChooser dateChooser;
+    private DateChooser dateChooser;
     public Button getButton2() {
         return btnClose;
     }

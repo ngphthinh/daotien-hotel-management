@@ -36,9 +36,9 @@
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="textField1" alignment="0" pref="171" max="32767" attributes="0"/>
                                   <Component id="lblRoomId" alignment="0" min="-2" pref="73" max="-2" attributes="0"/>
-                                  <Component id="txtRoomId" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="txtRoomId" alignment="0" pref="171" max="32767" attributes="0"/>
+                                  <Component id="cboRoomType" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -87,9 +87,9 @@
               </Group>
               <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="textField1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtStartDate" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtEndDate" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cboRoomType" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -135,16 +135,6 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Lo&#x1ea1;i ph&#xf2;ng"/>
       </Properties>
-    </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField1">
-      <Properties>
-        <Property name="borderRadius" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="4" type="code"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textField1ActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblStartDate">
       <Properties>
@@ -273,6 +263,13 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCloseActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cboRoomType">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

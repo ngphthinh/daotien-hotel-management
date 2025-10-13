@@ -9,15 +9,14 @@ import iuh.fit.se.group1.ui.component.booking.InfoAmenityPanel;
 import iuh.fit.se.group1.ui.component.booking.InfoRoomPanel;
 
 
-import javax.management.monitor.StringMonitor;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author THIS PC
@@ -28,6 +27,7 @@ public class BookingPage extends javax.swing.JPanel {
 
     private List<Map<String, String>> bookingRooms;
 
+    private final Map<String, Integer> amenityIds = new HashMap<>();
 
     /**
      * Creates new form BookingPage
@@ -40,7 +40,27 @@ public class BookingPage extends javax.swing.JPanel {
         );
         infoRoomPanel1.getTxtRoomId().setText(roomCount + "hihi");
         infoRoomPanel1.getBtnClose().setVisible(false);
-        headerBooking1.addAction(e -> bookingRooms = getBookingRooms());
+        headerBooking1.addAction(e -> {
+            bookingRooms = getBookingRooms();
+            System.out.println(amenityIds);
+        });
+
+        listAmenity1.addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                System.out.println(listAmenity1.getSearch1().getText() + "BookingPage");
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                System.out.println(listAmenity1.getSearch1().getText() + "BookingPage");
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
 
         listAmenity1.addTableMouseListener(new MouseListener() {
             @Override
@@ -76,6 +96,10 @@ public class BookingPage extends javax.swing.JPanel {
 
             }
         });
+        pnlListAmenityMain.add(createPanelEmpty());
+        pnlListAmenityMain.revalidate();
+        pnlListAmenityMain.repaint();
+
     }
 
     private List<Map<String, String>> getBookingRooms() {
@@ -97,23 +121,65 @@ public class BookingPage extends javax.swing.JPanel {
         return rooms;
     }
 
+    public JPanel createPanelEmpty(){
+        JLabel label = new JLabel("Chưa có dịch vụ nào được chọn");
+        label.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        label.setForeground(new Color(150, 150, 150));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBackground(new Color(255, 255, 255));
+        panel.add(label, BorderLayout.CENTER);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return panel;
+    }
+
     private void addNewAmenity(String amenityId, String amenityName, String amenityPrice) {
+
+//        // Xoá panel rỗng nếu có
+        if (pnlListAmenityMain.getComponentCount() <= 1 &&
+                !(pnlListAmenityMain.getComponent(0) instanceof InfoAmenityPanel)) {
+            pnlListAmenityMain.removeAll();
+        }
+
+        // Nếu đã có: tăng số lượng
+        if (amenityIds.containsKey(amenityId)) {
+            for (Component comp : pnlListAmenityMain.getComponents()) {
+                if (comp instanceof InfoAmenityPanel panel && amenityId.equals(panel.getAmenityId())) {
+                    int newValue = amenityIds.merge(amenityId, 1, Integer::sum);
+                    panel.getNumberSpinner().setValue(newValue);
+                    return; // ✅ Thoát, không thêm mới panel
+                }
+            }
+        }
+
+        // Nếu chưa có: thêm mới
+        int quantity = 1;
+        amenityIds.put(amenityId, quantity);
+
         InfoAmenityPanel newAmenity = new InfoAmenityPanel();
         newAmenity.setAmenityId(amenityId);
         newAmenity.getLblName().setText(amenityName);
         newAmenity.getLblPrice().setText(amenityPrice);
+        newAmenity.getNumberSpinner().setValue(quantity);
+
         newAmenity.getNumberSpinner().addMinusActionListener(e -> {
-            if (newAmenity.getNumberSpinner().getValue() <= 1) {
+            int current = newAmenity.getNumberSpinner().getValue();
+            if (current <= 1) {
+                amenityIds.remove(amenityId);
                 closeAmenityCard(newAmenity, pnlListAmenityMain);
             } else {
-                newAmenity.getNumberSpinner().setValue(newAmenity.getNumberSpinner().getValue() - 1);
+                amenityIds.put(amenityId, current - 1);
+                newAmenity.getNumberSpinner().setValue(current - 1);
             }
         });
-        newAmenity.getNumberSpinner().setValue(1);
-        newAmenity.getNumberSpinner().addPlusActionListener(e -> newAmenity.getNumberSpinner().setValue(newAmenity.getNumberSpinner().getValue() + 1));
+
+        newAmenity.getNumberSpinner().addPlusActionListener(e -> {
+            int newValue = newAmenity.getNumberSpinner().getValue() + 1;
+            amenityIds.put(amenityId, newValue);
+            newAmenity.getNumberSpinner().setValue(newValue);
+        });
 
         pnlListAmenityMain.add(newAmenity);
-
         pnlListAmenityMain.revalidate();
         pnlListAmenityMain.repaint();
     }
@@ -145,12 +211,17 @@ public class BookingPage extends javax.swing.JPanel {
         pnlListRoom.repaint();
     }
 
-    public void closeAmenityCard (InfoAmenityPanel amenityPanel, JPanel parentPanel) {
+    public void closeAmenityCard(InfoAmenityPanel amenityPanel, JPanel parentPanel) {
+
+        if (parentPanel.getComponentCount() == 1) {
+            parentPanel.add(createPanelEmpty());
+        }
+
         parentPanel.remove(amenityPanel);
         parentPanel.revalidate();
         parentPanel.repaint();
     }
-    
+
     private void closeRoomCard(InfoRoomPanel newRoom) {
         roomCount--;
         infoRoomPanel1.getBtnClose().setVisible(roomCount != 1);
@@ -247,13 +318,6 @@ public class BookingPage extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel2.setBackground(new java.awt.Color(217, 217, 217));
-        jPanel2.setForeground(new java.awt.Color(217, 217, 217));
-        jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.LINE_AXIS));
-
-        listAmenity1.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        jPanel2.add(listAmenity1);
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -264,40 +328,56 @@ public class BookingPage extends javax.swing.JPanel {
                     .addComponent(pnlListRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
                     .addComponent(infoCustomerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlListAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap(531, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(infoCustomerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(pnlListRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(pnlListAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(231, Short.MAX_VALUE))
+                .addComponent(infoCustomerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(pnlListRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(pnlListAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(427, Short.MAX_VALUE))
         );
 
         scrollPaneWin111.setViewportView(jPanel1);
+
+        jPanel2.setBackground(new java.awt.Color(217, 217, 217));
+        jPanel2.setForeground(new java.awt.Color(217, 217, 217));
+        jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.LINE_AXIS));
+
+        listAmenity1.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 1159, Short.MAX_VALUE)
-            .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, 1159, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 625, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(listAmenity1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(headerBooking1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 744, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 744, Short.MAX_VALUE)
+                    .addComponent(listAmenity1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
