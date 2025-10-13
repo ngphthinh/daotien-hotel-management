@@ -25,42 +25,60 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lblCCCD" min="-2" pref="115" max="-2" attributes="0"/>
-                  <Component id="lblEmail" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblSDT" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblTen" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblMa" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblGioiTinh" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblDiaChi" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblNgaySinh" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="txtDiaChi" max="32767" attributes="0"/>
-                  <Component id="txtGioiTinh" max="32767" attributes="0"/>
-                  <Component id="txtEmail" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txtCCCD" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txtNgaySinh" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txtTen" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txtSDT" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txtMa" alignment="0" max="32767" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" pref="52" max="-2" attributes="0"/>
-          </Group>
           <Group type="102" attributes="0">
               <EmptySpace min="128" pref="128" max="-2" attributes="0"/>
-              <Component id="lblTieuDe" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
-              <Component id="btnDong" min="-2" pref="36" max="-2" attributes="0"/>
+              <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="27" max="32767" attributes="0"/>
+              <Component id="btnClose" min="-2" pref="36" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="btnLuu" min="-2" pref="192" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="144" max="-2" attributes="0"/>
+              <Component id="btnSave" min="-2" pref="189" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lblCitizen" min="-2" pref="115" max="-2" attributes="0"/>
+                  <Component id="lblEmail" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPhone" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblName" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblGender" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblAddress" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblDob" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="lblErrolName" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="txtName" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtPhone" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtEmail" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtCitizen" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtGender" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtAddress" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtDob" alignment="0" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                      <Component id="iconDate" min="-2" pref="21" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="52" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblErrolDob" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblErrolAddress" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblErrolCitizen" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblErrolEmail" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblErrolPhone" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
@@ -69,58 +87,73 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lblTieuDe" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnDong" min="-2" pref="31" max="-2" attributes="0"/>
+                  <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnClose" min="-2" pref="31" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
+              <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblMa" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtMa" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+              <Component id="lblErrolName" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtTen" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblTen" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtPhone" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPhone" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtSDT" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblSDT" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+              <Component id="lblErrolPhone" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblEmail" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+              <Component id="lblErrolEmail" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtCCCD" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblCCCD" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtCitizen" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblCitizen" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+              <Component id="lblErrolCitizen" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblGioiTinh" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtGioiTinh" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblGender" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtGender" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblDiaChi" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDiaChi" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtAddress" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblAddress" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtNgaySinh" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblNgaySinh" alignment="3" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lblErrolAddress" min="-2" pref="14" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="iconDate" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblDob" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="txtDob" min="-2" pref="26" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lblErrolDob" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-              <Component id="btnLuu" min="-2" pref="46" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+              <Component id="btnSave" min="-2" pref="46" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="lblTieuDe">
+    <Component class="javax.swing.JLabel" name="lblTitle">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="24" style="1"/>
@@ -128,68 +161,84 @@
         <Property name="text" type="java.lang.String" value="Th&#xf4;ng tin kh&#xe1;ch h&#xe0;ng"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblMa">
+    <Component class="javax.swing.JLabel" name="lblName">
       <Properties>
-        <Property name="text" type="java.lang.String" value="M&#xe3; kh&#xe1;ch h&#xe0;ng:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblTen">
-      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="T&#xea;n kh&#xe1;ch h&#xe0;ng:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblSDT">
+    <Component class="javax.swing.JLabel" name="lblPhone">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="S&#x1ed1; &#x111;i&#x1ec7;n tho&#x1ea1;i:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblEmail">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Email:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblGioiTinh">
+    <Component class="javax.swing.JLabel" name="lblGender">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Gi&#x1edb;i t&#xed;nh:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblCCCD">
+    <Component class="javax.swing.JLabel" name="lblCitizen">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="C&#x103;n c&#x1b0;&#x1edb;c c&#xf4;ng d&#xe2;n:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblDiaChi">
+    <Component class="javax.swing.JLabel" name="lblAddress">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="&#x110;&#x1ecb;a ch&#x1ec9;:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblNgaySinh">
+    <Component class="javax.swing.JLabel" name="lblDob">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Ng&#xe0;y sinh"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtTen">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtName">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtTenActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtNameActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtSDT">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtPhone">
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtEmail">
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtEmailActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtCCCD">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtCitizen">
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtGioiTinh">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtGender">
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtDiaChi">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtAddress">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtDiaChiActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtAddressActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnLuu">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnSave">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="40" green="bd" red="5b" type="rgb"/>
@@ -198,17 +247,20 @@
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="L&#x1b0;u"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLuuActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtNgaySinh">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtDob">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtNgaySinhActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtDobActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnDong">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnClose">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="33" red="ff" type="rgb"/>
@@ -219,13 +271,79 @@
         <Property name="text" type="java.lang.String" value="X"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDongActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCloseActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtMa">
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtMaActionPerformed"/>
-      </Events>
+    <Component class="javax.swing.JLabel" name="iconDate">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="   "/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrolName">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="10" style="0"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="T&#xea;n kh&#xe1;ch h&#xe0;ng kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrolPhone">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="10" style="0"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="S&#x1ed1; &#x111;i&#x1ec7;n tho&#x1ea1;i kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrolEmail">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="10" style="0"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Email kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrolCitizen">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="10" style="0"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="C&#x103;n c&#x1b0;&#x1edb;c c&#xf4;ng d&#xe2;n kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrolAddress">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="10" style="0"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="&#x110;&#x1ecb;a ch&#x1ec9; kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrolDob">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="10" style="0"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="ff" red="ff" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Ng&#xe0;y sinh kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

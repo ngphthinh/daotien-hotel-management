@@ -4,35 +4,146 @@
  */
 package iuh.fit.se.group1.ui.component.modal;
 
+import com.raven.datechooser.DateChooser;
+import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.util.Constants;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 /**
  *
  * @author Windows
  */
 public class InfoPromotionModal extends javax.swing.JPanel {
+    private DateChooser dateChooser1;
+    private DateChooser dateChooser2;
 
+    public JLabel getLblErrolStarDate() {
+        return lblErrolStarDate;
+    }
+
+    public void setLblErrolStarDate(JLabel lblErrolStarDate) {
+        this.lblErrolStarDate = lblErrolStarDate;
+    }
+
+    public JLabel getLblErrolEndDate() {
+        return lblErrolEndDate;
+    }
+
+    public void setLblErrolEndDate(JLabel lblErrolEndDate) {
+        this.lblErrolEndDate = lblErrolEndDate;
+    }
+
+    public JLabel getLblErrolName() {
+        return lblErrolName;
+    }
+
+    public void setLblErrolName(JLabel lblErrolName) {
+        this.lblErrolName = lblErrolName;
+    }
+
+    public JLabel getLblErrolPrice() {
+        return lblErrolPrice;
+    }
+
+    public void setLblErrolPrice(JLabel lblErrolPrice) {
+        this.lblErrolPrice = lblErrolPrice;
+    }
+    
+    
     public void setButton1(Button button1) {
-        this.btnLuu = button1;
+        this.btnSave = button1;
     }
 
     public void setButton2(Button button2) {
-        this.btnDong = button2;
+        this.btnClose = button2;
     }
     
     public void closeModel (ActionListener ac) {
-        btnDong.addActionListener(ac);
+        btnClose.addActionListener(ac);
     }
 
     public void saveData(ActionListener ac) {
-        btnLuu.addActionListener(ac);
+        btnSave.addActionListener(ac);
     }
+
     /**
      * Creates new form InfoPromotionModal
      */
     public InfoPromotionModal() {
         initComponents();
+        txtEndDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        iconDate2.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
+        iconDate2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        dateChooser2 = new DateChooser();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        txtEndDate.setText(sdf.format(new Date()));
+        dateChooser2.setDateFormat("dd/MM/yyyy");
+        dateChooser2.toDay();
+        dateChooser2.setForeground(Constants.COLOR_ICON_MENU);
+        dateChooser2.addEventDateChooser((action, date) -> {
+            if (action.getAction() == SelectedAction.DAY_SELECTED) {
+                dateChooser2.hidePopup();
+            }
+        });
+        dateChooser2.setTextRefernce(txtEndDate);
+        iconDate2.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                dateChooser2.showPopup();
+            }
+        });
+        dateChooser2 = new DateChooser();
+        dateChooser2.setTextRefernce(txtEndDate);
+        try {
+            var popup = DateChooser.class.getDeclaredField("popup");
+            popup.setAccessible(true);
+            JPopupMenu popupMenu = (JPopupMenu) popup.get(dateChooser2);
+            popupMenu.setLightWeightPopupEnabled(false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+        txtStarDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        iconDate1.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
+        iconDate1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        dateChooser1 = new DateChooser();
+
+        txtStarDate.setText(sdf.format(new Date()));
+        dateChooser1.setDateFormat("dd/MM/yyyy");
+        dateChooser1.toDay();
+        dateChooser1.setForeground(Constants.COLOR_ICON_MENU);
+        dateChooser1.addEventDateChooser((action, date) -> {
+            if (action.getAction() == SelectedAction.DAY_SELECTED) {
+                dateChooser1.hidePopup();
+            }
+        });
+        dateChooser1.setTextRefernce(txtStarDate);
+        iconDate1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                dateChooser1.showPopup();
+            }
+        });
+        dateChooser1 = new DateChooser();
+        dateChooser1.setTextRefernce(txtStarDate);
+        try {
+            var popup = DateChooser.class.getDeclaredField("popup");
+            popup.setAccessible(true);
+            JPopupMenu popupMenu = (JPopupMenu) popup.get(dateChooser1);
+            popupMenu.setLightWeightPopupEnabled(false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -44,159 +155,207 @@ public class InfoPromotionModal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblTieuDe = new javax.swing.JLabel();
-        lblMa = new javax.swing.JLabel();
-        lblTen = new javax.swing.JLabel();
-        lblGia = new javax.swing.JLabel();
-        lblNgayTao = new javax.swing.JLabel();
-        txtMa = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtTen = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtGia = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtNgayTao = new iuh.fit.se.group1.ui.component.custom.TextField();
-        btnLuu = new iuh.fit.se.group1.ui.component.custom.Button();
-        lblNgayHetHan = new javax.swing.JLabel();
-        txtNgayHetHan = new iuh.fit.se.group1.ui.component.custom.TextField();
-        btnDong = new iuh.fit.se.group1.ui.component.custom.Button();
+        lblTitle = new javax.swing.JLabel();
+        lblName = new javax.swing.JLabel();
+        lblPrice = new javax.swing.JLabel();
+        lblStarDate = new javax.swing.JLabel();
+        txtName = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtPrice = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtStarDate = new iuh.fit.se.group1.ui.component.custom.TextField();
+        btnSave = new iuh.fit.se.group1.ui.component.custom.Button();
+        lblEndDate = new javax.swing.JLabel();
+        txtEndDate = new iuh.fit.se.group1.ui.component.custom.TextField();
+        btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
+        iconDate1 = new javax.swing.JLabel();
+        iconDate2 = new javax.swing.JLabel();
+        lblErrolName = new javax.swing.JLabel();
+        lblErrolPrice = new javax.swing.JLabel();
+        lblErrolStarDate = new javax.swing.JLabel();
+        lblErrolEndDate = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
-        lblTieuDe.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblTieuDe.setText("Thông tin khuyến mãi");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTitle.setText("Thông tin khuyến mãi");
 
-        lblMa.setText("Mã khuyến mãi");
+        lblName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblName.setText("Tên khuyến mãi:");
 
-        lblTen.setText("Tên khuyến mãi:");
+        lblPrice.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblPrice.setText("Giá khuyến mãi");
 
-        lblGia.setText("Giá khuyến mãi");
+        lblStarDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblStarDate.setText("Ngày tạo:");
 
-        lblNgayTao.setText("Ngày tạo:");
-
-        txtTen.addActionListener(new java.awt.event.ActionListener() {
+        txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTenActionPerformed(evt);
+                txtNameActionPerformed(evt);
             }
         });
 
-        txtGia.addActionListener(new java.awt.event.ActionListener() {
+        txtPrice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtGiaActionPerformed(evt);
+                txtPriceActionPerformed(evt);
             }
         });
 
-        btnLuu.setBackground(new java.awt.Color(91, 189, 64));
-        btnLuu.setForeground(new java.awt.Color(255, 255, 255));
-        btnLuu.setText("Lưu");
-        btnLuu.addActionListener(new java.awt.event.ActionListener() {
+        btnSave.setBackground(new java.awt.Color(91, 189, 64));
+        btnSave.setForeground(new java.awt.Color(255, 255, 255));
+        btnSave.setText("Lưu");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLuuActionPerformed(evt);
+                btnSaveActionPerformed(evt);
             }
         });
 
-        lblNgayHetHan.setText("Ngày hết hạn:");
+        lblEndDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblEndDate.setText("Ngày hết hạn:");
 
-        btnDong.setBackground(new java.awt.Color(255, 51, 0));
-        btnDong.setForeground(new java.awt.Color(255, 255, 255));
-        btnDong.setText("X");
-        btnDong.addActionListener(new java.awt.event.ActionListener() {
+        btnClose.setBackground(new java.awt.Color(255, 51, 0));
+        btnClose.setForeground(new java.awt.Color(255, 255, 255));
+        btnClose.setText("X");
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDongActionPerformed(evt);
+                btnCloseActionPerformed(evt);
             }
         });
+
+        iconDate1.setText("   ");
+
+        iconDate2.setText("   ");
+
+        lblErrolName.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolName.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolName.setText("Tên khuyến mãi không hợp lệ");
+
+        lblErrolPrice.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolPrice.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolPrice.setText("Giá khuyến mãi không hợp lệ");
+
+        lblErrolStarDate.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolStarDate.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolStarDate.setText("Ngày tạo không hợp lệ");
+
+        lblErrolEndDate.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolEndDate.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolEndDate.setText("Ngày hết hạn không hợp lệ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(58, 58, 58)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTen)
-                    .addComponent(lblMa)
-                    .addComponent(lblGia)
-                    .addComponent(lblNgayTao)
-                    .addComponent(lblNgayHetHan))
-                .addGap(56, 56, 56)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(txtNgayHetHan, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtNgayTao, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtGia, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtTen, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtMa, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(btnLuu, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(144, 144, 144))
-            .addGroup(layout.createSequentialGroup()
                 .addGap(116, 116, 116)
-                .addComponent(lblTieuDe)
+                .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
-                .addComponent(btnDong, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26))
+                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblName)
+                    .addComponent(lblPrice)
+                    .addComponent(lblStarDate)
+                    .addComponent(lblEndDate))
+                .addGap(46, 46, 46)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblErrolEndDate)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblErrolStarDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblErrolPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblErrolName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtStarDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtEndDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(iconDate2, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
+                            .addComponent(iconDate1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(44, 44, 44))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(140, Short.MAX_VALUE)
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(140, 140, 140))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(19, 19, 19)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblName)
+                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblErrolName)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTieuDe)
-                    .addComponent(btnDong, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblMa)
-                    .addComponent(txtMa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblPrice)
+                    .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblErrolPrice)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtTen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTen))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(iconDate1)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtStarDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblStarDate)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblErrolStarDate)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtGia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblGia))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(iconDate2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblEndDate)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblErrolEndDate)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNgayTao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNgayTao))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNgayHetHan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNgayHetHan))
-                .addGap(30, 30, 30)
-                .addComponent(btnLuu, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(86, 86, 86))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtGiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtGiaActionPerformed
+    private void txtPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPriceActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtGiaActionPerformed
+    }//GEN-LAST:event_txtPriceActionPerformed
 
-    private void txtTenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTenActionPerformed
+    private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtTenActionPerformed
+    }//GEN-LAST:event_txtNameActionPerformed
 
-    private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnLuuActionPerformed
+    }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnDongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDongActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnDongActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button btnDong;
-    private iuh.fit.se.group1.ui.component.custom.Button btnLuu;
-    private javax.swing.JLabel lblGia;
-    private javax.swing.JLabel lblMa;
-    private javax.swing.JLabel lblNgayHetHan;
-    private javax.swing.JLabel lblNgayTao;
-    private javax.swing.JLabel lblTen;
-    private javax.swing.JLabel lblTieuDe;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtGia;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtMa;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtNgayHetHan;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtNgayTao;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtTen;
+    private iuh.fit.se.group1.ui.component.custom.Button btnClose;
+    private iuh.fit.se.group1.ui.component.custom.Button btnSave;
+    private javax.swing.JLabel iconDate1;
+    private javax.swing.JLabel iconDate2;
+    private javax.swing.JLabel lblEndDate;
+    private javax.swing.JLabel lblErrolEndDate;
+    private javax.swing.JLabel lblErrolName;
+    private javax.swing.JLabel lblErrolPrice;
+    private javax.swing.JLabel lblErrolStarDate;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblPrice;
+    private javax.swing.JLabel lblStarDate;
+    private javax.swing.JLabel lblTitle;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtEndDate;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtName;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtPrice;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtStarDate;
     // End of variables declaration//GEN-END:variables
 }

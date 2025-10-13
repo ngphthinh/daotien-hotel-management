@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package iuh.fit.se.group1.ui.component;
+package iuh.fit.se.group1.ui.component.modal;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;
@@ -11,7 +11,6 @@ import com.raven.datechooser.DateChooser;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;

@@ -2,19 +2,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package iuh.fit.se.group1.ui.component;
+package iuh.fit.se.group1.ui.component.modal;
+
 
 /**
  *
  * @author hoxuy
  */
 public class CustomerModel extends javax.swing.JPanel {
-
     /**
      * Creates new form CustomerModel
      */
     public CustomerModel() {
         initComponents();
+       
     }
 
     /**
@@ -26,7 +27,7 @@ public class CustomerModel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        seviceModel1 = new iuh.fit.se.group1.ui.component.ServiceModal();
+        seviceModel1 = new iuh.fit.se.group1.ui.component.modal.ServiceModal();
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -47,6 +48,6 @@ public class CustomerModel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.ServiceModal seviceModel1;
+    private iuh.fit.se.group1.ui.component.modal.ServiceModal seviceModel1;
     // End of variables declaration//GEN-END:variables
 }

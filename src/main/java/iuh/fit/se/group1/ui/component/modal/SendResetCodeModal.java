@@ -37,37 +37,36 @@ public class SendResetCodeModal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
+        lblMessage = new javax.swing.JLabel();
+        lblEmail = new javax.swing.JLabel();
+        lblName = new javax.swing.JLabel();
+        lblPosition = new javax.swing.JLabel();
         avatarLabel1 = new iuh.fit.se.group1.ui.component.custom.AvatarLabel();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnSendCode = new iuh.fit.se.group1.ui.component.custom.Button();
         btnLogin = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Quên mật khẩu ?");
+        lblTitle.setBackground(new java.awt.Color(51, 51, 51));
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(51, 51, 51));
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitle.setText("Quên mật khẩu ?");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("<html>Mật khẩu sẽ gửi về email của bạn <br/>vui lòng kiểm tra</html>");
+        lblMessage.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMessage.setText("<html>Mật khẩu sẽ gửi về email của bạn <br/>vui lòng kiểm tra</html>");
 
-        jLabel3.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel3.setText("n****inh**@***");
+        lblEmail.setForeground(new java.awt.Color(51, 51, 51));
+        lblEmail.setText("n****inh**@***");
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel4.setText("Nguyễn Trần Quốc Việt");
+        lblName.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblName.setForeground(new java.awt.Color(102, 102, 102));
+        lblName.setText("Nguyễn Trần Quốc Việt");
 
-        jLabel6.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("Nhân viên quản lí");
+        lblPosition.setForeground(new java.awt.Color(51, 51, 51));
+        lblPosition.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPosition.setText("Nhân viên quản lí");
 
         javax.swing.GroupLayout avatarLabel1Layout = new javax.swing.GroupLayout(avatarLabel1);
         avatarLabel1.setLayout(avatarLabel1Layout);
@@ -80,12 +79,11 @@ public class SendResetCodeModal extends javax.swing.JPanel {
             .addGap(0, 60, Short.MAX_VALUE)
         );
 
-        button1.setBackground(new java.awt.Color(91, 189, 84));
-        button1.setForeground(new java.awt.Color(255, 255, 255));
-        button1.setText("Gửi lại mã");
-        button1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSendCode.setBackground(new java.awt.Color(91, 189, 84));
+        btnSendCode.setForeground(new java.awt.Color(255, 255, 255));
+        btnSendCode.setText("Gửi lại mã");
+        btnSendCode.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
-        btnLogin.setBackground(new java.awt.Color(255, 255, 255));
         btnLogin.setForeground(new java.awt.Color(50, 145, 255));
         btnLogin.setText("Đăng nhập bằng mật khẩu");
         btnLogin.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
@@ -94,12 +92,12 @@ public class SendResetCodeModal extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
                         .addComponent(avatarLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(53, 53, 53))
@@ -109,39 +107,39 @@ public class SendResetCodeModal extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnSendCode, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(14, 14, 14))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblPosition, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(21, 21, 21))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblName, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(lblTitle)
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(avatarLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel6))
+                    .addComponent(lblEmail)
+                    .addComponent(lblPosition))
                 .addGap(18, 18, 18)
-                .addComponent(jLabel4)
+                .addComponent(lblName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSendCode, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnLogin))
                 .addGap(11, 11, 11))
         );
@@ -153,17 +151,17 @@ public class SendResetCodeModal extends javax.swing.JPanel {
     }
 
     public void sendResetCode(java.awt.event.ActionListener evt) {
-        button1.addActionListener(evt);
+        btnSendCode.addActionListener(evt);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel1;
     private javax.swing.JButton btnLogin;
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel6;
+    private iuh.fit.se.group1.ui.component.custom.Button btnSendCode;
+    private javax.swing.JLabel lblEmail;
+    private javax.swing.JLabel lblMessage;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblPosition;
+    private javax.swing.JLabel lblTitle;
     // End of variables declaration//GEN-END:variables
 }
