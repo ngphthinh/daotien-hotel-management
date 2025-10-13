@@ -28,8 +28,8 @@ public class Test extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        seviceModel1 = new iuh.fit.se.group1.ui.component.ServiceModal();
-        seviceModel3 = new iuh.fit.se.group1.ui.component.ServiceModal();
+        seviceModel1 = new iuh.fit.se.group1.ui.component.modal.ServiceModal();
+        seviceModel3 = new iuh.fit.se.group1.ui.component.modal.ServiceModal();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -78,7 +78,7 @@ public class Test extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.ServiceModal seviceModel1;
-    private iuh.fit.se.group1.ui.component.ServiceModal seviceModel3;
+    private iuh.fit.se.group1.ui.component.modal.ServiceModal seviceModel1;
+    private iuh.fit.se.group1.ui.component.modal.ServiceModal seviceModel3;
     // End of variables declaration//GEN-END:variables
 }

@@ -4,7 +4,7 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.ServiceModal;
+import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 

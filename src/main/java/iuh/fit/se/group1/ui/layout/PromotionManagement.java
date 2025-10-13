@@ -4,7 +4,7 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.ServiceModal;
+import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.modal.InfoCustomerModal;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -134,36 +134,37 @@ public class PromotionManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1)
+                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addGap(18, 18, 18)
-                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 608, Short.MAX_VALUE)
+                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
                 .addGap(31, 31, 31))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
         var modal = new InfoPromotionModal();
-         modal.closeModel(new ActionListener() {       
-                ServiceModal modal = new ServiceModal();
-  
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                GlassPanePopup.closePopupLast();
-            }
+         modal.closeModel(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            raven.glasspanepopup.GlassPanePopup.closePopupLast();
+        }
+    });
 
-        });
-        modal.saveData(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
+    modal.saveData(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            modal.getLblErrolEndDate().setForeground(Color.red);
+            modal.getLblErrolStarDate().setForeground(Color.red);
+            modal.getLblErrolPrice().setForeground(Color.red);
+            modal.getLblErrolName().setForeground(Color.red);
+            System.out.println("Save data " + modal.getLblErrolName());
+        }
+    });
 
-                GlassPanePopup.closePopupLast();
-
-            }
-        });
-        GlassPanePopup.showPopup(modal);  
+    raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }//GEN-LAST:event_button1ActionPerformed
 
 

@@ -17,9 +17,8 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
               <Component id="seviceModel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="190" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="196" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -33,7 +32,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="iuh.fit.se.group1.ui.component.ServiceModal" name="seviceModel1">
+    <Component class="iuh.fit.se.group1.ui.component.modal.ServiceModal" name="seviceModel1">
     </Component>
   </SubComponents>
 </Form>

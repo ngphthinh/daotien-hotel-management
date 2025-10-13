@@ -4,19 +4,27 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.HeaderCustom;
-import iuh.fit.se.group1.ui.component.ServiceModal;
+import iuh.fit.se.group1.ui.component.modal.ServiceModal;
+import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
@@ -83,8 +91,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         tblEmployee.getTbl().getColumnModel().getColumn(0).setPreferredWidth(120);  // chiều rộng mong muốn
         tblEmployee.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
-        tblEmployee.getTbl().getColumnModel().getColumn(2).setPreferredWidth(70);
-        tblEmployee.getTbl().getColumnModel().getColumn(3).setPreferredWidth(70);
+        tblEmployee.getTbl().getColumnModel().getColumn(2).setPreferredWidth(120);
+        tblEmployee.getTbl().getColumnModel().getColumn(3).setPreferredWidth(120);
         tblEmployee.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
         tblEmployee.getTbl().getColumnModel().getColumn(5).setPreferredWidth(80);
 
@@ -121,8 +129,112 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
 
         });
-    }
+        var header = tblEmployee.getTbl().getTableHeader();
+        Combobox<String> cmb = new Combobox<>(new String[]{"Nam", "Nữ"});
+        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
+        TableColumn column = tblEmployee.getTbl().getColumnModel().getColumn(2);
+        column.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+            // Dùng renderer gốc để lấy màu & nền đúng
+            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
 
+            if (comp instanceof JLabel lbl) {
+                lbl.setText("Giới tính                              \u25BC");
+//                lbl.setIcon(FontIcon.of(FontAwesomeSolid.ARROW_DOWN, 16, Color.DARK_GRAY));
+                lbl.setHorizontalTextPosition(SwingConstants.LEFT);
+                lbl.setHorizontalAlignment(SwingConstants.LEFT);
+                lbl.setIconTextGap(5);
+            }
+            return comp;
+        });
+        
+        tblEmployee.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
+
+                if (col == 5) {
+                    tblEmployee.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    tblEmployee.getTbl().setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
+        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Nhân viên", "Quản lý"});
+        TableColumn columnChucVu = tblEmployee.getTbl().getColumnModel().getColumn(3);
+
+        columnChucVu.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+            if (comp instanceof JLabel lbl) {
+                lbl.setText("Chức vụ                              \u25BC"); // ▼
+                lbl.setHorizontalAlignment(SwingConstants.LEFT);
+                lbl.setIconTextGap(5);
+            }
+            return comp;
+        });
+
+
+        header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
+                if (col == 3) { // Cột "Chức vụ"
+                    Rectangle rect = header.getHeaderRect(col);
+                    cmbChucVu.setBounds(rect);
+                    cmbChucVu.setVisible(true);
+                    header.add(cmbChucVu);
+                    cmbChucVu.showPopup();
+
+                    cmbChucVu.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusLost(FocusEvent fe) {
+                            cmbChucVu.setVisible(false);
+                            header.remove(cmbChucVu);
+                        }
+                    });
+                }
+            }
+        });
+
+        cmbChucVu.addActionListener(ev -> {
+            String selected = (String) cmbChucVu.getSelectedItem();
+            System.out.println("Filter chức vụ: " + selected);
+            header.remove(cmbChucVu);
+            header.repaint();
+        });
+
+
+        cmb.addActionListener(ev -> {
+            String selected = (String) cmb.getSelectedItem();
+            System.out.println("Filter: " + selected);
+            header.remove(cmb);
+            header.repaint();
+        });
+        header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
+                if (col == 2) {
+                    Rectangle rect = header.getHeaderRect(col);
+
+//                     Thiết lập vị trí và kích thước cho combo
+                    cmb.setBounds(rect);
+                    cmb.setVisible(true); // hiển thị combo tại vị trí cột
+                    header.add(cmb);
+                    cmb.showPopup(); // mở dropdown ngay lập tức
+
+                    // Khi mất focus, ẩn combo
+                    cmb.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusLost(FocusEvent fe) {
+                            cmb.setVisible(false);
+                            header.remove(cmb);
+                        }
+                    });
+                }
+            }
+        });
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -184,10 +296,15 @@ public class EmployeeManagement extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private String generateEmployeeCode() {
+    int rowCount = tblEmployee.getTbl().getRowCount();
+    return String.format("NV%03d", rowCount + 1); // ví dụ NV001, NV002,...
+}
+
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
 
          var modal = new InfoEmployeeModal() ;
-            modal.closeModel(new ActionListener() {       
+         modal.closeModel(new ActionListener() {       
                 ServiceModal modal = new ServiceModal();
   
             @Override
@@ -196,15 +313,17 @@ public class EmployeeManagement extends javax.swing.JPanel {
             }
 
         });
-        modal.saveData(new ActionListener() {
+         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
 
-                GlassPanePopup.closePopupLast();
-
+                modal.getLblErrolName().setForeground(Color.red);
+                modal.getLblErrolEmail().setForeground(Color.red);
+                modal.getLblErrolPhone().setForeground(Color.red);
+                modal.getLblErrolHireDate().setForeground(Color.red);
             }
         });
-        GlassPanePopup.showPopup(modal);
+        GlassPanePopup.showPopup(modal);                                        
     }//GEN-LAST:event_button1ActionPerformed
 
 

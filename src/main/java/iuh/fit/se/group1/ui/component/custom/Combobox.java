@@ -15,9 +15,20 @@ public class Combobox<E> extends JComboBox<E> {
         setForeground(new Color(50, 50, 50));
         setBackground(new Color(250, 250, 250));
         setBorder(new EmptyBorder(4, 8, 4, 8));
-        setFocusable(false);
+        setFocusable(true);
         setUI(new ModernComboBoxUI());
     }
+
+
+    
+    public Combobox(ComboBoxModel<E> aModel) {
+        super(aModel);
+    }
+
+    public Combobox() {
+    }
+    
+
 
     // ===== Custom modern flat UI =====
     private static class ModernComboBoxUI extends BasicComboBoxUI {
@@ -27,20 +38,31 @@ public class Combobox<E> extends JComboBox<E> {
         private final Color focusBorder = new Color(140, 170, 255);
 
         @Override
-        protected JButton createArrowButton() {
-            JButton arrow = new JButton("\u25BC"); // ▼
-            arrow.setBorderPainted(false);
-            arrow.setFocusPainted(false);
-            arrow.setContentAreaFilled(false);
-            arrow.setOpaque(false);
-            arrow.setForeground(new Color(100, 100, 100));
-            arrow.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 10));
-            return arrow;
+protected JButton createArrowButton() {
+    JButton arrow = new JButton("\u25BC"); // ▼
+    arrow.setBorderPainted(false);
+    arrow.setFocusPainted(false);
+    arrow.setContentAreaFilled(false);
+    arrow.setOpaque(false);
+    arrow.setForeground(new Color(100, 100, 100));
+    arrow.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 10));
+
+    // ✅ Thêm dòng này để khi click vào mũi tên thì popup mở ra
+    arrow.addActionListener(e -> {
+        if (comboBox != null) {
+            comboBox.setPopupVisible(!comboBox.isPopupVisible());
         }
+    });
+
+    return arrow;
+}
+
 
         @Override
         public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
             Graphics2D g2 = (Graphics2D) g.create();
+            comboBox.setFocusable(true);
+
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             Color bg = comboBox.isPopupVisible() ? hoverBackground : background;
