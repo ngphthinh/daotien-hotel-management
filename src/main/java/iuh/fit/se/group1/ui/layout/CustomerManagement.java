@@ -87,7 +87,7 @@ public class CustomerManagement extends javax.swing.JPanel {
 
         tblCustomer.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);  // chiều rộng mong muốn
         tblCustomer.getTbl().getColumnModel().getColumn(1).setPreferredWidth(150);
-        tblCustomer.getTbl().getColumnModel().getColumn(2).setPreferredWidth(100);
+        tblCustomer.getTbl().getColumnModel().getColumn(2).setPreferredWidth(150);
         tblCustomer.getTbl().getColumnModel().getColumn(3).setPreferredWidth(120);
         tblCustomer.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
         tblCustomer.getTbl().getColumnModel().getColumn(5).setPreferredWidth(90);
@@ -104,7 +104,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
 
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Giới tính        \u25BC");
+                lbl.setText("Giới tính                  \u25BC");
 //                lbl.setIcon(FontIcon.of(FontAwesomeSolid.ARROW_DOWN, 16, Color.DARK_GRAY));
                 lbl.setHorizontalTextPosition(SwingConstants.LEFT);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
@@ -118,7 +118,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 int col = tblCustomer.getTbl().columnAtPoint(e.getPoint());
 
-                if (col == 4) {
+                if (col == 8) {
                     tblCustomer.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblCustomer.getTbl().setCursor(Cursor.getDefaultCursor());

@@ -91,8 +91,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         tblEmployee.getTbl().getColumnModel().getColumn(0).setPreferredWidth(120);  // chiều rộng mong muốn
         tblEmployee.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
-        tblEmployee.getTbl().getColumnModel().getColumn(2).setPreferredWidth(70);
-        tblEmployee.getTbl().getColumnModel().getColumn(3).setPreferredWidth(70);
+        tblEmployee.getTbl().getColumnModel().getColumn(2).setPreferredWidth(120);
+        tblEmployee.getTbl().getColumnModel().getColumn(3).setPreferredWidth(120);
         tblEmployee.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
         tblEmployee.getTbl().getColumnModel().getColumn(5).setPreferredWidth(80);
 
@@ -138,7 +138,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
 
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Giới tính            \u25BC");
+                lbl.setText("Giới tính                              \u25BC");
 //                lbl.setIcon(FontIcon.of(FontAwesomeSolid.ARROW_DOWN, 16, Color.DARK_GRAY));
                 lbl.setHorizontalTextPosition(SwingConstants.LEFT);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
@@ -146,19 +146,63 @@ public class EmployeeManagement extends javax.swing.JPanel {
             }
             return comp;
         });
-
+        
         tblEmployee.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
 
-                if (col == 4) {
+                if (col == 5) {
                     tblEmployee.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblEmployee.getTbl().setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
+
+        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Nhân viên", "Quản lý"});
+        TableColumn columnChucVu = tblEmployee.getTbl().getColumnModel().getColumn(3);
+
+        columnChucVu.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+            if (comp instanceof JLabel lbl) {
+                lbl.setText("Chức vụ                              \u25BC"); // ▼
+                lbl.setHorizontalAlignment(SwingConstants.LEFT);
+                lbl.setIconTextGap(5);
+            }
+            return comp;
+        });
+
+
+        header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
+                if (col == 3) { // Cột "Chức vụ"
+                    Rectangle rect = header.getHeaderRect(col);
+                    cmbChucVu.setBounds(rect);
+                    cmbChucVu.setVisible(true);
+                    header.add(cmbChucVu);
+                    cmbChucVu.showPopup();
+
+                    cmbChucVu.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusLost(FocusEvent fe) {
+                            cmbChucVu.setVisible(false);
+                            header.remove(cmbChucVu);
+                        }
+                    });
+                }
+            }
+        });
+
+        cmbChucVu.addActionListener(ev -> {
+            String selected = (String) cmbChucVu.getSelectedItem();
+            System.out.println("Filter chức vụ: " + selected);
+            header.remove(cmbChucVu);
+            header.repaint();
+        });
+
 
         cmb.addActionListener(ev -> {
             String selected = (String) cmb.getSelectedItem();

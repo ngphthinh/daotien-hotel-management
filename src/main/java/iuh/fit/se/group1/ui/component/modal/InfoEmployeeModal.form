@@ -43,7 +43,7 @@
                           <Component id="lblEmail" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
-                      <Component id="cboGender" min="-2" pref="241" max="-2" attributes="0"/>
+                      <Component id="cmbGender" min="-2" pref="241" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="lblPhone" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
@@ -93,7 +93,7 @@
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-                              <Component id="cboPosition" min="-2" pref="623" max="-2" attributes="0"/>
+                              <Component id="cmbPosition" min="-2" pref="623" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -173,7 +173,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="lblGender" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cboGender" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="cmbGender" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -187,7 +187,7 @@
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="cboPosition" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
+                  <Component id="cmbPosition" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
                   <Component id="lblPosition" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
@@ -381,12 +381,15 @@
         <Property name="text" type="java.lang.String" value="Ng&#xe0;y b&#x1eaf;t &#x111;&#x1ea7;u kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cboGender">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cmbGender">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboGenderActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbGenderActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cboPosition">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cmbPosition">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbPositionActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

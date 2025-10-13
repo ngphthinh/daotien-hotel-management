@@ -129,13 +129,13 @@ private DateChooser dateChooser;
      */
     public InfoCustomerModal() {
         initComponents();
-        cboGender.removeAllItems();
-        cboGender.addItem("Nam");
-        cboGender.setLightWeightPopupEnabled(false);
-        cboGender.addItem("Nữ");
-        cboGender.setBackground(new java.awt.Color(240, 248, 255)); 
-        cboGender.setForeground(new java.awt.Color(51, 51, 51));     
-        cboGender.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
+        cmbGender.removeAllItems();
+        cmbGender.addItem("Nam");
+        cmbGender.setLightWeightPopupEnabled(false);
+        cmbGender.addItem("Nữ");
+        cmbGender.setBackground(new java.awt.Color(240, 248, 255)); 
+        cmbGender.setForeground(new java.awt.Color(51, 51, 51));     
+        cmbGender.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
         txtDob.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         iconDate.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
         iconDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -211,7 +211,7 @@ private DateChooser dateChooser;
         lblErrolCitizen = new javax.swing.JLabel();
         lblErrolAddress = new javax.swing.JLabel();
         lblErrolDob = new javax.swing.JLabel();
-        cboGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        cmbGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -314,9 +314,9 @@ private DateChooser dateChooser;
         lblErrolDob.setForeground(new java.awt.Color(255, 255, 255));
         lblErrolDob.setText("Ngày sinh không hợp lệ");
 
-        cboGender.addActionListener(new java.awt.event.ActionListener() {
+        cmbGender.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cboGenderActionPerformed(evt);
+                cmbGenderActionPerformed(evt);
             }
         });
 
@@ -360,7 +360,7 @@ private DateChooser dateChooser;
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblErrolCitizen)
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(cboGender, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+                                        .addComponent(cmbGender, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
                                         .addComponent(txtCitizen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -389,7 +389,7 @@ private DateChooser dateChooser;
                     .addComponent(lblName)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblGender)
-                    .addComponent(cboGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblErrolName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -456,15 +456,15 @@ private DateChooser dateChooser;
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCitizenActionPerformed
 
-    private void cboGenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboGenderActionPerformed
+    private void cmbGenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbGenderActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_cboGenderActionPerformed
+    }//GEN-LAST:event_cmbGenderActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;
     private iuh.fit.se.group1.ui.component.custom.Button btnSave;
-    private iuh.fit.se.group1.ui.component.custom.Combobox cboGender;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cmbGender;
     private javax.swing.JLabel iconDate;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JLabel lblAddress;

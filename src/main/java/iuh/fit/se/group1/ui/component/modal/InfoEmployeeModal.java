@@ -25,11 +25,11 @@ import org.kordamp.ikonli.swing.FontIcon;
 public class InfoEmployeeModal extends javax.swing.JPanel {
 
     public Combobox getCboGender() {
-        return cboGender;
+        return cmbGender;
     }
 
     public void setCboGender(Combobox cboGender) {
-        this.cboGender = cboGender;
+        this.cmbGender = cboGender;
     }
 
     public TextField getTxtEmail() {
@@ -69,20 +69,20 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
     private DateChooser dateChooser;
     public InfoEmployeeModal() {
         initComponents();
-        cboGender.removeAllItems();
-        cboGender.addItem("Nam");
-        cboGender.setLightWeightPopupEnabled(false);
-        cboGender.addItem("Nữ");
-        cboGender.setBackground(new java.awt.Color(240, 248, 255)); 
-        cboGender.setForeground(new java.awt.Color(51, 51, 51));     
-        cboGender.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
-        cboPosition.removeAllItems();
-        cboPosition.addItem("Nhân viên");
-        cboPosition.setLightWeightPopupEnabled(false);
-        cboPosition.addItem("Quản lí");
-        cboPosition.setBackground(new java.awt.Color(240, 248, 255)); 
-        cboPosition.setForeground(new java.awt.Color(51, 51, 51));     
-        cboPosition.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+        cmbGender.removeAllItems();
+        cmbGender.addItem("Nam");
+        cmbGender.setLightWeightPopupEnabled(false);
+        cmbGender.addItem("Nữ");
+        cmbGender.setBackground(new java.awt.Color(240, 248, 255)); 
+        cmbGender.setForeground(new java.awt.Color(51, 51, 51));     
+        cmbGender.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
+        cmbPosition.removeAllItems();
+        cmbPosition.addItem("Nhân viên");
+        cmbPosition.setLightWeightPopupEnabled(false);
+        cmbPosition.addItem("Quản lí");
+        cmbPosition.setBackground(new java.awt.Color(240, 248, 255)); 
+        cmbPosition.setForeground(new java.awt.Color(51, 51, 51));     
+        cmbPosition.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
         txtHireDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         iconDate.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
         iconDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -207,8 +207,8 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         lblErrolPhone = new javax.swing.JLabel();
         lblErrolEmail = new javax.swing.JLabel();
         lblErrolHireDate = new javax.swing.JLabel();
-        cboGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
-        cboPosition = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        cmbGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        cmbPosition = new iuh.fit.se.group1.ui.component.custom.Combobox();
 
         jScrollPane1.setViewportView(jEditorPane1);
 
@@ -299,9 +299,15 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         lblErrolHireDate.setForeground(new java.awt.Color(255, 255, 255));
         lblErrolHireDate.setText("Ngày bắt đầu không hợp lệ");
 
-        cboGender.addActionListener(new java.awt.event.ActionListener() {
+        cmbGender.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cboGenderActionPerformed(evt);
+                cmbGenderActionPerformed(evt);
+            }
+        });
+
+        cmbPosition.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbPositionActionPerformed(evt);
             }
         });
 
@@ -317,7 +323,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
                             .addComponent(lblName)
                             .addComponent(lblEmail))
                         .addGap(32, 32, 32)
-                        .addComponent(cboGender, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cmbGender, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(35, 35, 35)
                         .addComponent(lblPhone)
                         .addContainerGap())
@@ -354,7 +360,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
                                         .addGap(0, 0, Short.MAX_VALUE))))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(3, 3, 3)
-                                .addComponent(cboPosition, javax.swing.GroupLayout.PREFERRED_SIZE, 623, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cmbPosition, javax.swing.GroupLayout.PREFERRED_SIZE, 623, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -413,7 +419,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblGender)
-                        .addComponent(cboGender, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cmbGender, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtHireDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -423,7 +429,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
                         .addComponent(lblErrolHireDate)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cboPosition, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbPosition, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblPosition))
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -460,16 +466,20 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtPhoneActionPerformed
 
-    private void cboGenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboGenderActionPerformed
+    private void cmbGenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbGenderActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_cboGenderActionPerformed
+    }//GEN-LAST:event_cmbGenderActionPerformed
+
+    private void cmbPositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPositionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbPositionActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;
     private iuh.fit.se.group1.ui.component.custom.Button btnSave;
-    private iuh.fit.se.group1.ui.component.custom.Combobox cboGender;
-    private iuh.fit.se.group1.ui.component.custom.Combobox cboPosition;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cmbGender;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cmbPosition;
     private javax.swing.JLabel iconDate;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JScrollPane jScrollPane1;

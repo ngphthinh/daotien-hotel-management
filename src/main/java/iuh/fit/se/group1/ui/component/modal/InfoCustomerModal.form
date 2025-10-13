@@ -67,7 +67,7 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="lblErrolCitizen" min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="cboGender" pref="187" max="32767" attributes="0"/>
+                                      <Component id="cmbGender" pref="187" max="32767" attributes="0"/>
                                       <Component id="txtCitizen" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
@@ -109,7 +109,7 @@
                   <Component id="lblName" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtName" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblGender" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="cboGender" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cmbGender" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblErrolName" min="-2" max="-2" attributes="0"/>
@@ -350,9 +350,9 @@
         <Property name="text" type="java.lang.String" value="Ng&#xe0;y sinh kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cboGender">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cmbGender">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboGenderActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbGenderActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
