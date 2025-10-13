@@ -19,6 +19,11 @@ public class Combobox<E> extends JComboBox<E> {
         setUI(new ModernComboBoxUI());
     }
 
+    public Combobox() {
+    }
+
+    
+    
     // ===== Custom modern flat UI =====
     private static class ModernComboBoxUI extends BasicComboBoxUI {
         private final Color borderColor = new Color(210, 210, 210);

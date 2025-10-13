@@ -116,6 +116,10 @@ public class Table extends javax.swing.JPanel {
         this.scr = scr;
     }
 
+    public void setBackGroundScr(Color c){
+        scr.setBackground(c);
+    }
+    
     public JTable getTbl() {
         return tbl;
     }

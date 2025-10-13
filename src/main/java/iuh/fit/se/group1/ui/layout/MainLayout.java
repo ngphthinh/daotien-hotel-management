@@ -100,8 +100,9 @@ public class MainLayout extends JPanel {
                     setMainContent(new CustomerManagement());
                 }else if (index == 5) {
                     setMainContent(new PromotionManagement());
-                }else 
-                    
+                }else if (index == 1) {
+                    setMainContent(new BookingPage());
+                }else
                 {
                     System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar");
                 }

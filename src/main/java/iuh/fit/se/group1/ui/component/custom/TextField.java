@@ -7,6 +7,9 @@ public class TextField extends JTextField {
 
     private int borderRadius = 15;
 
+    private Color borderColor = Color.BLACK;
+
+
     public TextField() {
         init();
     }
@@ -35,12 +38,17 @@ public class TextField extends JTextField {
         super.paintComponent(g);
 
         // ⚫ Viền đen bo góc (vẽ SAU CÙNG để không bị đè)
-        g2.setColor(Color.BLACK);
+        g2.setColor(borderColor);
         g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, borderRadius, borderRadius);
 
         g2.dispose();
     }
 
+    public void setBorderColor(Color color) {
+        this.borderColor = color;
+        repaint();
+    }
+    
     public void setBorderRadius(int borderRadius) {
         this.borderRadius = borderRadius;
         repaint();
