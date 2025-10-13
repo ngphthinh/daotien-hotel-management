@@ -138,7 +138,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
 
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Giới tính        \u25BC");
+                lbl.setText("Giới tính            \u25BC");
 //                lbl.setIcon(FontIcon.of(FontAwesomeSolid.ARROW_DOWN, 16, Color.DARK_GRAY));
                 lbl.setHorizontalTextPosition(SwingConstants.LEFT);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
@@ -166,7 +166,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
             header.remove(cmb);
             header.repaint();
         });
-
         header.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -191,9 +190,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 }
             }
         });
-        
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -254,6 +251,11 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 .addGap(37, 37, 37))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private String generateEmployeeCode() {
+    int rowCount = tblEmployee.getTbl().getRowCount();
+    return String.format("NV%03d", rowCount + 1); // ví dụ NV001, NV002,...
+}
 
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
 

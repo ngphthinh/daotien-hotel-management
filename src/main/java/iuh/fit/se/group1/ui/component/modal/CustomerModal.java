@@ -9,11 +9,11 @@ package iuh.fit.se.group1.ui.component.modal;
  *
  * @author hoxuy
  */
-public class CustomerModel extends javax.swing.JPanel {
+public class CustomerModal extends javax.swing.JPanel {
     /**
      * Creates new form CustomerModel
      */
-    public CustomerModel() {
+    public CustomerModal() {
         initComponents();
        
     }
@@ -34,9 +34,8 @@ public class CustomerModel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(seviceModel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addGap(0, 196, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
