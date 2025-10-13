@@ -4,37 +4,178 @@
  */
 package iuh.fit.se.group1.ui.component.modal;
 
+import com.raven.datechooser.DateChooser;
+import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.ui.component.custom.Button;
-import java.awt.Color;
+import iuh.fit.se.group1.ui.component.custom.TextField;
+import iuh.fit.se.group1.util.Constants;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
+import java.util.Date;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 
 /**
  *
  * @author Windows
  */
 public class InfoCustomerModal extends javax.swing.JPanel {
-
+private DateChooser dateChooser;
     public Button getButton2() {
-        return btnDong;
+        return btnClose;
+    }
+
+    public JLabel getLblErrolEmail() {
+        return lblErrolEmail;
+    }
+
+    public void setLblErrolEmail(JLabel lblErrolEmail) {
+        this.lblErrolEmail = lblErrolEmail;
     }
 
     public void setButton2(Button button2) {
-        this.btnDong = button2;
+        this.btnClose = button2;
     }
 
+    public JLabel getLblErrolAddress() {
+        return lblErrolAddress;
+    }
+
+    public void setLblErrolAddress(JLabel lblErrolAddress) {
+        this.lblErrolAddress = lblErrolAddress;
+    }
+
+    public JLabel getLblErrolCitizen() {
+        return lblErrolCitizen;
+    }
+
+    public void setLblErrolCitizen(JLabel lblErrolCitizen) {
+        this.lblErrolCitizen = lblErrolCitizen;
+    }
+
+    public JLabel getLblErrolDob() {
+        return lblErrolDob;
+    }
+
+    public void setLblErrolDob(JLabel lblErrolDob) {
+        this.lblErrolDob = lblErrolDob;
+    }
+
+    public JLabel getLblErrolName() {
+        return lblErrolName;
+    }
+
+    public void setLblErrolName(JLabel lblErrolName) {
+        this.lblErrolName = lblErrolName;
+    }
+
+    public JLabel getLblErrolPhone() {
+        return lblErrolPhone;
+    }
+
+    public void setLblErrolPhone(JLabel lblErrolPhone) {
+        this.lblErrolPhone = lblErrolPhone;
+    }
+    
+    
+
+    public TextField getTxtAddress() {
+        return txtAddress;
+    }
+
+    public void setTxtAddress(TextField txtAddress) {
+        this.txtAddress = txtAddress;
+    }
+
+    public TextField getTxtCitizen() {
+        return txtCitizen;
+    }
+
+    public void setTxtCitizen(TextField txtCitizen) {
+        this.txtCitizen = txtCitizen;
+    }
+
+    public TextField getTxtDob() {
+        return txtDob;
+    }
+
+    public void setTxtDob(TextField txtDob) {
+        this.txtDob = txtDob;
+    }
+
+    public TextField getTxtEmail() {
+        return txtEmail;
+    }
+
+    public void setTxtEmail(TextField txtEmail) {
+        this.txtEmail = txtEmail;
+    }
+
+    public TextField getTxtGender() {
+        return txtGender;
+    }
+
+    public void setTxtGender(TextField txtGender) {
+        this.txtGender = txtGender;
+    }
+
+    public TextField getTxtPhone() {
+        return txtPhone;
+    }
+
+    public void setTxtPhone(TextField txtPhone) {
+        this.txtPhone = txtPhone;
+    }
+
+    
     /**
      * Creates new form InfoCustomerModal
      */
     public InfoCustomerModal() {
         initComponents();
+        txtDob.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        iconDate.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
+        iconDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        dateChooser = new DateChooser();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        txtDob.setText(sdf.format(new Date()));
+        dateChooser.setDateFormat("dd/MM/yyyy");
+        dateChooser.toDay();
+        dateChooser.setForeground(Constants.COLOR_ICON_MENU);
+        dateChooser.addEventDateChooser((action, date) -> {
+            if (action.getAction() == SelectedAction.DAY_SELECTED) {
+                dateChooser.hidePopup();
+            }
+        });
+        dateChooser.setTextRefernce(txtDob);
+        iconDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                dateChooser.showPopup(txtDob, 0, txtDob.getHeight());
+            }
+        });
+        dateChooser = new DateChooser();
+        dateChooser.setTextRefernce(txtDob);
+        try {
+            var popup = DateChooser.class.getDeclaredField("popup");
+            popup.setAccessible(true);
+            JPopupMenu popupMenu = (JPopupMenu) popup.get(dateChooser);
+            popupMenu.setLightWeightPopupEnabled(false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void closeModel (ActionListener ac) {
-        btnDong.addActionListener(ac);
+        btnClose.addActionListener(ac);
     }
 
     public void saveData(ActionListener ac) {
-        btnLuu.addActionListener(ac);
+        btnSave.addActionListener(ac);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -46,50 +187,60 @@ public class InfoCustomerModal extends javax.swing.JPanel {
     private void initComponents() {
 
         jProgressBar1 = new javax.swing.JProgressBar();
-        lblTieuDe = new javax.swing.JLabel();
-        lblMa = new javax.swing.JLabel();
-        lblTen = new javax.swing.JLabel();
-        lblSDT = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
+        lblName = new javax.swing.JLabel();
+        lblPhone = new javax.swing.JLabel();
         lblEmail = new javax.swing.JLabel();
-        lblGioiTinh = new javax.swing.JLabel();
-        lblCCCD = new javax.swing.JLabel();
-        lblDiaChi = new javax.swing.JLabel();
-        lblNgaySinh = new javax.swing.JLabel();
-        txtTen = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtSDT = new iuh.fit.se.group1.ui.component.custom.TextField();
+        lblGender = new javax.swing.JLabel();
+        lblCitizen = new javax.swing.JLabel();
+        lblAddress = new javax.swing.JLabel();
+        lblDob = new javax.swing.JLabel();
+        txtName = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtPhone = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtEmail = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtCCCD = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtGioiTinh = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtDiaChi = new iuh.fit.se.group1.ui.component.custom.TextField();
-        btnLuu = new iuh.fit.se.group1.ui.component.custom.Button();
-        txtNgaySinh = new iuh.fit.se.group1.ui.component.custom.TextField();
-        btnDong = new iuh.fit.se.group1.ui.component.custom.Button();
-        txtMa = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtCitizen = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtGender = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtAddress = new iuh.fit.se.group1.ui.component.custom.TextField();
+        btnSave = new iuh.fit.se.group1.ui.component.custom.Button();
+        txtDob = new iuh.fit.se.group1.ui.component.custom.TextField();
+        btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
+        iconDate = new javax.swing.JLabel();
+        lblErrolName = new javax.swing.JLabel();
+        lblErrolPhone = new javax.swing.JLabel();
+        lblErrolEmail = new javax.swing.JLabel();
+        lblErrolCitizen = new javax.swing.JLabel();
+        lblErrolAddress = new javax.swing.JLabel();
+        lblErrolDob = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
-        lblTieuDe.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblTieuDe.setText("Thông tin khách hàng");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTitle.setText("Thông tin khách hàng");
 
-        lblMa.setText("Mã khách hàng:");
+        lblName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblName.setText("Tên khách hàng:");
 
-        lblTen.setText("Tên khách hàng:");
+        lblPhone.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblPhone.setText("Số điện thoại:");
 
-        lblSDT.setText("Số điện thoại:");
-
+        lblEmail.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblEmail.setText("Email:");
 
-        lblGioiTinh.setText("Giới tính:");
+        lblGender.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblGender.setText("Giới tính:");
 
-        lblCCCD.setText("Căn cước công dân:");
+        lblCitizen.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblCitizen.setText("Căn cước công dân:");
 
-        lblDiaChi.setText("Địa chỉ:");
+        lblAddress.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblAddress.setText("Địa chỉ:");
 
-        lblNgaySinh.setText("Ngày sinh");
+        lblDob.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblDob.setText("Ngày sinh");
 
-        txtTen.addActionListener(new java.awt.event.ActionListener() {
+        txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTenActionPerformed(evt);
+                txtNameActionPerformed(evt);
             }
         });
 
@@ -99,121 +250,168 @@ public class InfoCustomerModal extends javax.swing.JPanel {
             }
         });
 
-        txtDiaChi.addActionListener(new java.awt.event.ActionListener() {
+        txtAddress.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtDiaChiActionPerformed(evt);
+                txtAddressActionPerformed(evt);
             }
         });
 
-        btnLuu.setBackground(new java.awt.Color(91, 189, 64));
-        btnLuu.setForeground(new java.awt.Color(255, 255, 255));
-        btnLuu.setText("Lưu");
-        btnLuu.addActionListener(new java.awt.event.ActionListener() {
+        btnSave.setBackground(new java.awt.Color(91, 189, 64));
+        btnSave.setForeground(new java.awt.Color(255, 255, 255));
+        btnSave.setText("Lưu");
+        btnSave.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLuuActionPerformed(evt);
+                btnSaveActionPerformed(evt);
             }
         });
 
-        txtNgaySinh.addActionListener(new java.awt.event.ActionListener() {
+        txtDob.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNgaySinhActionPerformed(evt);
+                txtDobActionPerformed(evt);
             }
         });
 
-        btnDong.setBackground(new java.awt.Color(255, 51, 0));
-        btnDong.setForeground(new java.awt.Color(255, 255, 255));
-        btnDong.setText("X");
-        btnDong.addActionListener(new java.awt.event.ActionListener() {
+        btnClose.setBackground(new java.awt.Color(255, 51, 0));
+        btnClose.setForeground(new java.awt.Color(255, 255, 255));
+        btnClose.setText("X");
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDongActionPerformed(evt);
+                btnCloseActionPerformed(evt);
             }
         });
 
-        txtMa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtMaActionPerformed(evt);
-            }
-        });
+        iconDate.setText("   ");
+
+        lblErrolName.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolName.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolName.setText("Tên khách hàng không hợp lệ");
+
+        lblErrolPhone.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolPhone.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolPhone.setText("Số điện thoại không hợp lệ");
+
+        lblErrolEmail.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolEmail.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolEmail.setText("Email không hợp lệ");
+
+        lblErrolCitizen.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolCitizen.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolCitizen.setText("Căn cước công dân không hợp lệ");
+
+        lblErrolAddress.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolAddress.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolAddress.setText("Địa chỉ không hợp lệ");
+
+        lblErrolDob.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolDob.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolDob.setText("Ngày sinh không hợp lệ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblCCCD, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblEmail)
-                    .addComponent(lblSDT)
-                    .addComponent(lblTen)
-                    .addComponent(lblMa)
-                    .addComponent(lblGioiTinh)
-                    .addComponent(lblDiaChi)
-                    .addComponent(lblNgaySinh))
-                .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtDiaChi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtGioiTinh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtCCCD, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtNgaySinh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtTen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtSDT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtMa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(52, 52, 52))
-            .addGroup(layout.createSequentialGroup()
                 .addGap(128, 128, 128)
-                .addComponent(lblTieuDe)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnDong, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblTitle)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnLuu, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(144, 144, 144))
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(139, 139, 139))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(36, 36, 36)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCitizen, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblEmail)
+                    .addComponent(lblPhone)
+                    .addComponent(lblName)
+                    .addComponent(lblGender)
+                    .addComponent(lblAddress)
+                    .addComponent(lblDob))
+                .addGap(50, 50, 50)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblErrolName)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtPhone, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtCitizen, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtGender, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtAddress, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtDob, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(12, 12, 12)
+                        .addComponent(iconDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(52, 52, 52))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblErrolDob)
+                            .addComponent(lblErrolAddress)
+                            .addComponent(lblErrolCitizen)
+                            .addComponent(lblErrolEmail)
+                            .addComponent(lblErrolPhone))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTieuDe)
-                    .addComponent(btnDong, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblMa)
-                    .addComponent(txtMa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblTitle)
+                    .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtTen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTen))
-                .addGap(18, 18, 18)
+                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblName))
+                .addGap(4, 4, 4)
+                .addComponent(lblErrolName)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtSDT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblSDT))
-                .addGap(18, 18, 18)
+                    .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPhone))
+                .addGap(4, 4, 4)
+                .addComponent(lblErrolPhone)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblEmail))
-                .addGap(18, 18, 18)
+                .addGap(4, 4, 4)
+                .addComponent(lblErrolEmail)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtCCCD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCCCD))
-                .addGap(17, 17, 17)
+                    .addComponent(txtCitizen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCitizen))
+                .addGap(4, 4, 4)
+                .addComponent(lblErrolCitizen)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblGioiTinh)
-                    .addComponent(txtGioiTinh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, Short.MAX_VALUE)
+                    .addComponent(lblGender)
+                    .addComponent(txtGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblDiaChi)
-                    .addComponent(txtDiaChi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNgaySinh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNgaySinh))
-                .addGap(29, 29, 29)
-                .addComponent(btnLuu, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
+                    .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblAddress))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblErrolAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(iconDate)
+                            .addComponent(lblDob))
+                        .addGap(50, 50, 50))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(txtDob, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblErrolDob)
+                        .addGap(24, 24, 24)))
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -221,51 +419,52 @@ public class InfoCustomerModal extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtEmailActionPerformed
 
-    private void txtDiaChiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDiaChiActionPerformed
+    private void txtAddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAddressActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtDiaChiActionPerformed
+    }//GEN-LAST:event_txtAddressActionPerformed
 
-    private void txtTenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTenActionPerformed
+    private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtTenActionPerformed
+    }//GEN-LAST:event_txtNameActionPerformed
 
-    private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnLuuActionPerformed
+    }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnDongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDongActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnDongActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
-    private void txtNgaySinhActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNgaySinhActionPerformed
+    private void txtDobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDobActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtNgaySinhActionPerformed
-
-    private void txtMaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtMaActionPerformed
+    }//GEN-LAST:event_txtDobActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button btnDong;
-    private iuh.fit.se.group1.ui.component.custom.Button btnLuu;
+    private iuh.fit.se.group1.ui.component.custom.Button btnClose;
+    private iuh.fit.se.group1.ui.component.custom.Button btnSave;
+    private javax.swing.JLabel iconDate;
     private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JLabel lblCCCD;
-    private javax.swing.JLabel lblDiaChi;
+    private javax.swing.JLabel lblAddress;
+    private javax.swing.JLabel lblCitizen;
+    private javax.swing.JLabel lblDob;
     private javax.swing.JLabel lblEmail;
-    private javax.swing.JLabel lblGioiTinh;
-    private javax.swing.JLabel lblMa;
-    private javax.swing.JLabel lblNgaySinh;
-    private javax.swing.JLabel lblSDT;
-    private javax.swing.JLabel lblTen;
-    private javax.swing.JLabel lblTieuDe;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtCCCD;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtDiaChi;
+    private javax.swing.JLabel lblErrolAddress;
+    private javax.swing.JLabel lblErrolCitizen;
+    private javax.swing.JLabel lblErrolDob;
+    private javax.swing.JLabel lblErrolEmail;
+    private javax.swing.JLabel lblErrolName;
+    private javax.swing.JLabel lblErrolPhone;
+    private javax.swing.JLabel lblGender;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblPhone;
+    private javax.swing.JLabel lblTitle;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtAddress;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtCitizen;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtDob;
     private iuh.fit.se.group1.ui.component.custom.TextField txtEmail;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtGioiTinh;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtMa;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtNgaySinh;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtSDT;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtTen;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtGender;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtName;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtPhone;
     // End of variables declaration//GEN-END:variables
 }

@@ -2,7 +2,7 @@
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Component class="iuh.fit.se.group1.ui.component.ServiceModal" name="seviceModel1">
+    <Component class="iuh.fit.se.group1.ui.component.modal.ServiceModal" name="seviceModel1">
     </Component>
   </NonVisualComponents>
   <Properties>
@@ -44,7 +44,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="iuh.fit.se.group1.ui.component.ServiceModal" name="seviceModel3">
+    <Component class="iuh.fit.se.group1.ui.component.modal.ServiceModal" name="seviceModel3">
     </Component>
   </SubComponents>
 </Form>

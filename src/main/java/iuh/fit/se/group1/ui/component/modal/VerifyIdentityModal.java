@@ -31,48 +31,47 @@ public class VerifyIdentityModal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        button2 = new iuh.fit.se.group1.ui.component.custom.Button();
-        button3 = new iuh.fit.se.group1.ui.component.custom.Button();
-        textField1 = new iuh.fit.se.group1.ui.swing.TextField();
-        jLabel1 = new javax.swing.JLabel();
+        btnBack = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnContinue = new iuh.fit.se.group1.ui.component.custom.Button();
+        txtCitizenID = new iuh.fit.se.group1.ui.swing.TextField();
+        lblTitle = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
-        button2.setBackground(new java.awt.Color(153, 153, 153));
-        button2.setForeground(new java.awt.Color(255, 255, 255));
-        button2.setText("Quay lại");
-        button2.setBorderRadius(25);
-        button2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        button2.addActionListener(new java.awt.event.ActionListener() {
+        btnBack.setBackground(new java.awt.Color(153, 153, 153));
+        btnBack.setForeground(new java.awt.Color(255, 255, 255));
+        btnBack.setText("Quay lại");
+        btnBack.setBorderRadius(25);
+        btnBack.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button2ActionPerformed(evt);
+                btnBackActionPerformed(evt);
             }
         });
 
-        button3.setBackground(new java.awt.Color(91, 189, 64));
-        button3.setForeground(new java.awt.Color(255, 255, 255));
-        button3.setText("Tiếp tục");
-        button3.setBorderRadius(25);
-        button3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        button3.addActionListener(new java.awt.event.ActionListener() {
+        btnContinue.setBackground(new java.awt.Color(91, 189, 64));
+        btnContinue.setForeground(new java.awt.Color(255, 255, 255));
+        btnContinue.setText("Tiếp tục");
+        btnContinue.setBorderRadius(25);
+        btnContinue.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnContinue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button3ActionPerformed(evt);
+                btnContinueActionPerformed(evt);
             }
         });
 
-        textField1.setBackground(new java.awt.Color(255, 255, 255));
-        textField1.setLabelText("Nhập căn cước công dân của bạn");
-        textField1.setLineColor(new java.awt.Color(102, 102, 102));
-        textField1.addActionListener(new java.awt.event.ActionListener() {
+        txtCitizenID.setLabelText("Nhập căn cước công dân của bạn");
+        txtCitizenID.setLineColor(new java.awt.Color(102, 102, 102));
+        txtCitizenID.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textField1ActionPerformed(evt);
+                txtCitizenIDActionPerformed(evt);
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Quên mật khẩu?");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(51, 51, 51));
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitle.setText("Quên mật khẩu?");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -80,26 +79,26 @@ public class VerifyIdentityModal extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(51, 51, 51)
-                .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnContinue, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(51, 51, 51))
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(36, Short.MAX_VALUE)
-                .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtCitizenID, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(37, 37, 37))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtCitizenID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(button3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnContinue, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -125,30 +124,30 @@ public class VerifyIdentityModal extends javax.swing.JPanel {
 
     
     public void sendRestCode (ActionListener e){
-        button3.addActionListener(e);
+        btnContinue.addActionListener(e);
     }
     
      public void closeModal (ActionListener e){
-        button2.addActionListener(e);
+        btnBack.addActionListener(e);
     }
     
-    private void textField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField1ActionPerformed
+    private void txtCitizenIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCitizenIDActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_textField1ActionPerformed
+    }//GEN-LAST:event_txtCitizenIDActionPerformed
 
-    private void button3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button3ActionPerformed
+    private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_button3ActionPerformed
+    }//GEN-LAST:event_btnContinueActionPerformed
 
-    private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_button2ActionPerformed
+    }//GEN-LAST:event_btnBackActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button button2;
-    private iuh.fit.se.group1.ui.component.custom.Button button3;
-    private javax.swing.JLabel jLabel1;
-    private iuh.fit.se.group1.ui.swing.TextField textField1;
+    private iuh.fit.se.group1.ui.component.custom.Button btnBack;
+    private iuh.fit.se.group1.ui.component.custom.Button btnContinue;
+    private javax.swing.JLabel lblTitle;
+    private iuh.fit.se.group1.ui.swing.TextField txtCitizenID;
     // End of variables declaration//GEN-END:variables
 }

@@ -23,15 +23,15 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
-              <Component id="button2" min="-2" pref="116" max="-2" attributes="0"/>
+              <Component id="btnBack" min="-2" pref="116" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="button3" min="-2" pref="116" max="-2" attributes="0"/>
+              <Component id="btnContinue" min="-2" pref="116" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
           </Group>
-          <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
+          <Component id="lblTitle" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace pref="36" max="32767" attributes="0"/>
-              <Component id="textField1" min="-2" pref="335" max="-2" attributes="0"/>
+              <Component id="txtCitizenID" min="-2" pref="335" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -39,13 +39,13 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jLabel1" min="-2" pref="45" max="-2" attributes="0"/>
+              <Component id="lblTitle" min="-2" pref="45" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="textField1" min="-2" max="-2" attributes="0"/>
+              <Component id="txtCitizenID" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="button2" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
-                  <Component id="button3" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
+                  <Component id="btnBack" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
+                  <Component id="btnContinue" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
           </Group>
@@ -53,7 +53,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button2">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnBack">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="99" green="99" red="99" type="rgb"/>
@@ -70,10 +70,10 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button2ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBackActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button3">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnContinue">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="40" green="bd" red="5b" type="rgb"/>
@@ -90,24 +90,21 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button3ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnContinueActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.swing.TextField" name="textField1">
+    <Component class="iuh.fit.se.group1.ui.swing.TextField" name="txtCitizenID">
       <Properties>
-        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="ff" green="ff" red="ff" type="rgb"/>
-        </Property>
         <Property name="labelText" type="java.lang.String" value="Nh&#x1ead;p c&#x103;n c&#x1b0;&#x1edb;c c&#xf4;ng d&#xe2;n c&#x1ee7;a b&#x1ea1;n"/>
         <Property name="lineColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="66" green="66" red="66" type="rgb"/>
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textField1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtCitizenIDActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="lblTitle">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="24" style="1"/>

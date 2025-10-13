@@ -4,10 +4,8 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.ServiceModal;
-import iuh.fit.se.group1.ui.component.custom.message.Message;
+import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
-import iuh.fit.se.group1.util.Constants;
 
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;

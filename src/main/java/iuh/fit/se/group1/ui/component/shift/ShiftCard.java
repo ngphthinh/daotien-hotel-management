@@ -5,14 +5,14 @@
 package iuh.fit.se.group1.ui.component.shift;
 
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.border.LineBorder;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -21,6 +21,94 @@ import org.kordamp.ikonli.swing.FontIcon;
  * @author Administrator
  */
 public class ShiftCard extends javax.swing.JPanel {
+
+    public AvatarLabel getAvatarLabel1() {
+        return avatarLabel1;
+    }
+
+    public void setAvatarLabel1(AvatarLabel avatarLabel1) {
+        this.avatarLabel1 = avatarLabel1;
+    }
+
+    public AvatarLabel getAvatarLabel2() {
+        return avatarLabel2;
+    }
+
+    public void setAvatarLabel2(AvatarLabel avatarLabel2) {
+        this.avatarLabel2 = avatarLabel2;
+    }
+
+    public JButton getBtnAdd() {
+        return btnAdd;
+    }
+
+    public void setBtnAdd(JButton btnAdd) {
+        this.btnAdd = btnAdd;
+    }
+
+    public JLabel getLblCode1() {
+        return lblCode1;
+    }
+
+    public void setLblCode1(JLabel lblCode1) {
+        this.lblCode1 = lblCode1;
+    }
+
+    public JLabel getLblCode2() {
+        return lblCode2;
+    }
+
+    public void setLblCode2(JLabel lblCode2) {
+        this.lblCode2 = lblCode2;
+    }
+
+    public JLabel getLblName1() {
+        return lblName1;
+    }
+
+    public void setLblName1(JLabel lblName1) {
+        this.lblName1 = lblName1;
+    }
+
+    public JLabel getLblName2() {
+        return lblName2;
+    }
+
+    public void setLblName2(JLabel lblName2) {
+        this.lblName2 = lblName2;
+    }
+
+    public JLabel getLblTime() {
+        return lblTime;
+    }
+
+    public void setLblTime(JLabel lblTime) {
+        this.lblTime = lblTime;
+    }
+
+    public JLabel getLblTitle() {
+        return lblTitle;
+    }
+
+    public void setLblTitle(JLabel lblTitle) {
+        this.lblTitle = lblTitle;
+    }
+
+    public JPanel getPnlInforEmployee1() {
+        return pnlInforEmployee1;
+    }
+
+    public void setPnlInforEmployee1(JPanel pnlInforEmployee1) {
+        this.pnlInforEmployee1 = pnlInforEmployee1;
+    }
+
+    public JPanel getPnlInforEmployee2() {
+        return pnlInforEmployee2;
+    }
+
+    public void setPnlInforEmployee2(JPanel pnlInforEmployee2) {
+        this.pnlInforEmployee2 = pnlInforEmployee2;
+    }
 
     /**
      * Creates new form ShiftPanel
@@ -68,21 +156,21 @@ public class ShiftCard extends javax.swing.JPanel {
     private void styleButton() {
         // Tạo icon "+" bằng Ikonli (Material pack)
         FontIcon plusIcon = FontIcon.of(Material.ADD, 36, new Color(33, 150, 243));
-        jButton1.setIcon(plusIcon);
-        jButton1.setText(null); // ẩn text mặc định
+        btnAdd.setIcon(plusIcon);
+        btnAdd.setText(null); // ẩn text mặc định
 
         // Làm nút trong suốt, không border mặc định
-        jButton1.setFocusPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.setBorderPainted(false);
-        jButton1.setOpaque(false);
-        jButton1.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAdd.setFocusPainted(false);
+        btnAdd.setContentAreaFilled(false);
+        btnAdd.setBorderPainted(false);
+        btnAdd.setOpaque(false);
+        btnAdd.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         // Gán kích thước nút
-        jButton1.setSize(60, 60);
+        btnAdd.setSize(60, 60);
 
         // Hover: đổi màu icon
-        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnAdd.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 plusIcon.setIconColor(new Color(25, 118, 210));
@@ -95,7 +183,7 @@ public class ShiftCard extends javax.swing.JPanel {
         });
 
         // ⚙️ Bo tròn nút bằng custom UI thay vì tạo nút mới
-        jButton1.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
+        btnAdd.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
         @Override
         public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
             Graphics2D g2 = (Graphics2D) g.create();
@@ -113,7 +201,7 @@ public class ShiftCard extends javax.swing.JPanel {
             }
 
             // 🔹 Nền tròn (hover sáng hơn)
-            if (jButton1.getModel().isRollover()) {
+            if (btnAdd.getModel().isRollover()) {
                 g2.setColor(new Color(245, 245, 245));
             } else {
                 g2.setColor(Color.WHITE);
@@ -139,105 +227,105 @@ public class ShiftCard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
+        lblTime = new javax.swing.JLabel();
+        btnAdd = new javax.swing.JButton();
+        pnlInforEmployee1 = new javax.swing.JPanel();
+        lblName1 = new javax.swing.JLabel();
+        lblCode1 = new javax.swing.JLabel();
         avatarLabel1 = new iuh.fit.se.group1.ui.component.custom.AvatarLabel();
-        jPanel2 = new javax.swing.JPanel();
+        pnlInforEmployee2 = new javax.swing.JPanel();
         avatarLabel2 = new iuh.fit.se.group1.ui.component.custom.AvatarLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        lblName2 = new javax.swing.JLabel();
+        lblCode2 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMinimumSize(new java.awt.Dimension(500, 300));
         setPreferredSize(new java.awt.Dimension(450, 275));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel1.setText("CA 02");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 61, 38));
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(102, 102, 102));
+        lblTitle.setText("CA 02");
+        add(lblTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 61, 38));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel2.setText("13H-18H");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 40, 180, 50));
+        lblTime.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTime.setText("13H-18H");
+        add(lblTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 40, 180, 50));
 
-        jButton1.setPreferredSize(new java.awt.Dimension(60, 60));
-        add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 180, 70, 70));
+        btnAdd.setPreferredSize(new java.awt.Dimension(60, 60));
+        add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 180, 70, 70));
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        pnlInforEmployee1.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel3.setText("Nguyễn Chí Tâm");
+        lblName1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblName1.setText("Nguyễn Chí Tâm");
 
-        jLabel4.setText("NV732221213");
+        lblCode1.setText("NV732221213");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlInforEmployee1Layout = new javax.swing.GroupLayout(pnlInforEmployee1);
+        pnlInforEmployee1.setLayout(pnlInforEmployee1Layout);
+        pnlInforEmployee1Layout.setHorizontalGroup(
+            pnlInforEmployee1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInforEmployee1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(avatarLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(pnlInforEmployee1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblName1, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+                    .addComponent(lblCode1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        pnlInforEmployee1Layout.setVerticalGroup(
+            pnlInforEmployee1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInforEmployee1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(pnlInforEmployee1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(pnlInforEmployee1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(avatarLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlInforEmployee1Layout.createSequentialGroup()
+                        .addComponent(lblName1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4)
+                        .addComponent(lblCode1)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 300, 70));
+        add(pnlInforEmployee1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 300, 70));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        pnlInforEmployee2.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel5.setText("Nguyễn Trần Phước Thịnh");
+        lblName2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblName2.setText("Nguyễn Trần Phước Thịnh");
 
-        jLabel6.setText("NV213812731");
+        lblCode2.setText("NV213812731");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlInforEmployee2Layout = new javax.swing.GroupLayout(pnlInforEmployee2);
+        pnlInforEmployee2.setLayout(pnlInforEmployee2Layout);
+        pnlInforEmployee2Layout.setHorizontalGroup(
+            pnlInforEmployee2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlInforEmployee2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(avatarLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(pnlInforEmployee2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblName2, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                    .addComponent(lblCode2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+        pnlInforEmployee2Layout.setVerticalGroup(
+            pnlInforEmployee2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInforEmployee2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlInforEmployee2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlInforEmployee2Layout.createSequentialGroup()
+                        .addComponent(lblName2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel6))
+                        .addComponent(lblCode2))
                     .addComponent(avatarLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 300, 70));
+        add(pnlInforEmployee2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 300, 70));
     }// </editor-fold>//GEN-END:initComponents
 
     public static void main(String[] args) {
@@ -254,14 +342,14 @@ public class ShiftCard extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel1;
     private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel2;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JLabel lblCode1;
+    private javax.swing.JLabel lblCode2;
+    private javax.swing.JLabel lblName1;
+    private javax.swing.JLabel lblName2;
+    private javax.swing.JLabel lblTime;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JPanel pnlInforEmployee1;
+    private javax.swing.JPanel pnlInforEmployee2;
     // End of variables declaration//GEN-END:variables
 }
