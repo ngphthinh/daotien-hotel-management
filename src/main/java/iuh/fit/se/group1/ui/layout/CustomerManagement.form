@@ -24,9 +24,9 @@
           <Component id="headerCustom1" alignment="1" pref="1212" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <Component id="lblTitleCustomer" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="button1" min="-2" pref="211" max="-2" attributes="0"/>
+              <Component id="btnAddCustomer" min="-2" pref="211" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="87" max="-2" attributes="0"/>
           </Group>
           <Component id="tblCustomer" alignment="0" max="32767" attributes="0"/>
@@ -38,8 +38,8 @@
               <Component id="headerCustom1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="button1" alignment="3" min="-2" pref="46" max="-2" attributes="0"/>
-                  <Component id="jLabel1" alignment="3" min="-2" pref="58" max="-2" attributes="0"/>
+                  <Component id="btnAddCustomer" alignment="3" min="-2" pref="46" max="-2" attributes="0"/>
+                  <Component id="lblTitleCustomer" alignment="3" min="-2" pref="58" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="tblCustomer" min="-2" pref="663" max="-2" attributes="0"/>
@@ -51,7 +51,7 @@
   <SubComponents>
     <Component class="iuh.fit.se.group1.ui.component.HeaderCustom" name="headerCustom1">
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="lblTitleCustomer">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="30" style="1"/>
@@ -62,7 +62,7 @@
         <Property name="text" type="java.lang.String" value="Qu&#x1ea3;n l&#xfd; kh&#xe1;ch h&#xe0;ng"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnAddCustomer">
       <Properties>
         <Property name="text" type="java.lang.String" value="Th&#xea;m kh&#xe1;ch h&#xe0;ng"/>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -70,14 +70,14 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddCustomerActionPerformed"/>
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.table.Table" name="tblCustomer">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-            <EmptyBorder bottom="20" left="20" right="20" top="1"/>
+            <EmptyBorder bottom="0" left="0" right="0" top="1"/>
           </Border>
         </Property>
       </Properties>

@@ -90,8 +90,8 @@
               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="332" max="-2" attributes="0"/>
-              <Component id="btnSave" min="-2" pref="203" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="326" max="-2" attributes="0"/>
+              <Component id="btnSave" min="-2" pref="215" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -149,9 +149,9 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblErrolDob" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
-              <Component id="btnSave" min="-2" pref="46" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnSave" min="-2" pref="33" max="-2" attributes="0"/>
+              <EmptySpace pref="33" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -222,23 +222,38 @@
       </Properties>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtName">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Tr&#x1ea7;m H&#x1ed3;ng Vi&#xea;n Thi&#x1ec7;u"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtNameActionPerformed"/>
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtPhone">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="0977707088"/>
+      </Properties>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtEmail">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="vienthieu692005@gmail.com"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtEmailActionPerformed"/>
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtCitizen">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="084205004821"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtCitizenActionPerformed"/>
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtAddress">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Duyen Hai, Tra Vinh, Viet Nam"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtAddressActionPerformed"/>
       </Events>

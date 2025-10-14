@@ -7,6 +7,7 @@ package iuh.fit.se.group1.ui.component.modal;
 import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.util.Constants;
 import java.awt.event.ActionListener;
@@ -78,6 +79,22 @@ public class InfoCustomerModal extends javax.swing.JPanel {
     public void setLblErrolPhone(JLabel lblErrolPhone) {
         this.lblErrolPhone = lblErrolPhone;
     }
+
+    public Button getBtnClose() {
+        return btnClose;
+    }
+
+    public void setBtnClose(Button btnClose) {
+        this.btnClose = btnClose;
+    }
+
+    public Button getBtnSave() {
+        return btnSave;
+    }
+
+    public void setBtnSave(Button btnSave) {
+        this.btnSave = btnSave;
+    }
     
     
 
@@ -121,6 +138,22 @@ public class InfoCustomerModal extends javax.swing.JPanel {
 
     public void setTxtPhone(TextField txtPhone) {
         this.txtPhone = txtPhone;
+    }
+
+    public TextField getTxtName() {
+        return txtName;
+    }
+
+    public void setTxtName(TextField txtName) {
+        this.txtName = txtName;
+    }
+
+    public Combobox getCmbGender() {
+        return cmbGender;
+    }
+
+    public void setCmbGender(Combobox cmbGender) {
+        this.cmbGender = cmbGender;
     }
 
     
@@ -239,24 +272,30 @@ public class InfoCustomerModal extends javax.swing.JPanel {
         lblDob.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblDob.setText("Ngày sinh");
 
+        txtName.setText("Trầm Hồng Viên Thiệu");
         txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
             }
         });
 
+        txtPhone.setText("0977707088");
+
+        txtEmail.setText("vienthieu692005@gmail.com");
         txtEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtEmailActionPerformed(evt);
             }
         });
 
+        txtCitizen.setText("084205004821");
         txtCitizen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCitizenActionPerformed(evt);
             }
         });
 
+        txtAddress.setText("Duyen Hai, Tra Vinh, Viet Nam");
         txtAddress.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtAddressActionPerformed(evt);
@@ -373,8 +412,8 @@ public class InfoCustomerModal extends javax.swing.JPanel {
                     .addComponent(iconDate, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(31, 31, 31))
             .addGroup(layout.createSequentialGroup()
-                .addGap(332, 332, 332)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(326, 326, 326)
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -422,9 +461,9 @@ public class InfoCustomerModal extends javax.swing.JPanel {
                     .addComponent(lblDob))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblErrolDob)
-                .addGap(37, 37, 37)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(33, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
