@@ -16,26 +16,24 @@
     
     
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.miglayout/miglayout-swing -->
         <dependency>
             <groupId>com.miglayout</groupId>
             <artifactId>miglayout-swing</artifactId>
             <version>11.4.2</version>
         </dependency>
+
         <dependency>
             <groupId>org.netbeans.external</groupId>
             <artifactId>AbsoluteLayout</artifactId>
             <version>RELEASE270</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>2.0.30</version>
         </dependency>
 
-
-
-        <!-- https://mvnrepository.com/artifact/net.java.dev.timingframework/timingframework -->
         <dependency>
             <groupId>net.java.dev.timingframework</groupId>
             <artifactId>timingframework</artifactId>
@@ -47,6 +45,7 @@
             <artifactId>ikonli-core</artifactId>
             <version>12.3.1</version>
         </dependency>
+
         <!-- Swing bindings -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
@@ -65,15 +64,35 @@
             <artifactId>ikonli-material-pack</artifactId>
             <version>12.3.1</version>
         </dependency>
+
        <dependency>
-    <groupId>com.raven</groupId>
-    <artifactId>glasspane-popup</artifactId>
-    <version>2.0.1</version>
-</dependency>
-<dependency>
-    <groupId>com.raven.datechooser</groupId>
-  <artifactId>datechooser</artifactId>
-  <version>0.0.1</version>
-</dependency>
+            <groupId>com.raven</groupId>
+            <artifactId>glasspane-popup</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.raven.datechooser</groupId>
+          <artifactId>datechooser</artifactId>
+          <version>0.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.5.4</version> <!-- hoặc bản mới nhất -->
+        </dependency>
+
+        <dependency>
+            <groupId>com.raven.chart</groupId>
+            <artifactId>swing-chart</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.6</version>
+        </dependency>
     </dependencies>
 </project>
