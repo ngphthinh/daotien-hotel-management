@@ -6,6 +6,7 @@ package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.*;
@@ -253,7 +254,7 @@ public class RoomManagement extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddRoomActionPerformed
-        ServiceModal modal = new ServiceModal();
+        RoomManagementModal modal = new RoomManagementModal();
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -266,8 +267,9 @@ public class RoomManagement extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent ae) {
 //                modal.getjLabel1().setText("HIihihi");
 //                GlassPanePopup.closePopupLast();
-                modal.getLblErrorPrice().setForeground(Color.red);
-                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
+                modal.getLblErrolNumberRoom().setForeground(Color.red);
+                modal.getLblErrolPriceRoom().setForeground(Color.red);
+//                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
             }
         });
         GlassPanePopup.showPopup(modal);

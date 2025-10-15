@@ -4,6 +4,12 @@
  */
 package iuh.fit.se.group1.ui.component.modal;
 
+import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.custom.TextField;
+import java.awt.event.ActionListener;
+import javax.swing.JLabel;
+
 /**
  *
  * @author Windows
@@ -15,6 +21,132 @@ public class RoomManagementModal extends javax.swing.JPanel {
      */
     public RoomManagementModal() {
         initComponents();
+        cmbTypeRoom.setBackground(new java.awt.Color(240, 248, 255)); 
+        cmbTypeRoom.setForeground(new java.awt.Color(51, 51, 51));     
+        cmbTypeRoom.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
+        cmbTypeRoom.removeAllItems();
+        cmbTypeRoom.addItem("Phòng đơn");
+        cmbTypeRoom.setLightWeightPopupEnabled(false);
+        cmbTypeRoom.addItem("Phòng đôi");
+        
+        cmbStatus.setBackground(new java.awt.Color(240, 248, 255)); 
+        cmbStatus.setForeground(new java.awt.Color(51, 51, 51));     
+        cmbStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
+        cmbStatus.removeAllItems();
+        cmbStatus.addItem("Còn phòng");
+        cmbStatus.setLightWeightPopupEnabled(false);
+        cmbStatus.addItem("Hết phòng");
+    }
+    
+    public void saveData(ActionListener ac) {
+        btnSave.addActionListener(ac);
+    }
+     public void closeModel (ActionListener ac) {
+        btnClose.addActionListener(ac);
+    }
+
+    public Button getBtnClose() {
+        return btnClose;
+    }
+
+    public void setBtnClose(Button btnClose) {
+        this.btnClose = btnClose;
+    }
+
+    public Button getBtnSave() {
+        return btnSave;
+    }
+
+    public void setBtnSave(Button btnSave) {
+        this.btnSave = btnSave;
+    }
+
+    public Combobox getCmbStatus() {
+        return cmbStatus;
+    }
+
+    public void setCmbStatus(Combobox cmbStatus) {
+        this.cmbStatus = cmbStatus;
+    }
+
+    public Combobox getCmbTypeRoom() {
+        return cmbTypeRoom;
+    }
+
+    public void setCmbTypeRoom(Combobox cmbTypeRoom) {
+        this.cmbTypeRoom = cmbTypeRoom;
+    }
+
+    public JLabel getLblErrolNumberRoom() {
+        return lblErrolNumberRoom;
+    }
+
+    public void setLblErrolNumberRoom(JLabel lblErrolNumberRoom) {
+        this.lblErrolNumberRoom = lblErrolNumberRoom;
+    }
+
+    public JLabel getLblErrolPriceRoom() {
+        return lblErrolPriceRoom;
+    }
+
+    public void setLblErrolPriceRoom(JLabel lblErrolPriceRoom) {
+        this.lblErrolPriceRoom = lblErrolPriceRoom;
+    }
+
+    public JLabel getLblNumberRoom() {
+        return lblNumberRoom;
+    }
+
+    public void setLblNumberRoom(JLabel lblNumberRoom) {
+        this.lblNumberRoom = lblNumberRoom;
+    }
+
+    public JLabel getLblPriceRoom() {
+        return lblPriceRoom;
+    }
+
+    public void setLblPriceRoom(JLabel lblPriceRoom) {
+        this.lblPriceRoom = lblPriceRoom;
+    }
+
+    public JLabel getLblStatus() {
+        return lblStatus;
+    }
+
+    public void setLblStatus(JLabel lblStatus) {
+        this.lblStatus = lblStatus;
+    }
+
+    public JLabel getLblTitle() {
+        return lblTitle;
+    }
+
+    public void setLblTitle(JLabel lblTitle) {
+        this.lblTitle = lblTitle;
+    }
+
+    public JLabel getLblTypeRoom() {
+        return lblTypeRoom;
+    }
+
+    public void setLblTypeRoom(JLabel lblTypeRoom) {
+        this.lblTypeRoom = lblTypeRoom;
+    }
+
+    public TextField getTxtNumberRoom() {
+        return txtNumberRoom;
+    }
+
+    public void setTxtNumberRoom(TextField txtNumberRoom) {
+        this.txtNumberRoom = txtNumberRoom;
+    }
+
+    public TextField getTxtPriceRoom() {
+        return txtPriceRoom;
+    }
+
+    public void setTxtPriceRoom(TextField txtPriceRoom) {
+        this.txtPriceRoom = txtPriceRoom;
     }
 
     /**
@@ -26,19 +158,177 @@ public class RoomManagementModal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblTitle = new javax.swing.JLabel();
+        lblNumberRoom = new javax.swing.JLabel();
+        lblTypeRoom = new javax.swing.JLabel();
+        lblPriceRoom = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
+        btnSave = new iuh.fit.se.group1.ui.component.custom.Button();
+        txtNumberRoom = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtPriceRoom = new iuh.fit.se.group1.ui.component.custom.TextField();
+        cmbTypeRoom = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        cmbStatus = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
+        lblErrolNumberRoom = new javax.swing.JLabel();
+        lblErrolPriceRoom = new javax.swing.JLabel();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTitle.setText("Thêm Phòng");
+
+        lblNumberRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblNumberRoom.setText("Số phòng:");
+
+        lblTypeRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblTypeRoom.setText("Loại phòng:");
+
+        lblPriceRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblPriceRoom.setText("Giá phòng:");
+
+        lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblStatus.setText("Trạng thái:");
+
+        btnSave.setBackground(new java.awt.Color(91, 189, 64));
+        btnSave.setForeground(new java.awt.Color(255, 255, 255));
+        btnSave.setText("Thêm");
+        btnSave.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+
+        cmbTypeRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbTypeRoomActionPerformed(evt);
+            }
+        });
+
+        cmbStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbStatusActionPerformed(evt);
+            }
+        });
+
+        btnClose.setBackground(new java.awt.Color(255, 51, 0));
+        btnClose.setForeground(new java.awt.Color(255, 255, 255));
+        btnClose.setText("X");
+        btnClose.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCloseActionPerformed(evt);
+            }
+        });
+
+        lblErrolNumberRoom.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolNumberRoom.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolNumberRoom.setText("jLabel1");
+
+        lblErrolPriceRoom.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolPriceRoom.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolPriceRoom.setText("jLabel3");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTypeRoom)
+                            .addComponent(lblPriceRoom)
+                            .addComponent(lblStatus))
+                        .addGap(40, 40, 40)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                            .addComponent(txtPriceRoom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmbTypeRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblErrolPriceRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblNumberRoom)
+                        .addGap(50, 50, 50)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTitle)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtNumberRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblErrolNumberRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 20, Short.MAX_VALUE)))))
+                .addGap(17, 17, 17))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(lblTitle))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNumberRoom)
+                    .addComponent(txtNumberRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addComponent(lblErrolNumberRoom)
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbTypeRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTypeRoom))
+                .addGap(30, 30, 30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPriceRoom)
+                    .addComponent(txtPriceRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addComponent(lblErrolPriceRoom)
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblStatus))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cmbTypeRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTypeRoomActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbTypeRoomActionPerformed
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCloseActionPerformed
+
+    private void cmbStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbStatusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbStatusActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.custom.Button btnClose;
+    private iuh.fit.se.group1.ui.component.custom.Button btnSave;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cmbStatus;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cmbTypeRoom;
+    private javax.swing.JLabel lblErrolNumberRoom;
+    private javax.swing.JLabel lblErrolPriceRoom;
+    private javax.swing.JLabel lblNumberRoom;
+    private javax.swing.JLabel lblPriceRoom;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JLabel lblTypeRoom;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtNumberRoom;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtPriceRoom;
     // End of variables declaration//GEN-END:variables
 }
