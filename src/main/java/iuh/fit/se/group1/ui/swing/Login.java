@@ -51,8 +51,8 @@ public class Login extends javax.swing.JFrame {
         addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
-                int w = getWidth();
-                int h = getHeight();
+                int w = getContentPane().getWidth();
+                int h = getContentPane().getHeight();
 
                 // Căn giữa panelLogin
                 int pw = panelLogin.getPreferredSize().width;
@@ -61,8 +61,12 @@ public class Login extends javax.swing.JFrame {
                 int y = (h - ph) / 2;
                 panelLogin.setBounds(x, y, pw, ph);
 
-                // Panel body luôn full frame
+                // Panel body full content pane
                 panelBody.setBounds(0, 0, w, h);
+                background1.revalidate();
+            background1.repaint();
+            panelBody.revalidate();
+                panelBody.repaint();
             }
         });
         btnEye.setIcon(FontIcon.of(FontAwesomeSolid.EYE, 20)); // 20px, to hơn mặc định
@@ -384,7 +388,11 @@ public class Login extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Login().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> {
+        Login login = new Login();
+        login.setExtendedState(login.getExtendedState() | javax.swing.JFrame.MAXIMIZED_BOTH);
+        login.setVisible(true);
+    });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

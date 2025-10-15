@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.menu.*;
-import iuh.fit.se.group1.ui.swing.Login;
 import iuh.fit.se.group1.util.Constants;
 import raven.glasspanepopup.GlassPanePopup;
 
@@ -102,7 +101,7 @@ public class MainLayout extends JPanel {
                 }else if (index == 5) {
                     setMainContent(new PromotionManagement());
                 }else if (index == 1) {
-                    setMainContent(new BookingPage());
+                    setMainContent(new OrderManagement());
                 }else
                 {
                     System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar");
