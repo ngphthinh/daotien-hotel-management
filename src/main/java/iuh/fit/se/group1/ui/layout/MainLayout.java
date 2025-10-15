@@ -102,7 +102,7 @@ public class MainLayout extends JPanel {
                 }else if (index == 5) {
                     setMainContent(new PromotionManagement());
                 }else if (index == 1) {
-                    setMainContent(new BookingPage());
+                    setMainContent(new OrderManagement());
                 }else
                 {
                     System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar");
