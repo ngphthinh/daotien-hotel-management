@@ -123,7 +123,7 @@
                   <Component id="lblErrolPrice" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblErrolDiscountPersent" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="lblStarDate" min="-2" max="-2" attributes="0"/>
                   <Component id="txtStarDate" alignment="0" max="32767" attributes="0"/>
@@ -131,7 +131,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblErrolStarDate" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtEndDate" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblEndDate" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -139,7 +139,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblErrolEndDate" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblDesciption" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtDesciption" alignment="3" min="-2" max="-2" attributes="0"/>
