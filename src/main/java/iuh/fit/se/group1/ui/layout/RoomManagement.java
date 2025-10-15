@@ -266,7 +266,7 @@ public class RoomManagement extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent ae) {
 //                modal.getjLabel1().setText("HIihihi");
-//                GlassPanePopup.closePopupLast();
+                GlassPanePopup.closePopupLast();
                 modal.getLblErrolNumberRoom().setForeground(Color.red);
                 modal.getLblErrolPriceRoom().setForeground(Color.red);
 //                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
