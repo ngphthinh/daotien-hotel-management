@@ -23,7 +23,6 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="headerBooking1" pref="1215" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
-              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
               <Component id="scrollPaneWin111" min="-2" pref="639" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel1" max="32767" attributes="0"/>
@@ -51,7 +50,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="iuh.fit.se.group1.ui.component.order.InfoOrder" name="infoOrder2">
+        <Component class="iuh.fit.se.group1.ui.component.payment.InfoPayment" name="infoPayment1">
         </Component>
       </SubComponents>
     </Container>

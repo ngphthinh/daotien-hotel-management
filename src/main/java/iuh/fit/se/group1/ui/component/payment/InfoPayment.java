@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package iuh.fit.se.group1.ui.component.order;
+package iuh.fit.se.group1.ui.component.payment;
 
 import iuh.fit.se.group1.ui.component.booking.InfoOrderPanel;
 import iuh.fit.se.group1.ui.component.booking.InfoPromotionOrderPanel;
@@ -25,13 +25,13 @@ import org.kordamp.ikonli.swing.FontIcon;
  *
  * @author Administrator
  */
-public class InfoOrder extends javax.swing.JPanel {
+public class InfoPayment extends javax.swing.JPanel {
     private int countSurcharge = 1;
     private int countAmenity = 1;
     /**
      * Creates new form infoOrder
      */
-    public InfoOrder() {
+    public InfoPayment() {
         initComponents();
         setOpaque(false);
         iconCustomer.setIcon(FontIcon.of(FontAwesomeSolid.USER, 20, new java.awt.Color(131,176,212)));
@@ -650,7 +650,7 @@ protected void paintComponent(Graphics g) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(700, 800); // bạn có thể chỉnh lại kích thước
             frame.setLocationRelativeTo(null); // căn giữa màn hình
-            frame.setContentPane(new InfoOrder()); // thêm panel InfoOrder vào frame
+            frame.setContentPane(new InfoPayment()); // thêm panel InfoPayment vào frame
             frame.setVisible(true);
         });
     }

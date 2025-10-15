@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package iuh.fit.se.group1.ui.component.order;
+package iuh.fit.se.group1.ui.component.payment;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -12,19 +13,27 @@ import org.kordamp.ikonli.swing.FontIcon;
  *
  * @author Administrator
  */
-public class CastOrder extends javax.swing.JPanel {
+public class CastPaymentModal extends javax.swing.JPanel {
 
     /**
      * Creates new form CastOrder
      */
-    public CastOrder() {
+    public CastPaymentModal() {
         initComponents();
-        btnExit.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 16)); // 16px
-        btnExit.setBorderPainted(false);
-        btnExit.setContentAreaFilled(false);
-        btnExit.setFocusPainted(false);
-        btnExit.setOpaque(false);
-        btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnExit.setIcon(FontIcon.of(FontAwesomeSolid.TIMES_CIRCLE, 16));
+btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+// Bỏ viền, focus
+btnExit.setBorderPainted(false);
+btnExit.setFocusPainted(false);
+
+// Nền trắng
+btnExit.setBackground(Color.WHITE);
+btnExit.setOpaque(true);
+btnExit.setContentAreaFilled(true);
+
+// Icon xám
+btnExit.setForeground(new Color(129, 129, 129));
     }
 
     /**
@@ -46,29 +55,40 @@ public class CastOrder extends javax.swing.JPanel {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Thanh toán tiền mặt");
 
-        btnExit.setText(" ");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(38, 38, 38)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(65, 65, 65)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(btnExit))
-                .addContainerGap(303, Short.MAX_VALUE))
+                .addGap(17, 17, 17)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addContainerGap(318, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+        java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+            window.dispose();
+        }
+    }//GEN-LAST:event_btnExitActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
