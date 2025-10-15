@@ -56,7 +56,8 @@ public class MainLayout extends JPanel {
                     pnlMain.repaint();
                 }
                 if (index == 0) {
-                    setMainContent(new HomePage());
+                    System.out.println("Home");
+                    setMainContent(new Dashboard());
                 } else if (index == 1) {
                     setMainContent(new RoomManagement());
                 } else if (index == 7 && subIndex == 3) {
@@ -85,7 +86,7 @@ public class MainLayout extends JPanel {
             @Override
             public void selected(int index, int subIndex) {
                 if (index == 0) {
-                    setMainContent(homePage);
+                    setMainContent(new Dashboard());
                 } else if (index == 6) {
                     setMainContent(new RoomManagement());
                 } else if (index == 7 && subIndex == 3) {
@@ -141,10 +142,11 @@ public class MainLayout extends JPanel {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-                    JFrame frame = new JFrame("Main Layout");
+                   JFrame frame = new JFrame("Main Layout");
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     GlassPanePopup.install(frame);
-                    frame.setSize(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME);
+//                    frame.setUnd  ecorated(true); // Optional: removes window borders
+                    frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
                     frame.setLocationRelativeTo(null);
                     frame.setContentPane(new MainLayout());
                     frame.setVisible(true);
