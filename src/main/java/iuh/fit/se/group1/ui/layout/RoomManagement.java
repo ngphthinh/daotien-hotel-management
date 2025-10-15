@@ -69,8 +69,8 @@ public class RoomManagement extends javax.swing.JPanel {
         var header = tblRoom.getTbl().getTableHeader();
 
         //todo: hard code
-        Combobox<String> cmbType = new Combobox<>(new String[]{"Loại phòng", "Phòng đơn", "Phòng đôi"});
-        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Trạng thái", "Còn phòng", "Hết phòng"});
+        Combobox<String> cmbType = new Combobox<>(new String[]{ "Phòng đơn", "Phòng đôi"});
+        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Còn trống", "Đang sử dụng","Bảo trì"});
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 

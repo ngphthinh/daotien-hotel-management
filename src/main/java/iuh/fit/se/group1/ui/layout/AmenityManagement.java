@@ -40,67 +40,68 @@ public class AmenityManagement extends javax.swing.JPanel {
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblAmenity.getTbl().setModel(model);
         TableActionEvent event = new TableActionEvent() {
-  @Override
-public void onEdit(int row) {
-    DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
-    String name = (String) model.getValueAt(row, 1);
-    String price = String.valueOf(model.getValueAt(row, 2)); // ✅ sửa chỗ này
+            @Override
+            public void onEdit(int row) {
+                DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
+                String name = (String) model.getValueAt(row, 1);
+                String price = String.valueOf(model.getValueAt(row, 2)); 
 
-    ServiceModal modal = new ServiceModal();
-    modal.getBtnSave().setText("Cập nhật");
+                ServiceModal modal = new ServiceModal();
+                modal.getBtnSave().setText("Cập nhật");
 
-    modal.getTxtName().setText(name);
-    modal.getTxtPrice().setText(price);
+                modal.getTxtName().setText(name);
+                modal.getTxtPrice().setText(price);
 
-    modal.closeModel(ae -> GlassPanePopup.closePopupLast());
-    modal.saveData(ae -> {
-        String nameNew = modal.getTxtName().getText().trim();
-        String priceNew = modal.getTxtPrice().getText().trim();
+                modal.closeModel(ae -> GlassPanePopup.closePopupLast());
+                modal.saveData(ae -> {
+                    String nameNew = modal.getTxtName().getText().trim();
+                    String priceNew = modal.getTxtPrice().getText().trim();
 
-        modal.getLblErrorName().setText("");
-        modal.getLblErrorPrice().setText("");
+                    modal.getLblErrorName().setText("");
+                    modal.getLblErrorPrice().setText("");
 
-        Color red = Color.RED;
-        modal.getLblErrorName().setForeground(red);
-        modal.getLblErrorPrice().setForeground(red);
+                    Color red = Color.RED;
+                    modal.getLblErrorName().setForeground(red);
+                    modal.getLblErrorPrice().setForeground(red);
 
-        boolean valid = true;
+                    boolean valid = true;
 
-        if (nameNew.isEmpty()) {
-            modal.getLblErrorName().setText("Tên không được để trống!");
-            valid = false;
-        } else if (nameNew.length() < 2) {
-            modal.getLblErrorName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
-            valid = false;
-        }
+                    if (nameNew.isEmpty()) {
+                        modal.getLblErrorName().setText("Tên không được để trống!");
+                        valid = false;
+                    } else if (nameNew.length() < 2) {
+                        modal.getLblErrorName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
+                        valid = false;
+                    }
 
-        double priceI = 0;
-        if (priceNew.isEmpty()) {
-            modal.getLblErrorPrice().setText("Giá không được để trống!");
-            valid = false;
-        } else {
-            try {
-                priceI = Double.parseDouble(priceNew);
-                if (priceI <= 0) {
-                    modal.getLblErrorPrice().setText("Giá phải lớn hơn 0!");
-                    valid = false;
-                }
-            } catch (NumberFormatException e) {
-                modal.getLblErrorPrice().setText("Giá phải là số hợp lệ!");
-                valid = false;
+                    double priceI = 0;
+                    if (priceNew.isEmpty()) {
+                        modal.getLblErrorPrice().setText("Giá không được để trống!");
+                        valid = false;
+                    } else {
+                        try {
+                            priceI = Double.parseDouble(priceNew);
+                            if (priceI <= 0) {
+                                modal.getLblErrorPrice().setText("Giá phải lớn hơn 0!");
+                                valid = false;
+                            }
+                        } catch (NumberFormatException e) {
+                            modal.getLblErrorPrice().setText("Giá phải là số hợp lệ!");
+                            valid = false;
+                        }
+                    }
+
+                    if (!valid) {
+                        return;
+                    }
+
+                    model.setValueAt(nameNew, row, 1);
+                    model.setValueAt(priceI, row, 2); 
+                    GlassPanePopup.closePopupLast();
+                });
+
+                GlassPanePopup.showPopup(modal);
             }
-        }
-
-        if (!valid) return;
-
-        model.setValueAt(nameNew, row, 1);
-        model.setValueAt(priceI, row, 2); // ✅ cập nhật đúng kiểu dữ liệu
-        GlassPanePopup.closePopupLast();
-    });
-
-    GlassPanePopup.showPopup(modal);
-}
-
 
             @Override
             public void onDelete(int row) {
@@ -113,7 +114,7 @@ public void onEdit(int row) {
         };
         tblAmenity.setTableActionColumn(tblAmenity.getTbl(), 3, event, false);
         tblAmenity.getTbl().getColumnModel().getColumn(0).setPreferredWidth(200);  // chiều rộng mong muốn
-        tblAmenity.getTbl().getColumnModel().getColumn(1).setPreferredWidth(500);
+        tblAmenity.getTbl().getColumnModel().getColumn(1).setPreferredWidth(300);
         tblAmenity.getTbl().getColumnModel().getColumn(2).setPreferredWidth(200);
         tblAmenity.getTbl().getColumnModel().getColumn(3).setPreferredWidth(80);
 
@@ -239,7 +240,7 @@ public void onEdit(int row) {
                     modal.getLblErrorName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
                     valid = false;
                 }
-                
+
                 double priceI = 0;
                 if (price.isEmpty()) {
                     modal.getLblErrorPrice().setText("Giá không được để trống!");

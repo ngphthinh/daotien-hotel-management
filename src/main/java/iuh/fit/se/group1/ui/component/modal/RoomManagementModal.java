@@ -32,10 +32,12 @@ public class RoomManagementModal extends javax.swing.JPanel {
         cmbStatus.setBackground(new java.awt.Color(240, 248, 255)); 
         cmbStatus.setForeground(new java.awt.Color(51, 51, 51));     
         cmbStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
-        cmbStatus.removeAllItems();
-        cmbStatus.addItem("Còn phòng");
-        cmbStatus.setLightWeightPopupEnabled(false);
-        cmbStatus.addItem("Hết phòng");
+       cmbStatus.removeAllItems();
+cmbStatus.setLightWeightPopupEnabled(false);
+cmbStatus.addItem("Còn trống");
+cmbStatus.addItem("Đang sử dụng");
+cmbStatus.addItem("Bảo trì");
+
     }
     
     public void saveData(ActionListener ac) {
