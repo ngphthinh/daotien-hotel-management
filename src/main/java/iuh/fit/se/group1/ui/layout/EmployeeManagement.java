@@ -13,8 +13,6 @@ import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -22,6 +20,7 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -37,10 +36,11 @@ import raven.glasspanepopup.GlassPanePopup;
  */
 public class EmployeeManagement extends javax.swing.JPanel {
 
-    private Map<String, String> employeeCitizenMap = new HashMap<>();
-    private Map<String, String> employeeEmailMap = new HashMap<>();
-    private Map<String, String> employeeHireDateMap = new HashMap<>();
-    private int employeeCounter = 0;
+    private int activeFilterColumn = -1;
+//    private Map<String, String> employeeCitizenMap = new HashMap<>();
+//    private Map<String, String> employeeEmailMap = new HashMap<>();
+//    private Map<String, String> employeeHireDateMap = new HashMap<>();
+//    private int employeeCounter = 0;
 
     public EmployeeManagement() {
         initComponents();
@@ -57,10 +57,20 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
+
+        tblEmployee.getTbl().setModel(model);
+
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         tblEmployee.getTbl().setRowSorter(sorter);
 
-        tblEmployee.getTbl().setModel(model);
+        tblEmployee.getTbl().setAutoCreateRowSorter(false);
+
+        for (int i = 0; i < tblEmployee.getTbl().getColumnCount(); i++) {
+            if (i != 2 && i != 3) {
+                sorter.setSortable(i, false);
+            }
+        }
+
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -86,9 +96,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 String gioiTinh = (String) model.getValueAt(row, 2);
                 String chucVu = (String) model.getValueAt(row, 3);
                 String sdt = (String) model.getValueAt(row, 4);
-                String citizen = employeeCitizenMap.getOrDefault(maNV, "");
-                String email = employeeEmailMap.getOrDefault(maNV, "");
-                String hireDate = employeeHireDateMap.getOrDefault(maNV, "");
+//                String citizen = employeeCitizenMap.getOrDefault(maNV, "");
+//                String email = employeeEmailMap.getOrDefault(maNV, "");
+//                String hireDate = employeeHireDateMap.getOrDefault(maNV, "");
 
                 InfoEmployeeModal modal = new InfoEmployeeModal();
 
@@ -97,9 +107,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 modal.getTxtPhone().setText(sdt);
                 modal.getCmbGender().setSelectedItem(gioiTinh);
                 modal.getCmbPosition().setSelectedItem(chucVu);
-                modal.getTxtCitizen().setText(citizen);
-                modal.getTxtEmail().setText(email);
-                modal.getTxtHireDate().setText(hireDate);
+//                modal.getTxtCitizen().setText(citizen);
+//                modal.getTxtEmail().setText(email);
+//                modal.getTxtHireDate().setText(hireDate);
 
                 modal.getBtnSave().setText("Cập nhật");
 
@@ -169,9 +179,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     model.setValueAt(chucVuNew, row, 3);
                     model.setValueAt(sdtNew, row, 4);
 
-                    employeeCitizenMap.put(maNV, citizenNew);
-                    employeeEmailMap.put(maNV, emailNew);
-                    employeeHireDateMap.put(maNV, hireDateNew);
+//                    employeeCitizenMap.put(maNV, citizenNew);
+//                    employeeEmailMap.put(maNV, emailNew);
+//                    employeeHireDateMap.put(maNV, hireDateNew);
 
                     GlassPanePopup.closePopupLast();
                 });
@@ -186,7 +196,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 }
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
                 String maNV = (String) model.getValueAt(row, 0);
-                employeeCitizenMap.remove(maNV);
+//                employeeCitizenMap.remove(maNV);
                 model.removeRow(row);
             }
 
@@ -198,9 +208,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 String gioiTinh = (String) model.getValueAt(row, 2);
                 String chucVu = (String) model.getValueAt(row, 3);
                 String sdt = (String) model.getValueAt(row, 4);
-                String citizen = employeeCitizenMap.getOrDefault(maNV, "");
-                String email = employeeEmailMap.getOrDefault(maNV, "");
-                String hireDate = employeeHireDateMap.getOrDefault(maNV, "");
+//                String citizen = employeeCitizenMap.getOrDefault(maNV, "");
+//                String email = employeeEmailMap.getOrDefault(maNV, "");
+//                String hireDate = employeeHireDateMap.getOrDefault(maNV, "");
 
                 InfoEmployeeModal modal = new InfoEmployeeModal();
                 modal.getBtnSave().setText("Xong");
@@ -210,9 +220,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 modal.getTxtPhone().setText(sdt);
                 modal.getCmbGender().setSelectedItem(gioiTinh);
                 modal.getCmbPosition().setSelectedItem(chucVu);
-                modal.getTxtCitizen().setText(citizen);
-                modal.getTxtEmail().setText(email);
-                modal.getTxtHireDate().setText(hireDate);
+//                modal.getTxtCitizen().setText(citizen);
+//                modal.getTxtEmail().setText(email);
+//                modal.getTxtHireDate().setText(hireDate);
 
                 modal.getTxtName().setEditable(false);
                 modal.getTxtPhone().setEditable(false);
@@ -266,68 +276,37 @@ public class EmployeeManagement extends javax.swing.JPanel {
             }
 
         });
+
         var header = tblEmployee.getTbl().getTableHeader();
         Combobox<String> cmb = new Combobox<>(new String[]{"Tất cả", "Nam", "Nữ"});
-        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
-        TableColumn column = tblEmployee.getTbl().getColumnModel().getColumn(2);
-        column.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
-            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
-
-            if (comp instanceof JLabel lbl) {
-                lbl.setText("Giới tính                           \u25BC");
-                lbl.setHorizontalTextPosition(SwingConstants.LEFT);
-                lbl.setHorizontalAlignment(SwingConstants.LEFT);
-                lbl.setIconTextGap(5);
-            }
-            return comp;
-        });
-
-        tblEmployee.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(java.awt.event.MouseEvent e) {
-                int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
-
-                if (col == 5) {
-                    tblEmployee.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                } else {
-                    tblEmployee.getTbl().setCursor(Cursor.getDefaultCursor());
-                }
-            }
-        });
-
         Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Tất cả", "Nhân viên", "Quản lí"});
-        TableColumn columnChucVu = tblEmployee.getTbl().getColumnModel().getColumn(3);
 
-        columnChucVu.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
+
+        for (int i = 0; i < tblEmployee.getTbl().getColumnCount(); i++) {
+            tblEmployee.getTbl().getColumnModel().getColumn(i).setHeaderRenderer(defaultRenderer);
+        }
+
+        TableColumn colGender = tblEmployee.getTbl().getColumnModel().getColumn(2);
+        colGender.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Chức vụ                           \u25BC"); // ▼
+                String text = "Giới tính                           \u25BC";
+                lbl.setText(text);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
-                lbl.setIconTextGap(5);
             }
             return comp;
         });
 
-        header.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
-                if (col == 3) {
-                    Rectangle rect = header.getHeaderRect(col);
-                    cmbChucVu.setBounds(rect);
-                    cmbChucVu.setVisible(true);
-                    header.add(cmbChucVu);
-                    cmbChucVu.showPopup();
-
-                    cmbChucVu.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusLost(FocusEvent fe) {
-                            cmbChucVu.setVisible(false);
-                            header.remove(cmbChucVu);
-                        }
-                    });
-                }
+        TableColumn colPosition = tblEmployee.getTbl().getColumnModel().getColumn(3);
+        colPosition.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+            if (comp instanceof JLabel lbl) {
+                String text = "Chức vụ                           \u25BC";
+                lbl.setText(text);
+                lbl.setHorizontalAlignment(SwingConstants.LEFT);
             }
+            return comp;
         });
 
         cmbChucVu.addActionListener(ev -> {
@@ -345,29 +324,58 @@ public class EmployeeManagement extends javax.swing.JPanel {
             header.remove(cmb);
             header.repaint();
         });
-
         header.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
-                if (col == 2) {
-                    Rectangle rect = header.getHeaderRect(col);
+                int col = header.columnAtPoint(e.getPoint());
+                int oldCol = activeFilterColumn; 
 
-                    cmb.setBounds(rect);
-                    cmb.setVisible(true);
-                    header.add(cmb);
-                    cmb.showPopup();
+                header.remove(cmb);
+                header.remove(cmbChucVu);
 
-                    cmb.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusLost(FocusEvent fe) {
-                            cmb.setVisible(false);
-                            header.remove(cmb);
-                        }
-                    });
+                if (col != 2 && col != 3) {
+                    if (activeFilterColumn != -1) {
+                        activeFilterColumn = -1;
+                        header.repaint(header.getHeaderRect(oldCol));
+                    }
+                    return;
                 }
+
+                activeFilterColumn = col;
+                Rectangle rect = header.getHeaderRect(col);
+
+                if (col == 2) {
+                    cmb.setBounds(rect);
+                    header.add(cmb);
+                    cmb.setVisible(true);
+                    cmb.showPopup();
+                } else if (col == 3) {
+                    cmbChucVu.setBounds(rect);
+                    header.add(cmbChucVu);
+                    cmbChucVu.setVisible(true);
+                    cmbChucVu.showPopup();
+                }
+
+//                Rectangle rect2 = header.getHeaderRect(2);
+//                Rectangle rect3 = header.getHeaderRect(3);
+//
+//// Chỉ vẽ lại khu vực 2 cột lọc
+//                Rectangle repaintArea = rect2.union(rect3);
+//
+//                header.revalidate();
+//
+//// 🚫 Chỉ repaint đúng 2 cột lọc (Giới tính & Chức vụ)
+//                header.repaint(header.getHeaderRect(2));
+//                header.repaint(header.getHeaderRect(3));
+//
+//                SwingUtilities.invokeLater(() -> {
+//                    Rectangle rectMaNV = header.getHeaderRect(0);
+//                    header.repaint(rectMaNV);
+//                });
+
             }
         });
+
     }
 
     @SuppressWarnings("unchecked")
@@ -426,10 +434,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private String generateEmployeeCode() {
-        employeeCounter++;
-        return String.format("NV%03d", employeeCounter);
-    }
+//    private String generateEmployeeCode() {
+//        employeeCounter++;
+//        return String.format("NV%03d", employeeCounter);
+//    }
 
     private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmployeeActionPerformed
 
@@ -445,7 +453,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                String maNV = generateEmployeeCode();
+//                String maNV = generateEmployeeCode();
                 String ten = modal.getTxtName().getText().trim();
                 String email = modal.getTxtEmail().getText().trim();
                 String citizen = modal.getTxtCitizen().getText().trim();
@@ -504,11 +512,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 }
 
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-                model.addRow(new Object[]{maNV, ten, gioiTinh, chucVu, sdt, ""});
-                employeeCitizenMap.put(maNV, citizen);
-                employeeEmailMap.put(maNV, email);
-                employeeHireDateMap.put(maNV, hireDate);
+                model.addRow(new Object[]{"", ten, gioiTinh, chucVu, sdt, ""});
 
+                tblEmployee.getTbl().revalidate();
+                tblEmployee.getTbl().repaint();
                 GlassPanePopup.closePopupLast();
             }
         });
@@ -532,8 +539,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         };
         sorter.setRowFilter(rf);
-        sorter.setSortKeys(java.util.List.of(new javax.swing.RowSorter.SortKey(0, javax.swing.SortOrder.ASCENDING)));
-        sorter.sort();
+        sorter.setSortKeys(null);
+
     }
 
 
