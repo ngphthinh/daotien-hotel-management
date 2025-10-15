@@ -97,21 +97,18 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         jSeparator1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 10));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("CCCD:");
 
         textField1.setBorderColor(new java.awt.Color(105, 105, 105));
         textField1.setBorderRadius(3);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("Tên khách hàng:");
 
         textField2.setBorderColor(new java.awt.Color(105, 105, 105));
         textField2.setBorderRadius(3);
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jLabel4.setText("Số điện thoại:");
 
         textField3.setBorderColor(new java.awt.Color(105, 105, 105));
@@ -123,27 +120,21 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         });
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("Ngày sinh:");
 
         textField4.setBorderColor(new java.awt.Color(105, 105, 105));
         textField4.setBorderRadius(3);
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
         jLabel6.setText("Giới tính:");
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
         jLabel7.setText("Email: ");
 
         textField5.setBorderColor(new java.awt.Color(105, 105, 105));
         textField5.setBorderRadius(3);
 
-        combobox1.setBackground(new java.awt.Color(255, 255, 255));
-
         jCheckBox1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jCheckBox1.setForeground(new java.awt.Color(0, 0, 0));
         jCheckBox1.setText("Tiền cọc");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -208,12 +199,12 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
                     .addComponent(textField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(combobox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox1))
-                .addContainerGap(19, Short.MAX_VALUE))
+                    .addComponent(jCheckBox1)
+                    .addComponent(textField5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

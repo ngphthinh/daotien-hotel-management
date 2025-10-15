@@ -38,6 +38,9 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         DateTimePicker.attachTo(txtEndDate);
         cboRoomType.addItem("Phòng đơn");
         cboRoomType.addItem("Phòng đôi");
+         cboRoomType.setBackground(new java.awt.Color(240, 248, 255)); 
+        cboRoomType.setForeground(new java.awt.Color(51, 51, 51));     
+        cboRoomType.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
     }
     
      @Override
@@ -155,17 +158,14 @@ public class InfoRoomPanel extends javax.swing.JPanel {
 
         lblTypeRoom.setBackground(new java.awt.Color(0, 0, 0));
         lblTypeRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblTypeRoom.setForeground(new java.awt.Color(0, 0, 0));
         lblTypeRoom.setText("Loại phòng");
 
         lblStartDate.setBackground(new java.awt.Color(0, 0, 0));
         lblStartDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblStartDate.setForeground(new java.awt.Color(0, 0, 0));
         lblStartDate.setText("Ngày bắt đầu");
 
         lblEndDate.setBackground(new java.awt.Color(0, 0, 0));
         lblEndDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblEndDate.setForeground(new java.awt.Color(0, 0, 0));
         lblEndDate.setText("Ngày kết thúc");
 
         txtStartDate.setBorderRadius(4);
@@ -184,17 +184,14 @@ public class InfoRoomPanel extends javax.swing.JPanel {
 
         lblRoomId.setBackground(new java.awt.Color(0, 0, 0));
         lblRoomId.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblRoomId.setForeground(new java.awt.Color(0, 0, 0));
         lblRoomId.setText("Mã phòng");
 
         lblPrice.setBackground(new java.awt.Color(0, 0, 0));
         lblPrice.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblPrice.setForeground(new java.awt.Color(0, 0, 0));
         lblPrice.setText("Giá phòng");
 
         lblRoomNumber.setBackground(new java.awt.Color(0, 0, 0));
         lblRoomNumber.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblRoomNumber.setForeground(new java.awt.Color(0, 0, 0));
         lblRoomNumber.setText("Số phòng");
 
         txtRoomNumber.setBorderRadius(4);
@@ -225,8 +222,6 @@ public class InfoRoomPanel extends javax.swing.JPanel {
             }
         });
 
-        cboRoomType.setBackground(new java.awt.Color(255, 255, 255));
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -250,7 +245,7 @@ public class InfoRoomPanel extends javax.swing.JPanel {
                                     .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
                                     .addComponent(txtPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addGap(24, 24, 24)
+                        .addGap(27, 27, 27)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -283,12 +278,12 @@ public class InfoRoomPanel extends javax.swing.JPanel {
                     .addComponent(txtStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cboRoomType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(3, 3, 3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRoomId)
-                    .addComponent(lblPrice)
-                    .addComponent(lblRoomNumber))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lblRoomNumber)
+                    .addComponent(lblPrice))
+                .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
