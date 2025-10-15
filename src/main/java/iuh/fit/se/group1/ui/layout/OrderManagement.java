@@ -29,61 +29,65 @@ public class OrderManagement extends javax.swing.JPanel {
      * Creates new form OrderManagement
      */
     public OrderManagement() {
-    initComponents();
+        initComponents();
 
-    
-    scrollPaneWin111.setOpaque(false);
-scrollPaneWin111.getViewport().setOpaque(false);
-scrollPaneWin111.setBorder(null);
+        scrollPaneWin111.setOpaque(false);
+        scrollPaneWin111.getViewport().setOpaque(false);
+        scrollPaneWin111.setBorder(null);
 
-    // Bo góc trắng cho phần InfoOrder bên trong
-    infoOrder2.setOpaque(true);
-    infoOrder2.setBackground(Color.WHITE);
-    infoOrder2.setBorder(
-        javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createLineBorder(new Color(160, 160, 160), 1, true), // viền bo góc
-            javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        )
-    );
+        // Bo góc trắng cho phần InfoOrder bên trong
+        infoOrder2.setOpaque(true);
+        infoOrder2.setBackground(Color.WHITE);
+        infoOrder2.setBorder(
+                javax.swing.BorderFactory.createCompoundBorder(
+                        javax.swing.BorderFactory.createLineBorder(new Color(160, 160, 160), 1, true), // viền bo góc
+                        javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                )
+        );
 
-    // Bo góc cho jPanel1 (bên phải)
-    jPanel1.setOpaque(true);
-    jPanel1.setBackground(new Color(241,241,241));
-    jPanel1.setBorder(
-        javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createLineBorder(new Color(160, 160, 160), 1, true),
-            javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        )
-    );
-    scrollPaneWin111.setViewportView(infoOrder2);
+        // Bo góc cho jPanel1 (bên phải)
+        jPanel1.setOpaque(true);
+        jPanel1.setBackground(new Color(241, 241, 241));
+        jPanel1.setBorder(
+                javax.swing.BorderFactory.createCompoundBorder(
+                        javax.swing.BorderFactory.createLineBorder(new Color(160, 160, 160), 1, true),
+                        javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                )
+        );
+        scrollPaneWin111.setViewportView(infoOrder2);
         scrollPaneWin111.setPreferredSize(new Dimension(700, 600));
 
-    listBooking.hideOtherPanel();
+        listBooking.hideOtherPanel();
 
-    javax.swing.GroupLayout layout = (javax.swing.GroupLayout) this.getLayout();
-layout.setHorizontalGroup(
-    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        .addGroup(layout.createSequentialGroup()
-            .addGap(0, 0, Short.MAX_VALUE)
-            .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(5)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(0, 0, Short.MAX_VALUE))
-);
-layout.setVerticalGroup(
-    layout.createSequentialGroup()
-        .addComponent(headerBooking1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(10)
-        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
-        .addContainerGap()
-);
-    int contentHeight = 1200; // chiều cao mong muốn, phải lớn hơn viewport
-    infoOrder2.setPreferredSize(new Dimension(infoOrder2.getWidth(), contentHeight));
-    scrollPaneWin111.setViewportView(infoOrder2);
-    
+        javax.swing.GroupLayout layout = (javax.swing.GroupLayout) this.getLayout();
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(5)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(headerBooking1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
+                        .addContainerGap()
+        );
+        int contentHeight = 1200; // chiều cao mong muốn, phải lớn hơn viewport
+        infoOrder2.setPreferredSize(new Dimension(infoOrder2.getWidth(), contentHeight));
+        scrollPaneWin111.setViewportView(infoOrder2);
+        listSurcharge.getjLabel1().setText("Danh sách phụ thu");
+        javax.swing.table.DefaultTableModel model = 
+        (javax.swing.table.DefaultTableModel) listSurcharge.getTable().getModel();
+
+        // Thay tiêu đề cột
+        model.setColumnIdentifiers(new Object[]{"Mã phụ thu", "Tên phụ thu", "Giá trị"});
     }
 
     /**
@@ -149,19 +153,6 @@ layout.setVerticalGroup(
         );
     }// </editor-fold>//GEN-END:initComponents
 
- public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("🧾 Test OrderManagement");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1280, 800);
-            frame.setLocationRelativeTo(null);
-            frame.setBackground(Color.WHITE);
-
-            frame.getContentPane().add(new OrderManagement());
-
-            frame.setVisible(true);
-        });
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.HeaderBooking headerBooking1;
     private iuh.fit.se.group1.ui.component.order.InfoOrder infoOrder2;

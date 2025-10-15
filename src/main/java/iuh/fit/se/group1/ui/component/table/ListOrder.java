@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
@@ -16,6 +17,7 @@ import javax.swing.table.DefaultTableModel;
  * @author Administrator
  */
 public class ListOrder extends javax.swing.JPanel {
+
 
     /**
      * Creates new form ListBooking
@@ -73,7 +75,17 @@ public class ListOrder extends javax.swing.JPanel {
     public void hideOtherPanel() {
         other.setVisible(false);
     }
+    public javax.swing.JTable getTable() {
+        return jTable1;
+    }
 
+    public JLabel getjLabel1() {
+        return jLabel1;
+    }
+
+    public void setjLabel1(JLabel jLabel1) {
+        this.jLabel1 = jLabel1;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -99,7 +111,7 @@ public class ListOrder extends javax.swing.JPanel {
                 {null, null, null}
             },
             new String [] {
-                "Số phòng", "Họ tên khách", "Ngày tạo"
+                "Số phòng", "Họ tên khách", "Số điện thoại"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -190,4 +202,8 @@ public class ListOrder extends javax.swing.JPanel {
     private javax.swing.JPanel other;
     private iuh.fit.se.group1.ui.component.booking.Search search1;
     // End of variables declaration//GEN-END:variables
+
+    public Object getJLabel1() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

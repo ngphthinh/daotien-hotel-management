@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.menu.*;
-import iuh.fit.se.group1.ui.swing.Login;
 import iuh.fit.se.group1.util.Constants;
 import raven.glasspanepopup.GlassPanePopup;
 
