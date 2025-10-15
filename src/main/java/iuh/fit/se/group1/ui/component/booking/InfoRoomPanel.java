@@ -23,7 +23,9 @@ import javax.swing.*;
  * @author THIS PC
  */
 public class InfoRoomPanel extends javax.swing.JPanel {
+
     private int borderRadius = 4;
+
     /**
      * Creates new form InfoRoomPanel
      */
@@ -32,18 +34,18 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         setOpaque(false);
         lblTitle.setIcon(FontIcon.of(FontAwesomeSolid.HOME, 20, lblTitle.getForeground()));
         btnClose.setText("");
-        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES_CIRCLE,20,Constants.COLOR_ICON_MENU));
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES_CIRCLE, 20, Constants.COLOR_ICON_MENU));
         btnClose.setBackground(Color.white);
         DateTimePicker.attachTo(txtStartDate);
         DateTimePicker.attachTo(txtEndDate);
         cboRoomType.addItem("Phòng đơn");
         cboRoomType.addItem("Phòng đôi");
-         cboRoomType.setBackground(new java.awt.Color(240, 248, 255)); 
-        cboRoomType.setForeground(new java.awt.Color(51, 51, 51));     
-        cboRoomType.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
+        cboRoomType.setBackground(new java.awt.Color(240, 248, 255));
+        cboRoomType.setForeground(new java.awt.Color(51, 51, 51));
+        cboRoomType.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
     }
-    
-     @Override
+
+    @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -80,8 +82,6 @@ public class InfoRoomPanel extends javax.swing.JPanel {
     public void setLblTitle(JLabel lblTitle) {
         this.lblTitle = lblTitle;
     }
-
-   
 
     public TextField getTxtEndDate() {
         return txtEndDate;
@@ -123,7 +123,6 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         this.txtStartDate = txtStartDate;
     }
 
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -315,8 +314,8 @@ public class InfoRoomPanel extends javax.swing.JPanel {
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnCloseActionPerformed
-    
-    public void closeRoomCard(ActionListener l){
+
+    public void closeRoomCard(ActionListener l) {
         btnClose.addActionListener(l);
     }
 
@@ -327,7 +326,7 @@ public class InfoRoomPanel extends javax.swing.JPanel {
     public void setBtnClose(Button btnClose) {
         this.btnClose = btnClose;
     }
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;

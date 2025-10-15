@@ -33,6 +33,9 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         dateChooser.setTextRefernce(textField4);
         combobox1.addItem("Nam");
         combobox1.addItem("Nữ");
+        combobox1.setBackground(new java.awt.Color(240, 248, 255));
+        combobox1.setForeground(new java.awt.Color(51, 51, 51));
+        combobox1.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
 
     }
 
@@ -58,7 +61,6 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         g2.dispose();
         super.paintComponent(g);
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
