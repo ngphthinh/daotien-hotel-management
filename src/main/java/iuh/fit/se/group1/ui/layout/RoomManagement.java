@@ -42,6 +42,12 @@ public class RoomManagement extends javax.swing.JPanel {
         String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Giá phòng", "Trạng thái", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 5);
         tblRoom.getTbl().setModel(model);
+         addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                tblRoom.getTbl().clearSelection();
+            }
+        });
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -69,8 +75,8 @@ public class RoomManagement extends javax.swing.JPanel {
         var header = tblRoom.getTbl().getTableHeader();
 
         //todo: hard code
-        Combobox<String> cmbType = new Combobox<>(new String[]{ "Phòng đơn", "Phòng đôi"});
-        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Còn trống", "Đang sử dụng","Bảo trì"});
+        Combobox<String> cmbType = new Combobox<>(new String[]{"Phòng đơn", "Phòng đôi"});
+        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Còn trống", "Đang sử dụng", "Bảo trì"});
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
@@ -121,7 +127,7 @@ public class RoomManagement extends javax.swing.JPanel {
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 int col = tblRoom.getTbl().columnAtPoint(e.getPoint());
 
-                if (col == 4) {
+                if (col == 5) {
                     tblRoom.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblRoom.getTbl().setCursor(Cursor.getDefaultCursor());
@@ -129,6 +135,7 @@ public class RoomManagement extends javax.swing.JPanel {
             }
         });
 
+        
         header.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

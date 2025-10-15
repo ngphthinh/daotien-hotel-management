@@ -129,6 +129,12 @@ public class AmenityManagement extends javax.swing.JPanel {
                 }
             }
         });
+         addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                tblAmenity.getTbl().clearSelection();
+            }
+        });
         headerCustom1.handleSearch(new DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {

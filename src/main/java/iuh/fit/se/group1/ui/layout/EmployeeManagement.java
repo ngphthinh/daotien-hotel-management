@@ -182,7 +182,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
 //                    employeeCitizenMap.put(maNV, citizenNew);
 //                    employeeEmailMap.put(maNV, emailNew);
 //                    employeeHireDateMap.put(maNV, hireDateNew);
-
                     GlassPanePopup.closePopupLast();
                 });
 
@@ -328,7 +327,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int col = header.columnAtPoint(e.getPoint());
-                int oldCol = activeFilterColumn; 
+                int oldCol = activeFilterColumn;
 
                 header.remove(cmb);
                 header.remove(cmbChucVu);
@@ -359,7 +358,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
 //                Rectangle rect2 = header.getHeaderRect(2);
 //                Rectangle rect3 = header.getHeaderRect(3);
 //
-//// Chỉ vẽ lại khu vực 2 cột lọc
+            
+        
+        //// Chỉ vẽ lại khu vực 2 cột lọc
 //                Rectangle repaintArea = rect2.union(rect3);
 //
 //                header.revalidate();
@@ -374,8 +375,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
 //                });
 
             }
+            
         });
-
+         addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                tblEmployee.getTbl().clearSelection();
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")

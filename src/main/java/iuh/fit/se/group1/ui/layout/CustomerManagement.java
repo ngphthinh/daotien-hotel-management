@@ -211,7 +211,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 int col = tblCustomer.getTbl().columnAtPoint(e.getPoint());
 
-                if (col == 8) {
+                if (col == 6) {
                     tblCustomer.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblCustomer.getTbl().setCursor(Cursor.getDefaultCursor());
@@ -246,6 +246,13 @@ public class CustomerManagement extends javax.swing.JPanel {
                         }
                     });
                 }
+            }
+        });
+
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                tblCustomer.getTbl().clearSelection();
             }
         });
     }
@@ -336,6 +343,18 @@ public class CustomerManagement extends javax.swing.JPanel {
             String gender = (String) modal.getCmbGender().getSelectedItem();
             String dob = modal.getTxtDob().getText().trim();
 
+            modal.getLblErrolName().setText("");
+            modal.getLblErrolPhone().setText("");
+            modal.getLblErrolEmail().setText("");
+            modal.getLblErrolCitizen().setText("");
+            modal.getLblErrolAddress().setText("");
+
+            Color red = Color.RED;
+            modal.getLblErrolName().setForeground(red);
+            modal.getLblErrolPhone().setForeground(red);
+            modal.getLblErrolEmail().setForeground(red);
+            modal.getLblErrolCitizen().setForeground(red);
+            modal.getLblErrolAddress().setForeground(red);
             boolean isValid = true;
 
             if (name.isEmpty()) {
@@ -375,19 +394,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             if (!isValid) {
                 return;
             }
-
-            modal.getLblErrolName().setText("");
-            modal.getLblErrolPhone().setText("");
-            modal.getLblErrolEmail().setText("");
-            modal.getLblErrolCitizen().setText("");
-            modal.getLblErrolAddress().setText("");
-
-            Color red = Color.RED;
-            modal.getLblErrolName().setForeground(red);
-            modal.getLblErrolPhone().setForeground(red);
-            modal.getLblErrolEmail().setForeground(red);
-            modal.getLblErrolCitizen().setForeground(red);
-            modal.getLblErrolAddress().setForeground(red);
 
             DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
 

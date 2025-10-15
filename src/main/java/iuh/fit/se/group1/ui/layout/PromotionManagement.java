@@ -9,6 +9,7 @@ import iuh.fit.se.group1.ui.component.modal.InfoCustomerModal;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.SwingConstants;
@@ -33,11 +34,17 @@ public class PromotionManagement extends javax.swing.JPanel {
         button1.setBorderRadius(40);
         button1.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         headerCustom1.getjLabel1().setText(
-        "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
+                "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
         headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
-        String cols[] = {"Mã khuyến mãi", "Tên khuyến mãi", "Giá khuyến mãi", "Ngày tạo","Ngày hết hạn","Chức năng"};
+        String cols[] = {"Mã khuyến mãi", "Tên khuyến mãi", "Giá khuyến mãi", "Ngày tạo", "Ngày hết hạn", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 10);
         tblPromotion.getTbl().setModel(model);
+         addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                tblPromotion.getTbl().clearSelection();
+            }
+        });
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -80,6 +87,18 @@ public class PromotionManagement extends javax.swing.JPanel {
         tblPromotion.getTbl().getColumnModel().getColumn(3).setPreferredWidth(120);
         tblPromotion.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
         tblPromotion.getTbl().getColumnModel().getColumn(5).setPreferredWidth(90);
+        tblPromotion.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int col = tblPromotion.getTbl().columnAtPoint(e.getPoint());
+
+                if (col == 5) {
+                    tblPromotion.getTbl().setCursor(Cursor.getDefaultCursor().getPredefinedCursor(Cursor.HAND_CURSOR));
+                } else {
+                    tblPromotion.getTbl().setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
 
     }
 
@@ -146,25 +165,25 @@ public class PromotionManagement extends javax.swing.JPanel {
 
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
         var modal = new InfoPromotionModal();
-         modal.closeModel(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            raven.glasspanepopup.GlassPanePopup.closePopupLast();
-        }
-    });
+        modal.closeModel(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                raven.glasspanepopup.GlassPanePopup.closePopupLast();
+            }
+        });
 
-    modal.saveData(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            modal.getLblErrolEndDate().setForeground(Color.red);
-            modal.getLblErrolStarDate().setForeground(Color.red);
-            modal.getLblErrolPrice().setForeground(Color.red);
-            modal.getLblErrolName().setForeground(Color.red);
-            System.out.println("Save data " + modal.getLblErrolName());
-        }
-    });
+        modal.saveData(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                modal.getLblErrolEndDate().setForeground(Color.red);
+                modal.getLblErrolStarDate().setForeground(Color.red);
+                modal.getLblErrolPrice().setForeground(Color.red);
+                modal.getLblErrolName().setForeground(Color.red);
+                System.out.println("Save data " + modal.getLblErrolName());
+            }
+        });
 
-    raven.glasspanepopup.GlassPanePopup.showPopup(modal);
+        raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }//GEN-LAST:event_button1ActionPerformed
 
 
