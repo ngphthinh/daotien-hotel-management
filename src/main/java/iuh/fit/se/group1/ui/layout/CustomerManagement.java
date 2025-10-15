@@ -44,68 +44,20 @@ public class CustomerManagement extends javax.swing.JPanel {
                 "<html><span style='color:white;'>Quản lý khách hàng</span>");
         headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
-        String cols[] = {"Mã khách hàng", "Họ tên", "Giới tính", "Email", "Số CCCD", "Số điện thoại", "Địa chỉ", "Ngày sinh", "Chức năng"};
+        String cols[] = {"Mã khách hàng", "Họ tên", "Giới tính", "Email", "CCCD", "Số điện thoại", "Chức năng"};
 
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         tblCustomer.getTbl().setRowSorter(sorter);
         tblCustomer.getTbl().setModel(model);
-        TableActionEvent event = new TableActionEvent() {
-            @Override
-            public void onEdit(int row) {
-                DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
-//todo:
-String code = model.getValueAt(row, 0).toString();
-                String name = model.getValueAt(row, 1).toString();
-                String gender = model.getValueAt(row, 2).toString();
-                String email = model.getValueAt(row, 3).toString();
-                String citizen = model.getValueAt(row, 4).toString();
-                String phone = model.getValueAt(row, 5).toString();
-                String address = model.getValueAt(row, 6).toString();
-                String dob = model.getValueAt(row, 7).toString();
+        tblCustomer.getTbl().setAutoCreateRowSorter(false);
+        tblCustomer.getTbl().setRowSorter(sorter);
 
-                InfoCustomerModal modal = new InfoCustomerModal();
-                modal.getTxtName().setText(name);
-                modal.getCmbGender().setSelectedItem(gender);
-                modal.getTxtEmail().setText(email);
-                modal.getTxtCitizen().setText(citizen);
-                modal.getTxtPhone().setText(phone);
-                modal.getTxtAddress().setText(address);
-                modal.getTxtDob().setText(dob);
+        for (int i = 0; i < tblCustomer.getTbl().getColumnCount(); i++) {
+            sorter.setSortable(i, false);
+        }
 
-                modal.saveData(ae -> {
-                    String newName = modal.getTxtName().getText().trim();
-                    String newGender = (String) modal.getCmbGender().getSelectedItem();
-                    String newEmail = modal.getTxtEmail().getText().trim();
-                    String newCitizen = modal.getTxtCitizen().getText().trim();
-                    String newPhone = modal.getTxtPhone().getText().trim();
-                    String newAddress = modal.getTxtAddress().getText().trim();
-                    String newDob = modal.getTxtDob().getText().trim();
-
-                    model.setValueAt(newName, row, 1);
-                    model.setValueAt(newGender, row, 2);
-                    model.setValueAt(newEmail, row, 3);
-                    model.setValueAt(newCitizen, row, 4);
-                    model.setValueAt(newPhone, row, 5);
-                    model.setValueAt(newAddress, row, 6);
-                    model.setValueAt(newDob, row, 7);
-
-                    GlassPanePopup.closePopupLast(); 
-                });
-
-                modal.closeModel(ae -> GlassPanePopup.closePopupLast());
-            }
-
-            @Override
-            public void onDelete(int row) {
-                if (tblCustomer.getTbl().isEditing()) {
-                    tblCustomer.getTbl().getCellEditor().stopCellEditing();
-                }
-                DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
-                model.removeRow(row);
-            }
-        };
-        tblCustomer.setTableActionColumn(tblCustomer.getTbl(), 8, new TableActionEvent() {
+        tblCustomer.setTableActionColumn(tblCustomer.getTbl(), 6, new TableActionEvent() {
             @Override
             public void onEdit(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
@@ -115,8 +67,6 @@ String code = model.getValueAt(row, 0).toString();
                 String email = model.getValueAt(row, 3).toString();
                 String citizen = model.getValueAt(row, 4).toString();
                 String phone = model.getValueAt(row, 5).toString();
-                String address = model.getValueAt(row, 6).toString();
-                String dob = model.getValueAt(row, 7).toString();
 
                 InfoCustomerModal modal = new InfoCustomerModal();
                 modal.getBtnSave().setText("Cập nhật");
@@ -125,30 +75,24 @@ String code = model.getValueAt(row, 0).toString();
                 modal.getTxtEmail().setText(email);
                 modal.getTxtCitizen().setText(citizen);
                 modal.getTxtPhone().setText(phone);
-                modal.getTxtAddress().setText(address);
-                modal.getTxtDob().setText(dob);
 
                 modal.getLblErrolName().setText("");
                 modal.getLblErrolPhone().setText("");
                 modal.getLblErrolEmail().setText("");
                 modal.getLblErrolCitizen().setText("");
-                modal.getLblErrolAddress().setText("");
 
                 Color red = Color.RED;
                 modal.getLblErrolName().setForeground(red);
                 modal.getLblErrolPhone().setForeground(red);
                 modal.getLblErrolEmail().setForeground(red);
                 modal.getLblErrolCitizen().setForeground(red);
-                modal.getLblErrolAddress().setForeground(red);
 
                 modal.saveData(ae -> {
                     String newName = modal.getTxtName().getText().trim();
                     String newPhone = modal.getTxtPhone().getText().trim();
                     String newEmail = modal.getTxtEmail().getText().trim();
                     String newCitizen = modal.getTxtCitizen().getText().trim();
-                    String newAddress = modal.getTxtAddress().getText().trim();
                     String newGender = (String) modal.getCmbGender().getSelectedItem();
-                    String newDob = modal.getTxtDob().getText().trim();
 
                     boolean isValid = true;
 
@@ -181,11 +125,6 @@ String code = model.getValueAt(row, 0).toString();
                         isValid = false;
                     }
 
-                    if (newAddress.isEmpty()) {
-                        modal.getLblErrolAddress().setText("Vui lòng nhập địa chỉ");
-                        isValid = false;
-                    }
-
                     if (!isValid) {
                         return;
                     }
@@ -195,8 +134,6 @@ String code = model.getValueAt(row, 0).toString();
                     model.setValueAt(newEmail, row, 3);
                     model.setValueAt(newCitizen, row, 4);
                     model.setValueAt(newPhone, row, 5);
-                    model.setValueAt(newAddress, row, 6);
-                    model.setValueAt(newDob, row, 7);
 
                     GlassPanePopup.closePopupLast();
                 });
@@ -223,8 +160,6 @@ String code = model.getValueAt(row, 0).toString();
                 String email = model.getValueAt(row, 3).toString();
                 String citizen = model.getValueAt(row, 4).toString();
                 String phone = model.getValueAt(row, 5).toString();
-                String address = model.getValueAt(row, 6).toString();
-                String dob = model.getValueAt(row, 7).toString();
 
                 InfoCustomerModal modal = new InfoCustomerModal();
                 modal.getBtnSave().setText("Xong");
@@ -233,37 +168,29 @@ String code = model.getValueAt(row, 0).toString();
                 modal.getTxtEmail().setText(email);
                 modal.getTxtCitizen().setText(citizen);
                 modal.getTxtPhone().setText(phone);
-                modal.getTxtAddress().setText(address);
-                modal.getTxtDob().setText(dob);
 
                 modal.getTxtName().setEditable(false);
                 modal.getTxtPhone().setEditable(false);
                 modal.getTxtEmail().setEditable(false);
                 modal.getTxtCitizen().setEditable(false);
                 modal.getCmbGender().setEnabled(false);
-                modal.getTxtEmail().setEnabled(false);
-                modal.getTxtDob().setEditable(false);
-                modal.getTxtAddress().setEditable(false);
 
                 modal.saveData(ae -> GlassPanePopup.closePopupLast());
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
-
                 GlassPanePopup.showPopup(modal);
             }
         }, true);
 
-        tblCustomer.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);  
+        tblCustomer.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);
         tblCustomer.getTbl().getColumnModel().getColumn(1).setPreferredWidth(150);
-        tblCustomer.getTbl().getColumnModel().getColumn(2).setPreferredWidth(180);
+        tblCustomer.getTbl().getColumnModel().getColumn(2).setPreferredWidth(150);
         tblCustomer.getTbl().getColumnModel().getColumn(3).setPreferredWidth(180);
-        tblCustomer.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
-        tblCustomer.getTbl().getColumnModel().getColumn(5).setPreferredWidth(90);
-        tblCustomer.getTbl().getColumnModel().getColumn(6).setPreferredWidth(190);
-        tblCustomer.getTbl().getColumnModel().getColumn(7).setPreferredWidth(80);
-        tblCustomer.getTbl().getColumnModel().getColumn(8).setPreferredWidth(100);
+        tblCustomer.getTbl().getColumnModel().getColumn(4).setPreferredWidth(120);
+        tblCustomer.getTbl().getColumnModel().getColumn(5).setPreferredWidth(120);
+        tblCustomer.getTbl().getColumnModel().getColumn(6).setPreferredWidth(100);
 
         var header = tblCustomer.getTbl().getTableHeader();
-        
+
         Combobox<String> cmbGender = new Combobox<>(new String[]{"Tất cả", "Nam", "Nữ"});
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
         TableColumn column = tblCustomer.getTbl().getColumnModel().getColumn(2);
@@ -303,7 +230,7 @@ String code = model.getValueAt(row, 0).toString();
             @Override
             public void mouseClicked(MouseEvent e) {
                 int col = tblCustomer.getTbl().columnAtPoint(e.getPoint());
-                if (col == 2) { 
+                if (col == 2) {
                     Rectangle rect = header.getHeaderRect(col);
 
                     cmbGender.setBounds(rect);
@@ -346,7 +273,7 @@ String code = model.getValueAt(row, 0).toString();
             }
         });
 
-        tblCustomer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 0, 0, 0));
+        tblCustomer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -374,21 +301,26 @@ String code = model.getValueAt(row, 0).toString();
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    private String generateEmployeeCode() {
-        customerCounter++;
-        return String.format("KH%03d", customerCounter);
-    }
 
     private void filterCustomerTable(String genderFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
-        sorter.setRowFilter(new RowFilter<DefaultTableModel, Object>() {
+
+        RowFilter<DefaultTableModel, Object> rf = new RowFilter<>() {
             @Override
-            public boolean include(Entry<? extends DefaultTableModel, ? extends Object> entry) {
-                String gender = entry.getStringValue(2);
-                return genderFilter.equals("Tất cả") || gender.equals(genderFilter);
+            public boolean include(RowFilter.Entry<? extends DefaultTableModel, ? extends Object> entry) {
+                String gender = entry.getStringValue(2); // cột 2 là "Giới tính"
+                boolean genderMatches = genderFilter == null
+                        || genderFilter.equals("Tất cả")
+                        || gender.equalsIgnoreCase(genderFilter);
+
+                return genderMatches;
             }
-        });
+        };
+
+        sorter.setRowFilter(rf);
+        sorter.setSortKeys(null);
     }
+
 
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddCustomerActionPerformed
         InfoCustomerModal modal = new InfoCustomerModal();
@@ -458,8 +390,8 @@ String code = model.getValueAt(row, 0).toString();
             modal.getLblErrolAddress().setForeground(red);
 
             DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
-            String code = generateEmployeeCode();
-            model.addRow(new Object[]{code, name, gender, email, citizen, phone, address, dob, ""});
+
+            model.addRow(new Object[]{"", name, gender, email, citizen, phone, ""});
 
             GlassPanePopup.closePopupLast();
         });
