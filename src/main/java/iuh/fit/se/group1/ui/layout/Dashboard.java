@@ -4,6 +4,8 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.enums.TimeType;
+
 /**
  *
  * @author THIS PC
@@ -17,6 +19,30 @@ public class Dashboard extends javax.swing.JPanel {
         initComponents();
         // todo: hard code card
         fetchData();
+        addActionTimeType();
+    }
+
+    private void addActionTimeType() {
+        headerDashboard1.getBtnToday().addActionListener(e -> {
+            headerDashboard1.setActiveButton(TimeType.TODAY);
+            // TODO: Update chart and data for Today
+        });
+
+        headerDashboard1.getBtn7Days().addActionListener(e -> {
+            headerDashboard1.setActiveButton(TimeType.DAYS_7);
+            // TODO: Update chart and data for 7 Days
+        });
+
+        headerDashboard1.getBtn30Days().addActionListener(e -> {
+            headerDashboard1.setActiveButton(TimeType.DAYS_30);
+            // TODO: Update chart and data for 30 Days
+        });
+
+        headerDashboard1.getBtn90Days().addActionListener(e -> {
+            headerDashboard1.setActiveButton(TimeType.DAYS_90);
+            // TODO: Update chart and data for 90 Days
+        });
+
     }
 
     private void fetchData() {
@@ -33,50 +59,65 @@ public class Dashboard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
         pnlListCard1 = new iuh.fit.se.group1.ui.component.dashboard.PnlListCard();
         revenueChart1 = new iuh.fit.se.group1.ui.component.dashboard.RevenueChart();
+        headerDashboard1 = new iuh.fit.se.group1.ui.component.dashboard.HeaderDashboard();
+        lineChartPanel1 = new iuh.fit.se.group1.ui.component.dashboard.LineChartPanel();
+        cardLiquid1 = new iuh.fit.se.group1.ui.component.chart.CardLiquid();
+        cardLiquid2 = new iuh.fit.se.group1.ui.component.chart.CardLiquid();
+        panelWarning1 = new iuh.fit.se.group1.ui.component.dashboard.PanelWarning();
 
         setBackground(new java.awt.Color(241, 241, 241));
         setForeground(new java.awt.Color(241, 241, 241));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 75, Short.MAX_VALUE)
-        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlListCard1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1200, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(revenueChart1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(pnlListCard1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(headerDashboard1, javax.swing.GroupLayout.DEFAULT_SIZE, 1202, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(panelWarning1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(revenueChart1, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addComponent(lineChartPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(62, 62, 62)
+                        .addComponent(cardLiquid2, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(cardLiquid1, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(47, 47, 47))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(headerDashboard1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlListCard1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(revenueChart1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(319, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lineChartPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(revenueChart1, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cardLiquid1, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cardLiquid2, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelWarning1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
+    private iuh.fit.se.group1.ui.component.chart.CardLiquid cardLiquid1;
+    private iuh.fit.se.group1.ui.component.chart.CardLiquid cardLiquid2;
+    private iuh.fit.se.group1.ui.component.dashboard.HeaderDashboard headerDashboard1;
+    private iuh.fit.se.group1.ui.component.dashboard.LineChartPanel lineChartPanel1;
+    private iuh.fit.se.group1.ui.component.dashboard.PanelWarning panelWarning1;
     private iuh.fit.se.group1.ui.component.dashboard.PnlListCard pnlListCard1;
     private iuh.fit.se.group1.ui.component.dashboard.RevenueChart revenueChart1;
     // End of variables declaration//GEN-END:variables

@@ -24,47 +24,66 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" max="32767" attributes="0"/>
-          <Component id="pnlListCard1" alignment="1" pref="1200" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-              <Component id="revenueChart1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+          <Component id="pnlListCard1" alignment="1" max="32767" attributes="0"/>
+          <Component id="headerDashboard1" alignment="0" pref="1202" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <Component id="panelWarning1" pref="0" max="32767" attributes="0"/>
+                  <Component id="revenueChart1" pref="355" max="32767" attributes="0"/>
+              </Group>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+                      <Component id="lineChartPanel1" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace min="-2" pref="62" max="-2" attributes="0"/>
+                      <Component id="cardLiquid2" min="-2" pref="343" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="cardLiquid1" min="-2" pref="343" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <Component id="headerDashboard1" min="-2" pref="75" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlListCard1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="revenueChart1" min="-2" pref="231" max="-2" attributes="0"/>
-              <EmptySpace pref="319" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="lineChartPanel1" pref="0" max="32767" attributes="0"/>
+                  <Component id="revenueChart1" pref="308" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="cardLiquid1" min="-2" pref="216" max="-2" attributes="0"/>
+                  <Component id="cardLiquid2" min="-2" pref="216" max="-2" attributes="0"/>
+                  <Component id="panelWarning1" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="15" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JPanel" name="jPanel1">
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="75" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-    </Container>
     <Component class="iuh.fit.se.group1.ui.component.dashboard.PnlListCard" name="pnlListCard1">
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.dashboard.RevenueChart" name="revenueChart1">
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.dashboard.HeaderDashboard" name="headerDashboard1">
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.dashboard.LineChartPanel" name="lineChartPanel1">
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.chart.CardLiquid" name="cardLiquid1">
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.chart.CardLiquid" name="cardLiquid2">
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.dashboard.PanelWarning" name="panelWarning1">
     </Component>
   </SubComponents>
 </Form>
