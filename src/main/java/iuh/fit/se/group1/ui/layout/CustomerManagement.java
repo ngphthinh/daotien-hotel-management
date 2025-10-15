@@ -54,8 +54,8 @@ public class CustomerManagement extends javax.swing.JPanel {
             @Override
             public void onEdit(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
-
-                String code = model.getValueAt(row, 0).toString();
+//todo:
+String code = model.getValueAt(row, 0).toString();
                 String name = model.getValueAt(row, 1).toString();
                 String gender = model.getValueAt(row, 2).toString();
                 String email = model.getValueAt(row, 3).toString();
@@ -263,8 +263,8 @@ public class CustomerManagement extends javax.swing.JPanel {
         tblCustomer.getTbl().getColumnModel().getColumn(8).setPreferredWidth(100);
 
         var header = tblCustomer.getTbl().getTableHeader();
+        
         Combobox<String> cmbGender = new Combobox<>(new String[]{"Tất cả", "Nam", "Nữ"});
-
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
         TableColumn column = tblCustomer.getTbl().getColumnModel().getColumn(2);
         column.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
