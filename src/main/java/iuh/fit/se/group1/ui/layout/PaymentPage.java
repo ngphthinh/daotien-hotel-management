@@ -4,9 +4,11 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.ui.component.payment.CastPaymentModal;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
@@ -15,6 +17,7 @@ import java.awt.RenderingHints;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -23,12 +26,12 @@ import javax.swing.SwingUtilities;
  *
  * @author Administrator
  */
-public class OrderManagement extends javax.swing.JPanel {
+public class PaymentPage extends javax.swing.JPanel {
 
     /**
      * Creates new form OrderManagement
      */
-    public OrderManagement() {
+    public PaymentPage() {
         initComponents();
 
         scrollPaneWin111.setOpaque(false);
@@ -36,9 +39,9 @@ public class OrderManagement extends javax.swing.JPanel {
         scrollPaneWin111.setBorder(null);
 
         // Bo góc trắng cho phần InfoOrder bên trong
-        infoOrder2.setOpaque(true);
-        infoOrder2.setBackground(Color.WHITE);
-        infoOrder2.setBorder(
+        infoPayment1.setOpaque(true);
+        infoPayment1.setBackground(Color.WHITE);
+        infoPayment1.setBorder(
                 javax.swing.BorderFactory.createCompoundBorder(
                         javax.swing.BorderFactory.createLineBorder(new Color(160, 160, 160), 1, true), // viền bo góc
                         javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
@@ -54,7 +57,7 @@ public class OrderManagement extends javax.swing.JPanel {
                         javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)
                 )
         );
-        scrollPaneWin111.setViewportView(infoOrder2);
+        scrollPaneWin111.setViewportView(infoPayment1);
         scrollPaneWin111.setPreferredSize(new Dimension(700, 600));
 
         listBooking.hideOtherPanel();
@@ -80,14 +83,26 @@ public class OrderManagement extends javax.swing.JPanel {
                         .addContainerGap()
         );
         int contentHeight = 1200; // chiều cao mong muốn, phải lớn hơn viewport
-        infoOrder2.setPreferredSize(new Dimension(infoOrder2.getWidth(), contentHeight));
-        scrollPaneWin111.setViewportView(infoOrder2);
+        infoPayment1.setPreferredSize(new Dimension(infoPayment1.getWidth(), contentHeight));
+        scrollPaneWin111.setViewportView(infoPayment1);
         listSurcharge.getjLabel1().setText("Danh sách phụ thu");
         javax.swing.table.DefaultTableModel model = 
         (javax.swing.table.DefaultTableModel) listSurcharge.getTable().getModel();
 
         // Thay tiêu đề cột
         model.setColumnIdentifiers(new Object[]{"Mã phụ thu", "Tên phụ thu", "Giá trị"});
+        headerBooking1.getBtn().addActionListener(l -> {
+            // Tạo JDialog
+            JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(headerBooking1), "Thanh toán", true); // modal
+            dialog.setContentPane(new CastPaymentModal()); // panel CastPayment
+            dialog.setUndecorated(true); // nếu muốn không viền
+            dialog.pack();
+
+            // Canh giữa màn hình
+            dialog.setLocationRelativeTo(headerBooking1);
+
+            dialog.setVisible(true);
+        });
     }
 
     /**
@@ -101,14 +116,14 @@ public class OrderManagement extends javax.swing.JPanel {
 
         headerBooking1 = new iuh.fit.se.group1.ui.component.HeaderBooking();
         scrollPaneWin111 = new iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11();
-        infoOrder2 = new iuh.fit.se.group1.ui.component.order.InfoOrder();
+        infoPayment1 = new iuh.fit.se.group1.ui.component.payment.InfoPayment();
         jPanel1 = new javax.swing.JPanel();
         listBooking = new iuh.fit.se.group1.ui.component.table.ListOrder();
         listSurcharge = new iuh.fit.se.group1.ui.component.table.ListOrder();
 
         setBackground(new java.awt.Color(241, 241, 241));
 
-        scrollPaneWin111.setViewportView(infoOrder2);
+        scrollPaneWin111.setViewportView(infoPayment1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -136,7 +151,6 @@ public class OrderManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, 1215, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
                 .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 639, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -155,7 +169,7 @@ public class OrderManagement extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.HeaderBooking headerBooking1;
-    private iuh.fit.se.group1.ui.component.order.InfoOrder infoOrder2;
+    private iuh.fit.se.group1.ui.component.payment.InfoPayment infoPayment1;
     private javax.swing.JPanel jPanel1;
     private iuh.fit.se.group1.ui.component.table.ListOrder listBooking;
     private iuh.fit.se.group1.ui.component.table.ListOrder listSurcharge;
