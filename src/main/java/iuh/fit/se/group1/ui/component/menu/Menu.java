@@ -3,8 +3,6 @@ package iuh.fit.se.group1.ui.component.menu;
 
 import iuh.fit.se.group1.util.Constants;
 import net.miginfocom.swing.MigLayout;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,16 +21,28 @@ public class Menu extends JComponent {
         this.menuEvent = menuEvent;
     }
 
+    private boolean isManager = true;
+
     private MigLayout layout;
-    private final String[][] menuItems = new String[][]{
-            {"Trang chủ"},
-            {"Quản lý đặt phòng"},
+    private final String[][] menuItemsManager = new String[][]{
+            {"Dashboard"},
+            {"Đặt phòng"},
+            {"Thanh toán"},
             {"Quản lý nhân viên", "Quản lý ca", "Danh sách nhân viên"},
             {"Quản lý khách hàng"},
             {"Quản lý dịch vụ"},
             {"Quản lý khuyến mãi"},
             {"Quản lý phòng"},
-            {"Quản lý thống kê", "Quản lí hóa đơn", "Thống kê doanh thu", "Tỷ lê lấp đầy phòng", "Thống kê theo xu hướng"},
+            {"Quản lý hóa đơn"},
+            {"Quản lý thống kê", "Thống kê doanh thu", "Tỷ lê lấp đầy phòng", "Thống kê theo xu hướng"},
+            {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản"}
+    };
+
+    private final String[][] menuItemsEmployee = new String[][]{
+            {"Dashboard"},
+            {"Đặt phòng"},
+            {"Thanh toán"},
+            {"Đóng ca"},
             {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản"}
     };
 
@@ -45,12 +55,26 @@ public class Menu extends JComponent {
         setLayout(layout);
         setOpaque(true);
         // tạo menu items
-        for (int i = 0; i < menuItems.length; i++) {
-            addMenuItem(menuItems[i][0], i);
+        if (isManager) {
+            setMenuManager();
+        } else {
+            setMenuEmployee();
         }
     }
 
-//    private Icon getIcon(int index) {
+    private void setMenuEmployee() {
+        for (int i = 0; i < menuItemsEmployee.length; i++) {
+            addMenuItem(menuItemsEmployee[i][0], i);
+        }
+    }
+
+    private void setMenuManager() {
+        for (int i = 0; i < menuItemsManager.length; i++) {
+            addMenuItem(menuItemsManager[i][0], i);
+        }
+    }
+
+//    private Icon getIconOfManager(int index) {
 //        return switch (index) {
 //            case 0 -> FontIcon.of(FontAwesomeSolid.HOME, 16, Constants.COLOR_ICON_MENU);
 //            case 1 -> FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 16, Constants.COLOR_ICON_MENU);
@@ -66,11 +90,12 @@ public class Menu extends JComponent {
 //    }
 
     private void addMenuItem(String name, int index) {
-        int length = menuItems[index].length;
+
+        int length = isManager ? menuItemsManager[index].length : menuItemsEmployee[index].length;
         boolean subMenuAble = length > 1;
         MenuItem item = new MenuItem(name, index, subMenuAble);
 
-        Icon icon = Constants.getIcon(index);
+        Icon icon = isManager ? Constants.getIconOfManager(index) : Constants.getIconOfEmployee(index);
         if (icon != null) {
             item.setIcon(icon);
         }
@@ -85,7 +110,7 @@ public class Menu extends JComponent {
                     MenuAnimation.showMenu(pnl, item, layout, false);
                     item.setSubMenuAble(true);
                 }
-            }else {
+            } else {
                 if (menuEvent != null) {
                     menuEvent.selected(index, 0);
                 }
@@ -102,25 +127,47 @@ public class Menu extends JComponent {
         panel.setName(index + "");
         panel.setBackground(Constants.BACKGROUND_COLOR_MENU);
         for (int i = 1; i < length; i++) {
-            MenuItem subItem = new MenuItem(menuItems[index][i], i, false);
-            subItem.addActionListener(e -> {
-                if (menuEvent != null) {
-                    menuEvent.selected(index, subItem.getIndex());
-                }
-            });
-            subItem.initSubMenu(i, length);
-            panel.add(subItem);
+            if (isManager) {
+                setSubmenuItem(index, length, panel, i, menuItemsManager);
+            }else {
+                setSubmenuItem(index, length, panel, i, menuItemsEmployee);
+            }
         }
         add(panel, "h 0!", indexZorder + 1);
         revalidate();
         repaint();
         MenuAnimation.showMenu(panel, item, layout, true);
     }
+
+    private void setSubmenuItem(int index, int length, JPanel panel, int i, String[][] menuItems) {
+        MenuItem subItem = new MenuItem(menuItems[index][i], i, false);
+        subItem.addActionListener(e -> {
+            if (menuEvent != null) {
+                menuEvent.selected(index, subItem.getIndex());
+            }
+        });
+        subItem.initSubMenu(i, length);
+
+        panel.add(subItem);
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setColor(Constants.BACKGROUND_COLOR_MENU);
         g2.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
         super.paintComponent(g);
+    }
+
+    public void setAuth(boolean isAdmin) {
+        this.isManager = isAdmin;
+        removeAll();
+        if (isManager) {
+            setMenuManager();
+        } else {
+            setMenuEmployee();
+        }
+        revalidate();
+        repaint();
     }
 }

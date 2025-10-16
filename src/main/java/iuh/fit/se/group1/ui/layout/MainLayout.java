@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.menu.*;
+import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
 import iuh.fit.se.group1.ui.swing.Login;
 import iuh.fit.se.group1.util.Constants;
 import raven.glasspanepopup.GlassPanePopup;
@@ -13,9 +14,27 @@ public class MainLayout extends JPanel {
     private JPanel pnlMain;
     private JPanel pnlContent;
 
+    private boolean isAdmin;
+
+    private Dashboard dashboard;
+    private DashboardEmployee dashboardEmployee;
+    private BookingPage bookingPage;
+    private PaymentPage paymentPage;
+    private ShiftManagement shiftManagement;
+    private EmployeeManagement employeeManagement;
+    private CustomerManagement customerManagement;
+    private AmenityManagement amenityManagement;
+    private PromotionManagement promotionManagement;
+    private RoomManagement roomManagement;
+    private OrderManagement orderManagement;
+    private CheckForVersionPanel checkForVersionPanel;
+
+
     public MainLayout() {
         init();
         setOpaque(false);
+        isAdmin = true;
+        setAuth(isAdmin);
     }
 
     public void setAlpha(float alpha) {
@@ -48,32 +67,25 @@ public class MainLayout extends JPanel {
         menuIcon.setMenuEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
-                if (index == Constants.BARS) {
-                    sideBar.setVisible(true);
-                    pnlMain.remove(menuIcon);
-                    pnlMain.add(sideBar, BorderLayout.WEST);
-                    pnlMain.revalidate();
-                    pnlMain.repaint();
+                if (isAdmin) {
+                    if (index == 0) {
+                        setMainContent(dashboard);
+                    } else {
+                        System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
+                    }
+                } else {
+                    if (index == 0) {
+                        setMainContent(dashboardEmployee);
+                    } else {
+                        System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
+                    }
                 }
-                if (index == 0) {
-                    System.out.println("Home");
-                    setMainContent(new Dashboard());
-                } else if (index == 1) {
-                    setMainContent(new RoomManagement());
-                } else if (index == 7 && subIndex == 3) {
-                    setMainContent(new RoomOccupancyStatistics());
-                } else if (index == 6) {
-                    setMainContent(new AmenityManagement());
-                }  else {
-                    System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
-                }
+
             }
         });
 
-        JPanel homePage = new HomePage();
         pnlContent = new JPanel(new BorderLayout());
         pnlMain.add(pnlContent, BorderLayout.CENTER);
-        pnlContent.add(homePage);
         add(pnlMain, BorderLayout.CENTER);
 
         sideBar.getCloseSideBar().addActionListener(e -> {
@@ -85,27 +97,38 @@ public class MainLayout extends JPanel {
         sideBar.getMenu1().setMenuEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
-                if (index == 0) {
-                    setMainContent(new Dashboard());
-                } else if (index == 6) {
-                    setMainContent(new RoomManagement());
-                } else if (index == 7 && subIndex == 3) {
-                    setMainContent(new RoomOccupancyStatistics());
-                } else if (index == 4) {
-                    setMainContent(new AmenityManagement());
-                } else if (index == 2 && subIndex == 1) {
-                    setMainContent(new ShiftManagement());
-                } else if (index == 2 && subIndex == 2) {
-                    setMainContent(new EmployeeManagement());
-                } else if (index == 3) {
-                    setMainContent(new CustomerManagement());
-                }else if (index == 5) {
-                    setMainContent(new PromotionManagement());
-                }else if (index == 1) {
-                    setMainContent(new BookingPage());
-                }else
-                {
-                    System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from SideBar");
+                if (isAdmin) {
+                    if (index == 0) {
+                        setMainContent(dashboard);
+                    } else if (index == 1) {
+                        setMainContent(bookingPage);
+                    } else if (index == 2) {
+                        setMainContent(paymentPage);
+                    } else if (index == 3) {
+                        setMainContent(shiftManagement);
+                    } else if (index == 4) {
+                        setMainContent(employeeManagement);
+                    } else if (index == 5) {
+                        setMainContent(customerManagement);
+                    } else if (index == 6) {
+                        setMainContent(amenityManagement);
+                    } else if (index == 7) {
+                        setMainContent(promotionManagement);
+                    } else if (index == 8) {
+                        setMainContent(roomManagement);
+                    } else if (index == 9) {
+                        setMainContent(orderManagement);
+                    } else if (index == 10) {
+                        setMainContent(checkForVersionPanel);
+                    } else {
+                        System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
+                    }
+                } else {
+                    if (index == 0) {
+                        setMainContent(dashboardEmployee);
+                    } else {
+                        System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
+                    }
                 }
             }
         });
@@ -142,7 +165,7 @@ public class MainLayout extends JPanel {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-                   JFrame frame = new JFrame("Main Layout");
+                    JFrame frame = new JFrame("Main Layout");
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     GlassPanePopup.install(frame);
 //                    frame.setUnd  ecorated(true); // Optional: removes window borders
@@ -152,5 +175,30 @@ public class MainLayout extends JPanel {
                     frame.setVisible(true);
                 }
         );
+    }
+
+    public void setAuth(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+        sideBar.getMenu1().setAuth(isAdmin);
+        if (isAdmin) {
+            dashboard = new Dashboard();
+            bookingPage = new BookingPage();
+            paymentPage = new PaymentPage();
+            shiftManagement = new ShiftManagement();
+            employeeManagement = new EmployeeManagement();
+            customerManagement = new CustomerManagement();
+            amenityManagement = new AmenityManagement();
+            promotionManagement = new PromotionManagement();
+            roomManagement = new RoomManagement();
+            orderManagement = new OrderManagement();
+            checkForVersionPanel = new CheckForVersionPanel();
+            setMainContent(dashboard);
+        } else {
+            dashboardEmployee = new DashboardEmployee();
+            bookingPage = new BookingPage();
+            paymentPage = new PaymentPage();
+            setMainContent(dashboardEmployee);
+        }
+
     }
 }
