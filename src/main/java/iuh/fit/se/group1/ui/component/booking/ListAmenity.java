@@ -27,7 +27,7 @@ public class ListAmenity extends javax.swing.JPanel {
         setOpaque(false);
         String cols[] = {"Mã dịch vụ", "Tên dịch vụ", "Giá dịch vụ"};
 
-        DefaultTableModel model = new DefaultTableModel(cols,0){
+        DefaultTableModel model = new DefaultTableModel(cols,100){
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;

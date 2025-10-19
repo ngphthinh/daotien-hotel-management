@@ -12,6 +12,13 @@ import java.awt.*;
  * @author THIS PC
  */
 public class CardReport extends javax.swing.JPanel {
+    public JLabel getLblRoomCount() {
+        return lblRoomCount;
+    }
+
+    public void setLblRoomCount(JLabel lblRoomCount) {
+        this.lblRoomCount = lblRoomCount;
+    }
 
     private Color borderColor = new Color(41, 121, 255);
 
@@ -172,7 +179,7 @@ public class CardReport extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblRoomCount, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblRoomCount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblIconRate, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)

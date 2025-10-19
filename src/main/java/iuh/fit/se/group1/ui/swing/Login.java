@@ -8,7 +8,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
+import javax.swing.*;
 
 import iuh.fit.se.group1.ui.component.modal.SendResetCodeModal;
 import iuh.fit.se.group1.ui.component.modal.VerifyIdentityModal;
@@ -37,17 +37,35 @@ public class Login extends javax.swing.JFrame {
 
     public Login() {
         initComponents();
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         // ⚙️ Bỏ layout mặc định để điều khiển vị trí thủ công
         background1.setLayout(null);
 
-// Thêm hai panel chính
+        // Thêm hai panel chính (thêm panelBody khi frame đã hiển thị để đảm bảo kích thước chính xác)
         background1.add(panelLogin);
-        background1.add(panelBody);
 
-// Ẩn body khi chưa đăng nhập
+        // Ẩn body khi chưa đăng nhập
         panelBody.setVisible(false);
 
-// Căn giữa và tự co giãn theo frame
+        // Sau khi frame được tạo xong, đặt kích thước ban đầu cho 2 panel
+        SwingUtilities.invokeLater(() -> {
+            int w = getWidth();
+            int h = getHeight();
+            // Đặt bounds ban đầu cho panelLogin (giữ theo preferred size)
+            int pw = panelLogin.getPreferredSize().width;
+            int ph = panelLogin.getPreferredSize().height;
+            int x = (w - pw) / 2;
+            int y = (h - ph) / 2;
+            panelLogin.setBounds(x, y, pw, ph);
+
+            // Panel body luôn full frame - thêm vào background sau khi frame đã hiện
+            panelBody.setBounds(0, 0, w, h);
+            background1.add(panelBody);
+        });
+        txtUser.setText("d");
+        txtPass.setText("d");
+
+        // Căn giữa và tự co giãn theo frame
         addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
@@ -64,9 +82,8 @@ public class Login extends javax.swing.JFrame {
                 // Panel body full content pane
                 panelBody.setBounds(0, 0, w, h);
                 background1.revalidate();
-            background1.repaint();
-            panelBody.revalidate();
-                panelBody.repaint();
+                background1.repaint();
+
             }
         });
         btnEye.setIcon(FontIcon.of(FontAwesomeSolid.EYE, 20)); // 20px, to hơn mặc định
@@ -263,7 +280,7 @@ public class Login extends javax.swing.JFrame {
         panelLoginLayout.setVerticalGroup(
             panelLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLoginLayout.createSequentialGroup()
-                .addContainerGap(192, Short.MAX_VALUE)
+                .addContainerGap(125, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(189, 189, 189))
         );
@@ -279,7 +296,7 @@ public class Login extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(background1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(background1, javax.swing.GroupLayout.PREFERRED_SIZE, 733, Short.MAX_VALUE)
         );
 
         pack();
@@ -303,8 +320,13 @@ public class Login extends javax.swing.JFrame {
                 }
                 action = false;
             }
+
+            boolean isAdmin = txtUser.getText().equals("d");
+
+
             if (action) {
                 animatorLogin.start();
+                panelBody.setAuth(isAdmin);
                 enableLogin(false);
             }
         }
@@ -366,9 +388,6 @@ public class Login extends javax.swing.JFrame {
         txtPass.setHelperText("");
     }
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -389,10 +408,11 @@ public class Login extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-        Login login = new Login();
-        login.setExtendedState(login.getExtendedState() | javax.swing.JFrame.MAXIMIZED_BOTH);
-        login.setVisible(true);
-    });
+            Login login = new Login();
+            login.setVisible(true);
+            login.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        });
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
