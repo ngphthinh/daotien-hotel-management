@@ -16,13 +16,14 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
- * @author THIS PC
+ * @author VienThieu
  */
 public class RoomManagement extends javax.swing.JPanel {
 
@@ -39,8 +40,10 @@ public class RoomManagement extends javax.swing.JPanel {
         btnAddRoom.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
 
         String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Giá phòng", "Trạng thái", "Chức năng"};
-        DefaultTableModel model = new DefaultTableModel(cols, 5);
+        DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblRoom.getTbl().setModel(model);
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        tblRoom.getTbl().setRowSorter(sorter);
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -50,7 +53,91 @@ public class RoomManagement extends javax.swing.JPanel {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row: " + row);
+                DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
+
+                String number = (String) model.getValueAt(row, 1);
+                String type = (String) model.getValueAt(row, 2);
+                String price = (String) model.getValueAt(row, 3);
+                String status = (String) model.getValueAt(row, 4);
+
+                RoomManagementModal modal = new RoomManagementModal();
+                modal.getBtnSave().setText("Cập nhật");
+
+                modal.getTxtNumberRoom().setText(number);
+                modal.getCmbTypeRoom().setSelectedItem(type);
+                modal.getTxtPriceRoom().setText(price);
+                modal.getCmbStatus().setSelectedItem(status);
+
+                modal.closeModel(ae -> GlassPanePopup.closePopupLast());
+                modal.saveData(ae -> {
+                    String numberNew = modal.getTxtNumberRoom().getText().trim();
+                    String priceNew = modal.getTxtPriceRoom().getText().trim();
+                    String typeNew = modal.getCmbTypeRoom().getSelectedItem() != null
+                            ? modal.getCmbTypeRoom().getSelectedItem().toString()
+                            : "";
+                    String statusNew = modal.getCmbStatus().getSelectedItem() != null
+                            ? modal.getCmbStatus().getSelectedItem().toString()
+                            : "";
+
+                    modal.getLblErrolNumberRoom().setText("");
+                    modal.getLblErrolPriceRoom().setText("");
+
+                    Color red = Color.RED;
+                    modal.getLblErrolNumberRoom().setForeground(red);
+                    modal.getLblErrolPriceRoom().setForeground(red);
+
+                    boolean isValid = true;
+
+                    if (numberNew.isEmpty()) {
+                        modal.getLblErrolNumberRoom().setText("Số phòng không được để trống!");
+                        isValid = false;
+                    } else if (!numberNew.matches("\\d+")) {
+                        modal.getLblErrolNumberRoom().setText("Số phòng chỉ được chứa chữ số!");
+                        isValid = false;
+                    } else {
+                        DefaultTableModel modelNew = (DefaultTableModel) tblRoom.getTbl().getModel();
+                        for (int i = 0; i < modelNew.getRowCount(); i++) {
+                            if (i == row) {
+                                continue;
+                            }
+                            Object val = modelNew.getValueAt(i, 1);
+                            if (val != null && val.toString().equals(numberNew)) {
+                                modal.getLblErrolNumberRoom().setText("Số phòng đã tồn tại!");
+                                isValid = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (priceNew.isEmpty()) {
+                        modal.getLblErrolPriceRoom().setText("Giá phòng không được để trống!");
+                        isValid = false;
+                    } else {
+                        try {
+                            double priceValue = Double.parseDouble(priceNew);
+                            if (priceValue <= 0) {
+                                modal.getLblErrolPriceRoom().setText("Giá phòng phải lớn hơn 0!");
+                                isValid = false;
+                            }
+                        } catch (NumberFormatException ex) {
+                            modal.getLblErrolPriceRoom().setText("Giá phòng phải là số hợp lệ!");
+                            isValid = false;
+                        }
+                    }
+
+                    if (!isValid) {
+                        return;
+                    }
+
+                    model.setValueAt(numberNew, row, 1);
+                    model.setValueAt(typeNew, row, 2);
+                    model.setValueAt(priceNew, row, 3);
+                    model.setValueAt(statusNew, row, 4);
+
+                    GlassPanePopup.closePopupLast();
+                });
+
+                GlassPanePopup.showPopup(modal);
             }
 
             @Override
@@ -64,7 +151,7 @@ public class RoomManagement extends javax.swing.JPanel {
         };
 
         tblRoom.setTableActionColumn(tblRoom.getTbl(), 5, event, false);
-        tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(250);  // chiều rộng mong muốn
+        tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(250);
         tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(250);
         tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(250);
         tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(250);
@@ -74,8 +161,8 @@ public class RoomManagement extends javax.swing.JPanel {
         var header = tblRoom.getTbl().getTableHeader();
 
         //todo: hard code
-        Combobox<String> cmbType = new Combobox<>(new String[]{"Phòng đơn", "Phòng đôi"});
-        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Còn trống", "Đang sử dụng", "Bảo trì"});
+        Combobox<String> cmbType = new Combobox<>(new String[]{"Tất cả", "Phòng đơn", "Phòng đôi"});
+        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Tất cả", "Còn trống", "Đang sử dụng", "Bảo trì"});
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
@@ -87,7 +174,7 @@ public class RoomManagement extends javax.swing.JPanel {
         colGender.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
             if (comp instanceof JLabel lbl) {
-                String text = "Loại phòng                          \u25BC";
+                String text = "Loại phòng                                       \u25BC";
                 lbl.setText(text);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
             }
@@ -98,7 +185,7 @@ public class RoomManagement extends javax.swing.JPanel {
         colPosition.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
             if (comp instanceof JLabel lbl) {
-                String text = "Trạng thái                           \u25BC";
+                String text = "Trạng thái                                       \u25BC";
                 lbl.setText(text);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
             }
@@ -108,7 +195,7 @@ public class RoomManagement extends javax.swing.JPanel {
         cmbType.addActionListener(ev -> {
             String selectedType = (String) cmbType.getSelectedItem();
             String selectedStatus = (String) cmbStatus.getSelectedItem();
-//    filterTable(selectedType, selectedStatus);
+            filterTable(selectedType, selectedStatus); 
             header.remove(cmbType);
             header.repaint();
         });
@@ -116,7 +203,7 @@ public class RoomManagement extends javax.swing.JPanel {
         cmbStatus.addActionListener(ev -> {
             String selectedStatus = (String) cmbStatus.getSelectedItem();
             String selectedType = (String) cmbType.getSelectedItem();
-//    filterTable(selectedType, selectedStatus);
+            filterTable(selectedType, selectedStatus); 
             header.remove(cmbStatus);
             header.repaint();
         });
@@ -141,13 +228,10 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (col == 2) {
                     Rectangle rect = header.getHeaderRect(col);
 
-//                     Thiết lập vị trí và kích thước cho combo
                     cmbType.setBounds(rect);
-                    cmbType.setVisible(true); // hiển thị combo tại vị trí cột
+                    cmbType.setVisible(true);
                     header.add(cmbType);
-                    cmbType.showPopup(); // mở dropdown ngay lập tức
-
-                    // Khi mất focus, ẩn combo
+                    cmbType.showPopup();
                     cmbType.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusLost(FocusEvent fe) {
@@ -159,13 +243,11 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (col == 4) {
                     Rectangle rect = header.getHeaderRect(col);
 
-//                     Thiết lập vị trí và kích thước cho combo
                     cmbStatus.setBounds(rect);
-                    cmbStatus.setVisible(true); // hiển thị combo tại vị trí cột
+                    cmbStatus.setVisible(true);
                     header.add(cmbStatus);
-                    cmbStatus.showPopup(); // mở dropdown ngay lập tức
+                    cmbStatus.showPopup();
 
-                    // Khi mất focus, ẩn combo
                     cmbStatus.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusLost(FocusEvent fe) {
@@ -323,11 +405,34 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (!isValid) {
                     return;
                 }
+
+                DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
+                model.addRow(new Object[]{"", number, type, price, status, ""});
+                GlassPanePopup.closePopupLast();
             }
         });
         GlassPanePopup.showPopup(modal);
     }//GEN-LAST:event_btnAddRoomActionPerformed
+    private void filterTable(String genderFilter, String positionFilter) {
+        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblRoom.getTbl().getRowSorter();
 
+        RowFilter<DefaultTableModel, Object> rf = new RowFilter() {
+            @Override
+            public boolean include(RowFilter.Entry entry) {
+                String gender = entry.getStringValue(2);
+                String position = entry.getStringValue(4);
+
+                boolean genderMatches = genderFilter == null || genderFilter.equals("Tất cả") || gender.equals(genderFilter);
+                boolean positionMatches = positionFilter == null || positionFilter.equals("Tất cả") || position.equals(positionFilter);
+
+                return genderMatches && positionMatches;
+            }
+
+        };
+        sorter.setRowFilter(rf);
+        sorter.setSortKeys(null);
+
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddRoom;
