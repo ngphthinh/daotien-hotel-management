@@ -7,17 +7,27 @@ package iuh.fit.se.group1.ui.layout;
 import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
 import com.raven.datechooser.SelectedDate;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
+import iuh.fit.se.group1.ui.component.shift.ShiftCard;
 import iuh.fit.se.group1.ui.component.shift.ShiftList;
+import iuh.fit.se.group1.ui.component.shift.ShiftProfile;
 import iuh.fit.se.group1.util.Constants;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import javax.swing.JPanel;
 import raven.glasspanepopup.GlassPanePopup;
 
@@ -63,6 +73,56 @@ public class ShiftManagement extends javax.swing.JPanel {
                 dateChooser.showPopup(txtDate, 0, txtDate.getHeight());
             }
         });
+        setupShiftCardButtons();
+    }
+    private void setupShiftCardButtons() {
+        // Gắn sự kiện cho từng ShiftCard
+        shiftCard3.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard3));
+        shiftCard4.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard4));
+        shiftCard5.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard5));
+        shiftCard8.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard8));
+    }
+
+    private void handleAddEmployeesToShift(ShiftCard shiftCard) {
+        // Lấy danh sách nhân viên đã chọn từ ShiftList
+        List<ShiftProfile> selectedProfiles = shiftList2.getSelectedEmployees();
+
+        // Kiểm tra xem có đúng 2 nhân viên được chọn không
+        if (selectedProfiles.size() != 2) {
+            Message.showMessage("Thông báo", "Vui lòng chọn đúng 2 nhân viên!");
+            return;
+        }
+
+        // Cập nhật thông tin nhân viên vào ShiftCard
+        ShiftProfile profile1 = selectedProfiles.get(0);
+        ShiftProfile profile2 = selectedProfiles.get(1);
+
+        // Cập nhật nhân viên 1
+        shiftCard.getLblName1().setText(profile1.getLblName().getText());
+        shiftCard.getLblCode1().setText(profile1.getLblCode().getText());
+        shiftCard.getAvatarLabel1().setImage(profile1.getAvatarLabel().getImage());
+
+        // Cập nhật nhân viên 2
+        shiftCard.getLblName2().setText(profile2.getLblName().getText());
+        shiftCard.getLblCode2().setText(profile2.getLblCode().getText());
+        shiftCard.getAvatarLabel2().setImage(profile2.getAvatarLabel().getImage());
+
+        // Hiển thị panel thông tin nhân viên (ẩn nút Add)
+        shiftCard.getPnlInforEmployee1().setVisible(true);
+        shiftCard.getPnlInforEmployee2().setVisible(true);
+        shiftCard.getBtnAdd().setVisible(true);
+
+        // Bỏ chọn các radio button sau khi đã thêm
+        shiftList2.clearAllSelections();
+
+        Message.showConfirm(
+                "Thành công",
+                "Đã thêm 2 nhân viên vào ca làm!",
+                null
+//              Hoặc () -> {
+//              reloadEmployeeTable(); // ví dụ bạn muốn load lại danh sách
+//              }
+        );
     }
     /**
      * This method is called from within the constructor to initialize the form.

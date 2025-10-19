@@ -7,6 +7,9 @@ package iuh.fit.se.group1.ui.component.shift;
 import iuh.fit.se.group1.ui.component.booking.InfoOrderPanel;
 import java.awt.Image;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -30,9 +33,11 @@ public class ShiftList extends javax.swing.JPanel {
         addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
         addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
         addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
+        
     }
+
     @Override
-protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) {
     super.paintComponent(g); // ✅ Gọi đầu tiên để xóa nền mặc định
 
     Graphics2D g2 = (Graphics2D) g.create();
@@ -56,6 +61,30 @@ protected void paintComponent(Graphics g) {
 
     g2.dispose();
 }
+public List<ShiftProfile> getSelectedEmployees() {
+        List<ShiftProfile> selectedList = new ArrayList<>();
+        
+        for (Component c : pnlEmployees.getComponents()) {
+            if (c instanceof ShiftProfile) {
+                ShiftProfile profile = (ShiftProfile) c;
+                if (profile.isSelected()) {
+                    selectedList.add(profile);
+                }
+            }
+        }
+        
+        return selectedList;
+    }
+
+    // ✅ Method để bỏ chọn tất cả radio button
+    public void clearAllSelections() {
+        for (Component c : pnlEmployees.getComponents()) {
+            if (c instanceof ShiftProfile) {
+                ShiftProfile profile = (ShiftProfile) c;
+                profile.getjRadioButton2().setSelected(false);
+            }
+        }
+    }
 
 
     /**

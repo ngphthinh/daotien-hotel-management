@@ -7,6 +7,7 @@ package iuh.fit.se.group1.ui.component.shift;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import java.awt.Dimension;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 
 /**
  *
@@ -31,6 +32,16 @@ public class ShiftProfile extends javax.swing.JPanel {
         this.avatarLabel = avatarLabel;
     }
 
+    public JRadioButton getjRadioButton2() {
+        return jRadioButton2;
+    }
+
+    public void setjRadioButton2(JRadioButton jRadioButton2) {
+        this.jRadioButton2 = jRadioButton2;
+    }
+    public boolean isSelected() {
+        return jRadioButton2.isSelected();
+    }
     public JLabel getLblCode() {
         return lblCode;
     }

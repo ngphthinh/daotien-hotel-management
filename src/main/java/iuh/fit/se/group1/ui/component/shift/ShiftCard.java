@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -118,6 +117,9 @@ public class ShiftCard extends javax.swing.JPanel {
         initComponents();
         styleButton();
         styleCard();
+        pnlInforEmployee1.setVisible(true);
+        pnlInforEmployee2.setVisible(true);
+        btnAdd.setVisible(true);
     }
     private void styleCard() {
         // Làm trong suốt để tự vẽ nền
@@ -130,7 +132,7 @@ public class ShiftCard extends javax.swing.JPanel {
 
         int w = getWidth();
         int h = getHeight();
-        int arc = 5;
+        int arc = 25;
         int shadow = 6;
         int headerHeight = 40;
 
@@ -338,10 +340,6 @@ public class ShiftCard extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnAddActionPerformed
 
-    public void addActionListener(ActionListener l) {
-        btnAdd.addActionListener(l);
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel1;
     private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel2;
