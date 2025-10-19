@@ -4,10 +4,8 @@
  */
 package iuh.fit.se.group1.ui.component.chart;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
+import java.awt.geom.Path2D;
 import javax.swing.JPanel;
 
 /**
@@ -25,33 +23,54 @@ public class CardLiquid extends JPanel {
     public CardLiquid() {
         initComponents();
         setOpaque(false);
+
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();
-
-        // Khử răng cưa
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int width = getWidth() + 35;
-        int height = getHeight() + 35;
+        int width = getWidth();
+        int height = getHeight();
+        int r = cornerRadius;    // bán kính bo góc
+        int shadow = shadowSize; // độ lệch bóng
 
-        // Vẽ bóng (dịch xuống + sang phải)
-        g2.setColor(new Color(0, 0, 0, 80));
-        g2.fillRoundRect(shadowSize, shadowSize,
-                width - shadowSize, height - shadowSize,
-                cornerRadius, cornerRadius);
+        // --- (Tuỳ chọn) Vẽ bóng mờ ---
+        if (shadow > 0) {
+            g2.setColor(new Color(0, 0, 0, 40)); // bóng đen mờ
+            Shape shadowShape = createRoundedShape(width - shadow, height - shadow, r, r, r, r);
+            g2.translate(shadow, shadow);
+            g2.fill(shadowShape);
+            g2.translate(-shadow, -shadow);
+        }
 
-        // Vẽ nền panel
-        g2.setColor(Color.WHITE);
-        g2.fillRoundRect(0, 0,
-                width - shadowSize, height - shadowSize,
-                cornerRadius, cornerRadius);
+        // --- Vẽ nền panel ---
+        g2.setColor(getBackground());
+        Shape shape = createRoundedShape(width, height, r, r, r, r);
+        g2.fill(shape);
 
         g2.dispose();
     }
+
+    /**
+     * Tạo hình có thể bo riêng từng góc
+     */
+    private Shape createRoundedShape(int width, int height, int tl, int tr, int br, int bl) {
+        Path2D path = new Path2D.Float();
+        path.moveTo(0, tl);
+        path.quadTo(0, 0, tl, 0);                   // top-left
+        path.lineTo(width - tr, 0);
+        path.quadTo(width, 0, width, tr);           // top-right
+        path.lineTo(width, height - br);
+        path.quadTo(width, height, width - br, height); // bottom-right
+        path.lineTo(bl, height);
+        path.quadTo(0, height, 0, height - bl);     // bottom-left
+        path.closePath();
+        return path;
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

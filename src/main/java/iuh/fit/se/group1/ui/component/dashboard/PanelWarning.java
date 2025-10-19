@@ -4,6 +4,13 @@
  */
 package iuh.fit.se.group1.ui.component.dashboard;
 
+import iuh.fit.se.group1.ui.component.custom.CircularProgress;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.material.Material;
+import org.kordamp.ikonli.swing.FontIcon;
+
+import java.awt.*;
+
 /**
  *
  * @author THIS PC
@@ -15,6 +22,33 @@ public class PanelWarning extends javax.swing.JPanel {
      */
     public PanelWarning() {
         initComponents();
+        setContentCardMessage();
+        
+    }
+
+    private void setContentCardMessage() {
+        cardMessage1.getLblTitle().setText("Khách trả trể");
+        cardMessage1.getLblSubTitle().setText("5 Phòng");
+        cardMessage1.getLblIcon().setIcon(FontIcon.of(FontAwesomeSolid.EXCLAMATION_CIRCLE,16, Color.WHITE));
+        cardMessage1.getLblIcon().setText("");
+
+        cardMessage2.getLblTitle().setText("Phòng bị hỏng");
+        cardMessage2.getLblSubTitle().setText("5 Phòng");
+        cardMessage2.getLblIcon().setIcon(FontIcon.of(FontAwesomeSolid.BAN,16,Color.WHITE));
+        cardMessage2.getLblIcon().setText("");
+
+        cardMessage3.getLblTitle().setText("Phiên bản mới");
+        cardMessage3.getLblTitle().setForeground(Color.white);
+        cardMessage3.getLblSubTitle().setForeground(Color.white);
+        cardMessage3.setBackground(new Color(157,157,157));
+        cardMessage3.getLblIcon().setIcon(FontIcon.of(FontAwesomeSolid.INFO_CIRCLE,16,Color.WHITE));
+        cardMessage3.getLblIcon().setText("");
+        cardMessage3.getLblSubTitle().setText("Hiện chưa có");
+
+        lblExigent.setIcon(FontIcon.of(Material.FIBER_MANUAL_RECORD,10,new Color(212,110,110)));
+        lblImportant.setIcon(FontIcon.of(Material.FIBER_MANUAL_RECORD,10,new Color(157,157,157)));
+
+
     }
 
     /**
@@ -26,17 +60,26 @@ public class PanelWarning extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel2 = new javax.swing.JLabel();
-        cardMessage2 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
+        lblTitle = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
+        lblExigent = new javax.swing.JLabel();
+        lblImportant = new javax.swing.JLabel();
+        cardMessage1 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
+        cardMessage2 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
         cardMessage3 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
-        cardMessage4 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
 
         setBackground(new java.awt.Color(255, 255, 255));
+        setForeground(new java.awt.Color(0, 0, 0));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Cảnh báo");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(0, 0, 0));
+        lblTitle.setText("Cảnh báo");
+
+        lblExigent.setForeground(new java.awt.Color(0, 0, 0));
+        lblExigent.setText("Khẩn cấp");
+
+        lblImportant.setForeground(new java.awt.Color(0, 0, 0));
+        lblImportant.setText("Quan trọng");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -46,39 +89,51 @@ public class PanelWarning extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(30, 30, 30)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cardMessage4, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cardMessage2, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2)
-                            .addComponent(cardMessage3, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lblTitle))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 13, Short.MAX_VALUE))
+                        .addContainerGap()
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblExigent, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblImportant, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(cardMessage1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cardMessage2, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cardMessage3, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
-                .addGap(9, 9, 9)
+                .addComponent(lblTitle)
+                .addGap(0, 0, 0)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblImportant, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblExigent))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cardMessage3, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
-                .addComponent(cardMessage4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cardMessage1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cardMessage2, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
+                .addComponent(cardMessage2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cardMessage3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(10, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.dashboard.CardMessage cardMessage1;
     private iuh.fit.se.group1.ui.component.dashboard.CardMessage cardMessage2;
     private iuh.fit.se.group1.ui.component.dashboard.CardMessage cardMessage3;
-    private iuh.fit.se.group1.ui.component.dashboard.CardMessage cardMessage4;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lblExigent;
+    private javax.swing.JLabel lblImportant;
+    private javax.swing.JLabel lblTitle;
     // End of variables declaration//GEN-END:variables
 }

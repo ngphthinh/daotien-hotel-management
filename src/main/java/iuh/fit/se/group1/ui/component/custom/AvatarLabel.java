@@ -3,6 +3,9 @@
 
 package iuh.fit.se.group1.ui.component.custom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.net.URL;
@@ -14,6 +17,7 @@ import javax.swing.*;
  */
 public class AvatarLabel extends JPanel {
 
+    private static final Logger log = LoggerFactory.getLogger(AvatarLabel.class);
     private Image image;
 
     public AvatarLabel() {
@@ -25,9 +29,9 @@ public class AvatarLabel extends JPanel {
             if (url != null) {
                 ImageIcon icon = new ImageIcon(url);
                 this.image = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-                System.out.println("✅ Ảnh avatar URL: " + url);
+                log.info("✅ Ảnh avatar URL: {}", url);
             } else {
-                System.err.println("❌ Không tìm thấy ảnh avatar!");
+                log.warn("⚠️ Ảnh avatar không tìm thấy");
             }
         } catch (Exception e) {
             e.printStackTrace();

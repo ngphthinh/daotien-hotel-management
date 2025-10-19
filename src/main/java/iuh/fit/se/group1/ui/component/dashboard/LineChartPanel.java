@@ -5,11 +5,6 @@
 package iuh.fit.se.group1.ui.component.dashboard;
 
 
-
-
-
-
-
 import iuh.fit.se.group1.ui.component.raven.chart.CurveLineChart;
 import iuh.fit.se.group1.ui.component.raven.chart.ModelChart;
 import iuh.fit.se.group1.ui.component.raven.panel.PanelShadow;

@@ -10,8 +10,8 @@ import iuh.fit.se.group1.ui.component.booking.InfoRoomPanel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -602,7 +602,8 @@ public class InfoOrder extends javax.swing.JPanel {
         promotionPanel.getLblName().setText(promotionName);
         promotionPanel.getLblPrice().setText(price);
         promotionPanel.getLblQuantity().setText(quantity);
-        pnlPromotion.add(promotionPanel, countSurcharge - 1);
+        pnlPromotion.add(promotionPanel);
+        promotionPanel.add(Box.createVerticalStrut(8));
         pnlPromotion.revalidate();
         pnlPromotion.repaint();
     }

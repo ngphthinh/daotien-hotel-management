@@ -12,6 +12,13 @@ import java.awt.*;
  * @author THIS PC
  */
 public class CardReport extends javax.swing.JPanel {
+    public JLabel getLblRoomCount() {
+        return lblRoomCount;
+    }
+
+    public void setLblRoomCount(JLabel lblRoomCount) {
+        this.lblRoomCount = lblRoomCount;
+    }
 
     private Color borderColor = new Color(41, 121, 255);
 

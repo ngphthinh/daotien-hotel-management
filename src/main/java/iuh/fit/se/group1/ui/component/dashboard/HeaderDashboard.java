@@ -21,6 +21,7 @@ public class HeaderDashboard extends javax.swing.JPanel {
      */
     public HeaderDashboard() {
         initComponents();
+        setActiveButton(TimeType.TODAY);
     }
 
     public Button getBtn30Days() {

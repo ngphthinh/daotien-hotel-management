@@ -2,7 +2,6 @@ package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.menu.*;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
-import iuh.fit.se.group1.ui.swing.Login;
 import iuh.fit.se.group1.util.Constants;
 import raven.glasspanepopup.GlassPanePopup;
 
@@ -33,7 +32,7 @@ public class MainLayout extends JPanel {
     public MainLayout() {
         init();
         setOpaque(false);
-        isAdmin = true;
+        isAdmin = false;
         setAuth(isAdmin);
     }
 
