@@ -36,12 +36,12 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Component id="headerCustom1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnAddCustomer" alignment="3" min="-2" pref="46" max="-2" attributes="0"/>
                   <Component id="lblTitleCustomer" alignment="3" min="-2" pref="58" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
               <Component id="tblCustomer" min="-2" pref="663" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
