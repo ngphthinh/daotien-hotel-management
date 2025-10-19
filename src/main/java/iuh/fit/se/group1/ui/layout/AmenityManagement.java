@@ -180,7 +180,7 @@ public class AmenityManagement extends javax.swing.JPanel {
             }
         });
 
-        tblAmenity.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 30, 1, 30));
+        tblAmenity.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
         tblAmenity.setForeground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -189,7 +189,7 @@ public class AmenityManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tblAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, 1228, Short.MAX_VALUE)
+                .addComponent(tblAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
             .addComponent(headerCustom1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()

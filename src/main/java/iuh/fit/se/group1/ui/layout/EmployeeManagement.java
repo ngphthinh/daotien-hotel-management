@@ -226,7 +226,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 modal.getTxtCitizen().setEditable(false);
                 modal.getCmbGender().setEnabled(false);
                 modal.getCmbPosition().setEnabled(false);
-                modal.getTxtEmail().setEnabled(false);
+                modal.getTxtEmail().setEditable(false);
                 modal.getTxtHireDate().setEditable(false);
 
                 modal.saveData(ae -> GlassPanePopup.closePopupLast());

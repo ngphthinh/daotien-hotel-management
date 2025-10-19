@@ -4,7 +4,6 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -42,7 +41,7 @@ public class RoomManagement extends javax.swing.JPanel {
         String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Giá phòng", "Trạng thái", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 5);
         tblRoom.getTbl().setModel(model);
-         addMouseListener(new java.awt.event.MouseAdapter() {
+        addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 tblRoom.getTbl().clearSelection();
@@ -135,7 +134,6 @@ public class RoomManagement extends javax.swing.JPanel {
             }
         });
 
-        
         header.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -272,11 +270,59 @@ public class RoomManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-//                modal.getjLabel1().setText("HIihihi");
-                GlassPanePopup.closePopupLast();
-                modal.getLblErrolNumberRoom().setForeground(Color.red);
-                modal.getLblErrolPriceRoom().setForeground(Color.red);
-//                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
+                String number = modal.getTxtNumberRoom().getText().trim();
+                String type = modal.getCmbTypeRoom().getSelectedItem() != null
+                        ? modal.getCmbTypeRoom().getSelectedItem().toString()
+                        : "";
+                String price = modal.getTxtPriceRoom().getText().trim();
+                String status = modal.getCmbStatus().getSelectedItem() != null
+                        ? modal.getCmbStatus().getSelectedItem().toString()
+                        : "";
+
+                modal.getLblErrolNumberRoom().setText("");
+                modal.getLblErrolPriceRoom().setText("");
+
+                Color red = Color.RED;
+                modal.getLblErrolNumberRoom().setForeground(red);
+                modal.getLblErrolPriceRoom().setForeground(red);
+
+                boolean isValid = true;
+
+                if (number.isEmpty()) {
+                    modal.getLblErrolNumberRoom().setText("Số phòng không được để trống!");
+                    isValid = false;
+                } else if (!number.matches("\\d+")) {
+                    modal.getLblErrolNumberRoom().setText("Số phòng chỉ được chứa chữ số!");
+                    isValid = false;
+                } else {
+                    DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        Object val = model.getValueAt(i, 1);
+                        if (val != null && val.toString().equals(number)) {
+                            modal.getLblErrolNumberRoom().setText("Số phòng đã tồn tại!");
+                            isValid = false;
+                            break;
+                        }
+                    }
+                }
+                if (price.isEmpty()) {
+                    modal.getLblErrolPriceRoom().setText("Giá phòng không được để trống!");
+                    isValid = false;
+                } else {
+                    try {
+                        double priceValue = Double.parseDouble(price);
+                        if (priceValue <= 0) {
+                            modal.getLblErrolPriceRoom().setText("Giá phòng phải lớn hơn 0!");
+                            isValid = false;
+                        }
+                    } catch (NumberFormatException ex) {
+                        modal.getLblErrolPriceRoom().setText("Giá phòng phải là số hợp lệ!");
+                        isValid = false;
+                    }
+                }
+                if (!isValid) {
+                    return;
+                }
             }
         });
         GlassPanePopup.showPopup(modal);

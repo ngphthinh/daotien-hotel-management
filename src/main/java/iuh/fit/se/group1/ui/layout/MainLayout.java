@@ -33,7 +33,7 @@ public class MainLayout extends JPanel {
     public MainLayout() {
         init();
         setOpaque(false);
-        isAdmin = false;
+        isAdmin = true;
         setAuth(isAdmin);
     }
 
