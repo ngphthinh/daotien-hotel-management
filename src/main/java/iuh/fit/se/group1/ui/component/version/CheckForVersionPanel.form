@@ -30,9 +30,9 @@
                   <Group type="103" alignment="0" groupAlignment="1" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="button1" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnCheckForUpdate" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
-                          <Component id="button2" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnClose" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
@@ -80,8 +80,8 @@
               <Component id="lblInfo5" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="button2" pref="36" max="32767" attributes="0"/>
-                  <Component id="button1" max="32767" attributes="0"/>
+                  <Component id="btnClose" pref="36" max="32767" attributes="0"/>
+                  <Component id="btnCheckForUpdate" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
           </Group>
@@ -161,7 +161,7 @@
         <Property name="text" type="java.lang.String" value="Powered by open-source. &#xa9; 2020-2025 &#x110;&#xe0;o Ti&#xea;n Software."/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnCheckForUpdate">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="91" red="32" type="rgb"/>
@@ -172,10 +172,10 @@
         <Property name="text" type="java.lang.String" value="Ki&#x1ec3;m tra c&#x1ead;p nh&#x1ead;t"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCheckForUpdateActionPerformed"/>
       </Events>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button2">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnClose">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="96" green="96" red="96" type="rgb"/>
@@ -186,7 +186,7 @@
         <Property name="text" type="java.lang.String" value="&#x110;&#xf3;ng"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button2ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCloseActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
