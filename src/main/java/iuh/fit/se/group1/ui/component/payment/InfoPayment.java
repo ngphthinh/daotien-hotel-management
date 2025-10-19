@@ -15,6 +15,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -64,6 +67,22 @@ public class InfoPayment extends javax.swing.JPanel {
         addPromotion("Dịch vụ cho thuê chăn mền","200k","3");
         
         
+    }
+
+    public JButton getBtnCash() {
+        return btnCash;
+    }
+
+    public void setBtnCash(JButton btnCash) {
+        this.btnCash = btnCash;
+    }
+
+    public JButton getBtnTransfer() {
+        return btnTransfer;
+    }
+
+    public void setBtnTransfer(JButton btnTransfer) {
+        this.btnTransfer = btnTransfer;
     }
     @Override
 protected void paintComponent(Graphics g) {
@@ -116,8 +135,8 @@ protected void paintComponent(Graphics g) {
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnTransfer = new javax.swing.JButton();
+        btnCash = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel12 = new javax.swing.JLabel();
         iconRoom = new javax.swing.JLabel();
@@ -207,23 +226,23 @@ protected void paintComponent(Graphics g) {
         jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel11.setText("Hình thức thanh toán ");
 
-        jButton1.setBackground(new java.awt.Color(249, 115, 22));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Chuyển khoản");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnTransfer.setBackground(new java.awt.Color(249, 115, 22));
+        btnTransfer.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnTransfer.setForeground(new java.awt.Color(255, 255, 255));
+        btnTransfer.setText("Chuyển khoản");
+        btnTransfer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnTransferActionPerformed(evt);
             }
         });
 
-        jButton2.setBackground(new java.awt.Color(249, 115, 22));
-        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Tiền mặt");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnCash.setBackground(new java.awt.Color(249, 115, 22));
+        btnCash.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnCash.setForeground(new java.awt.Color(255, 255, 255));
+        btnCash.setText("Tiền mặt");
+        btnCash.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnCashActionPerformed(evt);
             }
         });
 
@@ -253,9 +272,9 @@ protected void paintComponent(Graphics g) {
                                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jButton1)
+                                .addComponent(btnTransfer)
                                 .addGap(29, 29, 29)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnCash, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(27, 27, 27))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -277,8 +296,8 @@ protected void paintComponent(Graphics g) {
                 .addComponent(jLabel11)
                 .addGap(0, 0, 0)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnTransfer, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCash, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -558,23 +577,23 @@ protected void paintComponent(Graphics g) {
         // TODO add your handling code here:
     }//GEN-LAST:event_textField4ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTransferActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnTransferActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCashActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnCashActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCash;
+    private javax.swing.JButton btnTransfer;
     private javax.swing.JLabel iconAmenity;
     private javax.swing.JLabel iconCustomer;
     private javax.swing.JLabel iconPromotion;
     private javax.swing.JLabel iconRoom;
     private javax.swing.JLabel iconSurcharge;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -620,7 +639,8 @@ protected void paintComponent(Graphics g) {
         amenityOrderPanel.getLblPrice().setText(price);
         amenityOrderPanel.getLblQuantity().setText(quantity);
 
-        pnlAmenities.add(amenityOrderPanel, countAmenity-1);
+        pnlAmenities.add(amenityOrderPanel);
+        pnlAmenities.add(Box.createVerticalStrut(8));
         pnlAmenities.revalidate();
         pnlAmenities.repaint();
     }
@@ -629,8 +649,9 @@ protected void paintComponent(Graphics g) {
         surchargeOrderPanel.getLblName().setText(surchargeName);
         surchargeOrderPanel.getLblPrice().setText(price);
         surchargeOrderPanel.getLblQuantity().setText(quantity);
-
-        pnlSurcharges.add(surchargeOrderPanel, countSurcharge-1);
+        
+        pnlSurcharges.add(surchargeOrderPanel);
+        pnlSurcharges.add(Box.createVerticalStrut(8));
         pnlSurcharges.revalidate();
         pnlSurcharges.repaint();
     }
@@ -640,7 +661,9 @@ protected void paintComponent(Graphics g) {
         promotionPanel.getLblPrice().setText(price);
         promotionPanel.getLblQuantity().setText(quantity);
 
-        pnlPromotion.add(promotionPanel, countSurcharge - 1);
+        pnlPromotion.add(promotionPanel);
+        pnlPromotion.add(Box.createVerticalStrut(8));
+        
         pnlPromotion.revalidate();
         pnlPromotion.repaint();
     }
