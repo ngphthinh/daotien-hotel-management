@@ -104,7 +104,13 @@ public class MainLayout extends JPanel {
                 } else {
                     if (index == 0) {
                         setMainContent(dashboardEmployee);
-                    } else {
+                    } else if (index == 1) {
+                        setMainContent(bookingPage);
+                    } else if (index == 2) {
+                        setMainContent(paymentPage);
+                    } else if (index == 3){
+                        setMainContent(new CloseShift());
+                    }else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
