@@ -42,9 +42,6 @@ public class SideBar extends javax.swing.JPanel {
         return scrollPaneWin111;
     }
 
-    public JButton getCloseSideBar(){
-        return logo1.getBtnCloseSideBar();
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.

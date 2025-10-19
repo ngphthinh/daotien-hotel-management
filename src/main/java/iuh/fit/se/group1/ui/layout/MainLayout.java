@@ -62,37 +62,11 @@ public class MainLayout extends JPanel {
         sideBar = new SideBar();
         pnlMain.add(sideBar, BorderLayout.WEST);
 
-        MenuIcon menuIcon = new MenuIcon();
-
-        menuIcon.setMenuEvent(new MenuEvent() {
-            @Override
-            public void selected(int index, int subIndex) {
-                if (isAdmin) {
-                    if (index == 0) {
-                        setMainContent(dashboard);
-                    } else {
-                        System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
-                    }
-                } else {
-                    if (index == 0) {
-                        setMainContent(dashboardEmployee);
-                    } else {
-                        System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
-                    }
-                }
-
-            }
-        });
 
         pnlContent = new JPanel(new BorderLayout());
         pnlMain.add(pnlContent, BorderLayout.CENTER);
         add(pnlMain, BorderLayout.CENTER);
 
-        sideBar.getCloseSideBar().addActionListener(e -> {
-            sideBar.setVisible(false);
-            pnlMain.remove(sideBar);
-            pnlMain.add(menuIcon, BorderLayout.WEST);
-        });
 
         sideBar.getMenu1().setMenuEvent(new MenuEvent() {
             @Override
@@ -104,29 +78,39 @@ public class MainLayout extends JPanel {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
                         setMainContent(paymentPage);
-                    } else if (index == 3) {
+                    } else if (index == 3 && subIndex == 1) {
                         setMainContent(shiftManagement);
-                    } else if (index == 4) {
+                    } else if (index == 3 && subIndex == 2) {
                         setMainContent(employeeManagement);
-                    } else if (index == 5) {
+                    } else if (index == 4) {
                         setMainContent(customerManagement);
-                    } else if (index == 6) {
+                    } else if (index == 5) {
                         setMainContent(amenityManagement);
-                    } else if (index == 7) {
+                    } else if (index == 6) {
                         setMainContent(promotionManagement);
-                    } else if (index == 8) {
+                    } else if (index == 7) {
                         setMainContent(roomManagement);
-                    } else if (index == 9) {
+                    } else if (index == 8) {
                         setMainContent(orderManagement);
-                    } else if (index == 10) {
-                        setMainContent(checkForVersionPanel);
+                    } else if (index == 10 && subIndex == 3) {
+                        var modal = new CheckForVersionPanel();
+                        GlassPanePopup.showPopup(modal);
+                        modal.getBtnClose().addActionListener(e ->
+                                GlassPanePopup.closePopupLast()
+                        );
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 } else {
                     if (index == 0) {
                         setMainContent(dashboardEmployee);
-                    } else {
+                    } else if (index == 1) {
+                        setMainContent(bookingPage);
+                    } else if (index == 2) {
+                        setMainContent(paymentPage);
+                    } else if (index == 3){
+                        setMainContent(new CloseShift());
+                    }else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
@@ -168,7 +152,6 @@ public class MainLayout extends JPanel {
                     JFrame frame = new JFrame("Main Layout");
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     GlassPanePopup.install(frame);
-//                    frame.setUnd  ecorated(true); // Optional: removes window borders
                     frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
                     frame.setLocationRelativeTo(null);
                     frame.setContentPane(new MainLayout());
