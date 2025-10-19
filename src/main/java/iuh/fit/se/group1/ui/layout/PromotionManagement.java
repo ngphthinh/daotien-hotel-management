@@ -4,8 +4,6 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.modal.ServiceModal;
-import iuh.fit.se.group1.ui.component.modal.InfoCustomerModal;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.Color;
@@ -39,7 +37,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         String cols[] = {"Mã khuyến mãi", "Tên khuyến mãi", "Giá khuyến mãi", "Ngày tạo", "Ngày hết hạn", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 10);
         tblPromotion.getTbl().setModel(model);
-         addMouseListener(new java.awt.event.MouseAdapter() {
+        addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 tblPromotion.getTbl().clearSelection();
@@ -175,12 +173,78 @@ public class PromotionManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                modal.getLblErrolEndDate().setForeground(Color.red);
-                modal.getLblErrolStarDate().setForeground(Color.red);
-                modal.getLblErrolPrice().setForeground(Color.red);
-                modal.getLblErrolName().setForeground(Color.red);
-                System.out.println("Save data " + modal.getLblErrolName());
+                String name = modal.getTxtName().getText().trim();
+                String price = modal.getTxtPrice().getText().trim();
+                String discountPersent = modal.getTxtDiscountPersent().getText().trim();
+                String desciption = modal.getTxtDesciption().getText().trim();
+                String startDate = modal.getTxtStarDate().getText().trim();
+
+                modal.getLblErrolName().setText("");
+                modal.getLblErrolPrice().setText("");
+                modal.getLblErrolDiscountPersent().setText("");
+                modal.getLblErrolDesciption().setText("");
+
+                Color red = Color.RED;
+                modal.getLblErrolName().setForeground(red);
+                modal.getLblErrolPrice().setForeground(red);
+                modal.getLblErrolDiscountPersent().setForeground(red);
+                modal.getLblErrolDesciption().setForeground(red);
+
+                boolean isValid = true;
+
+                if (name.isEmpty()) {
+                    modal.getLblErrolName().setText("Vui lòng nhập tên khuyến mãi!");
+                    isValid = false;
+                }
+                double priceI = 0;
+                if (price.isEmpty()) {
+                    modal.getLblErrolPrice().setText("Giá không được để trống!");
+                    isValid = false;
+                } else {
+                    try {
+                        priceI = Double.parseDouble(price);
+                        if (priceI <= 0) {
+                            modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
+                            isValid = false;
+                        }
+                    } catch (NumberFormatException e) {
+                        modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
+                        isValid = false;
+                    }
+                }
+                double percent = 0;
+                if (discountPersent.isEmpty()) {
+                    modal.getLblErrolDiscountPersent().setText("Không được trống!");
+                    isValid = false;
+                } else {
+                    try {
+                        percent = Double.parseDouble(discountPersent);
+                        if (percent < 0 || percent > 100) {
+                            modal.getLblErrolDiscountPersent().setText("Trong khoảng 0–100!");
+                            isValid = false;
+                        }
+                    } catch (NumberFormatException e) {
+                        modal.getLblErrolDiscountPersent().setText("Là số hợp lệ!");
+                        isValid = false;
+                    }
+                }
+                if (desciption.isEmpty()) {
+                    modal.getLblErrolDesciption().setText("Vui lòng nhập mô tả khuyến mãi!");
+                    isValid = false;
+                } else if (desciption.length() < 10) {
+                    modal.getLblErrolDesciption().setText("Mô tả phải ít nhất 10 ký tự!");
+                    isValid = false;
+                }
+                if (!isValid) {
+                    return;
+                }
+                
+                DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
+                model.addRow(new Object[]{"", name, price, startDate, "", ""});
+
+                GlassPanePopup.closePopupLast();
             }
+
         });
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);

@@ -69,7 +69,7 @@ public class OrderManagement extends javax.swing.JPanel {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
 
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Loại hóa đơn                         \u25BC");
+                lbl.setText("Loại hóa đơn                 \u25BC");
                 lbl.setHorizontalTextPosition(SwingConstants.LEFT);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
                 lbl.setIconTextGap(5);
@@ -146,7 +146,6 @@ public class OrderManagement extends javax.swing.JPanel {
 
         tblOrder.setBackground(new java.awt.Color(255, 255, 255));
         tblOrder.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
-        tblOrder.setForeground(new java.awt.Color(255, 255, 255));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(102, 102, 102));

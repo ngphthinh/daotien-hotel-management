@@ -4,7 +4,6 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
@@ -44,7 +43,7 @@ public class AmenityManagement extends javax.swing.JPanel {
             public void onEdit(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
                 String name = (String) model.getValueAt(row, 1);
-                String price = String.valueOf(model.getValueAt(row, 2)); 
+                String price = String.valueOf(model.getValueAt(row, 2));
 
                 ServiceModal modal = new ServiceModal();
                 modal.getBtnSave().setText("Cập nhật");
@@ -57,36 +56,36 @@ public class AmenityManagement extends javax.swing.JPanel {
                     String nameNew = modal.getTxtName().getText().trim();
                     String priceNew = modal.getTxtPrice().getText().trim();
 
-                    modal.getLblErrorName().setText("");
-                    modal.getLblErrorPrice().setText("");
+                    modal.getLblErrolName().setText("");
+                    modal.getLblErrolPrice().setText("");
 
                     Color red = Color.RED;
-                    modal.getLblErrorName().setForeground(red);
-                    modal.getLblErrorPrice().setForeground(red);
+                    modal.getLblErrolName().setForeground(red);
+                    modal.getLblErrolPrice().setForeground(red);
 
                     boolean valid = true;
 
                     if (nameNew.isEmpty()) {
-                        modal.getLblErrorName().setText("Tên không được để trống!");
+                        modal.getLblErrolName().setText("Tên không được để trống!");
                         valid = false;
                     } else if (nameNew.length() < 2) {
-                        modal.getLblErrorName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
+                        modal.getLblErrolName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
                         valid = false;
                     }
 
                     double priceI = 0;
                     if (priceNew.isEmpty()) {
-                        modal.getLblErrorPrice().setText("Giá không được để trống!");
+                        modal.getLblErrolPrice().setText("Giá không được để trống!");
                         valid = false;
                     } else {
                         try {
                             priceI = Double.parseDouble(priceNew);
                             if (priceI <= 0) {
-                                modal.getLblErrorPrice().setText("Giá phải lớn hơn 0!");
+                                modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
                                 valid = false;
                             }
                         } catch (NumberFormatException e) {
-                            modal.getLblErrorPrice().setText("Giá phải là số hợp lệ!");
+                            modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
                             valid = false;
                         }
                     }
@@ -96,7 +95,7 @@ public class AmenityManagement extends javax.swing.JPanel {
                     }
 
                     model.setValueAt(nameNew, row, 1);
-                    model.setValueAt(priceI, row, 2); 
+                    model.setValueAt(priceI, row, 2);
                     GlassPanePopup.closePopupLast();
                 });
 
@@ -129,7 +128,7 @@ public class AmenityManagement extends javax.swing.JPanel {
                 }
             }
         });
-         addMouseListener(new java.awt.event.MouseAdapter() {
+        addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 tblAmenity.getTbl().clearSelection();
@@ -230,36 +229,36 @@ public class AmenityManagement extends javax.swing.JPanel {
                 String name = modal.getTxtName().getText().trim();
                 String price = modal.getTxtPrice().getText().trim();
 
-                modal.getLblErrorName().setText("");
-                modal.getLblErrorPrice().setText("");
+                modal.getLblErrolName().setText("");
+                modal.getLblErrolPrice().setText("");
 
                 Color red = Color.RED;
-                modal.getLblErrorName().setForeground(red);
-                modal.getLblErrorPrice().setForeground(red);
+                modal.getLblErrolName().setForeground(red);
+                modal.getLblErrolPrice().setForeground(red);
 
                 boolean valid = true;
 
                 if (name.isEmpty()) {
-                    modal.getLblErrorName().setText("Tên không được để trống!");
+                    modal.getLblErrolName().setText("Tên không được để trống!");
                     valid = false;
                 } else if (name.length() < 2) {
-                    modal.getLblErrorName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
+                    modal.getLblErrolName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
                     valid = false;
                 }
 
                 double priceI = 0;
                 if (price.isEmpty()) {
-                    modal.getLblErrorPrice().setText("Giá không được để trống!");
+                    modal.getLblErrolPrice().setText("Giá không được để trống!");
                     valid = false;
                 } else {
                     try {
                         priceI = Double.parseDouble(price);
                         if (priceI <= 0) {
-                            modal.getLblErrorPrice().setText("Giá phải lớn hơn 0!");
+                            modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
                             valid = false;
                         }
                     } catch (NumberFormatException e) {
-                        modal.getLblErrorPrice().setText("Giá phải là số hợp lệ!");
+                        modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
                         valid = false;
                     }
                 }

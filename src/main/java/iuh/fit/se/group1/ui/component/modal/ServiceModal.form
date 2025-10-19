@@ -37,9 +37,9 @@
               <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="lblErrorName" min="-2" pref="174" max="-2" attributes="0"/>
+                      <Component id="lblErrolName" min="-2" pref="174" max="-2" attributes="0"/>
                       <Component id="txtPrice" pref="235" max="32767" attributes="0"/>
-                      <Component id="lblErrorPrice" alignment="0" max="32767" attributes="0"/>
+                      <Component id="lblErrolPrice" alignment="0" max="32767" attributes="0"/>
                       <Component id="txtName" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <Component id="btnSave" min="-2" pref="194" max="-2" attributes="0"/>
@@ -62,14 +62,14 @@
                   <Component id="lblName" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="lblErrorName" min="-2" pref="16" max="-2" attributes="0"/>
+              <Component id="lblErrolName" min="-2" pref="16" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtPrice" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblPrice" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-              <Component id="lblErrorPrice" min="-2" pref="16" max="-2" attributes="0"/>
+              <Component id="lblErrolPrice" min="-2" pref="16" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="btnSave" min="-2" pref="41" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
@@ -157,7 +157,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPriceActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblErrorName">
+    <Component class="javax.swing.JLabel" name="lblErrolName">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="0"/>
@@ -171,7 +171,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblErrorPrice">
+    <Component class="javax.swing.JLabel" name="lblErrolPrice">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="0"/>
