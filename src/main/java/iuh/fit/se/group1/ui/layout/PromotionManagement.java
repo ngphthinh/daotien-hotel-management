@@ -154,13 +154,10 @@ public class PromotionManagement extends javax.swing.JPanel {
                     if (!isValid) {
                         return;
                     }
-
                     model.setValueAt(nameNew, row, 1);
                     model.setValueAt(priceNew, row, 2);
                     model.setValueAt(startDateNew, row, 3);
                     model.setValueAt(endDateNew, row, 4);
-                    tblPromotion.getTbl().repaint();
-tblPromotion.getTbl().revalidate();
 
                     GlassPanePopup.closePopupLast();
                 });
