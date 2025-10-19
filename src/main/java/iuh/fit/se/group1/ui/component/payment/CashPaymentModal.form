@@ -25,23 +25,23 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
-                      <Component id="jLabel1" min="-2" pref="344" max="-2" attributes="0"/>
+                      <Component id="lblTitle" min="-2" pref="344" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="btnExit" min="-2" pref="27" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="button1" min="-2" pref="114" max="-2" attributes="0"/>
-                          <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnComplete" min="-2" pref="114" max="-2" attributes="0"/>
+                          <Component id="pnlMoney" min="-2" max="-2" attributes="0"/>
                           <Group type="102" attributes="0">
-                              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblMoneyGive" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="textField1" min="-2" pref="122" max="-2" attributes="0"/>
+                              <Component id="txtMoneyGive" min="-2" pref="122" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblMoneyChange" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="textField2" min="-2" pref="125" max="-2" attributes="0"/>
+                              <Component id="txtMoneyChange" min="-2" pref="125" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -56,26 +56,26 @@
               <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="btnExit" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="textField1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="textField2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblMoneyGive" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtMoneyGive" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblMoneyChange" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtMoneyChange" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <Component id="pnlMoney" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-              <Component id="button1" min="-2" pref="36" max="-2" attributes="0"/>
+              <Component id="btnComplete" min="-2" pref="36" max="-2" attributes="0"/>
               <EmptySpace pref="28" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="lblTitle">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="16" style="1"/>
@@ -98,7 +98,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExitActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
+    <Component class="javax.swing.JLabel" name="lblMoneyGive">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="14" style="1"/>
@@ -109,7 +109,7 @@
         <Property name="text" type="java.lang.String" value="Ti&#x1ec1;n kh&#xe1;ch &#x111;&#x1b0;a:"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtMoneyGive">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="81" green="81" red="81" type="rgb"/>
@@ -127,7 +127,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel3">
+    <Component class="javax.swing.JLabel" name="lblMoneyChange">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="14" style="1"/>
@@ -138,7 +138,7 @@
         <Property name="text" type="java.lang.String" value="Ti&#x1ec1;n th&#x1ed1;i:"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField2">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtMoneyChange">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="81" green="81" red="81" type="rgb"/>
@@ -156,7 +156,7 @@
         </Property>
       </Properties>
     </Component>
-    <Container class="javax.swing.JPanel" name="jPanel1">
+    <Container class="javax.swing.JPanel" name="pnlMoney">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="81" green="81" red="81" type="rgb"/>
@@ -176,7 +176,7 @@
         </DimensionLayout>
       </Layout>
     </Container>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnComplete">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="16" green="73" red="f9" type="rgb"/>
@@ -191,7 +191,7 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCompleteActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
