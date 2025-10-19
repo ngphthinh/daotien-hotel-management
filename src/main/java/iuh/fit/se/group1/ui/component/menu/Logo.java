@@ -36,7 +36,6 @@ public class Logo extends javax.swing.JPanel {
         lblLogo = new javax.swing.JLabel();
         lblTitle = new javax.swing.JLabel();
         lblNameHotel = new javax.swing.JLabel();
-        btnCloseSideBar = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(247, 169));
@@ -59,19 +58,15 @@ public class Logo extends javax.swing.JPanel {
             .addComponent(lblTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(lblNameHotel, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(10, Short.MAX_VALUE)
                 .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(49, 49, 49)
-                .addComponent(btnCloseSideBar, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(96, 96, 96))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCloseSideBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -82,7 +77,6 @@ public class Logo extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button btnCloseSideBar;
     private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel lblNameHotel;
     private javax.swing.JLabel lblTitle;
@@ -91,14 +85,9 @@ public class Logo extends javax.swing.JPanel {
     private void customUI() {
         lblTitle.setForeground(Constants.FOREGROUND_COLOR_MENU);
         lblNameHotel.setForeground(Constants.FOREGROUND_COLOR_MENU);
-        btnCloseSideBar.setText("");
-         btnCloseSideBar.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Constants.FOREGROUND_COLOR_MENU));
-         btnCloseSideBar.setBackground(Constants.BACKGROUND_COLOR_MENU);
-                 btnCloseSideBar.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    public Button getBtnCloseSideBar() {
-        return btnCloseSideBar;
-    }
+    
+   
     
 }

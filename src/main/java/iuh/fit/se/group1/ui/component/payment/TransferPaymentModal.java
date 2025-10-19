@@ -4,36 +4,27 @@
  */
 package iuh.fit.se.group1.ui.component.payment;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
+import raven.glasspanepopup.GlassPanePopup;
 
 /**
  *
  * @author Administrator
  */
-public class CastPaymentModal extends javax.swing.JPanel {
+public class TransferPaymentModal extends javax.swing.JPanel {
 
     /**
-     * Creates new form CastOrder
+     * Creates new form TransferPaymentModal
      */
-    public CastPaymentModal() {
+    public TransferPaymentModal() {
         initComponents();
-        btnExit.setIcon(FontIcon.of(FontAwesomeSolid.TIMES_CIRCLE, 16));
-btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-// Bỏ viền, focus
-btnExit.setBorderPainted(false);
-btnExit.setFocusPainted(false);
-
-// Nền trắng
-btnExit.setBackground(Color.WHITE);
-btnExit.setOpaque(true);
-btnExit.setContentAreaFilled(true);
-
-// Icon xám
-btnExit.setForeground(new Color(129, 129, 129));
+        btnExit.setIcon(FontIcon.of(FontAwesomeSolid.TIMES_CIRCLE, 20));
+        btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnExit.setText("");
+        btnExit.setOpaque(false);  
     }
 
     /**
@@ -46,15 +37,17 @@ btnExit.setForeground(new Color(129, 129, 129));
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        btnExit = new javax.swing.JButton();
+        btnExit = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(129, 129, 129));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Thanh toán tiền mặt");
+        jLabel1.setText("Thanh toán chuyển khoản");
 
+        btnExit.setBackground(new java.awt.Color(129, 129, 129));
+        btnExit.setText(" ");
         btnExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExitActionPerformed(evt);
@@ -66,33 +59,30 @@ btnExit.setForeground(new Color(129, 129, 129));
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(65, 65, 65)
+                .addContainerGap(55, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addContainerGap(318, Short.MAX_VALUE))
+                .addGap(16, 16, 16)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(189, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
-        java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
-        if (window != null) {
-            window.dispose();
-        }
+        GlassPanePopup.closePopupLast();
     }//GEN-LAST:event_btnExitActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnExit;
+    private iuh.fit.se.group1.ui.component.custom.Button btnExit;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

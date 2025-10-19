@@ -4,12 +4,15 @@
  */
 package iuh.fit.se.group1.ui.component.custom.message;
 
+import iuh.fit.se.group1.ui.component.custom.Button;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.JLabel;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
@@ -22,10 +25,78 @@ public class Message extends javax.swing.JPanel {
     public Message() {
         initComponents();
         setOpaque(false);
-        txt.setBackground(new Color(0,0,0,0)); 
-        txt.setOpaque(false);
+        lblMessage.setBackground(new Color(0,0,0,0)); 
+        lblMessage.setOpaque(false);
     }
 
+    public Button getCmdCancel() {
+        return cmdCancel;
+    }
+
+    public void setCmdCancel(Button cmdCancel) {
+        this.cmdCancel = cmdCancel;
+    }
+
+    public Button getCmdOK() {
+        return cmdOK;
+    }
+
+    public void setCmdOK(Button cmdOK) {
+        this.cmdOK = cmdOK;
+    }
+
+    public JLabel getLblMessage() {
+        return lblMessage;
+    }
+
+    public void setLblMessage(JLabel lblMessage) {
+        this.lblMessage = lblMessage;
+    }
+
+
+    public JLabel getLblTitle() {
+        return lblTitle;
+    }
+
+    public void setLblTitle(JLabel lblTitle) {
+        this.lblTitle = lblTitle;
+    }
+    
+    public static void showMessage(String title, String message) {
+        Message msg = new Message();
+        msg.setBackground(new java.awt.Color(255, 255, 255));
+        msg.getLblTitle().setText(title);
+        msg.getLblMessage().setText(message);
+
+        msg.eventOK(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GlassPanePopup.closePopupLast();
+            }
+        });
+
+        GlassPanePopup.showPopup(msg);
+    }
+
+    // ======= Hiển thị thông báo xác nhận (OK / Hủy) =======
+    public static void showConfirm(String title, String message, Runnable onOK) {
+        Message msg = new Message();
+        msg.setBackground(new java.awt.Color(255, 255, 255));
+        msg.getLblTitle().setText(title);
+        msg.getLblMessage().setText(message);
+
+        msg.eventOK(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GlassPanePopup.closePopupLast();
+                if (onOK != null) {
+                    onOK.run();
+                }
+            }
+        });
+
+        GlassPanePopup.showPopup(msg);
+    }
     @Override
     protected void paintComponent(Graphics grphcs) {
         Graphics2D g2 = (Graphics2D)grphcs.create();
@@ -42,8 +113,8 @@ public class Message extends javax.swing.JPanel {
     private void initComponents() {
 
         button2 = new iuh.fit.se.group1.ui.component.custom.Button();
-        jLabel1 = new javax.swing.JLabel();
-        txt = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
+        lblMessage = new javax.swing.JLabel();
         cmdOK = new iuh.fit.se.group1.ui.component.custom.Button();
         cmdCancel = new iuh.fit.se.group1.ui.component.custom.Button();
 
@@ -55,10 +126,10 @@ public class Message extends javax.swing.JPanel {
 
         setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setText("Your Message Title Dialog Custom");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTitle.setText("Your Message Title Dialog Custom");
 
-        txt.setText("Hien Thi Thong Bao Loi ?????????????????????????????????");
+        lblMessage.setText("Hien Thi Thong Bao Loi ?????????????????????????????????");
 
         cmdOK.setBackground(new java.awt.Color(0, 204, 51));
         cmdOK.setText("Xác nhận");
@@ -78,8 +149,8 @@ public class Message extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txt, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTitle))
                 .addContainerGap(95, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(60, 60, 60)
@@ -92,9 +163,9 @@ public class Message extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(7, Short.MAX_VALUE)
-                .addComponent(jLabel1)
+                .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txt, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmdCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -119,7 +190,7 @@ public class Message extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.custom.Button button2;
     private iuh.fit.se.group1.ui.component.custom.Button cmdCancel;
     private iuh.fit.se.group1.ui.component.custom.Button cmdOK;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel txt;
+    private javax.swing.JLabel lblMessage;
+    private javax.swing.JLabel lblTitle;
     // End of variables declaration//GEN-END:variables
 }

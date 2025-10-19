@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.version;
 
+import iuh.fit.se.group1.ui.component.custom.Button;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -46,8 +47,8 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         lblInfo3 = new javax.swing.JLabel();
         lblInfo4 = new javax.swing.JLabel();
         lblInfo5 = new javax.swing.JLabel();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
-        button2 = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnCheckForUpdate = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(92, 92, 92));
 
@@ -77,21 +78,21 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         lblInfo5.setForeground(new java.awt.Color(255, 255, 255));
         lblInfo5.setText("Powered by open-source. © 2020-2025 Đào Tiên Software.");
 
-        button1.setBackground(new java.awt.Color(50, 145, 255));
-        button1.setForeground(new java.awt.Color(255, 255, 255));
-        button1.setText("Kiểm tra cập nhật");
-        button1.addActionListener(new java.awt.event.ActionListener() {
+        btnCheckForUpdate.setBackground(new java.awt.Color(50, 145, 255));
+        btnCheckForUpdate.setForeground(new java.awt.Color(255, 255, 255));
+        btnCheckForUpdate.setText("Kiểm tra cập nhật");
+        btnCheckForUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button1ActionPerformed(evt);
+                btnCheckForUpdateActionPerformed(evt);
             }
         });
 
-        button2.setBackground(new java.awt.Color(150, 150, 150));
-        button2.setForeground(new java.awt.Color(255, 255, 255));
-        button2.setText("Đóng");
-        button2.addActionListener(new java.awt.event.ActionListener() {
+        btnClose.setBackground(new java.awt.Color(150, 150, 150));
+        btnClose.setForeground(new java.awt.Color(255, 255, 255));
+        btnClose.setText("Đóng");
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button2ActionPerformed(evt);
+                btnCloseActionPerformed(evt);
             }
         });
 
@@ -107,9 +108,9 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(layout.createSequentialGroup()
                             .addGap(0, 0, Short.MAX_VALUE)
-                            .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnCheckForUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGap(38, 38, 38)
-                            .addComponent(button2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createSequentialGroup()
                             .addGap(20, 20, 20)
                             .addComponent(lblLogoPage)
@@ -147,24 +148,42 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
                 .addComponent(lblInfo5)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(button2, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                    .addComponent(button1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                    .addComponent(btnCheckForUpdate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(20, 20, 20))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
+    private void btnCheckForUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckForUpdateActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_button1ActionPerformed
+    }//GEN-LAST:event_btnCheckForUpdateActionPerformed
 
-    private void button2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button2ActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_button2ActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
+    public Button getBtnCheckForUpdate() {
+        return btnCheckForUpdate;
+    }
+
+    public void setBtnCheckForUpdate(Button btnCheckForUpdate) {
+        this.btnCheckForUpdate = btnCheckForUpdate;
+    }
+
+    public Button getBtnClose() {
+        return btnClose;
+    }
+
+    public void setBtnClose(Button btnClose) {
+        this.btnClose = btnClose;
+    }
+
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
-    private iuh.fit.se.group1.ui.component.custom.Button button2;
+    private iuh.fit.se.group1.ui.component.custom.Button btnCheckForUpdate;
+    private iuh.fit.se.group1.ui.component.custom.Button btnClose;
     private javax.swing.JLabel lblInfo1;
     private javax.swing.JLabel lblInfo2;
     private javax.swing.JLabel lblInfo3;

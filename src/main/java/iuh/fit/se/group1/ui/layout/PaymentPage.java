@@ -4,7 +4,8 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.payment.CastPaymentModal;
+import iuh.fit.se.group1.ui.component.payment.CashPaymentModal;
+import iuh.fit.se.group1.ui.component.payment.TransferPaymentModal;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,6 +22,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import raven.glasspanepopup.GlassPanePopup;
 
 /**
  *
@@ -91,17 +93,13 @@ public class PaymentPage extends javax.swing.JPanel {
 
         // Thay tiêu đề cột
         model.setColumnIdentifiers(new Object[]{"Mã phụ thu", "Tên phụ thu", "Giá trị"});
-        headerBooking1.getBtn().addActionListener(l -> {
-            // Tạo JDialog
-            JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(headerBooking1), "Thanh toán", true); // modal
-            dialog.setContentPane(new CastPaymentModal()); // panel CastPayment
-            dialog.setUndecorated(true); // nếu muốn không viền
-            dialog.pack();
-
-            // Canh giữa màn hình
-            dialog.setLocationRelativeTo(headerBooking1);
-
-            dialog.setVisible(true);
+        infoPayment1.getBtnCash().addActionListener(l -> {
+           var modal = new CashPaymentModal();
+               GlassPanePopup.showPopup(modal);
+        });
+        infoPayment1.getBtnTransfer().addActionListener(l->{
+            var modal= new TransferPaymentModal();
+            GlassPanePopup.showPopup(modal);
         });
     }
 
