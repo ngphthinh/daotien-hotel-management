@@ -21,95 +21,7 @@ import org.kordamp.ikonli.swing.FontIcon;
  * @author Administrator
  */
 public class ShiftCard extends javax.swing.JPanel {
-
-    public AvatarLabel getAvatarLabel1() {
-        return avatarLabel1;
-    }
-
-    public void setAvatarLabel1(AvatarLabel avatarLabel1) {
-        this.avatarLabel1 = avatarLabel1;
-    }
-
-    public AvatarLabel getAvatarLabel2() {
-        return avatarLabel2;
-    }
-
-    public void setAvatarLabel2(AvatarLabel avatarLabel2) {
-        this.avatarLabel2 = avatarLabel2;
-    }
-
-    public JButton getBtnAdd() {
-        return btnAdd;
-    }
-
-    public void setBtnAdd(JButton btnAdd) {
-        this.btnAdd = btnAdd;
-    }
-
-    public JLabel getLblCode1() {
-        return lblCode1;
-    }
-
-    public void setLblCode1(JLabel lblCode1) {
-        this.lblCode1 = lblCode1;
-    }
-
-    public JLabel getLblCode2() {
-        return lblCode2;
-    }
-
-    public void setLblCode2(JLabel lblCode2) {
-        this.lblCode2 = lblCode2;
-    }
-
-    public JLabel getLblName1() {
-        return lblName1;
-    }
-
-    public void setLblName1(JLabel lblName1) {
-        this.lblName1 = lblName1;
-    }
-
-    public JLabel getLblName2() {
-        return lblName2;
-    }
-
-    public void setLblName2(JLabel lblName2) {
-        this.lblName2 = lblName2;
-    }
-
-    public JLabel getLblTime() {
-        return lblTime;
-    }
-
-    public void setLblTime(JLabel lblTime) {
-        this.lblTime = lblTime;
-    }
-
-    public JLabel getLblTitle() {
-        return lblTitle;
-    }
-
-    public void setLblTitle(JLabel lblTitle) {
-        this.lblTitle = lblTitle;
-    }
-
-    public JPanel getPnlInforEmployee1() {
-        return pnlInforEmployee1;
-    }
-
-    public void setPnlInforEmployee1(JPanel pnlInforEmployee1) {
-        this.pnlInforEmployee1 = pnlInforEmployee1;
-    }
-
-    public JPanel getPnlInforEmployee2() {
-        return pnlInforEmployee2;
-    }
-
-    public void setPnlInforEmployee2(JPanel pnlInforEmployee2) {
-        this.pnlInforEmployee2 = pnlInforEmployee2;
-    }
-
+    private Color headerColor=new Color(51, 204, 255);
     /**
      * Creates new form ShiftPanel
      */
@@ -148,7 +60,7 @@ public class ShiftCard extends javax.swing.JPanel {
         g2.fillRoundRect(0, 0, w - shadow, h - shadow, arc, arc);
 
         // 🎨 Header xanh bo 2 góc trên
-        g2.setColor(new Color(51, 204, 255));
+        g2.setColor(headerColor);
         g2.fillRoundRect(0, 0, w - shadow, headerHeight, arc, arc);
         g2.fillRect(0, headerHeight - arc, w - shadow, arc); // tránh bị lõm ở giữa
 
@@ -220,7 +132,104 @@ public class ShiftCard extends javax.swing.JPanel {
         }
     });
     }
+
+    public Color getHeaderColor() {
+        return headerColor;
+    }
+
+    public void setHeaderColor(Color headerColor) {
+        this.headerColor = headerColor;
+        repaint();
+    }
     
+    public AvatarLabel getAvatarLabel1() {
+        return avatarLabel1;
+    }
+
+    public void setAvatarLabel1(AvatarLabel avatarLabel1) {
+        this.avatarLabel1 = avatarLabel1;
+    }
+
+    public AvatarLabel getAvatarLabel2() {
+        return avatarLabel2;
+    }
+
+    public void setAvatarLabel2(AvatarLabel avatarLabel2) {
+        this.avatarLabel2 = avatarLabel2;
+    }
+
+    public JButton getBtnAdd() {
+        return btnAdd;
+    }
+
+    public void setBtnAdd(JButton btnAdd) {
+        this.btnAdd = btnAdd;
+    }
+
+    public JLabel getLblCode1() {
+        return lblCode1;
+    }
+
+    public void setLblCode1(JLabel lblCode1) {
+        this.lblCode1 = lblCode1;
+    }
+
+    public JLabel getLblCode2() {
+        return lblCode2;
+    }
+
+    public void setLblCode2(JLabel lblCode2) {
+        this.lblCode2 = lblCode2;
+    }
+
+    public JLabel getLblName1() {
+        return lblName1;
+    }
+
+    public void setLblName1(JLabel lblName1) {
+        this.lblName1 = lblName1;
+    }
+
+    public JLabel getLblName2() {
+        return lblName2;
+    }
+
+    public void setLblName2(JLabel lblName2) {
+        this.lblName2 = lblName2;
+    }
+
+    public JLabel getLblTime() {
+        return lblTime;
+    }
+
+    public void setLblTime(JLabel lblTime) {
+        this.lblTime = lblTime;
+    }
+
+    public JLabel getLblShiftName() {
+        return lblShiftName;
+    }
+
+    public void setLblShiftName(JLabel lblShiftName) {
+        this.lblShiftName = lblShiftName;
+    }
+    
+
+    public JPanel getPnlInforEmployee1() {
+        return pnlInforEmployee1;
+    }
+
+    public void setPnlInforEmployee1(JPanel pnlInforEmployee1) {
+        this.pnlInforEmployee1 = pnlInforEmployee1;
+    }
+
+    public JPanel getPnlInforEmployee2() {
+        return pnlInforEmployee2;
+    }
+
+    public void setPnlInforEmployee2(JPanel pnlInforEmployee2) {
+        this.pnlInforEmployee2 = pnlInforEmployee2;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -230,7 +239,7 @@ public class ShiftCard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblTitle = new javax.swing.JLabel();
+        lblShiftName = new javax.swing.JLabel();
         lblTime = new javax.swing.JLabel();
         btnAdd = new javax.swing.JButton();
         pnlInforEmployee1 = new javax.swing.JPanel();
@@ -247,10 +256,10 @@ public class ShiftCard extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(450, 275));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        lblTitle.setForeground(new java.awt.Color(102, 102, 102));
-        lblTitle.setText("CA 02");
-        add(lblTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 61, 38));
+        lblShiftName.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblShiftName.setForeground(new java.awt.Color(102, 102, 102));
+        lblShiftName.setText("CA 02");
+        add(lblShiftName, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 61, 38));
 
         lblTime.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblTime.setText("13H-18H");
@@ -348,8 +357,8 @@ public class ShiftCard extends javax.swing.JPanel {
     private javax.swing.JLabel lblCode2;
     private javax.swing.JLabel lblName1;
     private javax.swing.JLabel lblName2;
+    private javax.swing.JLabel lblShiftName;
     private javax.swing.JLabel lblTime;
-    private javax.swing.JLabel lblTitle;
     private javax.swing.JPanel pnlInforEmployee1;
     private javax.swing.JPanel pnlInforEmployee2;
     // End of variables declaration//GEN-END:variables

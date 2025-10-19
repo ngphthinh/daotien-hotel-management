@@ -5,6 +5,8 @@
 package iuh.fit.se.group1.ui.component.shift;
 
 import iuh.fit.se.group1.ui.component.booking.InfoOrderPanel;
+import iuh.fit.se.group1.ui.component.raven.panel.PanelShadow;
+
 import java.awt.Image;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.awt.*;
  *
  * @author Administrator
  */
-public class ShiftList extends javax.swing.JPanel {
+public class ShiftList extends JPanel {
 
     /**
      * Creates new form ShiftList
@@ -82,6 +84,8 @@ public List<ShiftProfile> getSelectedEmployees() {
             if (c instanceof ShiftProfile) {
                 ShiftProfile profile = (ShiftProfile) c;
                 profile.getjRadioButton2().setSelected(false);
+                profile.setIsSelect(false);
+                profile.updateBackground();
             }
         }
     }
@@ -133,7 +137,6 @@ public List<ShiftProfile> getSelectedEmployees() {
         ShiftProfile shiftProfile = new ShiftProfile();
         shiftProfile.getLblName().setText(employeeName);
         shiftProfile.getLblCode().setText(code);
-        
         // todo:
          try {
         // Nếu ảnh nằm trong thư mục resources (ví dụ: /images/avttest.jpg)
@@ -173,6 +176,7 @@ public List<ShiftProfile> getSelectedEmployees() {
         scrollPaneWin111.setViewportView(pnlEmployees);
         pnlEmployees.revalidate();
         pnlEmployees.repaint();
+        shiftProfile.addMouseListener(shiftProfile);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

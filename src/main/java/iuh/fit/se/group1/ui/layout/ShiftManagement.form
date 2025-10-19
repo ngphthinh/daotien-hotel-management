@@ -58,32 +58,39 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="shiftCard3" min="-2" pref="418" max="-2" attributes="0"/>
+                          <Component id="shiftCard1" min="-2" pref="418" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="shiftCard4" pref="0" max="32767" attributes="0"/>
+                          <Component id="shiftCard3" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="shiftCard5" alignment="0" min="-2" pref="418" max="-2" attributes="0"/>
-                              <Component id="shiftCard8" alignment="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="shiftCard2" alignment="0" min="-2" pref="418" max="-2" attributes="0"/>
+                              <Component id="shiftCard4" alignment="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="shiftList2" min="-2" pref="311" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="32767" attributes="0"/>
                       </Group>
-                      <Group type="102" alignment="1" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="32767" attributes="0"/>
                           <Component id="txtDate" min="-2" pref="204" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="iconDate" min="-2" pref="34" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="111" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                       </Group>
                   </Group>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="search1" min="-2" pref="174" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="shiftList2" min="-2" pref="311" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="16" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -94,18 +101,20 @@
                       <Component id="jLabel1" alignment="3" pref="84" max="32767" attributes="0"/>
                       <Component id="txtDate" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
                       <Component id="iconDate" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
+                      <Component id="search1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="shiftCard3" min="-2" pref="275" max="-2" attributes="0"/>
-                              <Component id="shiftCard5" min="-2" pref="274" max="-2" attributes="0"/>
+                              <Component id="shiftCard1" min="-2" pref="275" max="-2" attributes="0"/>
+                              <Component id="shiftCard2" min="-2" pref="274" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="shiftCard8" min="-2" pref="275" max="-2" attributes="0"/>
-                              <Component id="shiftCard4" min="-2" pref="276" max="-2" attributes="0"/>
+                              <Component id="shiftCard4" min="-2" pref="275" max="-2" attributes="0"/>
+                              <Component id="shiftCard3" min="-2" pref="276" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <Component id="shiftList2" min="-2" max="-2" attributes="0"/>
@@ -116,13 +125,13 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
+        <Component class="iuh.fit.se.group1.ui.component.shift.ShiftCard" name="shiftCard1">
+        </Component>
         <Component class="iuh.fit.se.group1.ui.component.shift.ShiftCard" name="shiftCard3">
         </Component>
+        <Component class="iuh.fit.se.group1.ui.component.shift.ShiftCard" name="shiftCard2">
+        </Component>
         <Component class="iuh.fit.se.group1.ui.component.shift.ShiftCard" name="shiftCard4">
-        </Component>
-        <Component class="iuh.fit.se.group1.ui.component.shift.ShiftCard" name="shiftCard5">
-        </Component>
-        <Component class="iuh.fit.se.group1.ui.component.shift.ShiftCard" name="shiftCard8">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
@@ -154,7 +163,22 @@
             <Property name="text" type="java.lang.String" value=" "/>
           </Properties>
         </Component>
+        <Component class="iuh.fit.se.group1.ui.component.booking.Search" name="search1">
+          <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="f1" green="f1" red="f1" type="rgb"/>
+            </Property>
+          </Properties>
+        </Component>
         <Component class="iuh.fit.se.group1.ui.component.shift.ShiftList" name="shiftList2">
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel2">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Segoe UI" size="14" style="1"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="T&#xec;m ki&#x1ebf;m nh&#xe2;n vi&#xea;n:"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>

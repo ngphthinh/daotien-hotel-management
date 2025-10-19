@@ -66,7 +66,7 @@ public class Message extends javax.swing.JPanel {
         Message msg = new Message();
         msg.setBackground(new java.awt.Color(255, 255, 255));
         msg.getLblTitle().setText(title);
-        msg.getLblMessage().setText(message);
+        msg.getLblMessage().setText("<html><body style='width: 348px;'>" + message + "</body></html>");
 
         msg.eventOK(new ActionListener() {
             @Override
@@ -77,13 +77,12 @@ public class Message extends javax.swing.JPanel {
 
         GlassPanePopup.showPopup(msg);
     }
-
-    // ======= Hiển thị thông báo xác nhận (OK / Hủy) =======
+    
     public static void showConfirm(String title, String message, Runnable onOK) {
         Message msg = new Message();
         msg.setBackground(new java.awt.Color(255, 255, 255));
         msg.getLblTitle().setText(title);
-        msg.getLblMessage().setText(message);
+        msg.getLblMessage().setText("<html><body style='width: 348px;'>" + message + "</body></html>");
 
         msg.eventOK(new ActionListener() {
             @Override
@@ -94,7 +93,42 @@ public class Message extends javax.swing.JPanel {
                 }
             }
         });
+      
+        GlassPanePopup.showPopup(msg);
+    }
+    public static void showMessageNoCancel(String title, String message) {
+        Message msg = new Message();
+        msg.setBackground(new java.awt.Color(255, 255, 255));
+        msg.getLblTitle().setText(title);
+        msg.getLblMessage().setText("<html><body style='width: 348px;'>" + message + "</body></html>");
 
+        msg.getCmdCancel().setVisible(false);
+        msg.eventOK(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GlassPanePopup.closePopupLast();
+            }
+        });
+
+        GlassPanePopup.showPopup(msg);
+    }
+    public static void showConfirmNoCancel(String title, String message, Runnable onOK) {
+        Message msg = new Message();
+        msg.setBackground(new java.awt.Color(255, 255, 255));
+        msg.getLblTitle().setText(title);
+        msg.getLblMessage().setText("<html><body style='width: 348px;'>" + message + "</body></html>");
+
+        msg.getCmdCancel().setVisible(false);
+        msg.eventOK(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GlassPanePopup.closePopupLast();
+                if (onOK != null) {
+                    onOK.run();
+                }
+            }
+        });
+      
         GlassPanePopup.showPopup(msg);
     }
     @Override
@@ -147,17 +181,19 @@ public class Message extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTitle))
-                .addContainerGap(95, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addGap(60, 60, 60)
                 .addComponent(cmdCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(cmdOK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(63, 63, 63))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblTitle)
+                        .addGap(0, 115, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -181,6 +217,7 @@ public class Message extends javax.swing.JPanel {
     public void eventOK(ActionListener event){
         cmdOK.addActionListener(event);
     }
+    
     private void cmdCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCancelActionPerformed
         GlassPanePopup.closePopupLast();
     }//GEN-LAST:event_cmdCancelActionPerformed

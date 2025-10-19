@@ -5,7 +5,11 @@
 package iuh.fit.se.group1.ui.component.shift;
 
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
@@ -13,8 +17,42 @@ import javax.swing.JRadioButton;
  *
  * @author Administrator
  */
-public class ShiftProfile extends javax.swing.JPanel {
+public class ShiftProfile extends javax.swing.JPanel implements MouseListener{
+    private boolean isSelect = false;
+    private Color defaultTextColor = Color.BLACK;
+    private Color selectedTextColor = Color.WHITE;
+    private Color defaultBackground = Color.WHITE;
+    private Color selectedBackground = new Color(0, 120, 215);
+    private Color hoverBackground = new Color(245, 245, 245);
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        jRadioButton2.setSelected(!jRadioButton2.isSelected());
+        isSelect = jRadioButton2.isSelected();
+        
+        updateBackground();
+    }
 
+    @Override
+    public void mousePressed(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        if (!isSelect) {
+            pnlInforEmployee.setBackground(hoverBackground);
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        updateBackground();
+    }
     /**
      * Creates new form ShiftProfile
      */
@@ -22,6 +60,11 @@ public class ShiftProfile extends javax.swing.JPanel {
         initComponents();
         setPreferredSize(new Dimension(290, getPreferredSize().height));
         jRadioButton2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 24));
+         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+         jRadioButton2.addActionListener(e -> {
+            isSelect = jRadioButton2.isSelected();
+            updateBackground();
+        });
     }
 
     public AvatarLabel getAvatarLabel() {
@@ -39,9 +82,11 @@ public class ShiftProfile extends javax.swing.JPanel {
     public void setjRadioButton2(JRadioButton jRadioButton2) {
         this.jRadioButton2 = jRadioButton2;
     }
+
     public boolean isSelected() {
         return jRadioButton2.isSelected();
     }
+
     public JLabel getLblCode() {
         return lblCode;
     }
@@ -57,7 +102,16 @@ public class ShiftProfile extends javax.swing.JPanel {
     public void setLblName(JLabel lblName) {
         this.lblName = lblName;
     }
-
+    public void setIsSelect(boolean isSelect) {
+        this.isSelect = isSelect;
+    }
+    public void updateBackground() {
+        boolean selected = jRadioButton2.isSelected() || isSelect;
+        pnlInforEmployee.setBackground(selected ? selectedBackground : defaultBackground);
+        lblName.setForeground(selected ? selectedTextColor : defaultTextColor);
+        lblCode.setForeground(selected ? selectedTextColor : defaultTextColor);
+        repaint();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
