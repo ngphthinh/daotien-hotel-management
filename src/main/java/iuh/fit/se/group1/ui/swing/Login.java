@@ -83,8 +83,7 @@ public class Login extends javax.swing.JFrame {
                 panelBody.setBounds(0, 0, w, h);
                 background1.revalidate();
                 background1.repaint();
-                panelBody.revalidate();
-                panelBody.repaint();
+
             }
         });
         btnEye.setIcon(FontIcon.of(FontAwesomeSolid.EYE, 20)); // 20px, to hơn mặc định
@@ -413,6 +412,7 @@ public class Login extends javax.swing.JFrame {
             login.setVisible(true);
             login.setExtendedState(JFrame.MAXIMIZED_BOTH);
         });
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

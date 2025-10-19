@@ -6,6 +6,7 @@ package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.*;
@@ -38,9 +39,15 @@ public class RoomManagement extends javax.swing.JPanel {
 
         btnAddRoom.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
 
-        String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Giá phòng", "Chức năng"};
+        String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Giá phòng", "Trạng thái", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 5);
         tblRoom.getTbl().setModel(model);
+         addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                tblRoom.getTbl().clearSelection();
+            }
+        });
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -56,32 +63,63 @@ public class RoomManagement extends javax.swing.JPanel {
                 model.removeRow(row);
             }
         };
-        tblRoom.setTableActionColumn(tblRoom.getTbl(), 4, event,false);
+
+        tblRoom.setTableActionColumn(tblRoom.getTbl(), 5, event, false);
         tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(250);  // chiều rộng mong muốn
         tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(250);
         tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(250);
         tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(250);
-        tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(80);
+        tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(250);
+        tblRoom.getTbl().getColumnModel().getColumn(5).setPreferredWidth(100);
 
         var header = tblRoom.getTbl().getTableHeader();
 
-
         //todo: hard code
-        Combobox<String> cmb = new Combobox<>(new String[]{"Tất cả", "Phòng đôi", "Phòng đơn"});
-        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
-        TableColumn column = tblRoom.getTbl().getColumnModel().getColumn(2);
-        column.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
-            // Dùng renderer gốc để lấy màu & nền đúng
-            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+        Combobox<String> cmbType = new Combobox<>(new String[]{"Phòng đơn", "Phòng đôi"});
+        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Còn trống", "Đang sử dụng", "Bảo trì"});
 
+        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
+
+        for (int i = 0; i < tblRoom.getTbl().getColumnCount(); i++) {
+            tblRoom.getTbl().getColumnModel().getColumn(i).setHeaderRenderer(defaultRenderer);
+        }
+
+        TableColumn colGender = tblRoom.getTbl().getColumnModel().getColumn(2);
+        colGender.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Loại phòng                                         \u25BC");
-//                lbl.setIcon(FontIcon.of(FontAwesomeSolid.ARROW_DOWN, 16, Color.DARK_GRAY));
-                lbl.setHorizontalTextPosition(SwingConstants.LEFT);
+                String text = "Loại phòng                          \u25BC";
+                lbl.setText(text);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
-                lbl.setIconTextGap(5);
             }
             return comp;
+        });
+
+        TableColumn colPosition = tblRoom.getTbl().getColumnModel().getColumn(4);
+        colPosition.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+            if (comp instanceof JLabel lbl) {
+                String text = "Trạng thái                           \u25BC";
+                lbl.setText(text);
+                lbl.setHorizontalAlignment(SwingConstants.LEFT);
+            }
+            return comp;
+        });
+
+        cmbType.addActionListener(ev -> {
+            String selectedType = (String) cmbType.getSelectedItem();
+            String selectedStatus = (String) cmbStatus.getSelectedItem();
+//    filterTable(selectedType, selectedStatus);
+            header.remove(cmbType);
+            header.repaint();
+        });
+
+        cmbStatus.addActionListener(ev -> {
+            String selectedStatus = (String) cmbStatus.getSelectedItem();
+            String selectedType = (String) cmbType.getSelectedItem();
+//    filterTable(selectedType, selectedStatus);
+            header.remove(cmbStatus);
+            header.repaint();
         });
 
         tblRoom.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -89,7 +127,7 @@ public class RoomManagement extends javax.swing.JPanel {
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 int col = tblRoom.getTbl().columnAtPoint(e.getPoint());
 
-                if (col == 4) {
+                if (col == 5) {
                     tblRoom.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblRoom.getTbl().setCursor(Cursor.getDefaultCursor());
@@ -97,13 +135,7 @@ public class RoomManagement extends javax.swing.JPanel {
             }
         });
 
-        cmb.addActionListener(ev -> {
-            String selected = (String) cmb.getSelectedItem();
-            System.out.println("Filter: " + selected);
-            header.remove(cmb);
-            header.repaint();
-        });
-
+        
         header.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -112,23 +144,40 @@ public class RoomManagement extends javax.swing.JPanel {
                     Rectangle rect = header.getHeaderRect(col);
 
 //                     Thiết lập vị trí và kích thước cho combo
-                    cmb.setBounds(rect);
-                    cmb.setVisible(true); // hiển thị combo tại vị trí cột
-                    header.add(cmb);
-                    cmb.showPopup(); // mở dropdown ngay lập tức
+                    cmbType.setBounds(rect);
+                    cmbType.setVisible(true); // hiển thị combo tại vị trí cột
+                    header.add(cmbType);
+                    cmbType.showPopup(); // mở dropdown ngay lập tức
 
                     // Khi mất focus, ẩn combo
-                    cmb.addFocusListener(new FocusAdapter() {
+                    cmbType.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusLost(FocusEvent fe) {
-                            cmb.setVisible(false);
-                            header.remove(cmb);
+                            cmbType.setVisible(false);
+                            header.remove(cmbType);
+                        }
+                    });
+                }
+                if (col == 4) {
+                    Rectangle rect = header.getHeaderRect(col);
+
+//                     Thiết lập vị trí và kích thước cho combo
+                    cmbStatus.setBounds(rect);
+                    cmbStatus.setVisible(true); // hiển thị combo tại vị trí cột
+                    header.add(cmbStatus);
+                    cmbStatus.showPopup(); // mở dropdown ngay lập tức
+
+                    // Khi mất focus, ẩn combo
+                    cmbStatus.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusLost(FocusEvent fe) {
+                            cmbStatus.setVisible(false);
+                            header.remove(cmbStatus);
                         }
                     });
                 }
             }
         });
-
 
         headerCustom.handleSearch(new DocumentListener() {
             @Override
@@ -146,7 +195,6 @@ public class RoomManagement extends javax.swing.JPanel {
             public void changedUpdate(DocumentEvent e) {
 
             }
-
 
         });
 
@@ -213,7 +261,7 @@ public class RoomManagement extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddRoomActionPerformed
-        ServiceModal modal = new ServiceModal();
+        RoomManagementModal modal = new RoomManagementModal();
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -225,9 +273,10 @@ public class RoomManagement extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent ae) {
 //                modal.getjLabel1().setText("HIihihi");
-//                GlassPanePopup.closePopupLast();
-                modal.getLblErrorPrice().setForeground(Color.red);
-                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
+                GlassPanePopup.closePopupLast();
+                modal.getLblErrolNumberRoom().setForeground(Color.red);
+                modal.getLblErrolPriceRoom().setForeground(Color.red);
+//                System.out.println("Save data" + modal.getServiceName() + " - " + modal.getServicePrice());
             }
         });
         GlassPanePopup.showPopup(modal);

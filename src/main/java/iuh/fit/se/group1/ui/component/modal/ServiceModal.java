@@ -4,14 +4,9 @@
  */
 package iuh.fit.se.group1.ui.component.modal;
 
-import java.awt.Color;
 import java.awt.event.ActionListener;
-
-import com.raven.datechooser.DateChooser;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 
@@ -26,15 +21,32 @@ public class ServiceModal extends javax.swing.JPanel {
      */
     public ServiceModal() {
         initComponents();
-         btnClose.setBorderRadius(50);
-         // Icon lịch màu xám (kích thước 30px)
-        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 20, Color.BLACK));
-        btnClose.setText("");
-        txtName.setBorderRadius(50);
-        txtPrice.setBorderRadius(50);
+//         btnClose.setBorderRadius(50);
+//         // Icon lịch màu xám (kích thước 30px)
+    
+
+    ////        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 20, Color.WHITE));
+//        btnClose.setText("");
+//        txtName.setBorderRadius(50);
+//        txtPrice.setBorderRadius(50);
 
     }
 
+    public JLabel getLblErrolName() {
+        return lblErrolName;
+    }
+
+    public void setLblErrolName(JLabel lblErrolName) {
+        this.lblErrolName = lblErrolName;
+    }
+
+    public JLabel getLblErrolPrice() {
+        return lblErrolPrice;
+    }
+
+    public void setLblErrolPrice(JLabel lblErrolPrice) {
+        this.lblErrolPrice = lblErrolPrice;
+    }
 
     public Button getBtnClose() {
         return btnClose;
@@ -50,23 +62,6 @@ public class ServiceModal extends javax.swing.JPanel {
 
     public void setBtnSave(Button btnSave) {
         this.btnSave = btnSave;
-    }
-
-    public JLabel getLblErrorPrice() {
-        return lblErrorPrice;
-    }
-
-    public void setLblErrorPrice(JLabel lblErrorPrice) {
-        this.lblErrorPrice = lblErrorPrice;
-    }
-
-   
-    public JLabel getLblErrorName() {
-        return lblErrorName;
-    }
-
-    public void setLblErrorName(JLabel lblErrorName) {
-        this.lblErrorName = lblErrorName;
     }
 
     public JLabel getLblName() {
@@ -109,7 +104,7 @@ public class ServiceModal extends javax.swing.JPanel {
         this.txtPrice = txtPrice;
     }
 
-    public void closeModel (ActionListener ac) {
+    public void closeModel(ActionListener ac) {
         btnClose.addActionListener(ac);
     }
 
@@ -120,10 +115,10 @@ public class ServiceModal extends javax.swing.JPanel {
     public String getServiceName() {
         return txtName.getText();
     }
+
     public String getServicePrice() {
         return txtPrice.getText();
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -141,8 +136,8 @@ public class ServiceModal extends javax.swing.JPanel {
         btnSave = new iuh.fit.se.group1.ui.component.custom.Button();
         txtName = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtPrice = new iuh.fit.se.group1.ui.component.custom.TextField();
-        lblErrorName = new javax.swing.JLabel();
-        lblErrorPrice = new javax.swing.JLabel();
+        lblErrolName = new javax.swing.JLabel();
+        lblErrolPrice = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -151,7 +146,8 @@ public class ServiceModal extends javax.swing.JPanel {
         lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTitle.setText("Thêm dịch vụ");
 
-        btnClose.setBackground(new java.awt.Color(217, 217, 217));
+        btnClose.setBackground(new java.awt.Color(255, 51, 0));
+        btnClose.setForeground(new java.awt.Color(255, 255, 255));
         btnClose.setText("X");
 
         lblName.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -181,17 +177,25 @@ public class ServiceModal extends javax.swing.JPanel {
             }
         });
 
-        lblErrorName.setForeground(new java.awt.Color(255, 255, 255));
-        lblErrorName.setText("Không được để trống trường này");
-        lblErrorName.setPreferredSize(new java.awt.Dimension(20, 0));
+        lblErrolName.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolName.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolName.setText("Không được để trống trường này");
+        lblErrolName.setPreferredSize(new java.awt.Dimension(20, 0));
 
-        lblErrorPrice.setForeground(new java.awt.Color(255, 255, 255));
-        lblErrorPrice.setText("Giá không được bỏ trống");
+        lblErrolPrice.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        lblErrolPrice.setForeground(new java.awt.Color(255, 255, 255));
+        lblErrolPrice.setText("Giá không được bỏ trống");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(0, 135, Short.MAX_VALUE)
+                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(60, 60, 60)
+                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18))
             .addGroup(layout.createSequentialGroup()
                 .addGap(43, 43, 43)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -199,22 +203,13 @@ public class ServiceModal extends javax.swing.JPanel {
                     .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblErrorName, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
-                            .addComponent(lblErrorPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(108, 108, 108))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(lblErrolName, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+                        .addComponent(lblErrolPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -223,21 +218,18 @@ public class ServiceModal extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(31, 31, 31)
-                        .addComponent(lblName, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblErrorName, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblErrorPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblName, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblErrolName, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6)
+                .addComponent(lblErrolPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30))
@@ -249,15 +241,15 @@ public class ServiceModal extends javax.swing.JPanel {
     }//GEN-LAST:event_txtPriceActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        
+
     }//GEN-LAST:event_btnSaveActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;
     private iuh.fit.se.group1.ui.component.custom.Button btnSave;
-    private javax.swing.JLabel lblErrorName;
-    private javax.swing.JLabel lblErrorPrice;
+    private javax.swing.JLabel lblErrolName;
+    private javax.swing.JLabel lblErrolPrice;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblPrice;
     private javax.swing.JLabel lblTitle;
