@@ -4,6 +4,7 @@ import java.awt.*;
 import java.lang.reflect.Field;
 import javax.swing.*;
 
+import com.raven.chart.Chart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.chart.bar.HorizontalBarChart;
@@ -16,6 +17,7 @@ public class ChartUtils {
 
     /**
      * Truy xuất và thay đổi màu nền của các JPanel bên trong PieChart sử dụng Reflection
+     *
      * @param pieChart
      * @param color
      */
@@ -35,7 +37,7 @@ public class ChartUtils {
             }
 
         } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException e) {
-           log.error("Error setting PieChart background color", e);
+            log.error("Error setting PieChart background color", e);
         }
     }
 
@@ -68,4 +70,19 @@ public class ChartUtils {
         }
     }
 
+
+    public static void clearDataColumnChart(Chart chart) {
+        try {
+            String[] fieldNames = {"model"};
+
+            for (String name : fieldNames) {
+                Field field = Chart.class.getDeclaredField(name);
+                field.setAccessible(true);
+                java.util.List<?> model = (java.util.List<?>) field.get(chart);
+                model.clear();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

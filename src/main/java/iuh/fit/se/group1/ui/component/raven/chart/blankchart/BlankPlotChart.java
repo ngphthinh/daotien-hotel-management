@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.ui.component.raven.chart.blankchart;
 
 
-//import raven.chart.blankchart.NiceScale;
 
 
 import java.awt.Color;

@@ -59,7 +59,7 @@ public class HeaderDashboard extends javax.swing.JPanel {
 
 
 
-    public void setColorButton(MouseListener l){
+    public void setAction(MouseListener l){
         btnToday.addMouseListener(l);
         btn7Days.addMouseListener(l);
         btn30Days.addMouseListener(l);

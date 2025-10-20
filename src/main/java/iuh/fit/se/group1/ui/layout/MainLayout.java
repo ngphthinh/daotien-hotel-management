@@ -28,6 +28,7 @@ public class MainLayout extends JPanel {
     private RoomManagement roomManagement;
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
+    private RevenueStatistics revenueStatistics;
 
 
     public MainLayout() {
@@ -92,6 +93,8 @@ public class MainLayout extends JPanel {
                         setMainContent(roomManagement);
                     } else if (index == 8) {
                         setMainContent(orderManagement);
+                    } else if (index ==9 && subIndex == 1) {
+                        setMainContent(revenueStatistics);
                     } else if (index == 10 && subIndex == 3) {
                         var modal = new CheckForVersionPanel();
                         GlassPanePopup.showPopup(modal);
@@ -175,6 +178,7 @@ public class MainLayout extends JPanel {
             roomManagement = new RoomManagement();
             orderManagement = new OrderManagement();
             checkForVersionPanel = new CheckForVersionPanel();
+            revenueStatistics = new RevenueStatistics();
             setMainContent(dashboard);
         } else {
             dashboardEmployee = new DashboardEmployee();

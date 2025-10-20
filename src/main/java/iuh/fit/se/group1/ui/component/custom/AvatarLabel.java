@@ -29,9 +29,9 @@ public class AvatarLabel extends JPanel {
             if (url != null) {
                 ImageIcon icon = new ImageIcon(url);
                 this.image = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-                log.info("✅ Ảnh avatar URL: {}", url);
+                log.info("avatar URL: {}", url);
             } else {
-                log.warn("⚠️ Ảnh avatar không tìm thấy");
+                log.warn("Avatar image resource not found.");
             }
         } catch (Exception e) {
             e.printStackTrace();

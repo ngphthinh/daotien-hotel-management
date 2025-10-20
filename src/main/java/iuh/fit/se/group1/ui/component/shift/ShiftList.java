@@ -5,6 +5,9 @@
 package iuh.fit.se.group1.ui.component.shift;
 
 import iuh.fit.se.group1.ui.component.booking.InfoOrderPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Image;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,6 +21,8 @@ import java.awt.*;
  * @author Administrator
  */
 public class ShiftList extends javax.swing.JPanel {
+
+    private static final Logger log = LoggerFactory.getLogger(ShiftList.class);
 
     /**
      * Creates new form ShiftList
@@ -142,9 +147,9 @@ public List<ShiftProfile> getSelectedEmployees() {
                 ImageIcon icon = new ImageIcon(url);
                 Image avatar = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
                 shiftProfile.getAvatarLabel().setImage(avatar); // ✅ Gán ảnh vào AvatarLabel
-                System.out.println("✅ Ảnh avatar URL: " + url);
+                log.info("Loaded image from resources: {}", imagePath);
             } else {
-                System.err.println("❌ Không tìm thấy ảnh: " + imagePath);
+               log.error("Image not found at path: {}", imagePath);
             }
         } catch (Exception e) {
             e.printStackTrace();

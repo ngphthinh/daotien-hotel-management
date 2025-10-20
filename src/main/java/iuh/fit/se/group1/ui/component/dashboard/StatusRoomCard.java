@@ -2,7 +2,6 @@
 
     import com.formdev.flatlaf.FlatClientProperties;
     import iuh.fit.se.group1.util.ChartUtils;
-    import iuh.fit.se.group1.util.Constants;
     import raven.chart.bar.HorizontalBarChart;
     import raven.chart.data.pie.DefaultPieDataset;
 

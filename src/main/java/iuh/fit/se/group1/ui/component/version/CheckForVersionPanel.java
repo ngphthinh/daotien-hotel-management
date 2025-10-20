@@ -5,12 +5,17 @@
 package iuh.fit.se.group1.ui.component.version;
 
 import iuh.fit.se.group1.ui.component.custom.Button;
-import java.awt.Cursor;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
- *
  * @author Windows
  */
 public class CheckForVersionPanel extends javax.swing.JPanel {
@@ -28,6 +33,28 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
 //                JOptionPane.showMessageDialog(null, "Bạn vừa click vào support@daotienhms.vn");
             }
         });
+
+        ImageIcon icon = new ImageIcon("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png");
+        // Đọc ảnh gốc
+        BufferedImage original = null;
+        try {
+            original = ImageIO.read(new File("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Resize với chất lượng cao
+        int width = 64;
+        int height = 64;
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = resized.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.drawImage(original, 0, 0, width, height, null);
+        g2.dispose();
+        lblLogoPage.setIcon(new ImageIcon(resized));
     }
 
     /**
@@ -50,32 +77,32 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         btnCheckForUpdate = new iuh.fit.se.group1.ui.component.custom.Button();
         btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
 
-        setBackground(new java.awt.Color(92, 92, 92));
+        setBackground(new java.awt.Color(255, 255, 255));
 
-        lblLogoPage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo.png"))); // NOI18N
+        lblLogoPage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo64.png"))); // NOI18N
 
         lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lblTitle.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitle.setForeground(new java.awt.Color(0, 0, 0));
         lblTitle.setText("Hệ thống quản lí khách sạn Đào Tiên");
 
         lblTitleHMS.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblTitleHMS.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitleHMS.setForeground(new java.awt.Color(0, 0, 0));
         lblTitleHMS.setText("Hệ thống quản lí khách sạn đào tiên( Đào Tiên HMS)");
 
-        lblInfo1.setForeground(new java.awt.Color(255, 255, 255));
+        lblInfo1.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo1.setText("Phiên bản: 2025.1.0.0 (Build DT-2025.1.0.0-4567, ra mắt 15/06/2025).");
 
-        lblInfo2.setForeground(new java.awt.Color(255, 255, 255));
+        lblInfo2.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo2.setText("Yêu cầu: Java 21+, RAM 4GB+, MySQL/PostgreSQL.");
 
-        lblInfo3.setForeground(new java.awt.Color(255, 255, 255));
+        lblInfo3.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo3.setText("Tính năng chính: dashboard KPI (occupancy, RevPAR), khuyến mãi QR, tích hợp Momo. Changelog mới: ");
 
-        lblInfo4.setForeground(new java.awt.Color(255, 255, 255));
+        lblInfo4.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo4.setText("Liên hệ: support@daotienhms.vn | 1900-XXXX");
 
         lblInfo5.setBackground(new java.awt.Color(255, 255, 255));
-        lblInfo5.setForeground(new java.awt.Color(255, 255, 255));
+        lblInfo5.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo5.setText("Powered by open-source. © 2020-2025 Đào Tiên Software.");
 
         btnCheckForUpdate.setBackground(new java.awt.Color(50, 145, 255));
@@ -101,28 +128,26 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addComponent(lblTitle))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(0, 0, Short.MAX_VALUE)
-                            .addComponent(btnCheckForUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(38, 38, 38)
-                            .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(20, 20, 20)
-                            .addComponent(lblLogoPage)
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(lblInfo1)
-                                .addComponent(lblTitleHMS)
-                                .addComponent(lblInfo2)
-                                .addComponent(lblInfo4)
-                                .addComponent(lblInfo5)
-                                .addComponent(lblInfo3)))))
-                .addContainerGap(36, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnCheckForUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(32, 32, 32))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lblLogoPage)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblInfo1)
+                            .addComponent(lblTitleHMS)
+                            .addComponent(lblInfo2)
+                            .addComponent(lblInfo4)
+                            .addComponent(lblInfo5)
+                            .addComponent(lblInfo3)))
+                    .addComponent(lblTitle))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -134,12 +159,12 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
                         .addGap(37, 37, 37)
                         .addComponent(lblTitleHMS)
                         .addGap(18, 18, 18)
-                        .addComponent(lblInfo1))
+                        .addComponent(lblInfo1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblInfo2))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
+                        .addGap(52, 52, 52)
                         .addComponent(lblLogoPage)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblInfo2)
                 .addGap(18, 18, 18)
                 .addComponent(lblInfo3)
                 .addGap(18, 18, 18)
@@ -147,9 +172,9 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(lblInfo5)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
-                    .addComponent(btnCheckForUpdate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCheckForUpdate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(20, 20, 20))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -178,8 +203,6 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         this.btnClose = btnClose;
     }
 
-    
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnCheckForUpdate;
