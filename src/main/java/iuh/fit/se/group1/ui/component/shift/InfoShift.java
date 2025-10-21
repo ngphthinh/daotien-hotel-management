@@ -42,24 +42,25 @@ public class InfoShift extends javax.swing.JPanel {
         setBackground(new java.awt.Color(255, 255, 255));
 
         lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        lblTitle.setForeground(new java.awt.Color(0, 0, 0));
         lblTitle.setText("Thông tin ca làm");
 
         lblEmployee.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblEmployee.setForeground(new java.awt.Color(0, 0, 0));
         lblEmployee.setText("Ca làm việc");
 
-        txtEmployee.setText("textField1");
+        txtEmployee.setForeground(new java.awt.Color(153, 153, 153));
         txtEmployee.setBorderRadius(5);
         txtEmployee.setEnabled(false);
 
         lblShift.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblShift.setForeground(new java.awt.Color(0, 0, 0));
         lblShift.setText("Nhân viên");
 
-        txtShift.setText("textField1");
         txtShift.setBorderRadius(5);
         txtShift.setEnabled(false);
+        txtShift.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtShiftActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -68,16 +69,16 @@ public class InfoShift extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblShift, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(50, 50, 50)
+                            .addComponent(txtEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(65, 65, 65)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtShift, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -94,6 +95,10 @@ public class InfoShift extends javax.swing.JPanel {
                 .addGap(0, 11, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtShiftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtShiftActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtShiftActionPerformed
 
 
     @Override

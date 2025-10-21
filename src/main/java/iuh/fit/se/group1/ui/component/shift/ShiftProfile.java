@@ -5,7 +5,11 @@
 package iuh.fit.se.group1.ui.component.shift;
 
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
@@ -13,15 +17,54 @@ import javax.swing.JRadioButton;
  *
  * @author Administrator
  */
-public class ShiftProfile extends javax.swing.JPanel {
+public class ShiftProfile extends javax.swing.JPanel implements MouseListener{
+    private boolean isSelect = false;
+    private Color defaultTextColor = Color.BLACK;
+    private Color selectedTextColor = Color.WHITE;
+    private Color defaultBackground = Color.WHITE;
+    private Color selectedBackground = new Color(0, 120, 215);
+    private Color hoverBackground = new Color(245, 245, 245);
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        rdoSelect.setSelected(!rdoSelect.isSelected());
+        isSelect = rdoSelect.isSelected();
+        
+        updateBackground();
+    }
 
+    @Override
+    public void mousePressed(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        if (!isSelect) {
+            pnlInforEmployee.setBackground(hoverBackground);
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        updateBackground();
+    }
     /**
      * Creates new form ShiftProfile
      */
     public ShiftProfile() {
         initComponents();
         setPreferredSize(new Dimension(290, getPreferredSize().height));
-        jRadioButton2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 24));
+        rdoSelect.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 24));
+         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+         rdoSelect.addActionListener(e -> {
+            isSelect = rdoSelect.isSelected();
+            updateBackground();
+        });
     }
 
     public AvatarLabel getAvatarLabel() {
@@ -33,15 +76,17 @@ public class ShiftProfile extends javax.swing.JPanel {
     }
 
     public JRadioButton getjRadioButton2() {
-        return jRadioButton2;
+        return rdoSelect;
     }
 
     public void setjRadioButton2(JRadioButton jRadioButton2) {
-        this.jRadioButton2 = jRadioButton2;
+        this.rdoSelect = jRadioButton2;
     }
+
     public boolean isSelected() {
-        return jRadioButton2.isSelected();
+        return rdoSelect.isSelected();
     }
+
     public JLabel getLblCode() {
         return lblCode;
     }
@@ -57,7 +102,16 @@ public class ShiftProfile extends javax.swing.JPanel {
     public void setLblName(JLabel lblName) {
         this.lblName = lblName;
     }
-
+    public void setIsSelect(boolean isSelect) {
+        this.isSelect = isSelect;
+    }
+    public void updateBackground() {
+        boolean selected = rdoSelect.isSelected() || isSelect;
+        pnlInforEmployee.setBackground(selected ? selectedBackground : defaultBackground);
+        lblName.setForeground(selected ? selectedTextColor : defaultTextColor);
+        lblCode.setForeground(selected ? selectedTextColor : defaultTextColor);
+        repaint();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -71,7 +125,7 @@ public class ShiftProfile extends javax.swing.JPanel {
         lblName = new javax.swing.JLabel();
         lblCode = new javax.swing.JLabel();
         avatarLabel = new iuh.fit.se.group1.ui.component.custom.AvatarLabel();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        rdoSelect = new javax.swing.JRadioButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -94,7 +148,7 @@ public class ShiftProfile extends javax.swing.JPanel {
                     .addComponent(lblName, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
                     .addComponent(lblCode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jRadioButton2)
+                .addComponent(rdoSelect)
                 .addGap(11, 11, 11))
         );
         pnlInforEmployeeLayout.setVerticalGroup(
@@ -113,7 +167,7 @@ public class ShiftProfile extends javax.swing.JPanel {
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInforEmployeeLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jRadioButton2)
+                .addComponent(rdoSelect)
                 .addGap(25, 25, 25))
         );
 
@@ -138,9 +192,9 @@ public class ShiftProfile extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel;
-    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JLabel lblCode;
     private javax.swing.JLabel lblName;
     private javax.swing.JPanel pnlInforEmployee;
+    private javax.swing.JRadioButton rdoSelect;
     // End of variables declaration//GEN-END:variables
 }

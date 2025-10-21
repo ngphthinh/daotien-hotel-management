@@ -4,9 +4,10 @@
  */
 package iuh.fit.se.group1.ui.component.shift;
 
-import iuh.fit.se.group1.ui.component.booking.InfoOrderPanel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import java.awt.Image;
 import java.net.URL;
@@ -20,7 +21,7 @@ import java.awt.*;
  *
  * @author Administrator
  */
-public class ShiftList extends javax.swing.JPanel {
+public class ShiftList extends JPanel {
 
     private static final Logger log = LoggerFactory.getLogger(ShiftList.class);
 
@@ -87,6 +88,8 @@ public List<ShiftProfile> getSelectedEmployees() {
             if (c instanceof ShiftProfile) {
                 ShiftProfile profile = (ShiftProfile) c;
                 profile.getjRadioButton2().setSelected(false);
+                profile.setIsSelect(false);
+                profile.updateBackground();
             }
         }
     }
@@ -101,15 +104,15 @@ public List<ShiftProfile> getSelectedEmployees() {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
         scrollPaneWin111 = new iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11();
         pnlEmployees = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(241, 241, 241));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Danh sách nhân viên");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitle.setText("Danh sách nhân viên");
 
         pnlEmployees.setLayout(new javax.swing.BoxLayout(pnlEmployees, javax.swing.BoxLayout.Y_AXIS));
         scrollPaneWin111.setViewportView(pnlEmployees);
@@ -122,13 +125,13 @@ public List<ShiftProfile> getSelectedEmployees() {
                 .addContainerGap()
                 .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
+            .addComponent(lblTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(lblTitle)
                 .addGap(12, 12, 12)
                 .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE)
                 .addContainerGap())
@@ -138,7 +141,6 @@ public List<ShiftProfile> getSelectedEmployees() {
         ShiftProfile shiftProfile = new ShiftProfile();
         shiftProfile.getLblName().setText(employeeName);
         shiftProfile.getLblCode().setText(code);
-        
         // todo:
          try {
         // Nếu ảnh nằm trong thư mục resources (ví dụ: /images/avttest.jpg)
@@ -178,10 +180,11 @@ public List<ShiftProfile> getSelectedEmployees() {
         scrollPaneWin111.setViewportView(pnlEmployees);
         pnlEmployees.revalidate();
         pnlEmployees.repaint();
+        shiftProfile.addMouseListener(shiftProfile);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblTitle;
     private javax.swing.JPanel pnlEmployees;
     private iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11 scrollPaneWin111;
     // End of variables declaration//GEN-END:variables

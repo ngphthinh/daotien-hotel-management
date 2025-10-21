@@ -37,21 +37,21 @@ public class CashPaymentModal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
         btnExit = new iuh.fit.se.group1.ui.component.custom.Button();
-        jLabel2 = new javax.swing.JLabel();
-        textField1 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        jLabel3 = new javax.swing.JLabel();
-        textField2 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        jPanel1 = new javax.swing.JPanel();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
+        lblMoneyGive = new javax.swing.JLabel();
+        txtMoneyGive = new iuh.fit.se.group1.ui.component.custom.TextField();
+        lblMoneyChange = new javax.swing.JLabel();
+        txtMoneyChange = new iuh.fit.se.group1.ui.component.custom.TextField();
+        pnlMoney = new javax.swing.JPanel();
+        btnComplete = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(129, 129, 129));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Thanh toán tiền mặt");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitle.setText("Thanh toán tiền mặt");
 
         btnExit.setBackground(new java.awt.Color(129, 129, 129));
         btnExit.setText(" ");
@@ -61,49 +61,49 @@ public class CashPaymentModal extends javax.swing.JPanel {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("Tiền khách đưa:");
+        lblMoneyGive.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMoneyGive.setForeground(new java.awt.Color(255, 255, 255));
+        lblMoneyGive.setText("Tiền khách đưa:");
 
-        textField1.setBackground(new java.awt.Color(129, 129, 129));
-        textField1.setForeground(new java.awt.Color(255, 255, 255));
-        textField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        textField1.setText("2.500.000đ");
-        textField1.setBorderColor(java.awt.Color.white);
-        textField1.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        txtMoneyGive.setBackground(new java.awt.Color(129, 129, 129));
+        txtMoneyGive.setForeground(new java.awt.Color(255, 255, 255));
+        txtMoneyGive.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtMoneyGive.setText("2.500.000đ");
+        txtMoneyGive.setBorderColor(java.awt.Color.white);
+        txtMoneyGive.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Tiền thối:");
+        lblMoneyChange.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMoneyChange.setForeground(new java.awt.Color(255, 255, 255));
+        lblMoneyChange.setText("Tiền thối:");
 
-        textField2.setBackground(new java.awt.Color(129, 129, 129));
-        textField2.setForeground(new java.awt.Color(255, 255, 255));
-        textField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        textField2.setText("2.500.000đ");
-        textField2.setBorderColor(java.awt.Color.white);
-        textField2.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        txtMoneyChange.setBackground(new java.awt.Color(129, 129, 129));
+        txtMoneyChange.setForeground(new java.awt.Color(255, 255, 255));
+        txtMoneyChange.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtMoneyChange.setText("2.500.000đ");
+        txtMoneyChange.setBorderColor(java.awt.Color.white);
+        txtMoneyChange.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
 
-        jPanel1.setBackground(new java.awt.Color(129, 129, 129));
+        pnlMoney.setBackground(new java.awt.Color(129, 129, 129));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlMoneyLayout = new javax.swing.GroupLayout(pnlMoney);
+        pnlMoney.setLayout(pnlMoneyLayout);
+        pnlMoneyLayout.setHorizontalGroup(
+            pnlMoneyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 427, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        pnlMoneyLayout.setVerticalGroup(
+            pnlMoneyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 162, Short.MAX_VALUE)
         );
 
-        button1.setBackground(new java.awt.Color(249, 115, 22));
-        button1.setForeground(new java.awt.Color(255, 255, 255));
-        button1.setText("Hoàn tất");
-        button1.setBorderRadius(5);
-        button1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        button1.addActionListener(new java.awt.event.ActionListener() {
+        btnComplete.setBackground(new java.awt.Color(249, 115, 22));
+        btnComplete.setForeground(new java.awt.Color(255, 255, 255));
+        btnComplete.setText("Hoàn tất");
+        btnComplete.setBorderRadius(5);
+        btnComplete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnComplete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button1ActionPerformed(evt);
+                btnCompleteActionPerformed(evt);
             }
         });
 
@@ -115,22 +115,22 @@ public class CashPaymentModal extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(65, 65, 65)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(29, 29, 29)
                         .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pnlMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
+                                .addComponent(lblMoneyGive)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtMoneyGive, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)
+                                .addComponent(lblMoneyChange)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(txtMoneyChange, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -139,17 +139,17 @@ public class CashPaymentModal extends javax.swing.JPanel {
                 .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(lblTitle))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblMoneyGive)
+                    .addComponent(txtMoneyGive, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblMoneyChange)
+                    .addComponent(txtMoneyChange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27)
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(28, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -158,19 +158,19 @@ public class CashPaymentModal extends javax.swing.JPanel {
         GlassPanePopup.closePopupLast();
     }//GEN-LAST:event_btnExitActionPerformed
 
-    private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
+    private void btnCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompleteActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_button1ActionPerformed
+    }//GEN-LAST:event_btnCompleteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.custom.Button btnComplete;
     private iuh.fit.se.group1.ui.component.custom.Button btnExit;
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField1;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField2;
+    private javax.swing.JLabel lblMoneyChange;
+    private javax.swing.JLabel lblMoneyGive;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JPanel pnlMoney;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtMoneyChange;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtMoneyGive;
     // End of variables declaration//GEN-END:variables
 }
