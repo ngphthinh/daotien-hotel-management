@@ -23,10 +23,14 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="307" max="-2" attributes="0"/>
+              <Component id="btnAddPromotion" min="-2" pref="178" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="btnExport" min="-2" pref="148" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="btnImport" min="-2" pref="148" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="button1" min="-2" pref="178" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="84" max="-2" attributes="0"/>
           </Group>
           <Component id="headerCustom1" alignment="1" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
@@ -42,8 +46,12 @@
               <Component id="headerCustom1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <Component id="button1" min="-2" pref="45" max="-2" attributes="0"/>
+                  <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="btnAddPromotion" alignment="3" min="-2" pref="45" max="-2" attributes="0"/>
+                      <Component id="btnExport" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
+                      <Component id="btnImport" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
               <Component id="tblPromotion" pref="594" max="32767" attributes="0"/>
@@ -55,7 +63,7 @@
   <SubComponents>
     <Component class="iuh.fit.se.group1.ui.component.HeaderCustom" name="headerCustom1">
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnAddPromotion">
       <Properties>
         <Property name="text" type="java.lang.String" value="Th&#xea;m khuy&#x1ebf;n m&#xe3;i"/>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -63,10 +71,10 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddPromotionActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="lblTitle">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="83" green="83" red="83" type="rgb"/>
@@ -86,6 +94,22 @@
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
             <EmptyBorder bottom="20" left="20" right="20" top="1"/>
           </Border>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnExport">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Xu&#x1ea5;t Excel"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="1"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnImport">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="T&#x1ea3;i excel"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="1"/>
         </Property>
       </Properties>
     </Component>

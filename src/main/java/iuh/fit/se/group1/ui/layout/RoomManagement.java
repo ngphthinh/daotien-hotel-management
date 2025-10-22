@@ -32,12 +32,21 @@ public class RoomManagement extends javax.swing.JPanel {
      */
     public RoomManagement() {
         initComponents();
-        headerCustom.getjLabel1().setText("Quản lý phòng");
         btnAddRoom.setBackground(new Color(108, 165, 200));
         btnAddRoom.setForeground(Color.WHITE);
-        btnAddRoom.setBorderRadius(40);
+        btnAddRoom.setBorderRadius(10);
 
+        btnExport.setBackground(new Color(13, 200, 7));
+        btnExport.setForeground(Color.WHITE);
+        btnExport.setBorderRadius(10);
+        
+        btnImport.setBackground(new Color(255, 108, 3));
+        btnImport.setForeground(Color.WHITE);
+        btnImport.setBorderRadius(10);
+        
         btnAddRoom.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
 
         String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Giá phòng", "Trạng thái", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
@@ -293,6 +302,8 @@ public class RoomManagement extends javax.swing.JPanel {
         lblTitle = new javax.swing.JLabel();
         btnAddRoom = new iuh.fit.se.group1.ui.component.custom.Button();
         tblRoom = new iuh.fit.se.group1.ui.component.table.Table();
+        btnExport = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnImport = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(241, 241, 241));
 
@@ -313,6 +324,12 @@ public class RoomManagement extends javax.swing.JPanel {
 
         tblRoom.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
 
+        btnExport.setText("Xuất excel");
+        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        btnImport.setText("Tải excel");
+        btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -321,9 +338,13 @@ public class RoomManagement extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(36, 36, 36)
                 .addComponent(lblTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(377, 377, 377)
                 .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(86, 86, 86))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(tblRoom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -333,10 +354,12 @@ public class RoomManagement extends javax.swing.JPanel {
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(25, 25, 25)
                 .addComponent(tblRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(7, Short.MAX_VALUE))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -436,6 +459,8 @@ public class RoomManagement extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddRoom;
+    private iuh.fit.se.group1.ui.component.custom.Button btnExport;
+    private iuh.fit.se.group1.ui.component.custom.Button btnImport;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom;
     private javax.swing.JLabel lblTitle;
     private iuh.fit.se.group1.ui.component.table.Table tblRoom;

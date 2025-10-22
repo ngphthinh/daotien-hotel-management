@@ -70,7 +70,7 @@ public class OrderManagement extends javax.swing.JPanel {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
 
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Loại hóa đơn                 \u25BC");
+                lbl.setText("Loại hóa đơn                                                                 \u25BC");
                 lbl.setHorizontalTextPosition(SwingConstants.LEFT);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
                 lbl.setIconTextGap(5);
@@ -109,10 +109,10 @@ public class OrderManagement extends javax.swing.JPanel {
         });
 
         tblOrder.setTableActionColumn(tblOrder.getTbl(), 5, event, true);
-        tblOrder.getTbl().getColumnModel().getColumn(0).setPreferredWidth(200);  // chiều rộng mong muốn
-        tblOrder.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
-        tblOrder.getTbl().getColumnModel().getColumn(2).setPreferredWidth(200);
-        tblOrder.getTbl().getColumnModel().getColumn(3).setPreferredWidth(170);
+        tblOrder.getTbl().getColumnModel().getColumn(0).setPreferredWidth(150);  // chiều rộng mong muốn
+        tblOrder.getTbl().getColumnModel().getColumn(1).setPreferredWidth(150);
+        tblOrder.getTbl().getColumnModel().getColumn(2).setPreferredWidth(150);
+        tblOrder.getTbl().getColumnModel().getColumn(3).setPreferredWidth(300);
         tblOrder.getTbl().getColumnModel().getColumn(4).setPreferredWidth(250);
         tblOrder.getTbl().getColumnModel().getColumn(5).setPreferredWidth(150);
 
@@ -166,9 +166,9 @@ public class OrderManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addGap(25, 25, 25)
+                .addGap(15, 15, 15)
                 .addComponent(tblOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 637, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents

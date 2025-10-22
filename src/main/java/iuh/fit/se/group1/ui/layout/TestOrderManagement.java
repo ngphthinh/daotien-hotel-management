@@ -20,7 +20,7 @@ public class TestOrderManagement {
             frame.setLocationRelativeTo(null); // Căn giữa màn hình
 
             // Thêm JPanel OrderManagement vào frame
-            frame.add(new OrderManagement());
+            frame.add(new InstructionsForUser());
 
             frame.setVisible(true);
      

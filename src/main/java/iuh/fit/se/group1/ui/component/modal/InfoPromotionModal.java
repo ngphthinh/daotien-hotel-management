@@ -9,6 +9,7 @@ import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.util.Constants;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -191,6 +192,7 @@ public class InfoPromotionModal extends javax.swing.JPanel {
      */
     public InfoPromotionModal() {
         initComponents();
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Color.white));
         txtEndDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         iconDate2.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
         iconDate2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -340,7 +342,7 @@ public class InfoPromotionModal extends javax.swing.JPanel {
 
         btnClose.setBackground(new java.awt.Color(255, 51, 0));
         btnClose.setForeground(new java.awt.Color(255, 255, 255));
-        btnClose.setText("X");
+        btnClose.setText("");
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
@@ -474,10 +476,11 @@ public class InfoPromotionModal extends javax.swing.JPanel {
                     .addComponent(lblDiscountPersent)
                     .addComponent(txtDiscountPersent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(4, 4, 4)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblErrolName)
-                    .addComponent(lblErrolPrice)
-                    .addComponent(lblErrolDiscountPersent, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblErrolDiscountPersent, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblErrolName)
+                        .addComponent(lblErrolPrice)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)

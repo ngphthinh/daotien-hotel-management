@@ -30,11 +30,21 @@ public class AmenityManagement extends javax.swing.JPanel {
      */
     public AmenityManagement() {
         initComponents();
-        btn1.setBackground(new Color(108, 165, 200));
-        btn1.setForeground(Color.WHITE);
-        btn1.setBorderRadius(40);
+        btnAddAmenity.setBackground(new Color(108, 165, 200));
+        btnAddAmenity.setForeground(Color.WHITE);
+        btnAddAmenity.setBorderRadius(10);
+        
+        btnExport.setBackground(new Color(13, 200, 7));
+        btnExport.setForeground(Color.WHITE);
+        btnExport.setBorderRadius(10);
+        
+        btnImport.setBackground(new Color(255, 108, 3));
+        btnImport.setForeground(Color.WHITE);
+        btnImport.setBorderRadius(10);
 
-        btn1.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnAddAmenity.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         String cols[] = {"Mã dịch vụ", "Tên dịch vụ", "Giá dịch vụ", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblAmenity.getTbl().setModel(model);
@@ -159,9 +169,11 @@ public class AmenityManagement extends javax.swing.JPanel {
     private void initComponents() {
 
         lblTiTle = new javax.swing.JLabel();
-        btn1 = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnAddAmenity = new iuh.fit.se.group1.ui.component.custom.Button();
         tblAmenity = new iuh.fit.se.group1.ui.component.table.Table();
         headerCustom1 = new iuh.fit.se.group1.ui.component.HeaderCustom();
+        btnExport = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnImport = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(241, 242, 241));
 
@@ -171,17 +183,28 @@ public class AmenityManagement extends javax.swing.JPanel {
         lblTiTle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblTiTle.setText("Danh sách dịch vụ");
 
-        btn1.setText("Thêm dịch vụ");
-        btn1.setToolTipText("");
-        btn1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btn1.addActionListener(new java.awt.event.ActionListener() {
+        btnAddAmenity.setText("Thêm dịch vụ");
+        btnAddAmenity.setToolTipText("");
+        btnAddAmenity.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnAddAmenity.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn1ActionPerformed(evt);
+                btnAddAmenityActionPerformed(evt);
             }
         });
 
         tblAmenity.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
         tblAmenity.setForeground(new java.awt.Color(255, 255, 255));
+
+        btnExport.setText("Xuất Excel");
+        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+
+        btnImport.setText("Nhập Excel");
+        btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -191,13 +214,17 @@ public class AmenityManagement extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(tblAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(headerCustom1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(headerCustom1, javax.swing.GroupLayout.DEFAULT_SIZE, 1227, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGap(36, 36, 36)
                 .addComponent(lblTiTle, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btn1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(83, 83, 83))
+                .addGap(372, 372, 372)
+                .addComponent(btnAddAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -205,15 +232,19 @@ public class AmenityManagement extends javax.swing.JPanel {
                 .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTiTle, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnAddAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTiTle, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(25, 25, 25)
                 .addComponent(tblAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addContainerGap(67, Short.MAX_VALUE))
         );
+
+        btnExport.getAccessibleContext().setAccessibleDescription("");
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn1ActionPerformed
+    private void btnAddAmenityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAmenityActionPerformed
 
         ServiceModal modal = new ServiceModal();
         modal.closeModel(new ActionListener() {
@@ -270,11 +301,17 @@ public class AmenityManagement extends javax.swing.JPanel {
             }
         });
         GlassPanePopup.showPopup(modal);
-    }//GEN-LAST:event_btn1ActionPerformed
+    }//GEN-LAST:event_btnAddAmenityActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnExportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button btn1;
+    private iuh.fit.se.group1.ui.component.custom.Button btnAddAmenity;
+    private iuh.fit.se.group1.ui.component.custom.Button btnExport;
+    private iuh.fit.se.group1.ui.component.custom.Button btnImport;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom1;
     private javax.swing.JLabel lblTiTle;
     private iuh.fit.se.group1.ui.component.table.Table tblAmenity;

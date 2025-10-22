@@ -7,7 +7,7 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.ui.component.HeaderShift;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
-import iuh.fit.se.group1.ui.component.shift.AtTheEnd;
+import iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote;
 import iuh.fit.se.group1.ui.component.shift.InfoShift;
 import iuh.fit.se.group1.ui.component.shift.MinPanel;
 import iuh.fit.se.group1.ui.component.shift.Money;
@@ -47,27 +47,27 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
 
     }
 
-    public AtTheEnd getAtTheEnd1() {
+    public OpenDifferenceNote getAtTheEnd1() {
         return atTheEnd1;
     }
 
-    public void setAtTheEnd1(AtTheEnd atTheEnd1) {
+    public void setAtTheEnd1(OpenDifferenceNote atTheEnd1) {
         this.atTheEnd1 = atTheEnd1;
     }
 
-    public AtTheEnd getAtTheEnd2() {
+    public OpenDifferenceNote getAtTheEnd2() {
         return atTheEnd2;
     }
 
-    public void setAtTheEnd2(AtTheEnd atTheEnd2) {
+    public void setAtTheEnd2(OpenDifferenceNote atTheEnd2) {
         this.atTheEnd2 = atTheEnd2;
     }
 
-    public AtTheEnd getAtTheEnd3() {
+    public OpenDifferenceNote getAtTheEnd3() {
         return atTheEnd3;
     }
 
-    public void setAtTheEnd3(AtTheEnd atTheEnd3) {
+    public void setAtTheEnd3(OpenDifferenceNote atTheEnd3) {
         this.atTheEnd3 = atTheEnd3;
     }
 
@@ -342,6 +342,7 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenu1 = new javax.swing.JMenu();
         headerShift1 = new iuh.fit.se.group1.ui.component.HeaderShift();
         infoShift1 = new iuh.fit.se.group1.ui.component.shift.InfoShift();
         moneyInTheSafe1 = new iuh.fit.se.group1.ui.component.shift.MoneyInTheSafe();
@@ -358,10 +359,10 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
         minPanel4 = new iuh.fit.se.group1.ui.component.shift.MinPanel();
         lblTotalPrice = new javax.swing.JLabel();
         lblPrice = new javax.swing.JLabel();
-        atTheEnd1 = new iuh.fit.se.group1.ui.component.shift.AtTheEnd();
+        atTheEnd1 = new iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote();
         lblTitleMoneyOpenShift = new javax.swing.JLabel();
         txtMoneyOpenShift = new iuh.fit.se.group1.ui.component.custom.TextField();
-        atTheEnd2 = new iuh.fit.se.group1.ui.component.shift.AtTheEnd();
+        atTheEnd2 = new iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote();
         lblCheckDifference = new javax.swing.JLabel();
         minPanel1 = new iuh.fit.se.group1.ui.component.shift.MinPanel();
         lblSystem = new javax.swing.JLabel();
@@ -372,11 +373,14 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
         minPanel3 = new iuh.fit.se.group1.ui.component.shift.MinPanel();
         lblMoneyDifference = new javax.swing.JLabel();
         txtMoneyDifference = new javax.swing.JLabel();
-        atTheEnd3 = new iuh.fit.se.group1.ui.component.shift.AtTheEnd();
+        jLabel1 = new javax.swing.JLabel();
+        atTheEnd3 = new iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote();
         lblNote = new javax.swing.JLabel();
         scrNote = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
+
+        jMenu1.setText("jMenu1");
 
         setBackground(new java.awt.Color(241, 241, 241));
 
@@ -519,8 +523,8 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
             .addGroup(minPanel1Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
                 .addComponent(lblSystem)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
-                .addComponent(txtSystem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 123, Short.MAX_VALUE)
+                .addComponent(txtSystem, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
         );
         minPanel1Layout.setVerticalGroup(
@@ -552,8 +556,8 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, minPanel2Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
                 .addComponent(lblReality)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 145, Short.MAX_VALUE)
-                .addComponent(txtReality, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
+                .addComponent(txtReality, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
         );
         minPanel2Layout.setVerticalGroup(
@@ -597,6 +601,9 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
                 .addGap(13, 13, 13))
         );
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel1.setText("-   ");
+
         javax.swing.GroupLayout atTheEnd2Layout = new javax.swing.GroupLayout(atTheEnd2);
         atTheEnd2.setLayout(atTheEnd2Layout);
         atTheEnd2Layout.setHorizontalGroup(
@@ -607,13 +614,16 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(atTheEnd2Layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addGroup(atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(minPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(atTheEnd2Layout.createSequentialGroup()
-                        .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(minPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         atTheEnd2Layout.setVerticalGroup(
             atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -622,11 +632,16 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
                 .addComponent(lblCheckDifference)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                    .addGroup(atTheEnd2Layout.createSequentialGroup()
+                        .addGroup(atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd2Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(37, 37, 37)))
                 .addComponent(minPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         atTheEnd3.setBackground(new java.awt.Color(255, 255, 255));
@@ -647,7 +662,7 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
                 .addComponent(lblNote)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd3Layout.createSequentialGroup()
-                .addContainerGap(29, Short.MAX_VALUE)
+                .addContainerGap(22, Short.MAX_VALUE)
                 .addComponent(scrNote, javax.swing.GroupLayout.PREFERRED_SIZE, 710, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -664,7 +679,7 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
         btnClose.setBackground(new java.awt.Color(0, 0, 0));
         btnClose.setForeground(new java.awt.Color(255, 255, 255));
         btnClose.setText("Xác nhận đóng ca");
-        btnClose.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        btnClose.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
@@ -684,11 +699,11 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(atTheEnd3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(atTheEnd2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(atTheEnd2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 738, Short.MAX_VALUE)
                             .addComponent(atTheEnd1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(infoShift1, javax.swing.GroupLayout.PREFERRED_SIZE, 1194, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(217, 217, 217))
+                .addGap(233, 233, 233))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -705,7 +720,7 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
                         .addGap(16, 16, 16)
                         .addComponent(atTheEnd3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(16, 16, 16)
-                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(moneyInTheSafe1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -722,12 +737,14 @@ btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.shift.AtTheEnd atTheEnd1;
-    private iuh.fit.se.group1.ui.component.shift.AtTheEnd atTheEnd2;
-    private iuh.fit.se.group1.ui.component.shift.AtTheEnd atTheEnd3;
+    private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd1;
+    private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd2;
+    private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd3;
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;
     private iuh.fit.se.group1.ui.component.HeaderShift headerShift1;
     private iuh.fit.se.group1.ui.component.shift.InfoShift infoShift1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JLabel lblCheckDifference;
     private javax.swing.JLabel lblMoneyDifference;

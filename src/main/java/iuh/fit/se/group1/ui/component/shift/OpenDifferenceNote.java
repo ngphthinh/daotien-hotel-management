@@ -12,12 +12,12 @@ import java.awt.RenderingHints;
  *
  * @author Windows
  */
-public class AtTheEnd extends javax.swing.JPanel {
+public class OpenDifferenceNote extends javax.swing.JPanel {
 
     /**
      * Creates new form AtTheEnd
      */
-    public AtTheEnd() {
+    public OpenDifferenceNote() {
         initComponents();
         setOpaque(false);
     }

@@ -10,6 +10,7 @@ import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.util.Constants;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -94,6 +95,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
     private DateChooser dateChooser;
     public InfoEmployeeModal() {
         initComponents();
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Color.white));
         cmbGender.removeAllItems();
         cmbGender.addItem("Nam");
         cmbGender.setLightWeightPopupEnabled(false);
@@ -348,7 +350,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
 
         btnClose.setBackground(new java.awt.Color(255, 0, 0));
         btnClose.setForeground(new java.awt.Color(255, 255, 255));
-        btnClose.setText("X");
+        btnClose.setText("");
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
@@ -487,7 +489,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
                 .addComponent(lblCode, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblStatus)
-                .addGap(18, 18, 18)
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblName)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -516,7 +518,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
                     .addComponent(txtCitizen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(3, 3, 3)
                 .addComponent(lblErrolCitizen)
-                .addGap(18, 18, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblEmail))
