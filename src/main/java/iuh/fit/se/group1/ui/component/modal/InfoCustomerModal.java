@@ -10,6 +10,7 @@ import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.util.Constants;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -162,6 +163,7 @@ public class InfoCustomerModal extends javax.swing.JPanel {
      */
     public InfoCustomerModal() {
         initComponents();
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Color.white));
         cmbGender.removeAllItems();
         cmbGender.addItem("Nam");
         cmbGender.setLightWeightPopupEnabled(false);
@@ -320,7 +322,7 @@ public class InfoCustomerModal extends javax.swing.JPanel {
 
         btnClose.setBackground(new java.awt.Color(255, 51, 0));
         btnClose.setForeground(new java.awt.Color(255, 255, 255));
-        btnClose.setText("X");
+        btnClose.setText("");
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);

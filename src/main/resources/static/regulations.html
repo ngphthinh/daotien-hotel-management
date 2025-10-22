@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<title>Quy định - DaoTien Hotel</title>
+<style>
+  :root{
+    --accent1:#1366d6; 
+    --accent2:#6f42c1; 
+    --muted:#555;
+    --container-w:900px;
+  }
+
+  body{
+    margin:0;
+    padding:0;
+    font-family:"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(135deg,#e7f0ff,#f7f2ff);
+    color:#222;
+  }
+
+  .card{
+    width:var(--container-w);
+    margin:30px auto;
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 8px 25px rgba(0,0,0,0.1);
+    overflow:hidden;
+    animation:fadeIn 0.8s ease;
+  }
+
+  header{
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#fff;
+    padding:25px 30px;
+  }
+
+  header h1{
+    margin:0;
+    font-size:28px;
+  }
+
+  header .meta{
+    font-size:15px;
+    opacity:0.9;
+    margin-top:4px;
+  }
+
+  .content{
+    padding:30px 40px;
+    font-size:16px;
+    line-height:1.7;
+  }
+
+  h2{
+    color:var(--accent2);
+    margin-top:25px;
+    margin-bottom:10px;
+    border-left:6px solid rgba(111,66,193,0.25);
+    padding-left:10px;
+    font-size:19px;
+  }
+
+  ol{
+    padding-left:22px;
+    margin:0;
+  }
+
+  li{
+    margin-bottom:10px;
+  }
+
+  ul{
+    margin:6px 0 10px 20px;
+  }
+
+  ul li{
+    list-style-type:"– ";
+    margin-bottom:5px;
+  }
+
+  .footer{
+    background:#fafafa;
+    border-top:1px solid #eee;
+    padding:12px 20px;
+    text-align:center;
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(20px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  @media(max-width:940px){
+    :root{--container-w:94vw;}
+    header h1{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+  <article class="card">
+    <header>
+      <h1>📜 Quy định – DaoTien Hotel</h1>
+      <div class="meta">
+        Môn học: <b>Phát triển Ứng dụng</b> – Khoa CNTT, IUH<br>
+        GV hướng dẫn: <b>Trần Thị Anh</b> | © 2025 Nhóm 1
+      </div>
+    </header>
+
+    <div class="content">
+      <ol>
+        <li><b>Giờ nhận phòng (Check-in)</b>
+          <ul>
+            <li>Đối với theo ngày: Khách được nhận phòng từ <b>14h</b>. Nếu khách check-in trước 14h hệ thống tự động tính <b>phụ thu 20.000đ/giờ</b>.</li>
+            <li>Đối với theo giờ: Nếu khách đến sau 22h nhưng chỉ ở 1–2 tiếng thì vẫn được tính theo <b>gói qua đêm</b>.</li>
+            <li><b>Ràng buộc:</b> không cho phép check-in trước <b>06h sáng</b> của cùng ngày.</li>
+          </ul>
+        </li>
+
+        <li><b>Giờ trả phòng (Check-out)</b>
+          <ul>
+            <li>Khách phải trả phòng trước <b>12h trưa</b>.</li>
+            <li>Nếu khách trả phòng sau 12h khách sạn tính <b>phụ thu 30.000đ/giờ</b>.</li>
+            <li>Nếu khách trả phòng muộn không quá 30 phút thì <b>không tính phí</b>.</li>
+            <li>Nếu thời gian trả phòng vượt quá <b>18h</b>, hệ thống <b>tự động tính thêm 1 ngày lưu trú</b>.</li>
+          </ul>
+        </li>
+
+        <li><b>Quy định về giấy tờ tùy thân</b>
+          <ul>
+            <li>Khách đi một mình hoặc theo nhóm đều phải xuất trình tối thiểu <b>1 giấy tờ tùy thân</b> để nhân viên chụp lại thông tin.</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
+    <div class="footer">
+      DaoTien Hotel Management System — Made with 💙 by Team 1
+    </div>
+  </article>
+</body>
+</html>

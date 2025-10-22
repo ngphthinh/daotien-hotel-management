@@ -25,9 +25,13 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
               <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="377" max="-2" attributes="0"/>
               <Component id="btnAddRoom" min="-2" pref="160" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="86" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="btnExport" min="-2" pref="148" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="btnImport" min="-2" pref="148" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
           <Component id="tblRoom" alignment="1" max="32767" attributes="0"/>
       </Group>
@@ -40,10 +44,12 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnAddRoom" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
                   <Component id="lblTitle" alignment="3" min="-2" pref="41" max="-2" attributes="0"/>
+                  <Component id="btnExport" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
+                  <Component id="btnImport" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
               <Component id="tblRoom" min="-2" pref="615" max="-2" attributes="0"/>
-              <EmptySpace pref="7" max="32767" attributes="0"/>
+              <EmptySpace pref="8" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -86,6 +92,22 @@
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
             <EmptyBorder bottom="20" left="20" right="20" top="1"/>
           </Border>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnExport">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Xu&#x1ea5;t excel"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="1"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnImport">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="T&#x1ea3;i excel"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="1"/>
         </Property>
       </Properties>
     </Component>

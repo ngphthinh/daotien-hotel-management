@@ -7,8 +7,11 @@ package iuh.fit.se.group1.ui.component.modal;
 import java.awt.event.ActionListener;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
+import java.awt.Color;
 
 import javax.swing.*;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 /**
  *
@@ -21,6 +24,7 @@ public class ServiceModal extends javax.swing.JPanel {
      */
     public ServiceModal() {
         initComponents();
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Color.white));
 //         btnClose.setBorderRadius(50);
 //         // Icon lịch màu xám (kích thước 30px)
     
@@ -148,7 +152,7 @@ public class ServiceModal extends javax.swing.JPanel {
 
         btnClose.setBackground(new java.awt.Color(255, 51, 0));
         btnClose.setForeground(new java.awt.Color(255, 255, 255));
-        btnClose.setText("X");
+        btnClose.setText("");
 
         lblName.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblName.setForeground(new java.awt.Color(51, 51, 51));

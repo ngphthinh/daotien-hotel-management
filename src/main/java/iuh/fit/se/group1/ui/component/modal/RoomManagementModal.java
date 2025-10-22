@@ -7,8 +7,11 @@ package iuh.fit.se.group1.ui.component.modal;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.TextField;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import javax.swing.JLabel;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 /**
  *
@@ -21,6 +24,7 @@ public class RoomManagementModal extends javax.swing.JPanel {
      */
     public RoomManagementModal() {
         initComponents();
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Color.white));
         cmbTypeRoom.setBackground(new java.awt.Color(240, 248, 255)); 
         cmbTypeRoom.setForeground(new java.awt.Color(51, 51, 51));     
         cmbTypeRoom.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
@@ -215,7 +219,7 @@ cmbStatus.addItem("Bảo trì");
 
         btnClose.setBackground(new java.awt.Color(255, 51, 0));
         btnClose.setForeground(new java.awt.Color(255, 255, 255));
-        btnClose.setText("X");
+        btnClose.setText("");
         btnClose.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

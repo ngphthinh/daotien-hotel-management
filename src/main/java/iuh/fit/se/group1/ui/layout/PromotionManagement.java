@@ -27,10 +27,22 @@ public class PromotionManagement extends javax.swing.JPanel {
      */
     public PromotionManagement() {
         initComponents();
-        button1.setBackground(new Color(108, 165, 200));
-        button1.setForeground(Color.WHITE);
-        button1.setBorderRadius(40);
-        button1.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
+       btnAddPromotion.setBackground(new Color(108, 165, 200));
+        btnAddPromotion.setForeground(Color.WHITE);
+        btnAddPromotion.setBorderRadius(10);
+
+        btnExport.setBackground(new Color(13, 200, 7));
+        btnExport.setForeground(Color.WHITE);
+        btnExport.setBorderRadius(10);
+        
+        btnImport.setBackground(new Color(255, 108, 3));
+        btnImport.setForeground(Color.WHITE);
+        btnImport.setBorderRadius(10);
+        
+        btnAddPromotion.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+
         headerCustom1.getjLabel1().setText(
                 "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
         headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
@@ -235,26 +247,34 @@ public class PromotionManagement extends javax.swing.JPanel {
     private void initComponents() {
 
         headerCustom1 = new iuh.fit.se.group1.ui.component.HeaderCustom();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
-        jLabel1 = new javax.swing.JLabel();
+        btnAddPromotion = new iuh.fit.se.group1.ui.component.custom.Button();
+        lblTitle = new javax.swing.JLabel();
         tblPromotion = new iuh.fit.se.group1.ui.component.table.Table();
+        btnExport = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnImport = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(241, 241, 241));
 
-        button1.setText("Thêm khuyến mãi");
-        button1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        button1.addActionListener(new java.awt.event.ActionListener() {
+        btnAddPromotion.setText("Thêm khuyến mãi");
+        btnAddPromotion.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnAddPromotion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button1ActionPerformed(evt);
+                btnAddPromotionActionPerformed(evt);
             }
         });
 
-        jLabel1.setBackground(new java.awt.Color(131, 131, 131));
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel1.setText("Danh sách khuyến mãi");
+        lblTitle.setBackground(new java.awt.Color(131, 131, 131));
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(102, 102, 102));
+        lblTitle.setText("Danh sách khuyến mãi");
 
         tblPromotion.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
+
+        btnExport.setText("Xuất Excel");
+        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        btnImport.setText("Tải excel");
+        btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -262,10 +282,14 @@ public class PromotionManagement extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(36, 36, 36)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(84, 84, 84))
+                .addComponent(lblTitle)
+                .addGap(307, 307, 307)
+                .addComponent(btnAddPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(headerCustom1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
@@ -278,15 +302,18 @@ public class PromotionManagement extends javax.swing.JPanel {
                 .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1)
-                    .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblTitle)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnAddPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(25, 25, 25)
                 .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE)
                 .addGap(31, 31, 31))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
+    private void btnAddPromotionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPromotionActionPerformed
         var modal = new InfoPromotionModal();
         modal.closeModel(new ActionListener() {
             @Override
@@ -362,7 +389,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                     modal.getLblErrolDesciption().setText("Vui lòng nhập mô tả khuyến mãi!");
                     isValid = false;
                 } else if (desciption.length() < 10) {
-                    modal.getLblErrolDesciption().setText("Mô tả phải ít nhất 10 ký tự!");
+                    modal.getLblErrolDesciption().setText("Mô tả phải ít nhất 10 ký tự");
                     isValid = false;
                 }
                 if (endDate.compareTo(startDate) < 0) {
@@ -382,13 +409,15 @@ public class PromotionManagement extends javax.swing.JPanel {
         });
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
-    }//GEN-LAST:event_button1ActionPerformed
+    }//GEN-LAST:event_btnAddPromotionActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
+    private iuh.fit.se.group1.ui.component.custom.Button btnAddPromotion;
+    private iuh.fit.se.group1.ui.component.custom.Button btnExport;
+    private iuh.fit.se.group1.ui.component.custom.Button btnImport;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblTitle;
     private iuh.fit.se.group1.ui.component.table.Table tblPromotion;
     // End of variables declaration//GEN-END:variables
 }

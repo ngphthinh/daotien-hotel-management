@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<title>Giới thiệu - DaoTien Hotel</title>
+<style>
+  :root{
+    --accent1:#1366d6; 
+    --accent2:#6f42c1; 
+    --muted:#555;
+    --container-w:900px;
+  }
+
+  body{
+    margin:0;
+    padding:0;
+    font-family:"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(135deg,#e7f0ff,#f7f2ff);
+    color:#222;
+  }
+
+  .card{
+    width:var(--container-w);
+    margin:30px auto;
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 8px 25px rgba(0,0,0,0.1);
+    overflow:hidden;
+    animation:fadeIn 0.8s ease;
+  }
+
+  header{
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#fff;
+    padding:25px 30px;
+  }
+
+  header h1{
+    margin:0;
+    font-size:28px;
+  }
+
+  header .meta{
+    font-size:15px;
+    opacity:0.9;
+    margin-top:4px;
+  }
+
+  .content{
+    padding:30px 40px;
+    font-size:16px;
+    line-height:1.6;
+  }
+
+  h2{
+    color:var(--accent2);
+    margin-top:25px;
+    margin-bottom:10px;
+    border-left:6px solid rgba(111,66,193,0.25);
+    padding-left:10px;
+    font-size:19px;
+  }
+
+  .refs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 16px;
+    margin-bottom:10px;
+  }
+
+  .refs a{
+    color:var(--accent1);
+    text-decoration:none;
+    font-size:15px;
+  }
+
+  .refs a:hover{text-decoration:underline;}
+
+  .members{
+    display:flex;
+    justify-content:space-between;
+    align-items:stretch;
+    gap:16px;
+    margin-top:12px;
+  }
+
+  .member{
+    flex:1;
+    background:#f3f6ff;
+    border-radius:10px;
+    padding:14px;
+    text-align:center;
+    transition:all 0.3s ease;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    min-width:0; 
+  }
+
+  .member:hover{
+    background:linear-gradient(135deg,#fff,#e8f0ff);
+    transform:scale(1.05);
+  }
+
+  .member b{
+    display:block;
+    color:#222;
+    font-size:17px;
+    margin-bottom:5px;
+    transition:color 0.3s;
+  }
+
+  .member:hover b{
+    color:var(--accent2);
+  }
+
+  .member i{
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  .footer{
+    background:#fafafa;
+    border-top:1px solid #eee;
+    padding:12px 20px;
+    text-align:center;
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(20px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  @media(max-width:940px){
+    :root{--container-w:94vw;}
+    header h1{font-size:24px;}
+    .members{flex-direction:column;} 
+  }
+</style>
+</head>
+<body>
+  <article class="card">
+    <header>
+      <h1>🏨 Hệ thống Quản lý Khách sạn Đào Tiên – Phiên bản 1.0.0</h1>
+      <div class="meta">
+        Môn học: <b>Phát triển Ứng dụng</b> – Khoa CNTT, IUH<br>
+        GV hướng dẫn: <b>Trần Thị Anh Thi</b> | © 2025 Nhóm 1
+      </div>
+    </header>
+
+    <div class="content">
+      <section>
+       <h2>Giới thiệu</h2>
+        <p>
+            Ứng dụng được phát triển nhằm hỗ trợ quản lý toàn bộ hoạt động của khách sạn Đào Tiên,
+            bao gồm các chức năng: đặt phòng, thanh toán, quản lý nhân viên, khách hàng, khuyến mãi và thống kê doanh
+            thu.
+            Giao diện hiện đại, thân thiện với người dùng, được xây dựng bằng <b>Java Swing</b>
+            và <b>Raven UI</b>, với quá trình thiết kế giao diện chủ yếu thực hiện bằng công cụ
+            <b>kéo-thả (GUI Builder)</b> trong <b>NetBeans IDE</b>.
+        </p>
+      </section>
+
+      <h2>📚 Tài liệu tham khảo</h2>
+      <div class="refs">
+        <a href="https://docs.oracle.com/javase/tutorial/uiswing/" target="_blank">Java Swing – Oracle</a>
+        <a href="https://github.com/raven-community/raven-ui" target="_blank">Raven UI – GitHub</a>
+        <a href="https://www.formdev.com/flatlaf/" target="_blank">FlatLaf – formdev.com</a>
+        <a href="https://github.com/k33ptoo/GlassPanePopup" target="_blank">GlassPanePopup – GitHub</a>
+      </div>
+
+      <h2>👨‍💻 Thành viên Nhóm 1</h2>
+      <div class="members">
+        <div class="member">
+          <b>Nguyễn Phước Thịnh</b>
+          <i>Trưởng nhóm – quản lý dự án</i>
+        </div>
+        <div class="member">
+          <b>Trầm Hồng Viên Thiệu</b>
+          <i>Giao diện & xử lý nghiệp vụ, kết nối CSDL</i>
+        </div>
+        <div class="member">
+          <b>Nguyễn Trần Quốc Việt</b>
+          <i>Giao diện & xử lý nghiệp vụ, kết nối CSDL</i>
+        </div>
+        <div class="member">
+          <b>Hồ Thị Kim Xuyến</b>
+          <i>Thiết kế giao diện</i>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      DaoTien Hotel Management System — Made with 💙 by Team 1
+    </div>
+  </article>
+</body>
+</html>
