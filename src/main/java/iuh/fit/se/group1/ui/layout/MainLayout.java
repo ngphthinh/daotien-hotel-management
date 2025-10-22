@@ -8,6 +8,8 @@ import raven.glasspanepopup.GlassPanePopup;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class MainLayout extends JPanel {
 
@@ -29,7 +31,6 @@ public class MainLayout extends JPanel {
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
-
 
     public MainLayout() {
         init();
@@ -63,11 +64,9 @@ public class MainLayout extends JPanel {
         sideBar = new SideBar();
         pnlMain.add(sideBar, BorderLayout.WEST);
 
-
         pnlContent = new JPanel(new BorderLayout());
         pnlMain.add(pnlContent, BorderLayout.CENTER);
         add(pnlMain, BorderLayout.CENTER);
-
 
         sideBar.getMenu1().setMenuEvent(new MenuEvent() {
             @Override
@@ -93,14 +92,48 @@ public class MainLayout extends JPanel {
                         setMainContent(roomManagement);
                     } else if (index == 8) {
                         setMainContent(orderManagement);
-                    } else if (index ==9 && subIndex == 1) {
+                    } else if (index == 9 && subIndex == 1) {
                         setMainContent(revenueStatistics);
+                    } else if (index == 10 && subIndex == 2) {
+                        try {
+                            File htmlFile = new File("src/main/resources/static/regulations.html");
+
+                            if (htmlFile.exists()) {
+                                Desktop.getDesktop().browse(htmlFile.toURI());
+                            } else {
+                                JOptionPane.showMessageDialog(null,
+                                        "Không tìm thấy file: " + htmlFile.getAbsolutePath(),
+                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+
+                        } catch (IOException e) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Không thể mở trang giới thiệu trong trình duyệt!",
+                                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
                     } else if (index == 10 && subIndex == 3) {
                         var modal = new CheckForVersionPanel();
                         GlassPanePopup.showPopup(modal);
-                        modal.getBtnClose().addActionListener(e ->
-                                GlassPanePopup.closePopupLast()
+                        modal.getBtnClose().addActionListener(e
+                                -> GlassPanePopup.closePopupLast()
                         );
+                    } else if (index == 10 && subIndex == 4) {
+                        try {
+                            File htmlFile = new File("src/main/resources/static/about.html");
+
+                            if (htmlFile.exists()) {
+                                Desktop.getDesktop().browse(htmlFile.toURI());
+                            } else {
+                                JOptionPane.showMessageDialog(null,
+                                        "Không tìm thấy file: " + htmlFile.getAbsolutePath(),
+                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+
+                        } catch (IOException e) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Không thể mở trang giới thiệu trong trình duyệt!",
+                                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
@@ -111,9 +144,9 @@ public class MainLayout extends JPanel {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
                         setMainContent(paymentPage);
-                    } else if (index == 3){
+                    } else if (index == 3) {
                         setMainContent(new CloseShift());
-                    }else {
+                    } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
@@ -131,7 +164,6 @@ public class MainLayout extends JPanel {
     public JButton getBtnSignOut() {
         return sideBar.getBtnSignOut();
     }
-
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -152,14 +184,14 @@ public class MainLayout extends JPanel {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-                    JFrame frame = new JFrame("Main Layout");
-                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    GlassPanePopup.install(frame);
-                    frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
-                    frame.setLocationRelativeTo(null);
-                    frame.setContentPane(new MainLayout());
-                    frame.setVisible(true);
-                }
+            JFrame frame = new JFrame("Main Layout");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            GlassPanePopup.install(frame);
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
+            frame.setLocationRelativeTo(null);
+            frame.setContentPane(new MainLayout());
+            frame.setVisible(true);
+        }
         );
     }
 

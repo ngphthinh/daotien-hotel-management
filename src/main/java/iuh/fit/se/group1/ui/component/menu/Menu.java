@@ -35,7 +35,7 @@ public class Menu extends JComponent {
             {"Quản lý phòng"},
             {"Quản lý hóa đơn"},
             {"Quản lý thống kê", "Thống kê doanh thu", "Tỷ lê lấp đầy phòng", "Thống kê theo xu hướng"},
-            {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản"}
+            {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản","Về chúng tôi"}
     };
 
     private final String[][] menuItemsEmployee = new String[][]{
