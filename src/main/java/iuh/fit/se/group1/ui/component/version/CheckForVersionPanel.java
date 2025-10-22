@@ -14,17 +14,27 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 /**
- * @author Windows
+ * @author VienThieu
  */
 public class CheckForVersionPanel extends javax.swing.JPanel {
 
     public CheckForVersionPanel() {
         initComponents();
-        lblInfo4.setText("<html>Liên hệ: <a href='' style='color:#3291FF;'>support@daotienhms.vn</a> | 1900-XXXX</html>");
+        lblInfo4.setText("<html>Liên hệ: <a href='' style='color:#3291FF;'>vienthieu692005@gmail.com</a> | 1900-XXXX</html>");
 
-
+        lblInfo4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    Desktop.getDesktop().mail(new URI("mailto:vienthieu692005@gmail.com"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
         lblInfo4.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         lblInfo4.addMouseListener(new MouseAdapter() {
@@ -55,6 +65,26 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
 //        g2.drawImage(original, 0, 0, width, height, null);
 //        g2.dispose();
 //        lblLogoPage.setIcon(new ImageIcon(resized));
+
+        ImageIcon icon = new ImageIcon("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png");
+        BufferedImage original = null;
+        try {
+            original = ImageIO.read(new File("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        int width = 64;
+        int height = 64;
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = resized.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.drawImage(original, 0, 0, width, height, null);
+        g2.dispose();
+        lblLogoPage.setIcon(new ImageIcon(resized));
     }
 
     /**
@@ -82,32 +112,26 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         lblLogoPage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo64.png"))); // NOI18N
 
         lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lblTitle.setForeground(new java.awt.Color(0, 0, 0));
         lblTitle.setText("Hệ thống quản lí khách sạn Đào Tiên");
 
         lblTitleHMS.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblTitleHMS.setForeground(new java.awt.Color(0, 0, 0));
         lblTitleHMS.setText("Hệ thống quản lí khách sạn đào tiên( Đào Tiên HMS)");
 
-        lblInfo1.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo1.setText("Phiên bản: 2025.1.0.0 (Build DT-2025.1.0.0-4567, ra mắt 15/06/2025).");
 
-        lblInfo2.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo2.setText("Yêu cầu: Java 21+, RAM 4GB+, MySQL/PostgreSQL.");
 
-        lblInfo3.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo3.setText("Tính năng chính: dashboard KPI (occupancy, RevPAR), khuyến mãi QR, tích hợp Momo. Changelog mới: ");
 
-        lblInfo4.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo4.setText("Liên hệ: support@daotienhms.vn | 1900-XXXX");
 
         lblInfo5.setBackground(new java.awt.Color(255, 255, 255));
-        lblInfo5.setForeground(new java.awt.Color(0, 0, 0));
         lblInfo5.setText("Powered by open-source. © 2020-2025 Đào Tiên Software.");
 
         btnCheckForUpdate.setBackground(new java.awt.Color(50, 145, 255));
         btnCheckForUpdate.setForeground(new java.awt.Color(255, 255, 255));
         btnCheckForUpdate.setText("Kiểm tra cập nhật");
+        btnCheckForUpdate.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnCheckForUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCheckForUpdateActionPerformed(evt);
@@ -117,6 +141,7 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         btnClose.setBackground(new java.awt.Color(150, 150, 150));
         btnClose.setForeground(new java.awt.Color(255, 255, 255));
         btnClose.setText("Đóng");
+        btnClose.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
