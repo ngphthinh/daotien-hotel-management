@@ -31,7 +31,7 @@
               <Component id="pnlFooter" max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="revenueChart1" min="-2" pref="376" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
               <Component id="lineChartPanel1" min="-2" pref="707" max="-2" attributes="0"/>
@@ -45,12 +45,12 @@
               <Component id="headerDashboard1" min="-2" pref="75" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlListCard1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lineChartPanel1" pref="0" max="32767" attributes="0"/>
-                  <Component id="revenueChart1" pref="334" max="32767" attributes="0"/>
+                  <Component id="revenueChart1" pref="346" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
               <Component id="pnlFooter" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>

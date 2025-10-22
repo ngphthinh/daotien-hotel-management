@@ -34,7 +34,7 @@ public class MainLayout extends JPanel {
     public MainLayout() {
         init();
         setOpaque(false);
-        isAdmin = false;
+        isAdmin = true;
         setAuth(isAdmin);
     }
 
@@ -95,6 +95,8 @@ public class MainLayout extends JPanel {
                         setMainContent(orderManagement);
                     } else if (index ==9 && subIndex == 1) {
                         setMainContent(revenueStatistics);
+                    } else if (index == 9 && subIndex ==2) {
+                        setMainContent(new BookingTrend());
                     } else if (index == 10 && subIndex == 3) {
                         var modal = new CheckForVersionPanel();
                         GlassPanePopup.showPopup(modal);

@@ -5,9 +5,11 @@ import java.lang.reflect.Field;
 import javax.swing.*;
 
 import com.raven.chart.Chart;
+import iuh.fit.se.group1.ui.swing.Background;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.chart.bar.HorizontalBarChart;
+import raven.chart.line.LineChart;
 import raven.chart.pie.PieChart;
 
 public class ChartUtils {
@@ -83,6 +85,35 @@ public class ChartUtils {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void setLineChart(LineChart chart, Color backgroundColor){
+        try {
+            String[] fieldNames = {"panelHeader", "panelRender", "panelFooter"};
+
+            for (String name : fieldNames) {
+                Field field = LineChart.class.getDeclaredField(name);
+                field.setAccessible(true);
+                JPanel panel = (JPanel) field.get(chart);
+                if (panel != null) {
+                    panel.setBackground(backgroundColor);
+                    panel.setOpaque(true);
+                }
+            }
+
+            // Thêm phần này để full nền trắng
+            chart.setBackground(backgroundColor);
+            chart.setOpaque(true);
+
+//            Field fieldLayered = HorizontalBarChart.class.getDeclaredField("layeredPane");
+//            fieldLayered.setAccessible(true);
+//            JLayeredPane layered = (JLayeredPane) fieldLayered.get(chart);
+//            layered.setBackground(backgroundColor);
+//            layered.setOpaque(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

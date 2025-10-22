@@ -6,9 +6,7 @@ import java.awt.*;
 public class TextField extends JTextField {
 
     private int borderRadius = 15;
-
     private Color borderColor = Color.BLACK;
-
 
     public TextField() {
         init();
@@ -20,9 +18,9 @@ public class TextField extends JTextField {
     }
 
     private void init() {
-        setOpaque(false); // để tự vẽ nền
-        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // padding bên trong
-        setBackground(Color.WHITE); // đảm bảo nền trắng
+        setOpaque(false); // tự vẽ nền
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // padding
+        setBackground(Color.WHITE);
     }
 
     @Override
@@ -30,17 +28,22 @@ public class TextField extends JTextField {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // 🌕 Nền trắng bo góc
+        // Vẽ nền bo góc
         g2.setColor(getBackground());
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius);
 
-        // Vẽ text và caret (phải sau khi vẽ nền)
-        super.paintComponent(g);
+        // Vẽ text
+        super.paintComponent(g2);
 
-        // ⚫ Viền đen bo góc (vẽ SAU CÙNG để không bị đè)
+        g2.dispose();
+    }
+
+    @Override
+    protected void paintBorder(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(borderColor);
         g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, borderRadius, borderRadius);
-
         g2.dispose();
     }
 
@@ -48,7 +51,7 @@ public class TextField extends JTextField {
         this.borderColor = color;
         repaint();
     }
-    
+
     public void setBorderRadius(int borderRadius) {
         this.borderRadius = borderRadius;
         repaint();

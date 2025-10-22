@@ -64,15 +64,4 @@ public class NumberSpinner extends JPanel {
         return value;
     }
 
-    // test nhanh
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame f = new JFrame("Spinner Demo");
-            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            f.add(new NumberSpinner());
-            f.pack();
-            f.setLocationRelativeTo(null);
-            f.setVisible(true);
-        });
-    }
 }

@@ -38,7 +38,7 @@ public class Main {
         java.awt.EventQueue.invokeLater(() -> {
             Login login = new Login();
             login.setVisible(true);
-            login.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//            login.setExtendedState(JFrame.MAXIMIZED_BOTH);
         });
     }
 }

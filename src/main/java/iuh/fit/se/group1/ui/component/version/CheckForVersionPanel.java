@@ -34,27 +34,27 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
             }
         });
 
-        ImageIcon icon = new ImageIcon("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png");
-        // Đọc ảnh gốc
-        BufferedImage original = null;
-        try {
-            original = ImageIO.read(new File("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        ImageIcon icon = new ImageIcon("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png");
+//        // Đọc ảnh gốc
+//        BufferedImage original = null;
+//        try {
+//            original = ImageIO.read(new File("src/main/resources/images/z7133187287314_6019d3504836aa41c92dddc9551ee796-removebg-preview.png"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
-        // Resize với chất lượng cao
-        int width = 64;
-        int height = 64;
-        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2 = resized.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.drawImage(original, 0, 0, width, height, null);
-        g2.dispose();
-        lblLogoPage.setIcon(new ImageIcon(resized));
+//        // Resize với chất lượng cao
+//        int width = 64;
+//        int height = 64;
+//        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//
+//        Graphics2D g2 = resized.createGraphics();
+//        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+//        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//        g2.drawImage(original, 0, 0, width, height, null);
+//        g2.dispose();
+//        lblLogoPage.setIcon(new ImageIcon(resized));
     }
 
     /**
