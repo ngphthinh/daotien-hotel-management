@@ -43,9 +43,9 @@ public class PromotionManagement extends javax.swing.JPanel {
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
 
-        headerCustom1.getjLabel1().setText(
+        headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
-        headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
+        headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
         String cols[] = {"Mã khuyến mãi", "Tên khuyến mãi", "Giá khuyến mãi", "Ngày tạo", "Ngày hết hạn", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblPromotion.getTbl().setModel(model);

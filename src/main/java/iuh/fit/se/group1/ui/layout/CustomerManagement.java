@@ -51,9 +51,9 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnAddCustomer.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
-        headerCustom1.getjLabel1().setText(
+        headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khách hàng</span>");
-        headerCustom1.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
+        headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
         String cols[] = {"Mã khách hàng", "Họ tên", "Giới tính", "Email", "CCCD", "Số điện thoại", "Chức năng"};
 

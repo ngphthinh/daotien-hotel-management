@@ -96,7 +96,8 @@ public class MainLayout extends JPanel {
                         setMainContent(revenueStatistics);
                     } else if (index == 9 && subIndex ==2) {
                         setMainContent(new BookingTrend());
-
+                    } else if (index == 9 && subIndex ==3) {
+                        setMainContent(new StatisticsDetail());
                     } else if (index == 10 && subIndex == 2) {
                         try {
                             File htmlFile = new File(getClass().getResource("/static/regulations.html").getFile());

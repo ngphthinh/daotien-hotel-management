@@ -23,6 +23,8 @@ public class SideBar extends javax.swing.JPanel {
         footer1.setBorder(new MatteBorder(new Insets(1, 0, 0, 0), Color.BLACK));
 
     }
+
+
     public JButton getBtnSignOut(){
         return footer1.getBtnSignOut();
     }

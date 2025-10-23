@@ -26,13 +26,24 @@ public class HeaderCustom extends javax.swing.JPanel {
     
 
     public String getSearchText() {
-        return seachBar1.getTextSearch();
+        return seachBar.getTextSearch();
     }
 
-    public JLabel getjLabel1() {
-        return jLabel1;
+    public JLabel getLblTitle() {
+        return lblTitle;
     }
 
+    public void setLblTitle(JLabel lblTitle) {
+        this.lblTitle = lblTitle;
+    }
+
+    public SeachBar getSeachBar() {
+        return seachBar;
+    }
+
+    public void setSeachBar(SeachBar seachBar) {
+        this.seachBar = seachBar;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -43,14 +54,14 @@ public class HeaderCustom extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        seachBar1 = new iuh.fit.se.group1.ui.component.SeachBar();
-        jLabel1 = new javax.swing.JLabel();
+        seachBar = new iuh.fit.se.group1.ui.component.SeachBar();
+        lblTitle = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(108, 165, 200));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Quản lý dịch vụ");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitle.setText("Quản lý dịch vụ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -58,27 +69,27 @@ public class HeaderCustom extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(34, 34, 34)
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
+                .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(seachBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 468, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(seachBar, javax.swing.GroupLayout.PREFERRED_SIZE, 468, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(73, 73, 73))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(15, Short.MAX_VALUE)
-                .addComponent(seachBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(seachBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(14, 14, 14))
-            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     public void handleSearch(DocumentListener listener) {
-        seachBar1.handleSearch(listener);
+        seachBar.handleSearch(listener);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private iuh.fit.se.group1.ui.component.SeachBar seachBar1;
+    private javax.swing.JLabel lblTitle;
+    private iuh.fit.se.group1.ui.component.SeachBar seachBar;
     // End of variables declaration//GEN-END:variables
 }

@@ -34,7 +34,7 @@ public class Menu extends JComponent {
             {"Quản lý khuyến mãi"},
             {"Quản lý phòng"},
             {"Quản lý hóa đơn"},
-            {"Quản lý thống kê", "Thống kê doanh thu", "Tỷ lê lấp đầy phòng", "Thống kê theo xu hướng"},
+            {"Quản lý thống kê", "Thống kê doanh thu",  "Thống kê theo xu hướng","Thống kê chi tiết",},
             {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản","Về chúng tôi"}
     };
 

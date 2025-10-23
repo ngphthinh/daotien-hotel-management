@@ -41,9 +41,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
     public EmployeeManagement() {
         initComponents();
-        headerCustom2.getjLabel1().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
+        headerCustom2.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
-        headerCustom2.getjLabel1().setText(
+        headerCustom2.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý nhân viên</span>"
                 + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>"
         );
@@ -385,12 +385,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             }
             
         });
-         addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent e) {
-                tblEmployee.getTbl().clearSelection();
-            }
-        });
+        
     }
 
     @SuppressWarnings("unchecked")
