@@ -97,9 +97,6 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="18" style="1"/>
         </Property>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="0" green="0" red="0" type="rgb"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="H&#x1ec7; th&#x1ed1;ng qu&#x1ea3;n l&#xed; kh&#xe1;ch s&#x1ea1;n &#x110;&#xe0;o Ti&#xea;n"/>
       </Properties>
     </Component>
@@ -108,41 +105,26 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="24" style="1"/>
         </Property>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="0" green="0" red="0" type="rgb"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="H&#x1ec7; th&#x1ed1;ng qu&#x1ea3;n l&#xed; kh&#xe1;ch s&#x1ea1;n &#x111;&#xe0;o ti&#xea;n( &#x110;&#xe0;o Ti&#xea;n HMS)"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblInfo1">
       <Properties>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="0" green="0" red="0" type="rgb"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="Phi&#xea;n b&#x1ea3;n: 2025.1.0.0 (Build DT-2025.1.0.0-4567, ra m&#x1eaf;t 15/06/2025)."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblInfo2">
       <Properties>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="0" green="0" red="0" type="rgb"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="Y&#xea;u c&#x1ea7;u: Java 21+, RAM 4GB+, MySQL/PostgreSQL."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblInfo3">
       <Properties>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="0" green="0" red="0" type="rgb"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="T&#xed;nh n&#x103;ng ch&#xed;nh: dashboard KPI (occupancy, RevPAR), khuy&#x1ebf;n m&#xe3;i QR, t&#xed;ch h&#x1ee3;p Momo. Changelog m&#x1edb;i: "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblInfo4">
       <Properties>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="0" green="0" red="0" type="rgb"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="Li&#xea;n h&#x1ec7;: support@daotienhms.vn | 1900-XXXX"/>
       </Properties>
     </Component>
@@ -150,9 +132,6 @@
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
-        </Property>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="0" green="0" red="0" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Powered by open-source. &#xa9; 2020-2025 &#x110;&#xe0;o Ti&#xea;n Software."/>
       </Properties>
@@ -166,6 +145,9 @@
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Ki&#x1ec3;m tra c&#x1ead;p nh&#x1ead;t"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="1"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCheckForUpdateActionPerformed"/>
@@ -180,6 +162,9 @@
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="&#x110;&#xf3;ng"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="1"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCloseActionPerformed"/>
