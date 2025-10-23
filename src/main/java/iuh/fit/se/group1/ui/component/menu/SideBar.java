@@ -29,6 +29,10 @@ public class SideBar extends javax.swing.JPanel {
     public Footer getFooter1() {
         return footer1;
     }
+    
+    public JLabel getLblAvt(){
+       return footer1.geLblAvt();
+    }
 
     public Logo getLogo1() {
         return logo1;
