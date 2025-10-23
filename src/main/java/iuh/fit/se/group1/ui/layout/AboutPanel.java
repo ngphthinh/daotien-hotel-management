@@ -1,26 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package iuh.fit.se.group1.ui.layout;
 
-import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author Windows
- */
-public class Regulations extends JPanel{
-    public Regulations() {
+public class AboutPanel extends JPanel {
+
+    public AboutPanel() {
         setLayout(new BorderLayout());
 
         try {
-            File htmlFile = new File("src/main/resources/static/regulations.html");
+            File htmlFile = new File("src/main/resources/static/about.html");
 
             if (htmlFile.exists()) {
                 Desktop.getDesktop().browse(htmlFile.toURI());
@@ -36,5 +29,4 @@ public class Regulations extends JPanel{
                 "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
 }

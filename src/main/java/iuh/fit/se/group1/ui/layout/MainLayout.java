@@ -8,6 +8,8 @@ import raven.glasspanepopup.GlassPanePopup;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -68,6 +70,8 @@ public class MainLayout extends JPanel {
         pnlMain.add(pnlContent, BorderLayout.CENTER);
         add(pnlMain, BorderLayout.CENTER);
 
+        
+        
         sideBar.getMenu1().setMenuEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
@@ -99,22 +103,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 9 && subIndex ==3) {
                         setMainContent(new StatisticsDetail());
                     } else if (index == 10 && subIndex == 2) {
-                        try {
-                            File htmlFile = new File(getClass().getResource("/static/regulations.html").getFile());
-
-                            if (htmlFile.exists()) {
-                                Desktop.getDesktop().browse(htmlFile.toURI());
-                            } else {
-                                JOptionPane.showMessageDialog(null,
-                                        "Không tìm thấy file: " + htmlFile.getAbsolutePath(),
-                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
-                            }
-
-                        } catch (IOException e) {
-                            JOptionPane.showMessageDialog(null,
-                                    "Không thể mở trang giới thiệu trong trình duyệt!",
-                                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        }
+                        setMainContent(new Regulation());
                     } else if (index == 10 && subIndex == 3) {
                         var modal = new CheckForVersionPanel();
                         GlassPanePopup.showPopup(modal);
@@ -156,6 +145,32 @@ public class MainLayout extends JPanel {
                 }
             }
         });
+        
+          
+        sideBar.getLblAvt().addMouseListener(new MouseListener(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            
+                setMainContent(new Profile());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+             }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+               }
+        });
+        
     }
 
     private void setMainContent(JPanel panel) {

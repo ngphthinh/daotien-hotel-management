@@ -18,8 +18,11 @@ public class Footer extends javax.swing.JPanel {
         initComponents();
                
     }
+    
+    public JLabel geLblAvt(){
+    return profileButton.getLblAvartar();}
     public JButton getBtnSignOut(){
-        return profileButton1.getBtnSignOut();
+        return profileButton.getBtnSignOut();
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -30,7 +33,7 @@ public class Footer extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        profileButton1 = new iuh.fit.se.group1.ui.component.menu.ProfileButton();
+        profileButton = new iuh.fit.se.group1.ui.component.menu.ProfileButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(267, 137));
@@ -40,19 +43,19 @@ public class Footer extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(profileButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(profileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(profileButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(profileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.menu.ProfileButton profileButton1;
+    private iuh.fit.se.group1.ui.component.menu.ProfileButton profileButton;
     // End of variables declaration//GEN-END:variables
 }
