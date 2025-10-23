@@ -5,6 +5,7 @@
 package iuh.fit.se.group1.ui.component.menu;
 
 import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.CircleLabel;
 import iuh.fit.se.group1.util.Constants;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -39,6 +40,10 @@ public class ProfileButton extends javax.swing.JPanel {
 
     public void setBtnSignOut(Button btnSignOut) {
         this.btnSignOut = btnSignOut;
+    }
+
+    public CircleLabel getLblAvartar() {
+        return lblAvartar;
     }
     
     /**

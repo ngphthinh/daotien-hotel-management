@@ -16,12 +16,29 @@ import javax.swing.JLabel;
  */
 public class HeaderShift extends javax.swing.JPanel {
 
+    
+    public JLabel getLblSubTitle() {
+        return lblSubTitle;
+        
+    }
+
+    public void setLblSubTitle(JLabel lblSubTitle) {
+        this.lblSubTitle = lblSubTitle;
+    }
+
+    public JLabel getLblTile() {
+        return lblTile;
+    }
+
     /**
      * Creates new form HeaderShift
      */
+    public void setLblTile(JLabel lblTile) {    
+        this.lblTile = lblTile;
+    }
+
     public HeaderShift() {
         initComponents();
-        
     }
     /**
      * This method is called from within the constructor to initialize the form.
