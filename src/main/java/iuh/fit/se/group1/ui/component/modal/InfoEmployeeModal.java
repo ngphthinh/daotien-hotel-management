@@ -89,6 +89,9 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
     public void setTxtPhone(TextField txtPhone) {
         this.txtPhone = txtPhone;
     }
+    public JLabel getLblTitle() {
+        return lblTitle;
+    }
     /**
      * Creates new form InfoEmployeeModal
      */

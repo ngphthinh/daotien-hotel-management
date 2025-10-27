@@ -36,7 +36,11 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             preparedStatement.setDate(4, Date.valueOf(entity.getHireDate()));
             preparedStatement.setString(5, entity.getCitizenId());
             preparedStatement.setBoolean(6, entity.isGender());
-            preparedStatement.setLong(7, entity.getAccount().getAccountId());
+            if (entity.getAccount() != null && entity.getAccount().getAccountId() != null) {
+                preparedStatement.setLong(7, entity.getAccount().getAccountId());
+            } else {
+                preparedStatement.setNull(7, java.sql.Types.BIGINT);
+            }
             entity.setCreatedAt(LocalDate.now());
             preparedStatement.setDate(8, Date.valueOf(entity.getCreatedAt()));
 
@@ -51,7 +55,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     ;
                 }
             }
-
             return entity;
         } catch (SQLException e) {
             log.error("Error saving Employee: ", e);
