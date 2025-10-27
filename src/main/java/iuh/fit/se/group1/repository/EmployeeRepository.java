@@ -149,5 +149,32 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             throw new RuntimeException(e);
         }
     }
+    public List<Employee> findByEmployeeNameOrId(String keyword) {
+        List<Employee> employees = new ArrayList<>();
+        String sql = "SELECT * FROM Employee WHERE fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR employeeId LIKE ? Order BY employeeId ASC, fullName ASC";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            String likeKeyword = "%" + keyword + "%";
+            preparedStatement.setString(1, likeKeyword);
+            preparedStatement.setString(2, likeKeyword);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Employee employee = new Employee();
+                    employee.setEmployeeId(resultSet.getLong("employeeId"));
+                    employee.setFullName(resultSet.getString("fullName"));
+                    employee.setPhone(resultSet.getString("phone"));
+                    employee.setEmail(resultSet.getString("email"));
+                    employee.setHireDate(resultSet.getDate("hireDate").toLocalDate());
+                    employee.setCitizenId(resultSet.getString("citizenId"));
+                    employee.setGender(resultSet.getBoolean("gender"));
+                    employee.getAccount().setAccountId(resultSet.getLong("accountId"));
+                    employee.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    employees.add(employee);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return employees;
+    }
 
 }

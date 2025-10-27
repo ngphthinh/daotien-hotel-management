@@ -148,4 +148,32 @@ public class CustomerRepository implements Repository<Customer, Long> {
         }
     }
 
+    public List<Customer> findByCustomerNameOrId(String keyword) {
+        List<Customer> customers = new ArrayList<>();
+        String sql = "SELECT * FROM Employee WHERE fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR customerId LIKE ? Order BY customerId ASC, fullName ASC";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            String likeKeyword = "%" + keyword + "%";
+            preparedStatement.setString(1, likeKeyword);
+            preparedStatement.setString(2, likeKeyword);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(resultSet.getLong("customerId"));
+                    customer.setFullName(resultSet.getString("fullName"));
+                    customer.setPhone(resultSet.getString("phone"));
+                    customer.setEmail(resultSet.getString("email"));
+                    customer.setCitizenId(resultSet.getString("citizenId"));
+                    customer.setGender(resultSet.getBoolean("gender"));
+                    customer.setAddress(resultSet.getString("address"));
+                    customer.setDateOfBirth(resultSet.getDate("dateOfBirth").toLocalDate());
+                    customer.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    customers.add(customer);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return customers;
+    }
+
 }
