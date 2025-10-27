@@ -55,7 +55,7 @@ public class AmenityRepository implements Repository<Amenity, Long> {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, entity.getNameAmenity());
             preparedStatement.setBigDecimal(2, entity.getPrice());
-            preparedStatement.setLong(3, entity.getAmenityId());
+
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
