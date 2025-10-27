@@ -55,7 +55,7 @@ public class AmenityRepository implements Repository<Amenity, Long> {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, entity.getNameAmenity());
             preparedStatement.setBigDecimal(2, entity.getPrice());
-
+            preparedStatement.setLong(3, entity.getAmenityId());
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -117,29 +117,6 @@ public class AmenityRepository implements Repository<Amenity, Long> {
                 }
             }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return amenities;
-    }
-
-    public List<Amenity> findByAmenityNameOrId(String keyword) {
-        List<Amenity> amenities = new ArrayList<>();
-        String sql = "SELECT * FROM Amenity WHERE nameAmenity COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR amenityId LIKE ? Order BY amenityId ASC, nameAmenity ASC";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            String likeKeyword = "%" + keyword + "%";
-            preparedStatement.setString(1, likeKeyword);
-            preparedStatement.setString(2, likeKeyword);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Amenity amenity = new Amenity();
-                    amenity.setAmenityId(resultSet.getLong("amenityId"));
-                    amenity.setNameAmenity(resultSet.getString("nameAmenity"));
-                    amenity.setPrice(resultSet.getBigDecimal("price"));
-                    amenity.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
-                    amenities.add(amenity);
-                }
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
