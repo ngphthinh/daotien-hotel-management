@@ -26,13 +26,14 @@ public class RoomRepository implements Repository<Room, Long> {
     }
 
     @Override
-    public Room save(Room room) {
+public Room save(Room room) {
     String sql = "INSERT INTO Room (roomNumber, roomTypeId, createdAt, roomStatus, price) VALUES (?, ?, ?, ?, ?)";
     try (Connection conn = DatabaseUtil.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        ps.setString(1, room.getRoomNumber());
+        conn.setAutoCommit(true);
 
+        ps.setString(1, room.getRoomNumber());
 
         if (room.getRoomType() != null && room.getRoomType().getRoomTypeId() != null) {
             ps.setString(2, room.getRoomType().getRoomTypeId());
@@ -40,15 +41,11 @@ public class RoomRepository implements Repository<Room, Long> {
             throw new SQLException("RoomTypeId cannot be null!");
         }
 
-
         if (room.getCreateAt() == null) {
             room.setCreatedAt(LocalDate.now());
         }
         ps.setDate(3, Date.valueOf(room.getCreateAt()));
-
-
         ps.setString(4, room.getRoomStatus().name());
-
         ps.setBigDecimal(5, room.getPrice());
 
         int affectedRows = ps.executeUpdate();
@@ -62,6 +59,7 @@ public class RoomRepository implements Repository<Room, Long> {
             }
         }
 
+        System.out.println(" Room saved: " + room.getRoomNumber());
         return room;
     } catch (SQLException e) {
         e.printStackTrace();
@@ -190,39 +188,42 @@ public Room update(Room entity) {
         }
     }
 
-    public List<Room> findByRoomNumberOrId(String keyword) {
-        List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT * FROM Room WHERE roomNumber COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR CAST(roomId AS NVARCHAR) LIKE ? ORDER BY roomId ASC, roomNumber ASC";
+public List<Room> findByRoomNumberOrId(String keyword) {
+    List<Room> rooms = new ArrayList<>();
+    String sql = "SELECT * FROM Room WHERE roomNumber LIKE ? OR CAST(roomId AS NVARCHAR(50)) LIKE ? ORDER BY roomId ASC, roomNumber ASC";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            String likeKeyword = "%" + keyword + "%";
-            preparedStatement.setString(1, likeKeyword);
-            preparedStatement.setString(2, likeKeyword);
+    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String likeKeyword = "%" + keyword + "%";
+        preparedStatement.setString(1, likeKeyword);
+        preparedStatement.setString(2, likeKeyword);
 
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Room room = new Room();
-                    room.setRoomId(resultSet.getLong("roomId"));
-                    room.setRoomNumber(resultSet.getString("roomNumber"));
-                    
-                    // Load full RoomType
-                    String typeId = resultSet.getString("roomTypeId");
-                    if (typeId != null) {
-                        room.setRoomType(roomTypeRepository.findById(typeId));
-                    }
-                    
-                    setRoomStatusFromString(room, resultSet.getString("roomStatus"));  // Safe enum
-                    room.setCreateAt(resultSet.getDate("createdAt") != null ? resultSet.getDate("createdAt").toLocalDate() : null);  // Fix: CreateAt
-                    room.setPrice(resultSet.getBigDecimal("price"));  // Thêm price
-                    rooms.add(room);
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                Room room = new Room();
+                room.setRoomId(resultSet.getLong("roomId"));
+                room.setRoomNumber(resultSet.getString("roomNumber"));
+
+                // Load full RoomType
+                String typeId = resultSet.getString("roomTypeId");
+                if (typeId != null) {
+                    room.setRoomType(roomTypeRepository.findById(typeId));
                 }
-            }
-            log.info("Found {} rooms by keyword '{}'", rooms.size(), keyword);  // Debug log
 
-        } catch (SQLException e) {
-            log.error("Error finding rooms by keyword: ", e);
-            throw new RuntimeException("Error finding rooms by name or ID", e);
+                setRoomStatusFromString(room, resultSet.getString("roomStatus"));
+                room.setCreateAt(resultSet.getDate("createdAt") != null
+                        ? resultSet.getDate("createdAt").toLocalDate()
+                        : null);
+                room.setPrice(resultSet.getBigDecimal("price"));
+                rooms.add(room);
+            }
         }
-        return rooms;
+        log.info("Found {} rooms by keyword '{}'", rooms.size(), keyword);
+
+    } catch (SQLException e) {
+        e.printStackTrace(); // 👉 In lỗi thật ra console
+        log.error("Error finding rooms by keyword: ", e);
+        throw new RuntimeException("Error finding rooms by name or ID", e);
     }
+    return rooms;
+}
 }
