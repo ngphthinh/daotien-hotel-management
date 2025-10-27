@@ -4,6 +4,8 @@
  */
 package iuh.fit.se.group1.ui.component.modal;
 
+import iuh.fit.se.group1.ui.swing.TextField;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -122,7 +124,15 @@ public class VerifyIdentityModal extends javax.swing.JPanel {
         g2.dispose();
     }
 
-    
+
+    public TextField getTxtCitizenID() {
+        return txtCitizenID;
+    }
+
+    public void setTxtCitizenID(TextField txtCitizenID) {
+        this.txtCitizenID = txtCitizenID;
+    }
+
     public void sendRestCode (ActionListener e){
         btnContinue.addActionListener(e);
     }

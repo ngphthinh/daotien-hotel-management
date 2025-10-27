@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import iuh.fit.se.group1.entity.Account;
+import iuh.fit.se.group1.entity.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
     public Employee save(Employee entity) {
         String sql = "INSERT INTO Employee (fullName, phone,email,hireDate,citizenId,gender,accountId,createdAt) VALUES (?, ?, ?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
             preparedStatement.setString(1, entity.getFullName());
             preparedStatement.setString(2, entity.getPhone());
             preparedStatement.setString(3, entity.getEmail());
@@ -149,6 +150,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             throw new RuntimeException(e);
         }
     }
+
     public List<Employee> findByEmployeeNameOrId(String keyword) {
         List<Employee> employees = new ArrayList<>();
         String sql = "SELECT * FROM Employee WHERE fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR employeeId LIKE ? Order BY employeeId ASC, fullName ASC";
@@ -175,6 +177,56 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             throw new RuntimeException(e);
         }
         return employees;
+    }
+
+    public Employee findByCitizenId(String citizenId) {
+        String sql = """
+        SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
+               e.accountId, a.username, a.password,
+               r.roleId, r.roleName
+        FROM Employee e
+        JOIN Account a ON e.accountId = a.accountId
+        JOIN Role r ON a.roleId = r.roleId
+        WHERE e.citizenId = ?
+        """;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, citizenId);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    // Employee
+                    Employee employee = new Employee();
+                    employee.setEmployeeId(rs.getLong("employeeId"));
+                    employee.setFullName(rs.getString("fullName"));
+                    employee.setPhone(rs.getString("phone"));
+                    employee.setEmail(rs.getString("email"));
+                    employee.setHireDate(rs.getDate("hireDate").toLocalDate());
+                    employee.setCitizenId(rs.getString("citizenId"));
+                    employee.setGender(rs.getBoolean("gender"));
+
+                    // Account
+                    Account account = new Account();
+                    account.setAccountId(rs.getLong("accountId"));
+                    account.setUsername(rs.getString("username"));
+                    account.setPassword(rs.getString("password"));
+
+                    // Role
+                    Role role = new Role();
+                    role.setRoleId(rs.getString("roleId"));
+                    role.setRoleName(rs.getString("roleName"));
+                    account.setRole(role);
+
+                    // Liên kết
+                    employee.setAccount(account);
+
+                    return employee;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi truy vấn Employee theo citizenId", e);
+        }
+        return null;
     }
 
 }

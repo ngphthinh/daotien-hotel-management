@@ -1,19 +1,63 @@
 package iuh.fit.se.group1.service;
 
+import java.text.Normalizer;
 import java.util.List;
 
+import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.entity.Role;
 import iuh.fit.se.group1.repository.EmployeeRepository;
+import iuh.fit.se.group1.util.PropertiesReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EmployeeService {
-     private final EmployeeRepository employeeRepository;
+    private static final Logger log = LoggerFactory.getLogger(EmployeeService.class);
+    private final EmployeeRepository employeeRepository;
+    private final AccountService accountService;
 
-     public EmployeeService() {
+
+    public EmployeeService() {
+        this.accountService = new AccountService();
         this.employeeRepository = new EmployeeRepository();
     }
 
-    public Employee createEmployee(Employee employee) {
-        return employeeRepository.save(employee);
+    public Employee createEmployee(Employee employee, String roleId) {
+
+        Account account = new Account();
+        account.setUsername("username");
+        account.setPassword(PropertiesReader.getInstance().get("daotien.password"));
+        account.setRole(new Role(roleId));
+        Account accountSave = accountService.createAccount(account);
+        // Tao nhan vien
+        employee.setAccount(accountSave);
+        Employee employeeSave = employeeRepository.save(employee);
+
+        // Tạo account khi thêm nhân viên
+        String username = generateUsername(employeeSave);
+
+        // update employee với account vừa tạo
+        accountSave.setUsername(username);
+        accountSave = accountService.updateAccount(accountSave);
+
+        employeeSave.setAccount(accountSave);
+        return employeeRepository.update(employeeSave);
+    }
+
+    public Employee getEmployeeByCitizenId(String citizenId) {
+        return employeeRepository.findByCitizenId(citizenId);
+    }
+
+    private String generateUsername(Employee entitySave) {
+        String fullName = entitySave.getFullName();
+
+        String normalized = Normalizer.normalize(fullName, Normalizer.Form.NFD);
+        String noAccent = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        String[] nameParts = noAccent.trim().split("\\s+");
+        String lastName = nameParts[nameParts.length - 1];
+
+        return String.format("%s%d", lastName.toLowerCase(), entitySave.getEmployeeId());
     }
 
     public void deleteEmployee(Long employeeId) {
