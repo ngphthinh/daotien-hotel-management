@@ -87,7 +87,7 @@ public class Message extends javax.swing.JPanel {
         msg.eventOK(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GlassPanePopup.closePopupLast();
+                GlassPanePopup.closePopupAll();
                 if (onOK != null) {
                     onOK.run();
                 }
