@@ -94,5 +94,15 @@ public class Room {
     public String toString() {
         return "Room{" + "roomId=" + roomId + ", roomNumber=" + roomNumber + ", roomType=" + roomType + ", createAt=" + createdAt + ", roomStatus=" + roomStatus + '}';
     }
+
+    public String getRoomTypeId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getRoomTypeId'");
+    }
+
+    public void setCreatedAt(LocalDate now) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCreatedAt'");
+    }
     
 }
