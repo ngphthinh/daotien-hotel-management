@@ -3,10 +3,8 @@ package iuh.fit.se.group1.entity;
 import iuh.fit.se.group1.enums.BookingType;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class Booking {
@@ -18,25 +16,10 @@ public class Booking {
     private BigDecimal deposit;
     private Room room;
     private BookingType bookingType;
-    private Payment payment;
     private BigDecimal totalPrice;
     private LocalDate createdAt;
 
     public Booking() {
-    }
-
-    public Booking(Long bookingId, Customer customer, LocalDateTime checkInDate, LocalDateTime checkOutDate, Employee employee, BigDecimal deposit, Room room, BookingType bookingType, Payment payment, BigDecimal totalPrice, LocalDate createdAt) {
-        this.setBookingId(bookingId);
-        this.setCustomer(customer);
-        this.setCheckInDate(checkInDate);
-        this.setCheckOutDate(checkOutDate);
-        this.setEmployee(employee);
-        this.setDeposit(deposit);
-        this.setRoom(room);
-        this.setBookingType(bookingType);
-        this.setPayment(payment);
-        this.setTotalPrice(calcTotalPrice());
-        this.setCreatedAt(createdAt);
     }
 
     public Booking(Customer customer, LocalDateTime checkInDate, LocalDateTime checkOutDate, Employee employee, BigDecimal deposit, Room room, BookingType bookingType) {
@@ -115,13 +98,7 @@ public class Booking {
         this.bookingType = bookingType;
     }
 
-    public Payment getPayment() {
-        return payment;
-    }
 
-    public void setPayment(Payment payment) {
-        this.payment = payment;
-    }
 
     public BigDecimal getTotalPrice() {
         return totalPrice;
@@ -171,7 +148,6 @@ public class Booking {
                 ", deposit=" + deposit +
                 ", room=" + room +
                 ", bookingType='" + bookingType + '\'' +
-                ", payment=" + payment +
                 ", totalPrice=" + totalPrice +
                 ", createdAt=" + createdAt +
                 '}';

@@ -14,29 +14,26 @@ public class Order {
     private Employee employee;
     private OrderType orderType;
     private Promotion promotion;
-    private Payment payment;
     private LocalDate createdAt;
 
     public Order() {
     }
 
-    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion,  Payment payment, LocalDate createdAt) {
+    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, LocalDate createdAt) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
         this.employee = employee;
         this.orderType = orderType;
         this.promotion = promotion;
-        this.payment = payment;
         this.createdAt = createdAt;
     }
 
-    public Order(BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, Payment payment) {
+    public Order(BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion) {
         this.totalAmount = totalAmount;
         this.employee = employee;
         this.orderType = orderType;
         this.promotion = promotion;
-        this.payment = payment;
     }
 
     public Long getOrderId() {
@@ -88,14 +85,6 @@ public class Order {
     }
 
 
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public void setPayment(Payment payment) {
-        this.payment = payment;
-    }
-
     public LocalDate getCreatedAt() {
         return createdAt;
     }
@@ -113,7 +102,6 @@ public class Order {
                 ", employee=" + employee +
                 ", orderType=" + orderType +
                 ", promotion=" + promotion +
-                ", payment=" + payment +
                 ", createdAt=" + createdAt +
                 '}';
     }
