@@ -13,6 +13,7 @@ public class Employee {
     private LocalDate hireDate;
     private Account account;
     private LocalDate createdAt;
+
     public Employee() {
     }
     public Employee(Long employeeId, String fullName, String phone, String email, boolean gender, String citizenId,
