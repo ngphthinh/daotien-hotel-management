@@ -667,15 +667,5 @@ protected void paintComponent(Graphics g) {
         pnlPromotions.revalidate();
         pnlPromotions.repaint();
     }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Test InfoOrder");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(700, 800); // bạn có thể chỉnh lại kích thước
-            frame.setLocationRelativeTo(null); // căn giữa màn hình
-            frame.setContentPane(new InfoPayment()); // thêm panel InfoPayment vào frame
-            frame.setVisible(true);
-        });
-    }
 
 }

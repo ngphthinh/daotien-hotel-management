@@ -59,6 +59,7 @@ public class HeaderShift extends javax.swing.JPanel {
         lblTile.setText("Quản lý nhân viên");
 
         lblSubTitle.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        lblSubTitle.setForeground(new java.awt.Color(204, 204, 204));
         lblSubTitle.setText("> Phân ca nhân viên");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

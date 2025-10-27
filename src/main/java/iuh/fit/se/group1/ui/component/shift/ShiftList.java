@@ -16,6 +16,9 @@ import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import org.imgscalr.Scalr;
 
 /**
  *
@@ -146,8 +149,9 @@ public List<ShiftProfile> getSelectedEmployees() {
         // Nếu ảnh nằm trong thư mục resources (ví dụ: /images/avttest.jpg)
             URL url = getClass().getResource(imagePath);
             if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                Image avatar = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+                BufferedImage original = ImageIO.read(url);
+        // Resize mượt
+                BufferedImage avatar = Scalr.resize(original, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
                 shiftProfile.getAvatarLabel().setImage(avatar); // ✅ Gán ảnh vào AvatarLabel
                 log.info("Loaded image from resources: {}", imagePath);
             } else {
