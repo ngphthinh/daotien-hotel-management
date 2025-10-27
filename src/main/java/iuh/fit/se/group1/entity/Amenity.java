@@ -22,6 +22,11 @@ public class Amenity {
 		this.createdAt = createdAt;
 	}
 
+	public Amenity(String nameAmenity, BigDecimal price) {
+		this.nameAmenity = nameAmenity;
+		this.price = price;
+	}
+
 	public Long getAmenityId() {
 		return amenityId;
 	}

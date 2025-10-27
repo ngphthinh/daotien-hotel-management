@@ -21,7 +21,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
-.metadata
+.metadata/
 
 ### NetBeans ###
 /nbproject/private/
@@ -37,6 +37,9 @@ build/
 .vscode/
 bin/
 
+
+### Secret files ###
+/src/main/resources/application-secret.properties
 
 ### Mac OS ###
 .DS_Store
