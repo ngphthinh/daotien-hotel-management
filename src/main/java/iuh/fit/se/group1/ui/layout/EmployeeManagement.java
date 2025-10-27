@@ -4,7 +4,11 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.Color;
@@ -15,24 +19,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JLabel;
-import javax.swing.RowFilter;
-import javax.swing.SwingConstants;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+
+import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
  * @author VienThieu
  */
 public class EmployeeManagement extends javax.swing.JPanel {
-
+    private static final Logger log = LoggerFactory.getLogger(EmployeeManagement.class);
+    private final EmployeeService employeeService;
     private int activeFilterColumn = -1;
 //    private Map<String, String> employeeCitizenMap = new HashMap<>();
 //    private Map<String, String> employeeEmailMap = new HashMap<>();
@@ -41,28 +52,51 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
     public EmployeeManagement() {
         initComponents();
+        custom();
+        employeeService = new EmployeeService();
+        loadTable(employeeService.getAllEmployees());
+    }
+    private void loadTable(java.util.List<Employee> employees) {
+        DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
+        model.setRowCount(0);
+        for (Employee employee : employees) {
+            String genderStr = employee.isGender() ? "Nữ" : "Nam";
+            String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
+                    ? employee.getAccount().getRole().getRoleName()
+                    : "N/A";
+            System.out.println("Loading employee: " + employee);
+            model.addRow(new Object[]{
+                    employee.getEmployeeId(),
+                    employee.getFullName(),
+                    genderStr,
+                    roleName,
+                    employee.getPhone()
+            });
+        }
+    }
+    private void custom() {
         headerCustom2.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
         headerCustom2.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý nhân viên</span>"
-                + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>"
+                        + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>"
         );
         btnAddEmployee.setBackground(new Color(108, 165, 200));
         btnAddEmployee.setForeground(Color.WHITE);
         btnAddEmployee.setBorderRadius(10);
-        
+
         btnExport.setBackground(new Color(13, 200, 7));
         btnExport.setForeground(Color.WHITE);
         btnExport.setBorderRadius(10);
-        
+
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
 
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
-        btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
-        btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
-        
+        btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+
         String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
 
@@ -78,119 +112,75 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 sorter.setSortable(i, false);
             }
         }
-
+//        DefaultTableModel model = new DefaultTableModel(cols, 0);
+//        tblPromotion.getTbl().setModel(model);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                tblEmployee.getTbl().clearSelection();
+            }
+        });
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row: " + row);
-            }
-
-            @Override
-            public void onDelete(int row) {
-                if (tblEmployee.getTbl().isEditing()) {
-                    tblEmployee.getTbl().getCellEditor().stopCellEditing();
-                }
+                // SỬA: Đổi từ tblPromotion sang tblEmployee
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-                model.removeRow(row);
-            }
-        };
-        tblEmployee.setTableActionColumn(tblEmployee.getTbl(), 5, new TableActionEvent() {
-            @Override
-            public void onEdit(int row) {
-                DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
+                // SỬA: Đổi tên biến và logic lấy dữ liệu Employee
+                Long employeeId = (Long) model.getValueAt(row, 0);
+                String fullName = (String) model.getValueAt(row, 1);
+                String gender = (String) model.getValueAt(row, 2);
+                String role = (String) model.getValueAt(row, 3);
+                String phone = (String) model.getValueAt(row, 4);
 
-                String maNV = (String) model.getValueAt(row, 0);
-                String ten = (String) model.getValueAt(row, 1);
-                String gioiTinh = (String) model.getValueAt(row, 2);
-                String chucVu = (String) model.getValueAt(row, 3);
-                String sdt = (String) model.getValueAt(row, 4);
-//                String citizen = employeeCitizenMap.getOrDefault(maNV, "");
-//                String email = employeeEmailMap.getOrDefault(maNV, "");
-//                String hireDate = employeeHireDateMap.getOrDefault(maNV, "");
-
+                // SỬA: Đổi từ InfoPromotionModal sang InfoEmployeeModal
                 InfoEmployeeModal modal = new InfoEmployeeModal();
-
-                modal.getLblCode().setText(maNV);
-                modal.getTxtName().setText(ten);
-                modal.getTxtPhone().setText(sdt);
-                modal.getCmbGender().setSelectedItem(gioiTinh);
-                modal.getCmbPosition().setSelectedItem(chucVu);
-//                modal.getTxtCitizen().setText(citizen);
-//                modal.getTxtEmail().setText(email);
-//                modal.getTxtHireDate().setText(hireDate);
-
+                modal.getLblTitle().setText("Cập nhật nhân viên");
                 modal.getBtnSave().setText("Cập nhật");
 
+                // SỬA: Set giá trị cho Employee modal
+                modal.getLblCode().setText(String.valueOf(employeeId));
+                modal.getTxtName().setText(fullName);
+                modal.getTxtPhone().setText(phone);
+                modal.getCmbGender().setSelectedItem(gender);
+                modal.getCmbPosition().setSelectedItem(role);
+
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
-
                 modal.saveData(ae -> {
-                    String tenNew = modal.getTxtName().getText().trim();
-                    String emailNew = modal.getTxtEmail().getText().trim();
-                    String citizenNew = modal.getTxtCitizen().getText().trim();
-                    String gioiTinhNew = modal.getCmbGender().getSelectedItem() != null
-                            ? modal.getCmbGender().getSelectedItem().toString()
-                            : "";
-                    String chucVuNew = modal.getCmbPosition().getSelectedItem() != null
-                            ? modal.getCmbPosition().getSelectedItem().toString()
-                            : "";
-                    String sdtNew = modal.getTxtPhone().getText().trim();
-                    String hireDateNew = modal.getTxtHireDate().getText().trim();
+                    // SỬA: Đổi message
+                    String title = "Xác nhận cập nhật nhân viên";
+                    String message = "Bạn có chắc chắn muốn cập nhật nhân viên này không?";
+                    Message.showConfirm(title, message, () -> {
+                        var result = getValid(modal);
+                        if (!result.valid) {
+                            return;
+                        }
 
-                    modal.getLblErrolName().setText("");
-                    modal.getLblErrolPhone().setText("");
-                    modal.getLblErrolEmail().setText("");
-                    modal.getLblErrolCitizen().setText("");
+                        // SỬA: Tạo Employee object thay vì Promotion
+                        Employee employee = new Employee();
+                        employee.setEmployeeId(employeeId);
+                        employee.setFullName(result.fullName);
+                        employee.setPhone(result.phone);
+                        employee.setEmail(result.email);
+                        employee.setGender(result.gender);
+                        employee.setCitizenId(result.citizenId);
+                        employee.setHireDate(result.hireDate);
 
-                    Color red = Color.RED;
-                    modal.getLblErrolName().setForeground(red);
-                    modal.getLblErrolPhone().setForeground(red);
-                    modal.getLblErrolEmail().setForeground(red);
-                    modal.getLblErrolCitizen().setForeground(red);
+                        // SỬA: Gọi employeeService
+                        Employee entitySave = employeeService.updateEmployee(employee);
 
-                    boolean isValid = true;
+                        // SỬA: Update giá trị Employee vào table
+                        String genderStr = entitySave.isGender() ? "Nữ" : "Nam";
+                        String roleName = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
+                                ? entitySave.getAccount().getRole().getRoleName()
+                                : "N/A";
 
-                    if (tenNew.isEmpty()) {
-                        modal.getLblErrolName().setText("Vui lòng nhập họ tên!");
-                        isValid = false;
-                    }
+                        model.setValueAt(entitySave.getFullName(), row, 1);
+                        model.setValueAt(genderStr, row, 2);
+                        model.setValueAt(roleName, row, 3);
+                        model.setValueAt(entitySave.getPhone(), row, 4);
 
-                    if (sdtNew.isEmpty()) {
-                        modal.getLblErrolPhone().setText("Vui lòng nhập số điện thoại!");
-                        isValid = false;
-                    } else if (!sdtNew.matches("^(0[0-9]{9})$")) {
-                        modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ (10 chữ số, bắt đầu bằng 0)!");
-                        isValid = false;
-                    }
-
-                    if (emailNew.isEmpty()) {
-                        modal.getLblErrolEmail().setText("Vui lòng nhập email!");
-                        isValid = false;
-                    } else if (!emailNew.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-                        modal.getLblErrolEmail().setText("Email không hợp lệ!");
-                        isValid = false;
-                    }
-
-                    if (citizenNew.isEmpty()) {
-                        modal.getLblErrolCitizen().setText("Vui lòng nhập số CCCD/CMND!");
-                        isValid = false;
-                    } else if (!citizenNew.matches("^[0-9]{12}$")) {
-                        modal.getLblErrolCitizen().setText("CCCD/CMND phải gồm 12 chữ số!");
-                        isValid = false;
-                    }
-
-                    if (!isValid) {
-                        return;
-                    }
-
-                    model.setValueAt(tenNew, row, 1);
-                    model.setValueAt(gioiTinhNew, row, 2);
-                    model.setValueAt(chucVuNew, row, 3);
-                    model.setValueAt(sdtNew, row, 4);
-
-//                    employeeCitizenMap.put(maNV, citizenNew);
-//                    employeeEmailMap.put(maNV, emailNew);
-//                    employeeHireDateMap.put(maNV, hireDateNew);
-                    GlassPanePopup.closePopupLast();
+                        GlassPanePopup.closePopupLast();
+                    });
                 });
 
                 GlassPanePopup.showPopup(modal);
@@ -198,55 +188,66 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             @Override
             public void onDelete(int row) {
-                if (tblEmployee.getTbl().isEditing()) {
-                    tblEmployee.getTbl().getCellEditor().stopCellEditing();
-                }
-                DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-                String maNV = (String) model.getValueAt(row, 0);
-//                employeeCitizenMap.remove(maNV);
-                model.removeRow(row);
+                // SỬA: Đổi message
+                String title = "Xác nhận xóa nhân viên";
+                String message = "Bạn có chắc chắn muốn xóa nhân viên này không?";
+                Message.showConfirm(title, message, () -> {
+                    // SỬA: Đổi từ tblPromotion sang tblEmployee
+                    JTable table = tblEmployee.getTbl();
+
+                    if (table.isEditing()) {
+                        table.getCellEditor().stopCellEditing();
+                    }
+
+                    DefaultTableModel model = (DefaultTableModel) table.getModel();
+                    int rowDelete = table.getSelectedRow();
+
+                    if (rowDelete >= 0) {
+                        Long id = (Long) model.getValueAt(rowDelete, 0);
+                        model.removeRow(rowDelete);
+                        // SỬA: Gọi employeeService
+                        employeeService.deleteEmployee(id);
+                    }
+                });
             }
 
+            // SỬA: Thêm onView cho Employee
             @Override
             public void onView(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-                String maNV = (String) model.getValueAt(row, 0);
-                String ten = (String) model.getValueAt(row, 1);
-                String gioiTinh = (String) model.getValueAt(row, 2);
-                String chucVu = (String) model.getValueAt(row, 3);
-                String sdt = (String) model.getValueAt(row, 4);
-//                String citizen = employeeCitizenMap.getOrDefault(maNV, "");
-//                String email = employeeEmailMap.getOrDefault(maNV, "");
-//                String hireDate = employeeHireDateMap.getOrDefault(maNV, "");
+                Long employeeId = (Long) model.getValueAt(row, 0);
+                String fullName = (String) model.getValueAt(row, 1);
+                String gender = (String) model.getValueAt(row, 2);
+                String role = (String) model.getValueAt(row, 3);
+                String phone = (String) model.getValueAt(row, 4);
 
                 InfoEmployeeModal modal = new InfoEmployeeModal();
+                modal.getLblTitle().setText("Thông tin nhân viên");
                 modal.getBtnSave().setText("Xong");
 
-                modal.getLblCode().setText(maNV);
-                modal.getTxtName().setText(ten);
-                modal.getTxtPhone().setText(sdt);
-                modal.getCmbGender().setSelectedItem(gioiTinh);
-                modal.getCmbPosition().setSelectedItem(chucVu);
-//                modal.getTxtCitizen().setText(citizen);
-//                modal.getTxtEmail().setText(email);
-//                modal.getTxtHireDate().setText(hireDate);
+                modal.getLblCode().setText(String.valueOf(employeeId));
+                modal.getTxtName().setText(fullName);
+                modal.getTxtPhone().setText(phone);
+                modal.getCmbGender().setSelectedItem(gender);
+                modal.getCmbPosition().setSelectedItem(role);
 
                 modal.getTxtName().setEditable(false);
                 modal.getTxtPhone().setEditable(false);
                 modal.getTxtEmail().setEditable(false);
                 modal.getTxtCitizen().setEditable(false);
+                modal.getTxtHireDate().setEditable(false);
                 modal.getCmbGender().setEnabled(false);
                 modal.getCmbPosition().setEnabled(false);
-                modal.getTxtEmail().setEditable(false);
-                modal.getTxtHireDate().setEditable(false);
 
                 modal.saveData(ae -> GlassPanePopup.closePopupLast());
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
 
                 GlassPanePopup.showPopup(modal);
             }
-        }, true);
+        };
 
+
+        tblEmployee.setTableActionColumn(tblEmployee.getTbl(), 5, event, true);
         tblEmployee.getTbl().getColumnModel().getColumn(0).setPreferredWidth(120);
         tblEmployee.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
         tblEmployee.getTbl().getColumnModel().getColumn(2).setPreferredWidth(120);
@@ -257,7 +258,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
         tblEmployee.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
+                // SỬA: Đổi từ tblPromotion sang tblEmployee
                 int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
+
+                // SỬA: Đổi cột 7 thành cột 5
                 if (col == 5) {
                     tblEmployee.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
@@ -267,26 +271,37 @@ public class EmployeeManagement extends javax.swing.JPanel {
         });
         headerCustom2.handleSearch(new DocumentListener() {
             @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+            public void insertUpdate(DocumentEvent e) {
+                // SỬA: Đổi từ headerCustom1 sang headerCustom2
                 String text = headerCustom2.getSearchText();
-                System.out.println("Search text in amenity search: " + text);
+                if (text.isEmpty()) {
+                    // SỬA: Gọi employeeService
+                    loadTable(employeeService.getAllEmployees());
+                    return;
+                }
+                loadTable(employeeService.getEmployeeByKeyword(text));
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-
+                // SỬA: Đổi từ headerCustom1 sang headerCustom2
+                String text = headerCustom2.getSearchText();
+                if (text.isEmpty()) {
+                    // SỬA: Gọi employeeService
+                    loadTable(employeeService.getAllEmployees());
+                    return;
+                }
+                loadTable(employeeService.getEmployeeByKeyword(text));
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-
             }
-
         });
 
         var header = tblEmployee.getTbl().getTableHeader();
         Combobox<String> cmb = new Combobox<>(new String[]{"Tất cả", "Nam", "Nữ"});
-        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Tất cả", "Nhân viên", "Quản lí"});
+        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Tất cả", "Nhân viên lễ tân", "Nhân viên quản lý"});
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
@@ -366,9 +381,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
 //                Rectangle rect2 = header.getHeaderRect(2);
 //                Rectangle rect3 = header.getHeaderRect(3);
 //
-            
-        
-        //// Chỉ vẽ lại khu vực 2 cột lọc
+
+
+                //// Chỉ vẽ lại khu vực 2 cột lọc
 //                Rectangle repaintArea = rect2.union(rect3);
 //
 //                header.revalidate();
@@ -383,9 +398,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
 //                });
 
             }
-            
+
         });
-        
+
     }
 
     @SuppressWarnings("unchecked")
@@ -473,7 +488,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
     private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmployeeActionPerformed
 
         InfoEmployeeModal modal = new InfoEmployeeModal();
-
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -484,75 +498,68 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-//                String maNV = generateEmployeeCode();
-                String ten = modal.getTxtName().getText().trim();
-                String email = modal.getTxtEmail().getText().trim();
-                String citizen = modal.getTxtCitizen().getText().trim();
-                String gioiTinh = modal.getCmbGender().getSelectedItem() != null
-                        ? modal.getCmbGender().getSelectedItem().toString()
-                        : "";
-                String chucVu = modal.getCmbPosition().getSelectedItem() != null
-                        ? modal.getCmbPosition().getSelectedItem().toString()
-                        : "";
-                String sdt = modal.getTxtPhone().getText().trim();
-                String hireDate = modal.getTxtHireDate().getText().trim();
-
-                modal.getLblErrolName().setText("");
-                modal.getLblErrolPhone().setText("");
-                modal.getLblErrolEmail().setText("");
-                modal.getLblErrolCitizen().setText("");
-
-                Color red = Color.RED;
-                modal.getLblErrolName().setForeground(red);
-                modal.getLblErrolPhone().setForeground(red);
-                modal.getLblErrolEmail().setForeground(red);
-                modal.getLblErrolCitizen().setForeground(red);
-
-                boolean isValid = true;
-
-                if (ten.isEmpty()) {
-                    modal.getLblErrolName().setText("Vui lòng nhập họ tên!");
-                    isValid = false;
-                }
-
-                if (sdt.isEmpty()) {
-                    modal.getLblErrolPhone().setText("Vui lòng nhập số điện thoại!");
-                    isValid = false;
-                } else if (!sdt.matches("^(0[0-9]{9})$")) {
-                    modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ (10 chữ số, bắt đầu bằng 0)!");
-                    isValid = false;
-                }
-
-                if (email.isEmpty()) {
-                    modal.getLblErrolEmail().setText("Vui lòng nhập email!");
-                    isValid = false;
-                } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-                    modal.getLblErrolEmail().setText("Email không hợp lệ!");
-                    isValid = false;
-                }
-
-                if (citizen.isEmpty()) {
-                    modal.getLblErrolCitizen().setText("Vui lòng nhập số CCCD/CMND!");
-                    isValid = false;
-                } else if (!citizen.matches("^[0-9]{12}$")) {
-                    modal.getLblErrolCitizen().setText("CCCD/CMND phải gồm 12 chữ số!");
-                    isValid = false;
-                }
-                if (!isValid) {
-                    return;
-                }
-
-                DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-                model.addRow(new Object[]{"", ten, gioiTinh, chucVu, sdt, ""});
-
-                tblEmployee.getTbl().revalidate();
-                tblEmployee.getTbl().repaint();
-                GlassPanePopup.closePopupLast();
+                saveData(modal);
             }
         });
 
-        GlassPanePopup.showPopup(modal);
-    }//GEN-LAST:event_btnAddEmployeeActionPerformed
+        raven.glasspanepopup.GlassPanePopup.showPopup(modal);
+    }
+    private void saveData(InfoEmployeeModal modal) {
+        Valid result = getValid(modal);
+
+        if (!result.valid) {
+            // Validation fail - các lỗi đã được hiển thị trong getValid()
+            Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào!");
+            return;
+        }
+
+        try {
+            String position = (String) modal.getCmbPosition().getSelectedItem();
+            String roleId;
+
+            if ("Nhân viên quản lý".equals(position)) {
+                roleId = "MANAGER"; // Hoặc ID tương ứng trong DB của bạn
+            } else {
+                roleId = "RECEPTIONIST"; // Role cho Nhân viên
+            }
+            Employee employee = new Employee();
+            employee.setFullName(result.fullName);
+            employee.setPhone(result.phone);
+            employee.setEmail(result.email);
+            employee.setGender(result.gender);
+            employee.setCitizenId(result.citizenId);
+            employee.setHireDate(result.hireDate);
+
+            Employee employeeSave = employeeService.createEmployee(employee, roleId);
+
+            if (employeeSave == null) {
+                Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
+                return;
+            }
+
+            DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
+            String genderStr = employeeSave.isGender() ? "Nữ" : "Nam";
+            String roleName = employeeSave.getAccount() != null && employeeSave.getAccount().getRole() != null
+                    ? employeeSave.getAccount().getRole().getRoleName()
+                    : "N/A";
+
+            model.addRow(new Object[]{
+                    employeeSave.getEmployeeId(),
+                    employeeSave.getFullName(),
+                    genderStr,
+                    roleName,
+                    employeeSave.getPhone()
+            });
+
+            Message.showMessage("Thành công", "Thêm nhân viên thành công!");
+            SwingUtilities.invokeLater(() -> GlassPanePopup.closePopupLast());
+
+        } catch (Exception e) {
+            log.error("Error creating employee: ", e);
+            Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
+        }
+    }
+    //GEN-LAST:event_btnAddEmployeeActionPerformed
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
@@ -577,7 +584,93 @@ public class EmployeeManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
 
     }
+    private static Valid getValid(InfoEmployeeModal modal) {
+        String name = modal.getTxtName().getText().trim();
+        String phone = modal.getTxtPhone().getText().trim();
+        String citizenId = modal.getTxtCitizen().getText().trim();
+        String email = modal.getTxtEmail().getText().trim();
+        String hireDateStr = modal.getTxtHireDate().getText().trim();
+        boolean gender = modal.getCmbGender().getSelectedItem() != null
+                && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nam");
 
+        // Reset lỗi
+        modal.getLblErrolName().setText("");
+        modal.getLblErrolPhone().setText("");
+        modal.getLblErrolCitizen().setText("");
+        modal.getLblErrolEmail().setText("");
+        modal.getLblErrolHireDate().setText("");
+
+        Color red = Color.RED;
+        modal.getLblErrolName().setForeground(red);
+        modal.getLblErrolPhone().setForeground(red);
+        modal.getLblErrolCitizen().setForeground(red);
+        modal.getLblErrolEmail().setForeground(red);
+        modal.getLblErrolHireDate().setForeground(red);
+
+        boolean valid = true;
+
+        // Tên
+        if (name.isEmpty()) {
+            modal.getLblErrolName().setText("Họ tên không được để trống!");
+            valid = false;
+        } else if (name.length() < 2) {
+            modal.getLblErrolName().setText("Họ tên quá ngắn!");
+            valid = false;
+        }
+
+        // Số điện thoại
+        if (phone.isEmpty()) {
+            modal.getLblErrolPhone().setText("Số điện thoại không được để trống!");
+            valid = false;
+        } else if (!phone.matches("^0\\d{9}$")) {
+            modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ!");
+            valid = false;
+        }
+
+        // CCCD
+        if (citizenId.isEmpty()) {
+            modal.getLblErrolCitizen().setText("CCCD không được để trống!");
+            valid = false;
+        } else if (!citizenId.matches("\\d{12}")) {
+            modal.getLblErrolCitizen().setText("CCCD phải có 12 chữ số!");
+            valid = false;
+        }
+
+        // Email
+        if (email.isEmpty()) {
+            modal.getLblErrolEmail().setText("Email không được để trống!");
+            valid = false;
+        } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            modal.getLblErrolEmail().setText("Email không hợp lệ!");
+            valid = false;
+        }
+
+        LocalDate hireDate = null;
+        try {
+            if (!hireDateStr.isEmpty()) {
+                hireDate = LocalDate.parse(hireDateStr, Constants.DATE_FORMATTER);
+            } else {
+                hireDate = LocalDate.now();
+            }
+        } catch (DateTimeParseException e) {
+            modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd/MM/yyyy)!");
+            valid = false;
+            log.error("Error parsing hire date: ", e);
+        }
+
+        return new Valid(name, valid, gender, phone, citizenId, email, hireDate);
+    }
+    private record Valid(
+            String fullName,      // SỬA: name -> fullName
+            boolean valid,
+            boolean gender,       // SỬA: thêm gender
+            String phone,         // SỬA: thêm phone
+            String citizenId,     // SỬA: thêm citizenId
+            String email,         // SỬA: thêm email
+            LocalDate hireDate    // SỬA: thêm hireDate
+            // SỬA: Xóa các field của Promotion: discountPrice, discountPercent, description, startDate, endDate
+    ) {
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddEmployee;

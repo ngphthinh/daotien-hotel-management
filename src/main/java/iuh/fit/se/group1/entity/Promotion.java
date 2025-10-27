@@ -8,7 +8,7 @@ public class Promotion {
     private Long promotionId;
     private String promotionName;
     private String description;
-    private BigDecimal discountPercent;
+    private Float discountPercent;
     private BigDecimal discountPrice;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -38,11 +38,11 @@ public class Promotion {
         this.description = description;
     }
 
-    public BigDecimal getDiscountPercent() {
+    public Float getDiscountPercent() {
         return discountPercent;
     }
 
-    public void setDiscountPercent(BigDecimal discountPercent) {
+    public void setDiscountPercent(Float discountPercent) {
         this.discountPercent = discountPercent;
     }
 
@@ -78,7 +78,7 @@ public class Promotion {
         this.createdAt = createdAt;
     }
 
-    public Promotion(Long promotionId, String promotionName, String description, BigDecimal discountPercent, BigDecimal discountPrice, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
+    public Promotion(Long promotionId, String promotionName, String description,Float discountPercent, BigDecimal discountPrice, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
         this.promotionId = promotionId;
         this.promotionName = promotionName;
         this.description = description;
@@ -89,7 +89,7 @@ public class Promotion {
         this.createdAt = createdAt;
     }
 
-    public Promotion(String promotionName, String description, BigDecimal discountPercent, BigDecimal discountPrice, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
+    public Promotion(String promotionName, String description,Float discountPercent, BigDecimal discountPrice, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
         this.promotionName = promotionName;
         this.description = description;
         this.discountPercent = discountPercent;

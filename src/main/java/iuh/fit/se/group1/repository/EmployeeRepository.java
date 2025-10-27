@@ -37,7 +37,11 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             preparedStatement.setDate(4, Date.valueOf(entity.getHireDate()));
             preparedStatement.setString(5, entity.getCitizenId());
             preparedStatement.setBoolean(6, entity.isGender());
-            preparedStatement.setLong(7, entity.getAccount().getAccountId());
+            if (entity.getAccount() != null && entity.getAccount().getAccountId() != null) {
+                preparedStatement.setLong(7, entity.getAccount().getAccountId());
+            } else {
+                preparedStatement.setNull(7, java.sql.Types.BIGINT);
+            }
             entity.setCreatedAt(LocalDate.now());
             preparedStatement.setDate(8, Date.valueOf(entity.getCreatedAt()));
 
@@ -52,7 +56,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     ;
                 }
             }
-
             return entity;
         } catch (SQLException e) {
             log.error("Error saving Employee: ", e);
@@ -102,21 +105,41 @@ public class EmployeeRepository implements Repository<Employee, Long> {
     @Override
     public List<Employee> findAll() {
         List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT * FROM Employee";
+        String sql = """
+        SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
+               e.accountId, a.username, a.password,
+               r.roleId, r.roleName
+        FROM Employee e
+        JOIN Account a ON e.accountId = a.accountId
+        JOIN Role r ON a.roleId = r.roleId
+        """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
                     Employee employee = new Employee();
+                    employee.setEmployeeId(rs.getLong("employeeId"));
+                    employee.setFullName(rs.getString("fullName"));
+                    employee.setPhone(rs.getString("phone"));
+                    employee.setEmail(rs.getString("email"));
+                    employee.setHireDate(rs.getDate("hireDate").toLocalDate());
+                    employee.setCitizenId(rs.getString("citizenId"));
+                    employee.setGender(rs.getBoolean("gender"));
 
-                    employee.setEmployeeId(resultSet.getLong("employeeId"));
-                    employee.setFullName(resultSet.getString("fullName"));
-                    employee.setPhone(resultSet.getString("phone"));
-                    employee.setEmail(resultSet.getString("email"));
-                    employee.setHireDate(resultSet.getDate("hireDate").toLocalDate());
-                    employee.setCitizenId(resultSet.getString("citizenId"));
-                    employee.setGender(resultSet.getBoolean("gender"));
-                    employee.getAccount().setAccountId(resultSet.getLong("accountId"));
-                    employee.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    // Account
+                    Account account = new Account();
+                    account.setAccountId(rs.getLong("accountId"));
+                    account.setUsername(rs.getString("username"));
+                    account.setPassword(rs.getString("password"));
+
+                    // Role
+                    Role role = new Role();
+                    role.setRoleId(rs.getString("roleId"));
+                    role.setRoleName(rs.getString("roleName"));
+                    account.setRole(role);
+
+                    // Liên kết
+                    employee.setAccount(account);
+
                     employees.add(employee);
                 }
             }

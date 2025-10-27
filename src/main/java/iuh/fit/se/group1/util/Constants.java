@@ -5,7 +5,11 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Constants {
     public static final Color FOREGROUND_COLOR_MENU = new Color(77, 134, 168);
@@ -15,6 +19,11 @@ public class Constants {
     public static final Color COLOR_ICON_MENU = Color.decode("#FF6C03");
 
     public static final Color LINE_SUBMENU = new Color(181, 181, 181);
+
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    public static final NumberFormat VND_FORMAT =
+            NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
     public static final int HEIGHT_FRAME = 800;
     public static final int WIDTH_FRAME = 1400;
