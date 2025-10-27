@@ -13,8 +13,8 @@ import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -187,6 +187,7 @@ public class InfoPromotionModal extends javax.swing.JPanel {
         btnSave.addActionListener(ac);
     }
 
+    
     /**
      * Creates new form InfoPromotionModal
      */
@@ -564,5 +565,9 @@ public class InfoPromotionModal extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.custom.TextField txtName;
     private iuh.fit.se.group1.ui.component.custom.TextField txtPrice;
     private iuh.fit.se.group1.ui.component.custom.TextField txtStartDate;
+
+    public JLabel getLblTitle() {
+        return lblTitle;
+    }
     // End of variables declaration//GEN-END:variables
 }

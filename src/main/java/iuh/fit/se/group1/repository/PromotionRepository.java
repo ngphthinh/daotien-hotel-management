@@ -144,5 +144,31 @@ public class PromotionRepository implements Repository<Promotion, Long>{
             throw new RuntimeException(e);
         }
     }
-
+    public List<Promotion> findByPromotionIdOrName(String keyword) {
+        List<Promotion> promotions = new ArrayList<>();
+        String sql = "SELECT * FROM Promotion WHERE CAST(promotionId AS NVARCHAR) LIKE ? OR promotionName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? ORDER BY promotionId ASC, promotionName ASC";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            String likeKeyword = "%" + keyword + "%";
+            preparedStatement.setString(1, likeKeyword);
+            preparedStatement.setString(2, likeKeyword);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Promotion promotion = new Promotion();
+                    promotion.setPromotionId(resultSet.getLong("promotionId"));
+                    promotion.setPromotionName(resultSet.getString("promotionName"));
+                    promotion.setDescription(resultSet.getString("description"));
+                    promotion.setDiscountPercent(resultSet.getFloat("discountPercent"));
+                    promotion.setDiscountPrice(resultSet.getBigDecimal("discountPrice"));
+                    promotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
+                    promotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
+                    promotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    promotions.add(promotion);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return promotions;
+    }
+    
 }

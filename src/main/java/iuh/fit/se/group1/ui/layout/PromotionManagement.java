@@ -4,16 +4,33 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.entity.Amenity;
+import iuh.fit.se.group1.entity.Promotion;
+import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.service.PromotionService;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
+import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
@@ -21,13 +38,36 @@ import raven.glasspanepopup.GlassPanePopup;
  * @author Windows
  */
 public class PromotionManagement extends javax.swing.JPanel {
+    private static final Logger log = LoggerFactory.getLogger(PromotionManagement.class);
+    private final PromotionService promotionService;
 
     /**
      * Creates new form PromotionManagement
      */
     public PromotionManagement() {
         initComponents();
-       btnAddPromotion.setBackground(new Color(108, 165, 200));
+        custom();
+        promotionService = new PromotionService();
+        loadTable(promotionService.getAllPromotions());
+    }
+    private void loadTable(java.util.List<Promotion> promotions) {
+        DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
+        model.setRowCount(0);
+        for (Promotion promotion : promotions) {
+            model.addRow(new Object[]{
+                promotion.getPromotionId(),
+                promotion.getPromotionName(),
+                Constants.VND_FORMAT.format(promotion.getDiscountPrice()),
+                promotion.getDiscountPercent() + " %",
+                promotion.getStartDate().format(Constants.DATE_FORMATTER),
+                promotion.getEndDate().format(Constants.DATE_FORMATTER),
+                promotion.getCreatedAt().format(Constants.DATE_FORMATTER)
+            });
+        }
+    }
+
+    private void custom(){
+        btnAddPromotion.setBackground(new Color(108, 165, 200));
         btnAddPromotion.setForeground(Color.WHITE);
         btnAddPromotion.setBorderRadius(10);
 
@@ -46,7 +86,16 @@ public class PromotionManagement extends javax.swing.JPanel {
         headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
-        String cols[] = {"Mã khuyến mãi", "Tên khuyến mãi", "Giá khuyến mãi", "Ngày tạo", "Ngày hết hạn", "Chức năng"};
+        String cols[] = {
+                "Mã KM",
+                "Tên KM",
+                "Giá KM",
+                "% Giảm",
+                "Ngày bắt đầu",
+                "Ngày kết thúc",
+                "Ngày tạo",
+                "Chức năng"
+        };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblPromotion.getTbl().setModel(model);
         addMouseListener(new java.awt.event.MouseAdapter() {
@@ -58,120 +107,55 @@ public class PromotionManagement extends javax.swing.JPanel {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row: " + row);
-            }
-
-            @Override
-            public void onDelete(int row) {
-                if (tblPromotion.getTbl().isEditing()) {
-                    tblPromotion.getTbl().getCellEditor().stopCellEditing();
-                }
                 DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
-                model.removeRow(row);
-            }
-        };
-        tblPromotion.setTableActionColumn(tblPromotion.getTbl(), 5, new TableActionEvent() {
-            @Override
-            public void onEdit(int row) {
-                DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
-
-                String code = model.getValueAt(row, 0).toString();
-                String name = model.getValueAt(row, 1).toString();
-                String price = model.getValueAt(row, 2).toString();
-                String startDate = model.getValueAt(row, 3).toString();
-                String endDate = model.getValueAt(row, 4).toString();
+                Long id = (Long) model.getValueAt(row, 0);
+                String name = (String) model.getValueAt(row, 1);
+                String discountPrice = String.valueOf(model.getValueAt(row, 2));
+                String discountPercent = String.valueOf(model.getValueAt(row, 3));
+                String startDate = (String) model.getValueAt(row, 4);
+                String endDate = (String) model.getValueAt(row, 5);
 
                 InfoPromotionModal modal = new InfoPromotionModal();
-
+                modal.getLblTitle().setText("Cập nhật khuyến mãi");
                 modal.getBtnSave().setText("Cập nhật");
 
                 modal.getTxtName().setText(name);
-                modal.getTxtPrice().setText(price);
+                modal.getTxtPrice().setText(discountPrice);
+                modal.getTxtDiscountPersent().setText(discountPercent);
                 modal.getTxtStarDate().setText(startDate);
                 modal.getTxtEndDate().setText(endDate);
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 modal.saveData(ae -> {
-                    String nameNew = modal.getTxtName().getText().trim();
-                    String priceNew = modal.getTxtPrice().getText().trim();
-                    String discountPersentNew = modal.getTxtDiscountPersent().getText().trim();
-                    String desciptionNew = modal.getTxtDesciption().getText().trim();
-                    String startDateNew = modal.getTxtStarDate().getText().trim();
-                    String endDateNew = modal.getTxtEndDate().getText().trim();
-
-                    modal.getLblErrolName().setText("");
-                    modal.getLblErrolPrice().setText("");
-                    modal.getLblErrolDiscountPersent().setText("");
-                    modal.getLblErrolDesciption().setText("");
-                    modal.getLblErrolStarDate().setText("");
-                    modal.getLblErrolEndDate().setText("");
-
-                    Color red = Color.RED;
-                    modal.getLblErrolName().setForeground(red);
-                    modal.getLblErrolPrice().setForeground(red);
-                    modal.getLblErrolDiscountPersent().setForeground(red);
-                    modal.getLblErrolDesciption().setForeground(red);
-                    modal.getLblErrolStarDate().setForeground(red);
-                    modal.getLblErrolEndDate().setForeground(red);
-
-                    boolean isValid = true;
-
-                    if (nameNew.isEmpty()) {
-                        modal.getLblErrolName().setText("Vui lòng nhập tên khuyến mãi!");
-                        isValid = false;
-                    }
-                    double priceI = 0;
-                    if (priceNew.isEmpty()) {
-                        modal.getLblErrolPrice().setText("Giá không được để trống!");
-                        isValid = false;
-                    } else {
-                        try {
-                            priceI = Double.parseDouble(priceNew);
-                            if (priceI <= 0) {
-                                modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
-                                isValid = false;
-                            }
-                        } catch (NumberFormatException e) {
-                            modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
-                            isValid = false;
+                    String title = "Xác nhận cập nhật khuyến mãi";
+                    String message = "Bạn có chắc chắn muốn cập nhật khuyến mãi này không?";
+                    Message.showConfirm(title, message, () -> {
+                        var result = getValid(modal);
+                        if (!result.valid) {
+                            return;
                         }
-                    }
-                    double percent = 0;
-                    if (discountPersentNew.isEmpty()) {
-                        modal.getLblErrolDiscountPersent().setText("Không được trống!");
-                        isValid = false;
-                    } else {
-                        try {
-                            percent = Double.parseDouble(discountPersentNew);
-                            if (percent < 0 || percent > 100) {
-                                modal.getLblErrolDiscountPersent().setText("Trong khoảng 0–100!");
-                                isValid = false;
-                            }
-                        } catch (NumberFormatException e) {
-                            modal.getLblErrolDiscountPersent().setText("Là số hợp lệ!");
-                            isValid = false;
-                        }
-                    }
-                    if (desciptionNew.isEmpty()) {
-                        modal.getLblErrolDesciption().setText("Vui lòng nhập mô tả khuyến mãi!");
-                        isValid = false;
-                    } else if (desciptionNew.length() < 10) {
-                        modal.getLblErrolDesciption().setText("Mô tả phải ít nhất 10 ký tự!");
-                        isValid = false;
-                    }
-                    if (endDateNew.compareTo(startDateNew) < 0) {
-                        modal.getLblErrolEndDate().setText("Ngày kết thúc phải sau hoặc bằng ngày bắt đầu!");
-                        isValid = false;
-                    }
-                    if (!isValid) {
-                        return;
-                    }
-                    model.setValueAt(nameNew, row, 1);
-                    model.setValueAt(priceNew, row, 2);
-                    model.setValueAt(startDateNew, row, 3);
-                    model.setValueAt(endDateNew, row, 4);
+                        
+                        Promotion promotion = new Promotion();
+                        promotion.setPromotionId(id);
+                        promotion.setPromotionName(result.name);
+                        promotion.setDiscountPrice(result.discountPrice);
+                        promotion.setDiscountPercent(result.discountPercent);
+                        promotion.setDescription(result.description);
+                        promotion.setStartDate(result.startDate);
+                        promotion.setEndDate(result.endDate);
+                        
+                        Promotion entitySave = promotionService.updatePromotion(promotion);
 
-                    GlassPanePopup.closePopupLast();
+                        model.setValueAt(entitySave.getPromotionName(), row, 1);
+                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getDiscountPrice()), row, 2);
+                        model.setValueAt(entitySave.getDiscountPercent()+ " %", row, 3);
+                        model.setValueAt(entitySave.getStartDate().format(Constants.DATE_FORMATTER), row, 4);
+                        model.setValueAt(entitySave.getEndDate().format(Constants.DATE_FORMATTER), row, 5);
+                        // Cột 6 là createdAt - không cập nhật
+                        // Cột 7 là action column
+
+                        GlassPanePopup.closePopupLast();
+                    });
                 });
 
                 GlassPanePopup.showPopup(modal);
@@ -179,64 +163,77 @@ public class PromotionManagement extends javax.swing.JPanel {
 
             @Override
             public void onDelete(int row) {
-                if (tblPromotion.getTbl().isEditing()) {
-                    tblPromotion.getTbl().getCellEditor().stopCellEditing();
-                }
-                DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
-                model.removeRow(row);
+                String title = "Xác nhận xóa khuyến mãi";
+                String message = "Bạn có chắc chắn muốn xóa khuyến mãi này không?";
+                Message.showConfirm(title, message, () -> {
+                    JTable table = tblPromotion.getTbl();
+
+                    if (table.isEditing()) {
+                        table.getCellEditor().stopCellEditing();
+                    }
+
+                    DefaultTableModel model = (DefaultTableModel) table.getModel();
+                    int rowDelete = table.getSelectedRow();
+
+                    if (rowDelete >= 0) {
+                        Long id = (Long) model.getValueAt(rowDelete, 0);
+                        model.removeRow(rowDelete);
+                        promotionService.deletePromotion(id);
+                    }
+                });
             }
+        };
 
-            @Override
-            public void onView(int row) {
-                DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
-                String code = model.getValueAt(row, 0).toString();
-                String name = model.getValueAt(row, 1).toString();
-                String price = model.getValueAt(row, 2).toString();
-                String startDate = model.getValueAt(row, 3).toString();
-                String endDate = model.getValueAt(row, 4).toString();
+        tblPromotion.setTableActionColumn(tblPromotion.getTbl(), 7, event, false);
 
-                InfoPromotionModal modal = new InfoPromotionModal();
-                modal.getBtnSave().setText("Xong");
-                modal.getTxtName().setText(name);
-                modal.getTxtPrice().setText(price);
-                modal.getTxtStarDate().setText(startDate);
-                modal.getTxtEndDate().setText(endDate);
-
-                modal.getTxtName().setEditable(false);
-                modal.getTxtName().setEditable(false);
-                modal.getTxtPrice().setEditable(false);
-                modal.getTxtStarDate().setEditable(false);
-                modal.getTxtEndDate().setEditable(false);
-                modal.getTxtDiscountPersent().setEditable(false);
-                modal.getTxtDesciption().setEditable(false);
-
-                modal.saveData(ae -> GlassPanePopup.closePopupLast());
-                modal.closeModel(ae -> GlassPanePopup.closePopupLast());
-                GlassPanePopup.showPopup(modal);
-            }
-        }, true);
-
-        tblPromotion.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);  // chiều rộng mong muốn
+        // SỬA: Cập nhật độ rộng cho 8 cột
+        tblPromotion.getTbl().getColumnModel().getColumn(0).setPreferredWidth(80);
         tblPromotion.getTbl().getColumnModel().getColumn(1).setPreferredWidth(150);
         tblPromotion.getTbl().getColumnModel().getColumn(2).setPreferredWidth(100);
-        tblPromotion.getTbl().getColumnModel().getColumn(3).setPreferredWidth(120);
+        tblPromotion.getTbl().getColumnModel().getColumn(3).setPreferredWidth(80);
         tblPromotion.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
-        tblPromotion.getTbl().getColumnModel().getColumn(5).setPreferredWidth(90);
+        tblPromotion.getTbl().getColumnModel().getColumn(5).setPreferredWidth(100);
+        tblPromotion.getTbl().getColumnModel().getColumn(6).setPreferredWidth(100);
+        tblPromotion.getTbl().getColumnModel().getColumn(7).setPreferredWidth(90);
         tblPromotion.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 int col = tblPromotion.getTbl().columnAtPoint(e.getPoint());
 
-                if (col == 5) {
-                    tblPromotion.getTbl().setCursor(Cursor.getDefaultCursor().getPredefinedCursor(Cursor.HAND_CURSOR));
+                if (col == 7) {
+                    tblPromotion.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblPromotion.getTbl().setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
+        headerCustom1.handleSearch(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                String text = headerCustom1.getSearchText();
+                if (text.isEmpty()) {
+                    loadTable(promotionService.getAllPromotions());
+                    return;
+                }
+                loadTable(promotionService.getPromotionByKeyword(text));
+            }
 
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                String text = headerCustom1.getSearchText();
+                if (text.isEmpty()) {
+                    loadTable(promotionService.getAllPromotions());
+                    return;
+                }
+                loadTable(promotionService.getPromotionByKeyword(text));
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+
+        });
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -314,103 +311,167 @@ public class PromotionManagement extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddPromotionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPromotionActionPerformed
-        var modal = new InfoPromotionModal();
+        InfoPromotionModal modal = new InfoPromotionModal();
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                raven.glasspanepopup.GlassPanePopup.closePopupLast();
+                GlassPanePopup.closePopupLast();
             }
         });
 
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                String name = modal.getTxtName().getText().trim();
-                String price = modal.getTxtPrice().getText().trim();
-                String discountPersent = modal.getTxtDiscountPersent().getText().trim();
-                String desciption = modal.getTxtDesciption().getText().trim();
-                String startDate = modal.getTxtStarDate().getText().trim();
-                String endDate = modal.getTxtEndDate().getText().trim();
-
-                modal.getLblErrolName().setText("");
-                modal.getLblErrolPrice().setText("");
-                modal.getLblErrolDiscountPersent().setText("");
-                modal.getLblErrolDesciption().setText("");
-                modal.getLblErrolStarDate().setText("");
-                modal.getLblErrolEndDate().setText("");
-
-                Color red = Color.RED;
-                modal.getLblErrolName().setForeground(red);
-                modal.getLblErrolPrice().setForeground(red);
-                modal.getLblErrolDiscountPersent().setForeground(red);
-                modal.getLblErrolDesciption().setForeground(red);
-                modal.getLblErrolStarDate().setForeground(red);
-                modal.getLblErrolEndDate().setForeground(red);
-
-                boolean isValid = true;
-
-                if (name.isEmpty()) {
-                    modal.getLblErrolName().setText("Vui lòng nhập tên khuyến mãi!");
-                    isValid = false;
-                }
-                double priceI = 0;
-                if (price.isEmpty()) {
-                    modal.getLblErrolPrice().setText("Giá không được để trống!");
-                    isValid = false;
-                } else {
-                    try {
-                        priceI = Double.parseDouble(price);
-                        if (priceI <= 0) {
-                            modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
-                            isValid = false;
-                        }
-                    } catch (NumberFormatException e) {
-                        modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
-                        isValid = false;
-                    }
-                }
-                double percent = 0;
-                if (discountPersent.isEmpty()) {
-                    modal.getLblErrolDiscountPersent().setText("Không được trống!");
-                    isValid = false;
-                } else {
-                    try {
-                        percent = Double.parseDouble(discountPersent);
-                        if (percent < 0 || percent > 100) {
-                            modal.getLblErrolDiscountPersent().setText("Trong khoảng 0–100!");
-                            isValid = false;
-                        }
-                    } catch (NumberFormatException e) {
-                        modal.getLblErrolDiscountPersent().setText("Là số hợp lệ!");
-                        isValid = false;
-                    }
-                }
-                if (desciption.isEmpty()) {
-                    modal.getLblErrolDesciption().setText("Vui lòng nhập mô tả khuyến mãi!");
-                    isValid = false;
-                } else if (desciption.length() < 10) {
-                    modal.getLblErrolDesciption().setText("Mô tả phải ít nhất 10 ký tự");
-                    isValid = false;
-                }
-                if (endDate.compareTo(startDate) < 0) {
-                    modal.getLblErrolEndDate().setText("Ngày kết thúc phải sau hoặc bằng ngày bắt đầu!");
-                    isValid = false;
-                }
-                if (!isValid) {
-                    return;
-                }
-
-                DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
-                model.addRow(new Object[]{"", name, price, startDate, endDate, ""});
-
-                GlassPanePopup.closePopupLast();
+                saveData(modal);
             }
-
         });
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }//GEN-LAST:event_btnAddPromotionActionPerformed
+    private void saveData(InfoPromotionModal modal) {
+        Valid result = getValid(modal);
+        if (result.valid) {
+            Promotion promotion = new Promotion();
+            promotion.setPromotionName(result.name);
+            promotion.setDiscountPrice(result.discountPrice);
+            promotion.setDiscountPercent(result.discountPercent);
+            promotion.setDescription(result.description);
+            promotion.setStartDate(result.startDate);
+            promotion.setEndDate(result.endDate);
 
+            Promotion entitySave = promotionService.createPromotion(promotion);
+
+            DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
+            // SỬA: Thêm đủ 7 cột dữ liệu (cột 8 là action tự động)
+            model.addRow(new Object[]{
+                    entitySave.getPromotionId(),                          // Cột 0
+                    entitySave.getPromotionName(),                        // Cột 1
+                    Constants.VND_FORMAT.format(promotion.getDiscountPrice()),    // Cột 2
+                    entitySave.getDiscountPercent() + " %",                      // Cột 3
+                    entitySave.getStartDate().format(Constants.DATE_FORMATTER),     // Cột 4
+                    entitySave.getEndDate().format(Constants.DATE_FORMATTER),       // Cột 5
+                    entitySave.getCreatedAt().format(Constants.DATE_FORMATTER)      // Cột 6
+            });
+            GlassPanePopup.closePopupLast();
+        }
+    }
+     private static Valid getValid(InfoPromotionModal modal) {
+        String name = modal.getTxtName().getText().trim();
+        String priceStr = modal.getTxtPrice().getText().trim();
+        String percentStr = modal.getTxtDiscountPersent().getText().trim();
+        String description = modal.getTxtDesciption().getText().trim();
+        String startDateStr = modal.getTxtStarDate().getText().trim();
+        String endDateStr = modal.getTxtEndDate().getText().trim();
+
+        modal.getLblErrolName().setText("");
+        modal.getLblErrolPrice().setText("");
+        modal.getLblErrolDiscountPersent().setText("");
+        modal.getLblErrolDesciption().setText("");
+        modal.getLblErrolStarDate().setText("");
+        modal.getLblErrolEndDate().setText("");
+
+        Color red = Color.RED;
+        modal.getLblErrolName().setForeground(red);
+        modal.getLblErrolPrice().setForeground(red);
+        modal.getLblErrolDiscountPersent().setForeground(red);
+        modal.getLblErrolDesciption().setForeground(red);
+        modal.getLblErrolStarDate().setForeground(red);
+        modal.getLblErrolEndDate().setForeground(red);
+
+        boolean valid = true;
+
+        // Validate name
+        if (name.isEmpty()) {
+            modal.getLblErrolName().setText("Tên không được để trống!");
+            valid = false;
+        } else if (name.length() < 2) {
+            modal.getLblErrolName().setText("Tên quá ngắn (tối thiểu 2 ký tự)!");
+            valid = false;
+        }
+
+         BigDecimal discountPrice = BigDecimal.ZERO;
+         boolean hasPrice = false;
+         if (!priceStr.isEmpty()) {
+             try {
+                 discountPrice = new BigDecimal(priceStr);
+                 if (discountPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                     modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
+                     valid = false;
+                 } else {
+                     hasPrice = true;
+                 }
+             } catch (Exception e) {
+                 modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
+                 valid = false;
+                 log.error("Lỗi chuyển đổi giá khuyến mãi: ", e);
+             }
+         }
+
+        // Validate discount percent
+         float discountPercent = 0;
+         boolean hasPercent = false;
+         if (!percentStr.isEmpty()) {
+             try {
+                 discountPercent = Float.parseFloat(percentStr);
+                 if (discountPercent <= 0 || discountPercent > 100) {
+                     modal.getLblErrolDiscountPersent().setText("Phần trăm phải từ 0-100!");
+                     valid = false;
+                 } else {
+                     hasPercent = true;
+                 }
+             } catch (Exception e) {
+                 modal.getLblErrolDiscountPersent().setText("Phần trăm phải là số hợp lệ!");
+                 valid = false;
+                 log.error("Lỗi chuyển đổi phần trăm: ", e);
+             }
+         }
+
+         // 🔹 Kiểm tra chỉ được nhập 1 trong 2
+         if (hasPrice && hasPercent) {
+             modal.getLblErrolPrice().setText("Chỉ được nhập giá hoặc phần trăm!");
+             modal.getLblErrolDiscountPersent().setText("Chỉ được nhập giá hoặc phần trăm!");
+             valid = false;
+         } else if (!hasPrice && !hasPercent) {
+             modal.getLblErrolPrice().setText("Phải nhập giá hoặc phần trăm!");
+             modal.getLblErrolDiscountPersent().setText("Phải nhập giá hoặc phần trăm!");
+             valid = false;
+         }
+
+        // Validate dates
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        try {
+            startDate = LocalDate.parse(startDateStr, Constants.DATE_FORMATTER);
+        } catch (Exception e) {
+            modal.getLblErrolStarDate().setText("Ngày bắt đầu không hợp lệ!");
+            valid = false;
+            log.error("Lỗi parse ngày bắt đầu: ", e);
+        }
+
+        try {
+            endDate = LocalDate.parse(endDateStr, Constants.DATE_FORMATTER);
+        } catch (Exception e) {
+            modal.getLblErrolEndDate().setText("Ngày kết thúc không hợp lệ!");
+            valid = false;
+            log.error("Lỗi parse ngày kết thúc: ", e);
+        }
+
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+            modal.getLblErrolEndDate().setText("Ngày kết thúc phải sau ngày bắt đầu!");
+            valid = false;
+        }
+
+        return new Valid(name, valid, discountPrice, discountPercent, description, startDate, endDate);
+    }
+
+    private record Valid( String name, 
+        boolean valid, 
+        BigDecimal discountPrice, 
+        float discountPercent,
+        String description,
+        LocalDate startDate,
+        LocalDate endDate) {
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddPromotion;

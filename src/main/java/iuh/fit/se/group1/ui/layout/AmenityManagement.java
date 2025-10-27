@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
+import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public class AmenityManagement extends javax.swing.JPanel {
                         Amenity entitySave = amenityService.updateAmenity(new Amenity((Long) model.getValueAt(row, 0), result.name, result.price));
 
                         model.setValueAt(entitySave.getNameAmenity(), row, 1);
-                        model.setValueAt(entitySave.getPrice(), row, 2);
+                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getPrice()), row, 2);
 
                         GlassPanePopup.closePopupLast();
                     });
@@ -294,7 +295,7 @@ public class AmenityManagement extends javax.swing.JPanel {
         if (result.valid()) {
             Amenity entitySave = amenityService.createAmenity(new Amenity(result.name(), result.price()));
             DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
-            model.addRow(new Object[]{entitySave.getAmenityId(), entitySave.getNameAmenity(), entitySave.getPrice()});
+            model.addRow(new Object[]{entitySave.getAmenityId(), entitySave.getNameAmenity(), Constants.VND_FORMAT.format(entitySave.getPrice())});
             GlassPanePopup.closePopupLast();
         }
     }
