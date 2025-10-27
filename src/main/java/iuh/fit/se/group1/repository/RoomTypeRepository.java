@@ -29,7 +29,10 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
             entity.setCreatedAt(LocalDate.now());
             preparedStatement.setDate(3, Date.valueOf(entity.getCreatedAt()));
 
-            preparedStatement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate(); 
+            if (affectedRows > 0) {
+                log.info("Saved RoomType with ID: {}", entity.getRoomTypeId());
+            }
             return entity;
 
         } catch (SQLException e) {
@@ -50,6 +53,7 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
             if (affectedRows == 0) {
                 throw new SQLException("Update failed, no rows affected.");
             }
+            log.info("Updated RoomType with ID: {}", entity.getRoomTypeId());
 
             return entity;
 
@@ -70,7 +74,10 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
                     RoomType roomType = new RoomType();
                     roomType.setRoomTypeId(resultSet.getString("roomTypeId"));
                     roomType.setName(resultSet.getString("name"));
-                    roomType.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    // Fix: Null-safe cho createdAt
+                    Date createdAtDate = resultSet.getDate("createdAt");
+                    roomType.setCreatedAt(createdAtDate != null ? createdAtDate.toLocalDate() : null);
+                    log.debug("Loaded RoomType ID: {}", id);  // Debug log
                     return roomType;
                 }
             }
@@ -87,7 +94,10 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
         String sql = "DELETE FROM RoomType WHERE roomTypeId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, id);
-            preparedStatement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                log.info("Deleted RoomType with ID: {}", id);
+            }
         } catch (SQLException e) {
             log.error("Error deleting RoomType: ", e);
             throw new RuntimeException(e);
@@ -97,7 +107,7 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
     @Override
     public List<RoomType> findAll() {
         List<RoomType> roomTypes = new ArrayList<>();
-        String sql = "SELECT * FROM RoomType";
+        String sql = "SELECT * FROM RoomType ORDER BY roomTypeId";  // Thêm ORDER BY
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -106,9 +116,12 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
                 RoomType roomType = new RoomType();
                 roomType.setRoomTypeId(resultSet.getString("roomTypeId"));
                 roomType.setName(resultSet.getString("name"));
-                roomType.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                // Fix: Null-safe cho createdAt
+                Date createdAtDate = resultSet.getDate("createdAt");
+                roomType.setCreatedAt(createdAtDate != null ? createdAtDate.toLocalDate() : null);
                 roomTypes.add(roomType);
             }
+            log.info("Found {} RoomTypes in total", roomTypes.size());  // Debug log
 
         } catch (SQLException e) {
             log.error("Error finding all RoomTypes: ", e);
@@ -117,4 +130,5 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
 
         return roomTypes;
     }
+    
 }

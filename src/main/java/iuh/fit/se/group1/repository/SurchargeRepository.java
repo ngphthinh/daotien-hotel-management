@@ -144,6 +144,7 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
             throw new RuntimeException(e);
         }
     }
+    
     public List<Surcharge> findBySurchargeNameOrId(String keyword) {
     List<Surcharge> surcharges = new ArrayList<>();
     String sql = """
