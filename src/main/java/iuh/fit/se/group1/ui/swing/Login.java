@@ -8,37 +8,64 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.*;
 
+import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.enums.Role;
+import iuh.fit.se.group1.service.AuthenticateService;
+import iuh.fit.se.group1.service.EmailSenderService;
+import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.ui.component.modal.SendResetCodeModal;
 import iuh.fit.se.group1.ui.component.modal.VerifyIdentityModal;
+import iuh.fit.se.group1.util.PropertiesReader;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTarget;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
- *
  * @author Administrator
  */
 public class Login extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(Login.class);
 
     /**
      * Creates new form Login
      */
+
+    private final AuthenticateService authenticateService;
+    private final EmployeeService employeeService;
+    private final EmailSenderService emailSenderService;
+
     private Animator animatorLogin;
     private Animator animatorBody;
     private boolean signIn;
-    JButton btnEye = new JButton();
+    private JButton btnEye = new JButton();
 
     public Login() {
+        this.authenticateService = new AuthenticateService();
+        this.employeeService = new EmployeeService();
+        this.emailSenderService = new EmailSenderService();
         initComponents();
+        custom();
+
+    }
+
+    private void custom() {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        // ⚙️ Bỏ layout mặc định để điều khiển vị trí thủ công
+        // Bỏ layout mặc định để điều khiển vị trí thủ công
         background1.setLayout(null);
 
         // Thêm hai panel chính (thêm panelBody khi frame đã hiển thị để đảm bảo kích
@@ -63,8 +90,7 @@ public class Login extends javax.swing.JFrame {
             panelBody.setBounds(0, 0, w, h);
             background1.add(panelBody);
         });
-        txtUser.setText("d");
-        txtPass.setText("d");
+
 
         // Căn giữa và tự co giãn theo frame
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -172,7 +198,13 @@ public class Login extends javax.swing.JFrame {
         animatorBody = new Animator(10, targetBody);
         animatorLogin.setResolution(0);
         animatorBody.setResolution(0);
+        txtUser.addActionListener(e -> {
+            txtPass.requestFocus();
+        });
 
+        txtPass.addActionListener(e -> {
+            doLogin();
+        });
     }
 
     /**
@@ -318,6 +350,10 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnSignInActionPerformed
+        doLogin();
+    }// GEN-LAST:event_btnSignInActionPerformed
+
+    private void doLogin() {
         if (!animatorLogin.isRunning()) {
             signIn = true;
             String user = txtUser.getText().trim();
@@ -336,15 +372,30 @@ public class Login extends javax.swing.JFrame {
                 action = false;
             }
 
-            boolean isAdmin = txtUser.getText().equals("d");
+            var authenticate = authenticateService.authenticate(user, pass);
+            if (authenticate == null) {
+                txtPass.setHelperText("Mật khẩu không chính xác");
+                if (action) {
+                    txtPass.grabFocus();
+                }
+                txtUser.setHelperText("Tên đăng nhập không chính xác");
+                if (action) {
+                    txtUser.grabFocus();
+                }
+                action = false;
+            }
+
 
             if (action) {
+                boolean isManager = authenticate.getRole().getRoleId().equals(Role.MANAGER.toString());
+                log.info("User '{}' login with role '{}'", authenticate.getUsername(), authenticate.getRole().getRoleId());
+
                 animatorLogin.start();
-                panelBody.setAuth(isAdmin);
+                panelBody.setAuth(isManager);
                 enableLogin(false);
             }
         }
-    }// GEN-LAST:event_btnSignInActionPerformed
+    }
 
     private void btnForgotPassActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnForgotPassActionPerformed
         var modal = new VerifyIdentityModal();
@@ -352,24 +403,78 @@ public class Login extends javax.swing.JFrame {
         modal.closeModal(e -> {
             GlassPanePopup.closePopupLast();
         });
+        AtomicReference<Employee> employeeAtomicReference = new AtomicReference<>();
         modal.sendRestCode(e -> {
-            GlassPanePopup.closePopupLast();
-            GlassPanePopup.showPopup(sendCodeModal);
-
+            var result = sendCode(modal, sendCodeModal);
+            employeeAtomicReference.set(result);
         });
 
-        sendCodeModal.sendResetCode(e -> {
-            GlassPanePopup.closePopupLast();
-        });
 
-        sendCodeModal.sendResetCode(e -> {
-            // Xử lý gửi mã xác nhận
-            System.out.println("Gửi mã xác nhận");
-        });
+        sendCodeModal.sendResetCode(e ->
+                sendCodeToEmail(employeeAtomicReference.get())
+        );
+
+
+        sendCodeModal.goToBackLogin(e ->
+                GlassPanePopup.closePopupAll()
+        );
 
         GlassPanePopup.showPopup(modal);
 
     }// GEN-LAST:event_btnForgotPassActionPerformed
+
+
+    private Employee sendCode(VerifyIdentityModal modal, SendResetCodeModal sendCodeModal) {
+        String citizenId = modal.getTxtCitizenID().getText();
+
+        if (citizenId.isBlank()) {
+            modal.getTxtCitizenID().setHelperText("Vui lòng nhập số CMND/CCCD");
+            modal.getTxtCitizenID().grabFocus();
+            return null;
+        }
+
+        var employee = employeeService.getEmployeeByCitizenId(citizenId);
+        if (employee == null) {
+            modal.getTxtCitizenID().setHelperText("Số CMND/CCCD không tồn tại");
+            modal.getTxtCitizenID().grabFocus();
+            return null;
+        }
+
+        sendCodeToEmail(employee);
+
+        GlassPanePopup.closePopupLast();
+        sendCodeModal.setTextEmail(employee.getEmail());
+        sendCodeModal.getLblName().setText(employee.getFullName());
+        sendCodeModal.getLblPosition().setText(employee.getAccount().getRole().getRoleName());
+        GlassPanePopup.showPopup(sendCodeModal);
+        return employee;
+    }
+
+    private void sendCodeToEmail(Employee employee) {
+
+        authenticateService.resetPassword(employee.getAccount().getUsername());
+
+        String title = "Đặt lại mật khẩu cho tài khoản của bạn";
+        String html = null;
+        try {
+            html = Files.readString(Paths.get("src/main/resources/static/reset-password.html"));
+            html = html.replace("{{user_name}}", employee.getFullName())
+                    .replace("{{user_password}}", PropertiesReader.getInstance().get("daotien.password"))
+                    .replace("{{support_email}}", PropertiesReader.getInstance().get("daotien.mail.email"))
+                    .replace("{{site_name}}", "Đào Tiên Hotel")
+                    .replace("{{current_year}}", LocalDate.now().getYear() + "");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        emailSenderService.sendHtmlMail(
+                employee.getEmail(),
+                title,
+                html
+        );
+
+
+    }
 
     private void enableLogin(boolean action) {
         txtUser.setEditable(action);
@@ -388,13 +493,12 @@ public class Login extends javax.swing.JFrame {
         });
     }
 
-    ;
 
-    // private void cmdSignOutActionPerformed(java.awt.event.ActionEvent evt) {
-    // signIn = false;
-    // clearLogin();
-    // animatorBody.start();
-    // }
+    //    private void cmdSignOutActionPerformed(java.awt.event.ActionEvent evt) {
+//        signIn = false;
+//        clearLogin();
+//        animatorBody.start();
+//    }
     public void clearLogin() {
         txtUser.setText("");
         txtPass.setText("");
