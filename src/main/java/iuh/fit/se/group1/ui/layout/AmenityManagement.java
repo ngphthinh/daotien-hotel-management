@@ -41,16 +41,18 @@ public class AmenityManagement extends javax.swing.JPanel {
         initComponents();
         custom();
         amenityService = new AmenityService();
-        loadTable();
+
+        loadTable(amenityService.getAllAmenities());
     }
-    private void loadTable() {
+
+    private void loadTable(java.util.List<Amenity> amenities) {
         DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
         model.setRowCount(0);
-        var amenities = amenityService.getAllAmenities();
         for (Amenity amenity : amenities) {
             model.addRow(new Object[]{amenity.getAmenityId(), amenity.getNameAmenity(), amenity.getPrice()});
         }
     }
+
     private void custom() {
         btnAddAmenity.setBackground(new Color(108, 165, 200));
         btnAddAmenity.setForeground(Color.WHITE);
@@ -88,18 +90,18 @@ public class AmenityManagement extends javax.swing.JPanel {
                 modal.saveData(ae -> {
                     String title = "Xác nhận cập nhật dịch vụ";
                     String message = "Bạn có chắc chắn muốn cập nhật dịch vụ này không?";
-                   Message.showConfirm(title, message, ()->{
-                       var result = getValid(modal);
-                       if (!result.valid) {
-                           return;
-                       }
-                       Amenity entitySave = amenityService.updateAmenity(new Amenity((Long) model.getValueAt(row, 0), result.name, result.price));
+                    Message.showConfirm(title, message, () -> {
+                        var result = getValid(modal);
+                        if (!result.valid) {
+                            return;
+                        }
+                        Amenity entitySave = amenityService.updateAmenity(new Amenity((Long) model.getValueAt(row, 0), result.name, result.price));
 
-                       model.setValueAt(entitySave.getNameAmenity(), row, 1);
-                       model.setValueAt(entitySave.getPrice(), row, 2);
+                        model.setValueAt(entitySave.getNameAmenity(), row, 1);
+                        model.setValueAt(entitySave.getPrice(), row, 2);
 
-                       GlassPanePopup.closePopupLast();
-                   });
+                        GlassPanePopup.closePopupLast();
+                    });
                 });
 
                 GlassPanePopup.showPopup(modal);
@@ -109,7 +111,7 @@ public class AmenityManagement extends javax.swing.JPanel {
             public void onDelete(int row) {
                 String title = "Xác nhận xóa dịch vụ";
                 String message = "Bạn có chắc chắn muốn xóa dịch vụ này không?";
-                Message.showConfirm(title,message , () -> {
+                Message.showConfirm(title, message, () -> {
                     JTable table = tblAmenity.getTbl();
 
                     // Nếu đang chỉnh sửa, dừng lại
@@ -161,12 +163,21 @@ public class AmenityManagement extends javax.swing.JPanel {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 String text = headerCustom1.getSearchText();
-                System.out.println("Search text in amenity search: " + text);
+                if (text.isEmpty()) {
+                    loadTable(amenityService.getAllAmenities());
+                    return;
+                }
+                loadTable(amenityService.getAmenityByKeyword(text));
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-
+                String text = headerCustom1.getSearchText();
+                if (text.isEmpty()) {
+                    loadTable(amenityService.getAllAmenities());
+                    return;
+                }
+                loadTable(amenityService.getAmenityByKeyword(text));
             }
 
             @Override
@@ -257,6 +268,8 @@ public class AmenityManagement extends javax.swing.JPanel {
         btnExport.getAccessibleContext().setAccessibleDescription("");
     }// </editor-fold>//GEN-END:initComponents
 
+
+
     private void btnAddAmenityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAmenityActionPerformed
 
         ServiceModal modal = new ServiceModal();
@@ -281,7 +294,7 @@ public class AmenityManagement extends javax.swing.JPanel {
         if (result.valid()) {
             Amenity entitySave = amenityService.createAmenity(new Amenity(result.name(), result.price()));
             DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
-            model.addRow(new Object[]{entitySave.getAmenityId(),entitySave.getNameAmenity(),entitySave.getPrice()});
+            model.addRow(new Object[]{entitySave.getAmenityId(), entitySave.getNameAmenity(), entitySave.getPrice()});
             GlassPanePopup.closePopupLast();
         }
     }
