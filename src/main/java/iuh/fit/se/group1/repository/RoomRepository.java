@@ -150,4 +150,40 @@ public class RoomRepository implements Repository<Room, Long> {
 
         return rooms;
     }
+    public List<Room> findByRoomNumberOrId(String keyword) {
+    List<Room> rooms = new ArrayList<>();
+    String sql = "SELECT * FROM Room WHERE roomNumber COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR CAST(roomId AS NVARCHAR) LIKE ? ORDER BY roomId ASC, roomNumber ASC";
+
+    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String likeKeyword = "%" + keyword + "%";
+        preparedStatement.setString(1, likeKeyword);
+        preparedStatement.setString(2, likeKeyword);
+
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                Room room = new Room();
+                room.setRoomId(resultSet.getLong("roomId"));
+                room.setRoomNumber(resultSet.getString("roomNumber"));
+                
+                // Lấy RoomTypeId và gán vào RoomType object
+                RoomType roomType = new RoomType();
+                roomType.setRoomTypeId(resultSet.getString("roomTypeId"));
+                room.setRoomType(roomType);
+
+                // Lấy roomStatus (enum)
+                String status = resultSet.getString("roomStatus");
+                if (status != null) {
+                    room.setRoomStatus(RoomStatus.valueOf(status));
+                }
+
+                room.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                rooms.add(room);
+            }
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException("Error finding rooms by name or ID", e);
+    }
+    return rooms;
+    }
+
 }
