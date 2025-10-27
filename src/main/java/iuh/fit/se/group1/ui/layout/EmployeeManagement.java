@@ -5,12 +5,14 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -19,10 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -44,18 +44,17 @@ import raven.glasspanepopup.GlassPanePopup;
 public class EmployeeManagement extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(EmployeeManagement.class);
     private final EmployeeService employeeService;
+    private final RoleService roleService;
     private int activeFilterColumn = -1;
-//    private Map<String, String> employeeCitizenMap = new HashMap<>();
-//    private Map<String, String> employeeEmailMap = new HashMap<>();
-//    private Map<String, String> employeeHireDateMap = new HashMap<>();
-//    private int employeeCounter = 0;
 
     public EmployeeManagement() {
         initComponents();
         custom();
         employeeService = new EmployeeService();
+        roleService = new RoleService();
         loadTable(employeeService.getAllEmployees());
     }
+
     private void loadTable(java.util.List<Employee> employees) {
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
         model.setRowCount(0);
@@ -64,7 +63,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
                     ? employee.getAccount().getRole().getRoleName()
                     : "N/A";
-            System.out.println("Loading employee: " + employee);
             model.addRow(new Object[]{
                     employee.getEmployeeId(),
                     employee.getFullName(),
@@ -74,6 +72,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             });
         }
     }
+
     private void custom() {
         headerCustom2.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
@@ -133,7 +132,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 String phone = (String) model.getValueAt(row, 4);
 
                 // SỬA: Đổi từ InfoPromotionModal sang InfoEmployeeModal
-                InfoEmployeeModal modal = new InfoEmployeeModal();
+                InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
                 modal.getLblTitle().setText("Cập nhật nhân viên");
                 modal.getBtnSave().setText("Cập nhật");
 
@@ -221,7 +220,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 String role = (String) model.getValueAt(row, 3);
                 String phone = (String) model.getValueAt(row, 4);
 
-                InfoEmployeeModal modal = new InfoEmployeeModal();
+                InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
                 modal.getLblTitle().setText("Thông tin nhân viên");
                 modal.getBtnSave().setText("Xong");
 
@@ -258,10 +257,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
         tblEmployee.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
-                // SỬA: Đổi từ tblPromotion sang tblEmployee
                 int col = tblEmployee.getTbl().columnAtPoint(e.getPoint());
 
-                // SỬA: Đổi cột 7 thành cột 5
                 if (col == 5) {
                     tblEmployee.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
@@ -272,10 +269,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
         headerCustom2.handleSearch(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                // SỬA: Đổi từ headerCustom1 sang headerCustom2
                 String text = headerCustom2.getSearchText();
                 if (text.isEmpty()) {
-                    // SỬA: Gọi employeeService
                     loadTable(employeeService.getAllEmployees());
                     return;
                 }
@@ -284,10 +279,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                // SỬA: Đổi từ headerCustom1 sang headerCustom2
                 String text = headerCustom2.getSearchText();
                 if (text.isEmpty()) {
-                    // SỬA: Gọi employeeService
                     loadTable(employeeService.getAllEmployees());
                     return;
                 }
@@ -313,7 +306,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         colGender.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
             if (comp instanceof JLabel lbl) {
-                String text = "Giới tính                           \u25BC";
+                String text = "Giới tính                                \u25BC";
                 lbl.setText(text);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
             }
@@ -324,7 +317,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         colPosition.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
             if (comp instanceof JLabel lbl) {
-                String text = "Chức vụ                           \u25BC";
+                String text = "Chức vụ                               \u25BC";
                 lbl.setText(text);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
             }
@@ -377,26 +370,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     cmbChucVu.setVisible(true);
                     cmbChucVu.showPopup();
                 }
-
-//                Rectangle rect2 = header.getHeaderRect(2);
-//                Rectangle rect3 = header.getHeaderRect(3);
-//
-
-
-                //// Chỉ vẽ lại khu vực 2 cột lọc
-//                Rectangle repaintArea = rect2.union(rect3);
-//
-//                header.revalidate();
-//
-//// 🚫 Chỉ repaint đúng 2 cột lọc (Giới tính & Chức vụ)
-//                header.repaint(header.getHeaderRect(2));
-//                header.repaint(header.getHeaderRect(3));
-//
-//                SwingUtilities.invokeLater(() -> {
-//                    Rectangle rectMaNV = header.getHeaderRect(0);
-//                    header.repaint(rectMaNV);
-//                });
-
             }
 
         });
@@ -445,49 +418,45 @@ public class EmployeeManagement extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(headerCustom2, javax.swing.GroupLayout.DEFAULT_SIZE, 988, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(tblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(lblTitleEmployee)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(45, 45, 45)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(headerCustom2, javax.swing.GroupLayout.DEFAULT_SIZE, 988, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(tblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(36, 36, 36)
+                                                .addComponent(lblTitleEmployee)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(45, 45, 45)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headerCustom2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTitleEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
-                .addComponent(tblEmployee, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
-                .addGap(37, 37, 37))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(headerCustom2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(30, 30, 30)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblTitleEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(25, 25, 25)
+                                .addComponent(tblEmployee, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+                                .addGap(37, 37, 37))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-//    private String generateEmployeeCode() {
-//        employeeCounter++;
-//        return String.format("NV%03d", employeeCounter);
-//    }
 
     private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmployeeActionPerformed
 
-        InfoEmployeeModal modal = new InfoEmployeeModal();
+        InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -499,28 +468,28 @@ public class EmployeeManagement extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 saveData(modal);
+                GlassPanePopup.closePopupAll();
             }
         });
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }
+
     private void saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
 
         if (!result.valid) {
-            // Validation fail - các lỗi đã được hiển thị trong getValid()
             Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào!");
             return;
         }
 
         try {
-            String position = (String) modal.getCmbPosition().getSelectedItem();
+            int position = modal.getCmbPosition().getSelectedIndex();
             String roleId;
-
-            if ("Nhân viên quản lý".equals(position)) {
-                roleId = "MANAGER"; // Hoặc ID tương ứng trong DB của bạn
+            if (position == 0) {
+                roleId = Role.MANAGER.toString();
             } else {
-                roleId = "RECEPTIONIST"; // Role cho Nhân viên
+                roleId = Role.RECEPTIONIST.toString();
             }
             Employee employee = new Employee();
             employee.setFullName(result.fullName);
@@ -539,21 +508,16 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
             String genderStr = employeeSave.isGender() ? "Nữ" : "Nam";
-            String roleName = employeeSave.getAccount() != null && employeeSave.getAccount().getRole() != null
-                    ? employeeSave.getAccount().getRole().getRoleName()
-                    : "N/A";
+
+            System.out.println(employeeSave);
 
             model.addRow(new Object[]{
                     employeeSave.getEmployeeId(),
                     employeeSave.getFullName(),
                     genderStr,
-                    roleName,
+                    employeeSave.getAccount().getRole().getRoleName(),
                     employeeSave.getPhone()
             });
-
-            Message.showMessage("Thành công", "Thêm nhân viên thành công!");
-            SwingUtilities.invokeLater(() -> GlassPanePopup.closePopupLast());
-
         } catch (Exception e) {
             log.error("Error creating employee: ", e);
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
@@ -564,6 +528,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnExportActionPerformed
+
     private void filterTable(String genderFilter, String positionFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl().getRowSorter();
 
@@ -584,6 +549,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
 
     }
+
     private static Valid getValid(InfoEmployeeModal modal) {
         String name = modal.getTxtName().getText().trim();
         String phone = modal.getTxtPhone().getText().trim();
@@ -593,12 +559,13 @@ public class EmployeeManagement extends javax.swing.JPanel {
         boolean gender = modal.getCmbGender().getSelectedItem() != null
                 && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nam");
 
-        // Reset lỗi
-        modal.getLblErrolName().setText("");
-        modal.getLblErrolPhone().setText("");
-        modal.getLblErrolCitizen().setText("");
-        modal.getLblErrolEmail().setText("");
-        modal.getLblErrolHireDate().setText("");
+//         Reset lỗi
+        Color white = Color.WHITE;
+        modal.getLblErrolName().setForeground(white);
+        modal.getLblErrolPhone().setForeground(white);
+        modal.getLblErrolCitizen().setForeground(white);
+        modal.getLblErrolEmail().setForeground(white);
+        modal.getLblErrolHireDate().setForeground(white);
 
         Color red = Color.RED;
         modal.getLblErrolName().setForeground(red);
@@ -653,22 +620,22 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 hireDate = LocalDate.now();
             }
         } catch (DateTimeParseException e) {
-            modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd/MM/yyyy)!");
+            modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd-MM-yyyy)!");
             valid = false;
             log.error("Error parsing hire date: ", e);
         }
 
         return new Valid(name, valid, gender, phone, citizenId, email, hireDate);
     }
+
     private record Valid(
-            String fullName,      // SỬA: name -> fullName
+            String fullName,
             boolean valid,
-            boolean gender,       // SỬA: thêm gender
-            String phone,         // SỬA: thêm phone
-            String citizenId,     // SỬA: thêm citizenId
-            String email,         // SỬA: thêm email
-            LocalDate hireDate    // SỬA: thêm hireDate
-            // SỬA: Xóa các field của Promotion: discountPrice, discountPercent, description, startDate, endDate
+            boolean gender,
+            String phone,
+            String citizenId,
+            String email,
+            LocalDate hireDate
     ) {
     }
 

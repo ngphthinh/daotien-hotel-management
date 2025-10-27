@@ -6,6 +6,7 @@ package iuh.fit.se.group1.ui.component.modal;
 
 import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
+import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.TextField;
@@ -24,6 +25,8 @@ import org.kordamp.ikonli.swing.FontIcon;
  * @author Windows
  */
 public class InfoEmployeeModal extends javax.swing.JPanel {
+
+    private final RoleService roleService;
 
     public Button getBtnClose() {
         return btnClose;
@@ -96,7 +99,8 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
      * Creates new form InfoEmployeeModal
      */
     private DateChooser dateChooser;
-    public InfoEmployeeModal() {
+    public InfoEmployeeModal(RoleService roleService) {
+        this.roleService = roleService;
         initComponents();
         btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Color.white));
         cmbGender.removeAllItems();
@@ -107,9 +111,12 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         cmbGender.setForeground(new java.awt.Color(51, 51, 51));     
         cmbGender.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
         cmbPosition.removeAllItems();
-        cmbPosition.addItem("Nhân viên lễ tân");
+
+        roleService.getAllRoles().forEach(role -> {
+            cmbPosition.addItem(role.getRoleName());
+        });
+
         cmbPosition.setLightWeightPopupEnabled(false);
-        cmbPosition.addItem("Nhân viên quản lý");
         cmbPosition.setBackground(new java.awt.Color(240, 248, 255)); 
         cmbPosition.setForeground(new java.awt.Color(51, 51, 51));     
         cmbPosition.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));

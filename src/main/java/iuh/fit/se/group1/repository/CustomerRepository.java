@@ -27,7 +27,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
 
     @Override
     public Customer save(Customer entity) {
-        String sql = "INSERT INTO Customer (fullName, phone,email,citizenId,gender,address,dateOfBirth, createdAt) VALUES (?, ?, ?,?,?,?,?,?)";
+        String sql = "INSERT INTO Customer(fullName, phone,email,citizenId,gender,address,dateOfBirth, createdAt) VALUES (?, ?, ?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, entity.getFullName());

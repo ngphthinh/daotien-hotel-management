@@ -18,4 +18,12 @@ public class RoleService {
         roleRepository.deleteById(roleId);
     }
 
+    public java.util.List<Role> getAllRoles() {
+        return roleRepository.findAll();
+    }
+
+    public Role getRoleById(String roleId) {
+        return roleRepository.findById(roleId);
+    }
+
 }

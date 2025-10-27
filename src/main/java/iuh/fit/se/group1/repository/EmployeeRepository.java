@@ -53,7 +53,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     entity.setEmployeeId(generatedKeys.getLong(1));
-                    ;
                 }
             }
             return entity;
@@ -106,13 +105,13 @@ public class EmployeeRepository implements Repository<Employee, Long> {
     public List<Employee> findAll() {
         List<Employee> employees = new ArrayList<>();
         String sql = """
-        SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
-               e.accountId, a.username, a.password,
-               r.roleId, r.roleName
-        FROM Employee e
-        JOIN Account a ON e.accountId = a.accountId
-        JOIN Role r ON a.roleId = r.roleId
-        """;
+                SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
+                       e.accountId, a.username, a.password,
+                       r.roleId, r.roleName
+                FROM Employee e
+                JOIN Account a ON e.accountId = a.accountId
+                JOIN Role r ON a.roleId = r.roleId
+                """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
@@ -174,44 +173,16 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         }
     }
 
-    public List<Employee> findByEmployeeNameOrId(String keyword) {
-        List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT * FROM Employee WHERE fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR employeeId LIKE ? Order BY employeeId ASC, fullName ASC";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            String likeKeyword = "%" + keyword + "%";
-            preparedStatement.setString(1, likeKeyword);
-            preparedStatement.setString(2, likeKeyword);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Employee employee = new Employee();
-                    employee.setEmployeeId(resultSet.getLong("employeeId"));
-                    employee.setFullName(resultSet.getString("fullName"));
-                    employee.setPhone(resultSet.getString("phone"));
-                    employee.setEmail(resultSet.getString("email"));
-                    employee.setHireDate(resultSet.getDate("hireDate").toLocalDate());
-                    employee.setCitizenId(resultSet.getString("citizenId"));
-                    employee.setGender(resultSet.getBoolean("gender"));
-                    employee.getAccount().setAccountId(resultSet.getLong("accountId"));
-                    employee.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
-                    employees.add(employee);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return employees;
-    }
-
     public Employee findByCitizenId(String citizenId) {
         String sql = """
-        SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
-               e.accountId, a.username, a.password,
-               r.roleId, r.roleName
-        FROM Employee e
-        JOIN Account a ON e.accountId = a.accountId
-        JOIN Role r ON a.roleId = r.roleId
-        WHERE e.citizenId = ?
-        """;
+                SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
+                       e.accountId, a.username, a.password,
+                       r.roleId, r.roleName
+                FROM Employee e
+                JOIN Account a ON e.accountId = a.accountId
+                JOIN Role r ON a.roleId = r.roleId
+                WHERE e.citizenId = ?
+                """;
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, citizenId);
@@ -252,4 +223,57 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return null;
     }
 
+    public List<Employee> findByIdOrNameOrPhoneNumber(String keyword) {
+        List<Employee> employees = new ArrayList<>();
+        String sql = """
+                SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
+                       e.accountId, a.username, a.password,
+                       r.roleId, r.roleName
+                FROM Employee e
+                JOIN Account a ON e.accountId = a.accountId
+                JOIN Role r ON a.roleId = r.roleId
+                WHERE employeeId LIKE ? OR fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR phone LIKE ?
+                Order BY employeeId , fullName
+                """;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            String likeKeyword = "%" + keyword + "%";
+            preparedStatement.setString(1, likeKeyword);
+            preparedStatement.setString(2, likeKeyword);
+            preparedStatement.setString(3, likeKeyword);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    Employee employee = new Employee();
+                    employee.setEmployeeId(rs.getLong("employeeId"));
+                    employee.setFullName(rs.getString("fullName"));
+                    employee.setPhone(rs.getString("phone"));
+                    employee.setEmail(rs.getString("email"));
+                    employee.setHireDate(rs.getDate("hireDate").toLocalDate());
+                    employee.setCitizenId(rs.getString("citizenId"));
+                    employee.setGender(rs.getBoolean("gender"));
+
+                    // Account
+                    Account account = new Account();
+                    account.setAccountId(rs.getLong("accountId"));
+                    account.setUsername(rs.getString("username"));
+                    account.setPassword(rs.getString("password"));
+
+                    // Role
+                    Role role = new Role();
+                    role.setRoleId(rs.getString("roleId"));
+                    role.setRoleName(rs.getString("roleName"));
+                    account.setRole(role);
+
+                    // Liên kết
+                    employee.setAccount(account);
+
+                    employees.add(employee);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return employees;
+    }
 }

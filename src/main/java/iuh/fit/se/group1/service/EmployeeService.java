@@ -15,24 +15,28 @@ public class EmployeeService {
     private static final Logger log = LoggerFactory.getLogger(EmployeeService.class);
     private final EmployeeRepository employeeRepository;
     private final AccountService accountService;
-
+    private final RoleService roleService;
 
     public EmployeeService() {
         this.accountService = new AccountService();
+        this.roleService = new RoleService();
         this.employeeRepository = new EmployeeRepository();
     }
 
     public Employee createEmployee(Employee employee, String roleId) {
-
+        Role role = roleService.getRoleById(roleId);
+        if (role == null) {
+            log.error("Role with ID {} not found. Cannot create employee.", roleId);
+            throw new IllegalArgumentException("Invalid role ID: " + roleId);
+        }
         Account account = new Account();
         account.setUsername("username");
         account.setPassword(PropertiesReader.getInstance().get("daotien.password"));
-        account.setRole(new Role(roleId));
+        account.setRole(role);
         Account accountSave = accountService.createAccount(account);
         // Tao nhan vien
         employee.setAccount(accountSave);
         Employee employeeSave = employeeRepository.save(employee);
-
         // Tạo account khi thêm nhân viên
         String username = generateUsername(employeeSave);
 
@@ -73,8 +77,8 @@ public class EmployeeService {
         return employeeRepository.update(employee);
     }
 
-    public List<Employee> getEmployeeByKeyword(String keyword) {
-        return employeeRepository.findByEmployeeNameOrId(keyword);
+    public List<Employee> getEmployeeByKeyword(String keyword){
+        return employeeRepository.findByIdOrNameOrPhoneNumber(keyword);
     }
 
 }

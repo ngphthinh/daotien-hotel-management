@@ -440,13 +440,12 @@ public class Login extends javax.swing.JFrame {
             return null;
         }
 
-        sendCodeToEmail(employee);
-
         GlassPanePopup.closePopupLast();
         sendCodeModal.setTextEmail(employee.getEmail());
         sendCodeModal.getLblName().setText(employee.getFullName());
         sendCodeModal.getLblPosition().setText(employee.getAccount().getRole().getRoleName());
         GlassPanePopup.showPopup(sendCodeModal);
+        sendCodeToEmail(employee);
         return employee;
     }
 
