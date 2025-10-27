@@ -29,5 +29,8 @@ public class AmenityService {
         return amenityRepository.update(amenity);
     }
 
+    public List<Amenity> getAmenityByKeyword(String keyword) {
+        return amenityRepository.findByAmenityNameOrId(keyword);
+    }
 
 }
