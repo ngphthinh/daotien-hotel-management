@@ -107,9 +107,9 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         cmbGender.setForeground(new java.awt.Color(51, 51, 51));     
         cmbGender.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12)); 
         cmbPosition.removeAllItems();
-        cmbPosition.addItem("Nhân viên");
+        cmbPosition.addItem("Nhân viên lễ tân");
         cmbPosition.setLightWeightPopupEnabled(false);
-        cmbPosition.addItem("Quản lí");
+        cmbPosition.addItem("Nhân viên quản lý");
         cmbPosition.setBackground(new java.awt.Color(240, 248, 255)); 
         cmbPosition.setForeground(new java.awt.Color(51, 51, 51));     
         cmbPosition.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));

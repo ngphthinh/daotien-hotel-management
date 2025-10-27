@@ -64,6 +64,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
                     ? employee.getAccount().getRole().getRoleName()
                     : "N/A";
+            System.out.println("Loading employee: " + employee);
             model.addRow(new Object[]{
                     employee.getEmployeeId(),
                     employee.getFullName(),
@@ -300,7 +301,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         var header = tblEmployee.getTbl().getTableHeader();
         Combobox<String> cmb = new Combobox<>(new String[]{"Tất cả", "Nam", "Nữ"});
-        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Tất cả", "Nhân viên", "Quản lí"});
+        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Tất cả", "Nhân viên lễ tân", "Nhân viên quản lý"});
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
@@ -513,6 +514,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
         }
 
         try {
+            String position = (String) modal.getCmbPosition().getSelectedItem();
+            String roleId;
+
+            if ("Nhân viên quản lý".equals(position)) {
+                roleId = "MANAGER"; // Hoặc ID tương ứng trong DB của bạn
+            } else {
+                roleId = "RECEPTIONIST"; // Role cho Nhân viên
+            }
             Employee employee = new Employee();
             employee.setFullName(result.fullName);
             employee.setPhone(result.phone);
@@ -521,7 +530,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             employee.setCitizenId(result.citizenId);
             employee.setHireDate(result.hireDate);
 
-            Employee employeeSave = employeeService.createEmployee(employee);
+            Employee employeeSave = employeeService.createEmployee(employee, roleId);
 
             if (employeeSave == null) {
                 Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
@@ -543,7 +552,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             });
 
             Message.showMessage("Thành công", "Thêm nhân viên thành công!");
-            GlassPanePopup.closePopupLast();
+            SwingUtilities.invokeLater(() -> GlassPanePopup.closePopupLast());
 
         } catch (Exception e) {
             log.error("Error creating employee: ", e);
