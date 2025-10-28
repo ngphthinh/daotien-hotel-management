@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.entity;
 
 import iuh.fit.se.group1.enums.RoomStatus;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Room {
@@ -10,22 +11,25 @@ public class Room {
     private RoomType roomType;
     private LocalDate createdAt;
     private RoomStatus roomStatus;
+    private BigDecimal price;  // Thêm trường price dựa trên schema SQL (DECIMAL(18,2) -> BigDecimal cho độ chính xác)
 
-    public Room(long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus) {
+    public Room(long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus, BigDecimal price) {
         this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.roomType = roomType;
         this.createdAt = createdAt;
         this.roomStatus = roomStatus;
+        this.price = price;
     }
 
     public Room() {
     }
 
-    public Room(String roomNumber, RoomType roomType, RoomStatus roomStatus) {
+    public Room(String roomNumber, RoomType roomType, RoomStatus roomStatus, BigDecimal price) {
         this.roomNumber = roomNumber;
         this.roomType = roomType;
         this.roomStatus = roomStatus;
+        this.price = price;
     }
 
     public long getRoomId() {
@@ -57,7 +61,7 @@ public class Room {
     }
 
     public void setCreateAt(LocalDate createAt) {
-        this.createdAt = createdAt;
+        this.createdAt = createAt;
     }
 
     public RoomStatus getRoomStatus() {
@@ -66,6 +70,14 @@ public class Room {
 
     public void setRoomStatus(RoomStatus roomStatus) {
         this.roomStatus = roomStatus;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     @Override
@@ -92,7 +104,18 @@ public class Room {
 
     @Override
     public String toString() {
-        return "Room{" + "roomId=" + roomId + ", roomNumber=" + roomNumber + ", roomType=" + roomType + ", createAt=" + createdAt + ", roomStatus=" + roomStatus + '}';
+        return "Room{" + "roomId=" + roomId + ", roomNumber=" + roomNumber + ", roomType=" + roomType + ", createAt=" + createdAt + ", roomStatus=" + roomStatus + ", price=" + price + '}';
+    }
+
+    public String getRoomTypeId() {
+        if (roomType != null) {
+            return roomType.getRoomTypeId();  // Giả sử RoomType có method getRoomTypeId()
+        }
+        return null;
+    }
+
+    public void setCreatedAt(LocalDate now) {
+        this.createdAt = now;
     }
     
 }
