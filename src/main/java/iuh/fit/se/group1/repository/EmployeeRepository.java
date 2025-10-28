@@ -29,7 +29,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
 
     @Override
     public Employee save(Employee entity) {
-        String sql = "INSERT INTO Employee (fullName, phone,email,hireDate,citizenId,gender,accountId,createdAt) VALUES (?, ?, ?,?,?,?,?,?)";
+        String sql = "INSERT INTO Employee (fullName, phone,email,hireDate,citizenId,gender,accountId,avt,createdAt) VALUES (?, ?, ?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getFullName());
             preparedStatement.setString(2, entity.getPhone());
@@ -43,7 +43,12 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                 preparedStatement.setNull(7, java.sql.Types.BIGINT);
             }
             entity.setCreatedAt(LocalDate.now());
-            preparedStatement.setDate(8, Date.valueOf(entity.getCreatedAt()));
+            if (entity.getAvt() != null && entity.getAvt().length > 0) {
+                preparedStatement.setBytes(8, entity.getAvt());
+            } else {
+                preparedStatement.setNull(8, java.sql.Types.VARBINARY);
+            }
+            preparedStatement.setDate(9, Date.valueOf(entity.getCreatedAt()));
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -62,7 +67,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         }
 
     }
-
     @Override
     public Employee findById(Long id) {
         String sql = "SELECT * FROM Employee WHERE employeeId = ?";
@@ -78,8 +82,16 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     employee.setHireDate(resultSet.getDate("hireDate").toLocalDate());
                     employee.setCitizenId(resultSet.getString("citizenId"));
                     employee.setGender(resultSet.getBoolean("gender"));
-                    employee.getAccount().setAccountId(resultSet.getLong("accountId"));
+                    Long accountId = resultSet.getLong("accountId");
+                    if (accountId != null && accountId > 0) {
+                        Account account = new Account();
+                        account.setAccountId(accountId);
+                        employee.setAccount(account);
+                    }
+                    byte[] avtBytes = resultSet.getBytes("avt");
+                    employee.setAvt(avtBytes);
                     employee.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+
                     return employee;
                 }
             }
@@ -107,7 +119,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         String sql = """
                 SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
                        e.accountId, a.username, a.password,
-                       r.roleId, r.roleName
+                       r.roleId, r.roleName,e.avt
                 FROM Employee e
                 JOIN Account a ON e.accountId = a.accountId
                 JOIN Role r ON a.roleId = r.roleId
@@ -123,6 +135,8 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     employee.setHireDate(rs.getDate("hireDate").toLocalDate());
                     employee.setCitizenId(rs.getString("citizenId"));
                     employee.setGender(rs.getBoolean("gender"));
+                    byte[] avtBytes = rs.getBytes("avt");
+                    employee.setAvt(avtBytes);
 
                     // Account
                     Account account = new Account();
@@ -147,10 +161,9 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         }
         return employees;
     }
-
     @Override
     public Employee update(Employee entity) {
-        String sql = "UPDATE Employee SET fullName = ?, phone = ?, email = ?, hireDate = ?, citizenId = ?, gender = ?, accountId = ? WHERE employeeId = ?";
+        String sql = "UPDATE Employee SET fullName = ?, phone = ?, email = ?, hireDate = ?, citizenId = ?, gender = ?, accountId = ?,avt=? WHERE employeeId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, entity.getFullName());
@@ -160,7 +173,12 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             preparedStatement.setString(5, entity.getCitizenId());
             preparedStatement.setBoolean(6, entity.isGender());
             preparedStatement.setLong(7, entity.getAccount().getAccountId());
-            preparedStatement.setLong(8, entity.getEmployeeId());
+            if (entity.getAvt() != null && entity.getAvt().length > 0) {
+                preparedStatement.setBytes(8, entity.getAvt());
+            } else {
+                preparedStatement.setNull(8, java.sql.Types.VARBINARY);
+            }
+            preparedStatement.setLong(9, entity.getEmployeeId());
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -177,7 +195,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         String sql = """
                 SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
                        e.accountId, a.username, a.password,
-                       r.roleId, r.roleName
+                       r.roleId, r.roleName,e.avt
                 FROM Employee e
                 JOIN Account a ON e.accountId = a.accountId
                 JOIN Role r ON a.roleId = r.roleId
@@ -198,7 +216,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     employee.setHireDate(rs.getDate("hireDate").toLocalDate());
                     employee.setCitizenId(rs.getString("citizenId"));
                     employee.setGender(rs.getBoolean("gender"));
-
+                    employee.setAvt(rs.getBytes("avt"));
                     // Account
                     Account account = new Account();
                     account.setAccountId(rs.getLong("accountId"));

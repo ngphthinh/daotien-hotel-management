@@ -4,11 +4,16 @@ package iuh.fit.se.group1.util;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Locale;
 
 public class Constants {
@@ -46,7 +51,29 @@ public class Constants {
             default -> null;
         };
     }
+    public static String bufferedImageToBase64(BufferedImage image, String format) {
+        if (image == null) return null;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ImageIO.write(image, format, baos);
+            byte[] bytes = baos.toByteArray();
+            return Base64.getEncoder().encodeToString(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
+
+    public static BufferedImage base64ToBufferedImage(String base64) {
+        try {
+            byte[] imageBytes = Base64.getDecoder().decode(base64);
+            ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
+            return ImageIO.read(bais);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static Icon getIconOfEmployee(int index) {
         return switch (index) {
             case 99 -> FontIcon.of(FontAwesomeSolid.BARS, 16, Constants.COLOR_ICON_MENU);
