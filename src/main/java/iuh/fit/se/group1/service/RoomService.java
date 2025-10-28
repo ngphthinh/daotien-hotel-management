@@ -1,7 +1,9 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.Room;
+import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.repository.RoomRepository;
+
 import java.util.List;
 
 public class RoomService {
@@ -29,5 +31,9 @@ public class RoomService {
 
     public List<Room> getRoomByKeyword(String keyword) {
         return roomRepository.findByRoomNumberOrId(keyword);
+    }
+
+    public List<Room> getRoomByStatusOrRoomType(String roomTypeId, RoomStatus status) {
+        return roomRepository.findRoomByStatusAndRoomType(roomTypeId, status);
     }
 }

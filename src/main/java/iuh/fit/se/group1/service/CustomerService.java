@@ -20,6 +20,7 @@ public class CustomerService {
         customerRepository.deleteById(customerId);
     }
 
+
     public List<Customer> getAllCustomer() {
         return customerRepository.findAll();
     }
@@ -31,6 +32,10 @@ public class CustomerService {
 
     public List<Customer> getAmenityByKeyword(String keyword) {
         return customerRepository.findByCustomerNameOrId(keyword);
+    }
+
+    public Customer getCustomerByCitizenId(String citizenId) {
+        return customerRepository.findByCitizenId(citizenId);
     }
 
 }

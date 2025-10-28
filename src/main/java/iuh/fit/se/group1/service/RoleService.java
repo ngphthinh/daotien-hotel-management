@@ -26,4 +26,7 @@ public class RoleService {
         return roleRepository.findById(roleId);
     }
 
+    public boolean roleExists(String roleId) {
+        return roleRepository.existsById(roleId);
+    }
 }

@@ -6,14 +6,14 @@ import java.time.LocalDate;
 
 public class Room {
 
-    private long roomId;
+    private Long roomId;
     private String roomNumber;
     private RoomType roomType;
     private LocalDate createdAt;
     private RoomStatus roomStatus;
     private BigDecimal price;  // Thêm trường price dựa trên schema SQL (DECIMAL(18,2) -> BigDecimal cho độ chính xác)
 
-    public Room(long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus, BigDecimal price) {
+    public Room(Long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus, BigDecimal price) {
         this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.roomType = roomType;
@@ -32,11 +32,15 @@ public class Room {
         this.price = price;
     }
 
-    public long getRoomId() {
+    public Room(Long roomId) {
+        this.roomId = roomId;
+    }
+
+    public Long getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(long roomId) {
+    public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
 

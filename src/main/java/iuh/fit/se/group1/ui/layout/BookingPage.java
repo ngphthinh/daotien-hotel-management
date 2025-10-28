@@ -5,8 +5,18 @@
 package iuh.fit.se.group1.ui.layout;
 
 
+import com.raven.datechooser.SelectedDate;
+import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.RoomStatus;
+import iuh.fit.se.group1.service.BookingService;
+import iuh.fit.se.group1.service.CustomerService;
+import iuh.fit.se.group1.service.OrderService;
+import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.ui.component.booking.InfoAmenityPanel;
+import iuh.fit.se.group1.ui.component.booking.InfoCustomerPanel;
 import iuh.fit.se.group1.ui.component.booking.InfoRoomPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import javax.swing.*;
@@ -15,35 +25,57 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author THIS PC
  */
 public class BookingPage extends javax.swing.JPanel {
 
+    private static final Logger log = LoggerFactory.getLogger(BookingPage.class);
+    private final OrderService orderService;
+    private final BookingService bookingService;
+    private final RoomService roomService;
+    private final CustomerService customerService;
     private int roomCount = 1;
+
+    private List<Room> rooms;
 
     private List<Map<String, String>> bookingRooms;
 
     private final Map<String, Integer> amenityIds = new HashMap<>();
+
+    AtomicReference<Customer> customerAtomicReference = new AtomicReference<>();
 
     /**
      * Creates new form BookingPage
      */
     public BookingPage() {
         initComponents();
+        custom();
+        orderService = new OrderService();
+        customerService = new CustomerService();
+        roomService = new RoomService();
+        bookingService = new BookingService();
+        rooms = new ArrayList<>();
+
+    }
+
+    private void custom() {
         headerBooking1.getBtn().setText("Đặt phòng");
         addRoomPanel1.addAction(a ->
                 addNewRoom()
         );
         infoRoomPanel1.getTxtRoomId().setText(roomCount + "hihi");
         infoRoomPanel1.getBtnClose().setVisible(false);
-        headerBooking1.addAction(e -> {
-            bookingRooms = getBookingRooms();
-            System.out.println(amenityIds);
-        });
+        headerBooking1.addAction(e -> createOrder());
 
         listAmenity1.addDocumentListener(new DocumentListener() {
             @Override
@@ -100,6 +132,102 @@ public class BookingPage extends javax.swing.JPanel {
         pnlListAmenityMain.revalidate();
         pnlListAmenityMain.repaint();
 
+        infoCustomerPanel1.addActionTxtCitizenId(e -> {
+            Customer customer = customerService.getCustomerByCitizenId(infoCustomerPanel1.getTxtCitizen().getText().trim());
+            if (customer != null) {
+                infoCustomerPanel1.getTxtCustomerName().setText(customer.getFullName());
+                infoCustomerPanel1.getTxtPhoneNumber().setText(customer.getPhone());
+                infoCustomerPanel1.getTxtEmail().setText(customer.getEmail());
+                // gender: false: male -> index 0 | true : female -> index 0
+                infoCustomerPanel1.getCboGender().setSelectedIndex(customer.isGender() ? 1 : 0);
+                Date dob = Date.from(customer.getDateOfBirth().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                infoCustomerPanel1.getDateChooser().setSelectedDate(dob);
+                customerAtomicReference.set(customer);
+            }
+        });
+
+        infoRoomPanel1.getCboRoomType().addActionListener(e -> selectRoomAuto(infoRoomPanel1));
+    }
+
+    private void selectRoomAuto(InfoRoomPanel infoRoomPanel) {
+        //TODO: Chưa test được  test lại sao khi có hóa đơn
+        String roomTypeId = infoRoomPanel.getCboRoomType().getSelectedIndex() == 0 ? "SINGLE" : "DOUBLE";
+
+        // Lấy danh sách phòng trống theo loại phòng
+        List<Room> rooms = roomService.getRoomByStatusOrRoomType(roomTypeId, RoomStatus.AVAILABLE);
+
+        // Nếu không có phòng loại đó trong hệ thống
+        if (rooms.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có phòng loại " + roomTypeId + " trong hệ thống!",
+                    "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        LocalDateTime checkInDate = LocalDateTime.parse(infoRoomPanel1.getTxtStartDate().getText().trim(), formatter);
+        LocalDateTime checkOutDate = LocalDateTime.parse(infoRoomPanel1.getTxtEndDate().getText().trim(), formatter);
+
+        // Tìm phòng đầu tiên còn trống trong thời gian đó
+        Room availableRoom = null;
+        for (Room room : rooms) {
+            boolean isAvailable = !bookingService.existsByRoomIdAndDate(room.getRoomId(), checkInDate, checkOutDate);
+            if (isAvailable) {
+                availableRoom = room;
+                break;
+            }
+        }
+
+        // TODO: Kiểm tra có trong danh sach phòng đã chọn chưa
+
+        // Nếu không có phòng nào trống trong ngày đó
+        if (availableRoom == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Không có phòng trống loại " + roomTypeId + " trong khoảng thời gian đã chọn!",
+                    "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Gán thông tin phòng trống đầu tiên vào panel
+        infoRoomPanel.getTxtRoomId().setText(availableRoom.getRoomId().toString());
+        infoRoomPanel.getTxtRoomNumber().setText(availableRoom.getRoomNumber());
+    }
+
+    private void createOrder() {
+        Customer customer = customerAtomicReference.get();
+        if (customer == null) {
+            validCustomer(infoCustomerPanel1);
+            customer = new Customer();
+            customer.setFullName(infoCustomerPanel1.getTxtCustomerName().getText().trim());
+            customer.setPhone(infoCustomerPanel1.getTxtPhoneNumber().getText().trim());
+            customer.setEmail(infoCustomerPanel1.getTxtEmail().getText().trim());
+            customer.setCitizenId(infoCustomerPanel1.getTxtCitizen().getText().trim());
+            customer.setGender(infoCustomerPanel1.getCboGender().getSelectedIndex() == 1);
+            SelectedDate dob = infoCustomerPanel1.getDateChooser().getSelectedDate();
+            LocalDate dateOfBirth = LocalDate.of(dob.getYear(), dob.getMonth(), dob.getDay());
+            customer.setDateOfBirth(dateOfBirth);
+        }
+
+
+        String roomTypeId = infoRoomPanel1.getCboRoomType().getSelectedIndex() == 0 ? "SINGLE" : "DOUBLE";
+
+
+//        List<Room> room = roomService.getRoomByStatusOrRoomType(roomTypeId, RoomStatus.AVAILABLE);
+
+
+        Order order = new Order();
+        order.setCustomer(customer);
+        order.setOrderDate(LocalDateTime.now());
+        order.setEmployee(new Employee(4L));
+        order.setOrderType(new OrderType(1L));
+        order.setDeposit(BigDecimal.ZERO);
+
+//        List<Map<String, String>> bookingRooms = getBookingRooms();
+
+
+    }
+
+    private void validCustomer(InfoCustomerPanel infoCustomerPanel) {
+
     }
 
     private List<Map<String, String>> getBookingRooms() {
@@ -121,7 +249,7 @@ public class BookingPage extends javax.swing.JPanel {
         return rooms;
     }
 
-    public JPanel createPanelEmpty(){
+    public JPanel createPanelEmpty() {
         JLabel label = new JLabel("Chưa có dịch vụ nào được chọn");
         label.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         label.setForeground(new Color(150, 150, 150));
@@ -195,7 +323,7 @@ public class BookingPage extends javax.swing.JPanel {
         newRoom.getTxtRoomId().setText(roomCount + "hihi");
 
         newRoom.closeRoomCard(e -> closeRoomCard(newRoom));
-
+        newRoom.getCboRoomType().addActionListener(e-> selectRoomAuto(newRoom));
         // vị trí trước nút "Thêm phòng"
         int index = pnlListRoom.getComponentCount() - 1;
         pnlListRoom.add(newRoom, index);
@@ -298,48 +426,48 @@ public class BookingPage extends javax.swing.JPanel {
         javax.swing.GroupLayout pnlListAmenityLayout = new javax.swing.GroupLayout(pnlListAmenity);
         pnlListAmenity.setLayout(pnlListAmenityLayout);
         pnlListAmenityLayout.setHorizontalGroup(
-            pnlListAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlListAmenityLayout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addGroup(pnlListAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlListAmenityLayout.createSequentialGroup()
-                        .addComponent(lblListAmenityTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(pnlListAmenityMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                pnlListAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlListAmenityLayout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(pnlListAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(pnlListAmenityLayout.createSequentialGroup()
+                                                .addComponent(lblListAmenityTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addComponent(pnlListAmenityMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         pnlListAmenityLayout.setVerticalGroup(
-            pnlListAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlListAmenityLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblListAmenityTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlListAmenityMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                pnlListAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlListAmenityLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblListAmenityTitle)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnlListAmenityMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(pnlListRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
-                    .addComponent(infoCustomerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlListAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(531, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(28, 28, 28)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(pnlListRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                                        .addComponent(infoCustomerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(pnlListAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap(531, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(infoCustomerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnlListRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnlListAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(427, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(24, 24, 24)
+                                .addComponent(infoCustomerPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnlListRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnlListAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(427, Short.MAX_VALUE))
         );
 
         scrollPaneWin111.setViewportView(jPanel1);
@@ -353,31 +481,31 @@ public class BookingPage extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, 1159, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 625, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(listAmenity1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, 1159, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 625, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(listAmenity1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(headerBooking1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 744, Short.MAX_VALUE)
-                    .addComponent(listAmenity1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(headerBooking1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 744, Short.MAX_VALUE)
+                                        .addComponent(listAmenity1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 

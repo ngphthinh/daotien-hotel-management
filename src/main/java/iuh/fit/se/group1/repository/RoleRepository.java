@@ -90,4 +90,21 @@ public class RoleRepository implements Repository<Role, String> {
     public Role update(Role entity) {
         return null;
     }
+
+    public boolean existsById(String roleId) {
+        String sql = "SELECT 1 FROM Role WHERE roleId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, roleId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error checking existence of Role by ID: ", e);
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
 }
