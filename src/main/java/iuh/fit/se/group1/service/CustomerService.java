@@ -32,5 +32,18 @@ public class CustomerService {
     public List<Customer> getAmenityByKeyword(String keyword) {
         return customerRepository.findByCustomerNameOrId(keyword);
     }
+    
+    public Customer getCustomerById(String idStr) {
+        try {
+            Long id = Long.parseLong(idStr);
+            return customerRepository.findById(id);
+        } catch (NumberFormatException e) {
+            return null; 
+        }
+    }
+    
+    public Customer updateCustomer(Customer customer) {
+        return customerRepository.update(customer);
+    }
 
 }
