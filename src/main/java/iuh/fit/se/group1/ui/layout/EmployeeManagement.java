@@ -485,12 +485,13 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         try {
             int position = modal.getCmbPosition().getSelectedIndex();
-            String roleId;
-            if (position == 0) {
-                roleId = Role.MANAGER.toString();
-            } else {
-                roleId = Role.RECEPTIONIST.toString();
-            }
+String roleId;
+if (position == 0) {
+    roleId = Role.RECEPTIONIST.toString(); 
+} else {
+    roleId = Role.MANAGER.toString();      
+}
+
             Employee employee = new Employee();
             employee.setFullName(result.fullName);
             employee.setPhone(result.phone);
@@ -507,7 +508,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             }
 
             DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-            String genderStr = employeeSave.isGender() ? "Nữ" : "Nam";
+            String genderStr = employeeSave.isGender() ?  "Nam":"Nữ" ;
 
             System.out.println(employeeSave);
 
@@ -523,7 +524,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
         }
     }
-    //GEN-LAST:event_btnAddEmployeeActionPerformed
+//GEN-LAST:event_btnAddEmployeeActionPerformed
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
