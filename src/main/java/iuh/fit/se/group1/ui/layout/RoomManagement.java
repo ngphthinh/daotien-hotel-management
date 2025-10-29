@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
+
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.Room;
@@ -37,9 +34,6 @@ public class RoomManagement extends javax.swing.JPanel {
     private String currentTypeFilter = "Tất cả";
     private String currentStatusFilter = "Tất cả";
 
-    /**
-     * Creates new form RoomManagement
-     */
     public RoomManagement() {
         initServices();
         initComponents();
@@ -96,12 +90,12 @@ public class RoomManagement extends javax.swing.JPanel {
     DefaultTableModel model = new DefaultTableModel(cols, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
-            return false; // Không cho edit
+            return false; 
         }
     };
     tblRoom.getTbl().setModel(model);
     tblRoom.getTbl().setAutoCreateRowSorter(false);
-    tblRoom.getTbl().getTableHeader().setReorderingAllowed(false); // Không cho kéo cột
+    tblRoom.getTbl().getTableHeader().setReorderingAllowed(false);
 
     tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(80);
     tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(100);
@@ -233,7 +227,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
     TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
-    // Cột Loại phòng - có icon dropdown
+
     TableColumn colType = tblRoom.getTbl().getColumnModel().getColumn(2);
     colType.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
         JPanel panel = new JPanel(new BorderLayout());
@@ -251,7 +245,7 @@ public class RoomManagement extends javax.swing.JPanel {
         return panel;
     });
 
-    // Cột Trạng thái - có icon dropdown
+ 
     TableColumn colStatus = tblRoom.getTbl().getColumnModel().getColumn(4);
     colStatus.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
         JPanel panel = new JPanel(new BorderLayout());
@@ -269,7 +263,7 @@ public class RoomManagement extends javax.swing.JPanel {
         return panel;
     });
 
-    // Xử lý khi chọn trong combobox
+  
     cmbType.addActionListener(ev -> {
         currentTypeFilter = (String) cmbType.getSelectedItem();
         applyFilters();
@@ -280,7 +274,7 @@ public class RoomManagement extends javax.swing.JPanel {
         applyFilters();
     });
 
-    // Click vào header để hiện combobox
+
     header.addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -296,23 +290,23 @@ public class RoomManagement extends javax.swing.JPanel {
     JTableHeader header = tblRoom.getTbl().getTableHeader();
     Rectangle headerRect = header.getHeaderRect(columnIndex);
     
-    // Tính toán vị trí hiển thị combobox
+
     Point headerLocation = header.getLocationOnScreen();
     Point tableLocation = tblRoom.getLocationOnScreen();
     
     int x = headerRect.x;
     int y = headerRect.y + headerRect.height;
     
-    // Tạo popup để chứa combobox
+
     JPopupMenu popup = new JPopupMenu();
     popup.setLayout(new BorderLayout());
     popup.add(cmb, BorderLayout.CENTER);
     popup.setPreferredSize(new Dimension(headerRect.width, 200));
     
-    // Hiển thị popup
+ 
     popup.show(header, x, y);
     
-    // Ẩn popup khi chọn xong
+
     cmb.addActionListener(e -> {
         popup.setVisible(false);
     });
@@ -410,24 +404,55 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private Room createRoomFromModal(Long roomId, String number, String typeName, String priceStr, String statusStr) {
-        Room room = new Room();
-        room.setRoomId(roomId != null ? roomId : 0);
-        room.setRoomNumber(number);
-        room.setPrice(new BigDecimal(priceStr));
+    Room room = new Room();
+    room.setRoomId(roomId != null ? roomId : 0);
+    room.setRoomNumber(number);
+    room.setPrice(new BigDecimal(priceStr));
 
-        RoomType type = roomTypeService.getAllRoomTypes().stream()
-            .filter(rt -> rt.getName().equals(typeName))
-            .findFirst().orElse(null);
-        room.setRoomType(type);
+    // ✅ Chuẩn hóa và so sánh an toàn hơn
+    List<RoomType> allTypes = roomTypeService.getAllRoomTypes();
+    
+    // Debug: In ra tất cả loại phòng để kiểm tra
+    System.out.println("=== DEBUG: Tìm loại phòng ===");
+    System.out.println("Tên cần tìm: [" + typeName + "] (length: " + typeName.length() + ")");
+    allTypes.forEach(rt -> {
+        System.out.println("- DB có: [" + rt.getName() + "] (length: " + rt.getName().length() + ")");
+    });
+    
+    RoomType type = allTypes.stream()
+        .filter(rt -> rt.getName() != null && rt.getName().trim().equalsIgnoreCase(typeName.trim()))
+        .findFirst()
+        .orElse(null);
 
-        try {
-            room.setRoomStatus(RoomStatus.valueOf(statusStr.toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            room.setRoomStatus(RoomStatus.AVAILABLE);
-        }
-
-        return room;
+    if (type == null) {
+        type = allTypes.stream()
+            .filter(rt -> rt.getRoomTypeId() != null && rt.getRoomTypeId().equals(typeName))
+            .findFirst()
+            .orElse(null);
     }
+
+    if (type == null) {
+        String availableTypes = allTypes.stream()
+            .map(rt -> "'" + rt.getName() + "'")
+            .reduce((a, b) -> a + ", " + b)
+            .orElse("(không có)");
+        
+        throw new IllegalArgumentException(
+            "Không tìm thấy loại phòng: '" + typeName + "'\n" +
+            "Các loại có sẵn: " + availableTypes
+        );
+    }
+
+    room.setRoomType(type);
+
+    try {
+        room.setRoomStatus(RoomStatus.valueOf(statusStr.toUpperCase()));
+    } catch (IllegalArgumentException e) {
+        room.setRoomStatus(RoomStatus.AVAILABLE);
+    }
+
+    return room;
+}
 
     @SuppressWarnings("unchecked")
     private void initComponents() {
