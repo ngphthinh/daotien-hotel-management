@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -42,6 +43,13 @@ import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.LoggerFactory;
 
 import raven.glasspanepopup.GlassPanePopup;
+
+import java.io.File;
+import java.util.List;
+
+import iuh.fit.se.group1.entity.Customer;
+import iuh.fit.se.group1.service.CustomerService;
+import iuh.fit.se.group1.service.ImportExcelService;
 
 /**
  *
@@ -304,7 +312,25 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
 }
 
 });
+        
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+    int result = fileChooser.showOpenDialog(this);
+    if (result == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        ImportExcelService importService = new ImportExcelService();
+        List<Customer> imported = importService.importCustomersFromExcel(file);
+        if (imported != null && !imported.isEmpty()) {
+            customerService.getAllCustomer().addAll(imported);
+            loadTable(customerService.getAllCustomer());
+            Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
+        } else {
+            Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+        }
+    }
+});
 
+        
         cmbGender.addActionListener(ev -> {
             String selected = (String) cmbGender.getSelectedItem();
             filterCustomerTable(selected);
@@ -594,7 +620,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             ) {
 
     }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddCustomer;
     private iuh.fit.se.group1.ui.component.custom.Button btnExport;
