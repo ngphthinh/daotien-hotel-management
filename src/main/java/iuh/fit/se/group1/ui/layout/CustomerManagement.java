@@ -161,11 +161,13 @@ public class CustomerManagement extends javax.swing.JPanel {
 
                     Customer updated = customerService.updateCustomer(customer);
                     if (updated != null) {
-                        model.setValueAt(updated.getFullName(), row, 1);
-                        model.setValueAt(updated.isGender() ? "Nam" : "Nữ", row, 2);
-                        model.setValueAt(updated.getEmail(), row, 3);
-                        model.setValueAt(updated.getCitizenId(), row, 4);
-                        model.setValueAt(updated.getPhone(), row, 5);
+                        int modelRow = tblCustomer.getTbl().convertRowIndexToModel(row);
+model.setValueAt(updated.getFullName(), modelRow, 1);
+model.setValueAt(updated.isGender() ? "Nam" : "Nữ", modelRow, 2);
+model.setValueAt(updated.getEmail(), modelRow, 3);
+model.setValueAt(updated.getCitizenId(), modelRow, 4);
+model.setValueAt(updated.getPhone(), modelRow, 5);
+
                         GlassPanePopup.closePopupLast();
                     } else {
                         Message.showMessage("Lỗi", "Cập nhật khách hàng thất bại!");
@@ -267,30 +269,42 @@ public class CustomerManagement extends javax.swing.JPanel {
             }
         });
         headerCustom1.handleSearch(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                String text = headerCustom1.getSearchText();
-                if (text.isEmpty()) {
-                    loadTable(customerService.getAllCustomer());
-                    return;
-                }
-                loadTable(customerService.getAmenityByKeyword(text));
-            }
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        filterTable();
+    }
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                String text = headerCustom1.getSearchText();
-                if (text.isEmpty()) {
-                    loadTable(customerService.getAllCustomer());
-                    return;
-                }
-                loadTable(customerService.getAmenityByKeyword(text));
-            }
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        filterTable();
+    }
 
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        filterTable();
+    }
+
+    private void filterTable() {
+    String keyword = headerCustom1.getSearchText().trim();
+    TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
+    if (keyword.isEmpty()) {
+        sorter.setRowFilter(null); 
+    } else {
+        sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                Object value = entry.getValue(0); 
+                if (value != null) {
+                    return value.toString().contains(keyword); 
+                }
+                return false;
             }
         });
+    }
+}
+
+});
+
         cmbGender.addActionListener(ev -> {
             String selected = (String) cmbGender.getSelectedItem();
             filterCustomerTable(selected);
@@ -338,10 +352,6 @@ public class CustomerManagement extends javax.swing.JPanel {
         } else {
             result = customerService.getAmenityByKeyword(keyword); // đã có trong service
         }
-
-        // Nếu bạn muốn kết hợp lọc giới tính cùng lúc:
-        // String genderFilter = "Tất cả"; // Hoặc lấy từ cmbGender
-        // filterAndSearchCustomer(genderFilter, keyword);
         loadTable(result);
     }
 
