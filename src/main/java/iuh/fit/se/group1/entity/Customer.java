@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Customer {
-    private static long idCounter = 0;
-
     private Long customerId;
     private String fullName;
     private String phone;
@@ -33,13 +31,6 @@ public class Customer {
 		this.createdAt = createdAt;
 	}
 
-	public static long getIdCounter() {
-		return idCounter;
-	}
-
-	public static void setIdCounter(long idCounter) {
-		Customer.idCounter = idCounter;
-	}
 
 	public Long getCustomerId() {
 		return customerId;

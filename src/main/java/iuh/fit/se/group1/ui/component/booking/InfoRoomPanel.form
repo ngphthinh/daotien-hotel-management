@@ -35,25 +35,17 @@
                               <Component id="lblStartDate" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="lblRoomId" alignment="0" min="-2" pref="73" max="-2" attributes="0"/>
-                                  <Component id="txtRoomId" alignment="0" pref="171" max="32767" attributes="0"/>
-                                  <Component id="cboRoomType" alignment="0" max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="cboRoomType" min="-2" pref="171" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="lblPrice" min="-2" pref="73" max="-2" attributes="0"/>
-                                  <Component id="txtStartDate" pref="171" max="32767" attributes="0"/>
-                                  <Component id="txtPrice" alignment="0" max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="txtStartDate" min="-2" pref="171" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="lblEndDate" min="-2" pref="89" max="-2" attributes="0"/>
-                          <Component id="txtEndDate" min="-2" pref="165" max="-2" attributes="0"/>
-                          <Component id="lblRoomNumber" min="-2" pref="73" max="-2" attributes="0"/>
-                          <Component id="txtRoomNumber" alignment="0" min="-2" pref="165" max="-2" attributes="0"/>
+                          <Component id="txtEndDate" pref="165" max="32767" attributes="0"/>
+                          <Component id="lblBookingType" alignment="0" min="-2" pref="131" max="-2" attributes="0"/>
+                          <Component id="cboBookingType" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
@@ -64,8 +56,24 @@
                       </Group>
                       <Component id="jSeparator1" min="-2" pref="556" max="-2" attributes="0"/>
                   </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="txtRoomId" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
+                          <Component id="lblRoomId" alignment="0" min="-2" pref="73" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="txtPrice" alignment="0" min="-2" pref="101" max="-2" attributes="0"/>
+                          <Component id="lblPrice" alignment="0" min="-2" pref="73" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblRoomNumber" min="-2" pref="73" max="-2" attributes="0"/>
+                          <Component id="txtRoomNumber" min="-2" pref="105" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
-              <EmptySpace pref="24" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -96,12 +104,14 @@
                   <Component id="lblRoomId" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblRoomNumber" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblPrice" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblBookingType" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtRoomId" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtPrice" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtRoomNumber" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cboBookingType" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -247,6 +257,19 @@
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cboRoomType">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblBookingType">
+      <Properties>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="0" green="0" red="0" type="rgb"/>
+        </Property>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Lo&#x1ea1;i &#x111;&#x1eb7;t ph&#xf2;ng"/>
+      </Properties>
+    </Component>
+    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cboBookingType">
     </Component>
   </SubComponents>
 </Form>

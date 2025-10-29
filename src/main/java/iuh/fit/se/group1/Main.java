@@ -1,14 +1,17 @@
 package iuh.fit.se.group1;
 
-import iuh.fit.se.group1.entity.Account;
-import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.repository.AccountRepository;
 import iuh.fit.se.group1.repository.EmployeeRepository;
+import iuh.fit.se.group1.repository.OrderRepository;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.util.PasswordUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 
@@ -45,10 +48,31 @@ public class Main {
 //
 //    }
     public static void main(String[] args) {
-        AccountRepository accountRepository = new AccountRepository();
-        Account account = accountRepository.findByUsername("thinh7");
-        account.setPassword(PasswordUtil.hashPassword("ThinhDepTrai@123"));
-        accountRepository.update(account);
+        OrderRepository orderRepository = new OrderRepository();
+
+        Customer customer = new Customer();
+        customer.setEmail("ngphthinh@gmail.com");
+        customer.setFullName("Nguyễn Phước Thịnh");
+        customer.setPhone("0338687106");
+        customer.setDateOfBirth(LocalDate.now());
+        customer.setGender(false);
+        customer.setCitizenId("082205000810");
+        customer.setAddress("Hihis");
+
+
+        Order order = new Order();
+
+        order.setOrderDate(LocalDateTime.now());
+        order.setCustomer(customer);
+        order.setEmployee(new Employee(4L));
+        order.setOrderType(new OrderType(1L, "sad", LocalDate.now()));
+        order.setDeposit(BigDecimal.ZERO);
+
+
+        Booking booking = new Booking(1L, LocalDateTime.now(), LocalDateTime.now(), new Employee(4L),new Room(1L), BookingType.HOURLY,BigDecimal.valueOf(2000l),LocalDate.now());
+
+        order.addBooking(booking);
+        System.out.println(orderRepository.save(order));
 
 
 

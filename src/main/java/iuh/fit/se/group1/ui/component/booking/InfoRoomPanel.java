@@ -5,6 +5,7 @@
 package iuh.fit.se.group1.ui.component.booking;
 
 import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.ui.component.custom.date.DateTimePicker;
 import iuh.fit.se.group1.util.Constants;
@@ -36,13 +37,38 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         btnClose.setText("");
         btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES_CIRCLE, 20, Constants.COLOR_ICON_MENU));
         btnClose.setBackground(Color.white);
-        DateTimePicker.attachTo(txtStartDate);
-        DateTimePicker.attachTo(txtEndDate);
+
         cboRoomType.addItem("Phòng đơn");
         cboRoomType.addItem("Phòng đôi");
         cboRoomType.setBackground(new java.awt.Color(240, 248, 255));
         cboRoomType.setForeground(new java.awt.Color(51, 51, 51));
         cboRoomType.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+        cboBookingType.addItem("Theo giờ");
+        cboBookingType.addItem("Qua đêm");
+        cboBookingType.addItem("Theo ngày");
+        cboBookingType.setBackground(new java.awt.Color(240, 248, 255));
+        cboBookingType.setForeground(new java.awt.Color(51, 51, 51));
+        cboBookingType.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+
+        DateTimePicker.attachTo(txtStartDate,cboBookingType);
+        DateTimePicker.attachTo(txtEndDate,cboBookingType);
+    }
+
+
+    public Combobox getCboRoomType() {
+        return cboRoomType;
+    }
+
+    public void setCboRoomType(Combobox cboRoomType) {
+        this.cboRoomType = cboRoomType;
+    }
+
+    public Combobox getCboBookingType() {
+        return cboBookingType;
+    }
+
+    public void setCboBookingType(Combobox cboBookingType) {
+        this.cboBookingType = cboBookingType;
     }
 
     @Override
@@ -147,6 +173,8 @@ public class InfoRoomPanel extends javax.swing.JPanel {
         txtRoomId = new iuh.fit.se.group1.ui.component.custom.TextField();
         btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
         cboRoomType = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        lblBookingType = new javax.swing.JLabel();
+        cboBookingType = new iuh.fit.se.group1.ui.component.custom.Combobox();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(new java.awt.Color(217, 217, 217));
@@ -221,6 +249,10 @@ public class InfoRoomPanel extends javax.swing.JPanel {
             }
         });
 
+        lblBookingType.setBackground(new java.awt.Color(0, 0, 0));
+        lblBookingType.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblBookingType.setText("Loại đặt phòng");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -235,28 +267,34 @@ public class InfoRoomPanel extends javax.swing.JPanel {
                                 .addGap(125, 125, 125)
                                 .addComponent(lblStartDate))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(lblRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtRoomId, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                                    .addComponent(cboRoomType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(cboRoomType, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(27, 27, 27)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                                    .addComponent(txtPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addGap(27, 27, 27)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(33, 33, 33)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(lblEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblRoomNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtRoomNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtEndDate, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                            .addComponent(lblBookingType, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cboBookingType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 556, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(24, Short.MAX_VALUE))
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 556, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblRoomNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtRoomNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -281,12 +319,14 @@ public class InfoRoomPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblRoomId)
                     .addComponent(lblRoomNumber)
-                    .addComponent(lblPrice))
+                    .addComponent(lblPrice)
+                    .addComponent(lblBookingType))
                 .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtRoomId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtRoomNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtRoomNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboBookingType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -330,8 +370,10 @@ public class InfoRoomPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnClose;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cboBookingType;
     private iuh.fit.se.group1.ui.component.custom.Combobox cboRoomType;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lblBookingType;
     private javax.swing.JLabel lblEndDate;
     private javax.swing.JLabel lblPrice;
     private javax.swing.JLabel lblRoomId;

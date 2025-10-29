@@ -5,10 +5,14 @@
 package iuh.fit.se.group1.ui.component.booking;
 
 import com.raven.datechooser.DateChooser;
+import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.custom.TextField;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 
 /**
@@ -16,7 +20,7 @@ import java.lang.reflect.Field;
  * @author THIS PC
  */
 public class InfoCustomerPanel extends javax.swing.JPanel {
-
+    
     private int borderRadius = 8;
 
     private DateChooser dateChooser;
@@ -27,15 +31,15 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
     public InfoCustomerPanel() {
         initComponents();
         setOpaque(false);
-        jLabel1.setIcon(FontIcon.of(FontAwesomeSolid.USER, 20, jLabel1.getForeground()));
+        lblTitle.setIcon(FontIcon.of(FontAwesomeSolid.USER, 20, lblTitle.getForeground()));
         dateChooser = new DateChooser();
         dateChooser.toDay();
-        dateChooser.setTextRefernce(textField4);
-        combobox1.addItem("Nam");
-        combobox1.addItem("Nữ");
-        combobox1.setBackground(new java.awt.Color(240, 248, 255));
-        combobox1.setForeground(new java.awt.Color(51, 51, 51));
-        combobox1.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+        dateChooser.setTextRefernce(txtDob);
+        cboGender.addItem("Nam");
+        cboGender.addItem("Nữ");
+        cboGender.setBackground(new java.awt.Color(240, 248, 255));
+        cboGender.setForeground(new java.awt.Color(51, 51, 51));
+        cboGender.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
 
     }
 
@@ -62,6 +66,74 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         super.paintComponent(g);
     }
 
+    public void addActionTxtCitizenId(ActionListener actionListener) {
+        txtCitizen.addActionListener(actionListener);
+    }
+
+    public Combobox getCboGender() {
+        return cboGender;
+    }
+
+    public void setCboGender(Combobox cboGender) {
+        this.cboGender = cboGender;
+    }
+
+    public TextField getTxtCustomerName() {
+        return txtCustomerName;
+    }
+
+    public void setTxtCustomerName(TextField txtTCustomerName) {
+        this.txtCustomerName = txtTCustomerName;
+    }
+
+    public TextField getTxtPhoneNumber() {
+        return txtPhoneNumber;
+    }
+
+    public void setTxtPhoneNumber(TextField txtPhoneNumber) {
+        this.txtPhoneNumber = txtPhoneNumber;
+    }
+
+    public TextField getTxtEmail() {
+        return txtEmail;
+    }
+
+    public void setTxtEmail(TextField txtEmail) {
+        this.txtEmail = txtEmail;
+    }
+
+    public TextField getTxtDob() {
+        return txtDob;
+    }
+
+    public void setTxtDob(TextField txtDob) {
+        this.txtDob = txtDob;
+    }
+
+    public TextField getTxtCitizen() {
+        return txtCitizen;
+    }
+
+    public void setTxtCitizen(TextField txtCitizen) {
+        this.txtCitizen = txtCitizen;
+    }
+
+    public JSeparator getSpn() {
+        return spn;
+    }
+
+    public void setSpn(JSeparator spn) {
+        this.spn = spn;
+    }
+
+    public DateChooser getDateChooser() {
+        return dateChooser;
+    }
+
+    public void setDateChooser(DateChooser dateChooser) {
+        this.dateChooser = dateChooser;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -71,73 +143,73 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel2 = new javax.swing.JLabel();
-        textField1 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        jLabel3 = new javax.swing.JLabel();
-        textField2 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        jLabel4 = new javax.swing.JLabel();
-        textField3 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        jLabel5 = new javax.swing.JLabel();
-        textField4 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        textField5 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        combobox1 = new iuh.fit.se.group1.ui.component.custom.Combobox();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        lblTitle = new javax.swing.JLabel();
+        spn = new javax.swing.JSeparator();
+        lblCitizen = new javax.swing.JLabel();
+        txtCitizen = new iuh.fit.se.group1.ui.component.custom.TextField();
+        lblCustomerName = new javax.swing.JLabel();
+        txtCustomerName = new iuh.fit.se.group1.ui.component.custom.TextField();
+        lblPhoneNumber = new javax.swing.JLabel();
+        txtPhoneNumber = new iuh.fit.se.group1.ui.component.custom.TextField();
+        lblDob = new javax.swing.JLabel();
+        txtDob = new iuh.fit.se.group1.ui.component.custom.TextField();
+        lblGender = new javax.swing.JLabel();
+        lblEmail = new javax.swing.JLabel();
+        txtEmail = new iuh.fit.se.group1.ui.component.custom.TextField();
+        cboGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        cbDeposit = new javax.swing.JCheckBox();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(131, 176, 211));
-        jLabel1.setText("Khách hàng");
-        jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(131, 176, 211));
+        lblTitle.setText("Khách hàng");
+        lblTitle.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
 
-        jSeparator1.setBackground(new java.awt.Color(255, 255, 51));
-        jSeparator1.setForeground(new java.awt.Color(217, 217, 217));
-        jSeparator1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 10));
+        spn.setBackground(new java.awt.Color(255, 255, 51));
+        spn.setForeground(new java.awt.Color(217, 217, 217));
+        spn.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 10));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel2.setText("CCCD:");
+        lblCitizen.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblCitizen.setText("CCCD:");
 
-        textField1.setBorderColor(new java.awt.Color(105, 105, 105));
-        textField1.setBorderRadius(3);
+        txtCitizen.setBorderColor(new java.awt.Color(105, 105, 105));
+        txtCitizen.setBorderRadius(3);
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel3.setText("Tên khách hàng:");
+        lblCustomerName.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblCustomerName.setText("Tên khách hàng:");
 
-        textField2.setBorderColor(new java.awt.Color(105, 105, 105));
-        textField2.setBorderRadius(3);
+        txtCustomerName.setBorderColor(new java.awt.Color(105, 105, 105));
+        txtCustomerName.setBorderRadius(3);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel4.setText("Số điện thoại:");
+        lblPhoneNumber.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblPhoneNumber.setText("Số điện thoại:");
 
-        textField3.setBorderColor(new java.awt.Color(105, 105, 105));
-        textField3.setBorderRadius(3);
-        textField3.addActionListener(new java.awt.event.ActionListener() {
+        txtPhoneNumber.setBorderColor(new java.awt.Color(105, 105, 105));
+        txtPhoneNumber.setBorderRadius(3);
+        txtPhoneNumber.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textField3ActionPerformed(evt);
+                txtPhoneNumberActionPerformed(evt);
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel5.setText("Ngày sinh:");
+        lblDob.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblDob.setText("Ngày sinh:");
 
-        textField4.setBorderColor(new java.awt.Color(105, 105, 105));
-        textField4.setBorderRadius(3);
+        txtDob.setBorderColor(new java.awt.Color(105, 105, 105));
+        txtDob.setBorderRadius(3);
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel6.setText("Giới tính:");
+        lblGender.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblGender.setText("Giới tính:");
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jLabel7.setText("Email: ");
+        lblEmail.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        lblEmail.setText("Email: ");
 
-        textField5.setBorderColor(new java.awt.Color(105, 105, 105));
-        textField5.setBorderRadius(3);
+        txtEmail.setBorderColor(new java.awt.Color(105, 105, 105));
+        txtEmail.setBorderRadius(3);
 
-        jCheckBox1.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        jCheckBox1.setText("Tiền cọc");
+        cbDeposit.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        cbDeposit.setText("Tiền cọc");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -146,90 +218,91 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 541, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spn, javax.swing.GroupLayout.PREFERRED_SIZE, 541, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblCitizen, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtCitizen, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblCustomerName, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtCustomerName, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel7)
+                                .addComponent(lblEmail)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(textField5, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(27, 27, 27)
-                                .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(cbDeposit, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
+                                .addComponent(lblPhoneNumber)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(textField3, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtPhoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel5)
+                                .addComponent(lblDob)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textField4, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtDob, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblGender, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(combobox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(cboGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(spn, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblCustomerName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblCitizen, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtCitizen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtCustomerName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(combobox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblPhoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtPhoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDob, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDob, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblGender, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox1)
-                    .addComponent(textField5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cbDeposit)))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void textField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textField3ActionPerformed
+    private void txtPhoneNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPhoneNumberActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_textField3ActionPerformed
+    }//GEN-LAST:event_txtPhoneNumberActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Combobox combobox1;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JSeparator jSeparator1;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField1;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField2;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField3;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField4;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField5;
+    private javax.swing.JCheckBox cbDeposit;
+    private iuh.fit.se.group1.ui.component.custom.Combobox cboGender;
+    private javax.swing.JLabel lblCitizen;
+    private javax.swing.JLabel lblCustomerName;
+    private javax.swing.JLabel lblDob;
+    private javax.swing.JLabel lblEmail;
+    private javax.swing.JLabel lblGender;
+    private javax.swing.JLabel lblPhoneNumber;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JSeparator spn;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtCitizen;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtCustomerName;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtDob;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtEmail;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtPhoneNumber;
     // End of variables declaration//GEN-END:variables
 }

@@ -9,25 +9,36 @@ import java.util.Objects;
 
 public class Booking {
     private Long bookingId;
-    private Customer customer;
     private LocalDateTime checkInDate;
     private LocalDateTime checkOutDate;
     private Employee employee;
-    private BigDecimal deposit;
+    private Order order;
     private Room room;
     private BookingType bookingType;
     private BigDecimal totalPrice;
     private LocalDate createdAt;
 
-    public Booking() {
+
+    public Booking(Order order) {
+        this.order = order;
     }
 
-    public Booking(Customer customer, LocalDateTime checkInDate, LocalDateTime checkOutDate, Employee employee, BigDecimal deposit, Room room, BookingType bookingType) {
-        this.setCustomer(customer);
+    public Booking(Long bookingId, LocalDateTime checkInDate, LocalDateTime checkOutDate, Employee employee, Room room, BookingType bookingType, BigDecimal totalPrice, LocalDate createdAt) {
+        this.bookingId = bookingId;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+        this.employee = employee;
+        this.room = room;
+        this.bookingType = bookingType;
+        this.totalPrice = totalPrice;
+        this.createdAt = createdAt;
+    }
+
+    public Booking(LocalDateTime checkInDate, LocalDateTime checkOutDate, Employee employee, Room room, BookingType bookingType, Order order) {
+        this.order = order;
         this.setCheckInDate(checkInDate);
         this.setCheckOutDate(checkOutDate);
         this.setEmployee(employee);
-        this.setDeposit(deposit);
         this.setRoom(room);
         this.setBookingType(bookingType);
         this.setTotalPrice(calcTotalPrice());
@@ -42,13 +53,6 @@ public class Booking {
         this.bookingId = bookingId;
     }
 
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
 
     public LocalDateTime getCheckInDate() {
         return checkInDate;
@@ -74,13 +78,6 @@ public class Booking {
         this.employee = employee;
     }
 
-    public BigDecimal getDeposit() {
-        return deposit;
-    }
-
-    public void setDeposit(BigDecimal deposit) {
-        this.deposit = deposit;
-    }
 
     public Room getRoom() {
         return room;
@@ -141,15 +138,21 @@ public class Booking {
     public String toString() {
         return "Booking{" +
                 "bookingId=" + bookingId +
-                ", customer=" + customer +
                 ", checkInDate=" + checkInDate +
                 ", checkOutDate=" + checkOutDate +
                 ", employee=" + employee +
-                ", deposit=" + deposit +
                 ", room=" + room +
-                ", bookingType='" + bookingType + '\'' +
+                ", bookingType=" + bookingType +
                 ", totalPrice=" + totalPrice +
                 ", createdAt=" + createdAt +
                 '}';
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }

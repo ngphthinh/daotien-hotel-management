@@ -22,6 +22,10 @@ public class OrderType {
         this.createdAt = LocalDate.now();
     }
 
+    public OrderType(Long orderTypeId) {
+        this.orderTypeId = orderTypeId;
+    }
+
     public Long getOrderTypeId() {
         return orderTypeId;
     }
