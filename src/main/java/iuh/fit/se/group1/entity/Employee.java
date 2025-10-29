@@ -13,16 +13,10 @@ public class Employee {
     private LocalDate hireDate;
     private Account account;
     private LocalDate createdAt;
-
     public Employee() {
     }
-
-    public Employee(Long employeeId) {
-        this.employeeId = employeeId;
-    }
-
     public Employee(Long employeeId, String fullName, String phone, String email, boolean gender, String citizenId,
-                    LocalDate hireDate, Account account, LocalDate createdAt) {
+            LocalDate hireDate, Account account, LocalDate createdAt) {
         this.employeeId = employeeId;
         this.fullName = fullName;
         this.phone = phone;

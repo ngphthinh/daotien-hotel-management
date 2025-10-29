@@ -34,14 +34,14 @@ public class ShiftList extends JPanel {
     public ShiftList() {
         initComponents();
         setPreferredSize(new Dimension(290, getPreferredSize().height));
-        addEmployees("Chó Thịnh đẹp trai", "CHOTHINH123", "/images/avttest.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
+        addEmployees("Chó Thịnh đẹp trai", "CHOTHINH123", "/images/conmeo.jpg");
+        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
+        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
+        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
+        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
+        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
+        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
+        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
         
     }
 

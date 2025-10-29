@@ -1,6 +1,7 @@
 
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -19,7 +20,7 @@ public class Footer extends javax.swing.JPanel {
                
     }
     
-    public JLabel geLblAvt(){
+    public AvatarLabel geLblAvt(){
     return profileButton.getLblAvartar();}
     public JButton getBtnSignOut(){
         return profileButton.getBtnSignOut();
