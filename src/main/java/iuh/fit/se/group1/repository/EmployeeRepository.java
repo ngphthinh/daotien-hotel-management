@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import iuh.fit.se.group1.entity.Account;
@@ -44,9 +45,10 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             }
             entity.setCreatedAt(LocalDate.now());
             if (entity.getAvt() != null && entity.getAvt().length > 0) {
-                preparedStatement.setBytes(8, entity.getAvt());
+                String base64String = Base64.getEncoder().encodeToString(entity.getAvt());
+                preparedStatement.setString(8, base64String);
             } else {
-                preparedStatement.setNull(8, java.sql.Types.VARBINARY);
+                preparedStatement.setNull(8, java.sql.Types.NVARCHAR);
             }
             preparedStatement.setDate(9, Date.valueOf(entity.getCreatedAt()));
 
@@ -88,8 +90,11 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                         account.setAccountId(accountId);
                         employee.setAccount(account);
                     }
-                    byte[] avtBytes = resultSet.getBytes("avt");
-                    employee.setAvt(avtBytes);
+                    String base64String = resultSet.getString("avt");
+                    if (base64String != null && !base64String.isEmpty()) {
+                        byte[] originalBytes = Base64.getDecoder().decode(base64String);
+                        employee.setAvt(originalBytes);
+                    }
                     employee.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
 
                     return employee;
@@ -102,17 +107,67 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return null;
     }
 
-    @Override
-    public void deleteById(Long aLong) {
-        String sql = "DELETE FROM Employee WHERE employeeId = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, aLong);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    @Override
+//    public void deleteById(Long aLong) {
+//        String sql = "DELETE FROM Employee WHERE employeeId = ?";
+//        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+//            preparedStatement.setLong(1, aLong);
+//            preparedStatement.executeUpdate();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+@Override
+public void deleteById(Long aLong) {
+    String sqlGetAccountId = "SELECT accountId FROM Employee WHERE employeeId = ?";
+    String sqlDeleteEmployee = "DELETE FROM Employee WHERE employeeId = ?";
+    String sqlDeleteAccount = "DELETE FROM Account WHERE accountId = ?";
 
+    try {
+        // Bắt đầu transaction
+        connection.setAutoCommit(false);
+
+        Long accountId = null;
+
+        // Lấy accountId trước khi xóa employee
+        try (PreparedStatement psGetAccount = connection.prepareStatement(sqlGetAccountId)) {
+            psGetAccount.setLong(1, aLong);
+            try (ResultSet rs = psGetAccount.executeQuery()) {
+                if (rs.next()) {
+                    accountId = rs.getLong("accountId");
+                }
+            }
+        }
+
+        // Xóa employee trước
+        try (PreparedStatement psDeleteEmployee = connection.prepareStatement(sqlDeleteEmployee)) {
+            psDeleteEmployee.setLong(1, aLong);
+            psDeleteEmployee.executeUpdate();
+        }
+
+        // Xóa account nếu có
+        if (accountId != null && accountId > 0) {
+            try (PreparedStatement psDeleteAccount = connection.prepareStatement(sqlDeleteAccount)) {
+                psDeleteAccount.setLong(1, accountId);
+                psDeleteAccount.executeUpdate();
+            }
+        }
+
+        // Commit transaction
+        connection.commit();
+        connection.setAutoCommit(true);
+
+    } catch (SQLException e) {
+        try {
+            connection.rollback();
+            connection.setAutoCommit(true);
+        } catch (SQLException ex) {
+            log.error("Error rolling back transaction: ", ex);
+        }
+        log.error("Error deleting Employee and Account: ", e);
+        throw new RuntimeException(e);
+    }
+}
     @Override
     public List<Employee> findAll() {
         List<Employee> employees = new ArrayList<>();
@@ -135,9 +190,11 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     employee.setHireDate(rs.getDate("hireDate").toLocalDate());
                     employee.setCitizenId(rs.getString("citizenId"));
                     employee.setGender(rs.getBoolean("gender"));
-                    byte[] avtBytes = rs.getBytes("avt");
-                    employee.setAvt(avtBytes);
-
+                    String base64String = rs.getString("avt");
+                    if (base64String != null && !base64String.isEmpty()) {
+                        byte[] originalBytes = Base64.getDecoder().decode(base64String);
+                        employee.setAvt(originalBytes);
+                    }
                     // Account
                     Account account = new Account();
                     account.setAccountId(rs.getLong("accountId"));
@@ -174,9 +231,10 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             preparedStatement.setBoolean(6, entity.isGender());
             preparedStatement.setLong(7, entity.getAccount().getAccountId());
             if (entity.getAvt() != null && entity.getAvt().length > 0) {
-                preparedStatement.setBytes(8, entity.getAvt());
+                String base64String = Base64.getEncoder().encodeToString(entity.getAvt());
+                preparedStatement.setString(8, base64String);
             } else {
-                preparedStatement.setNull(8, java.sql.Types.VARBINARY);
+                preparedStatement.setNull(8, java.sql.Types.NVARCHAR);
             }
             preparedStatement.setLong(9, entity.getEmployeeId());
 
@@ -216,7 +274,11 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     employee.setHireDate(rs.getDate("hireDate").toLocalDate());
                     employee.setCitizenId(rs.getString("citizenId"));
                     employee.setGender(rs.getBoolean("gender"));
-                    employee.setAvt(rs.getBytes("avt"));
+                    String base64String = rs.getString("avt");
+                    if (base64String != null && !base64String.isEmpty()) {
+                        byte[] originalBytes = Base64.getDecoder().decode(base64String);
+                        employee.setAvt(originalBytes);
+                    }
                     // Account
                     Account account = new Account();
                     account.setAccountId(rs.getLong("accountId"));
@@ -270,7 +332,11 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     employee.setHireDate(rs.getDate("hireDate").toLocalDate());
                     employee.setCitizenId(rs.getString("citizenId"));
                     employee.setGender(rs.getBoolean("gender"));
-
+                    String base64String = rs.getString("avt");
+                    if (base64String != null && !base64String.isEmpty()) {
+                        byte[] originalBytes = Base64.getDecoder().decode(base64String);
+                        employee.setAvt(originalBytes);
+                    }
                     // Account
                     Account account = new Account();
                     account.setAccountId(rs.getLong("accountId"));

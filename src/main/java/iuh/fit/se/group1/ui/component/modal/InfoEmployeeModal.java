@@ -109,16 +109,22 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
     private void showImageInPanel(String imagePath) {
         try {
             BufferedImage image = ImageIO.read(new File(imagePath));
-            avatarLabel.removeAll();
-            AvatarLabel avatar = new AvatarLabel();
-            avatar.setImage(image);
-            avatar.setPreferredSize(new Dimension(avatarLabel.getWidth(), avatarLabel.getHeight()));
-            avatarLabel.setLayout(new BorderLayout());
-            avatarLabel.add(avatar, BorderLayout.CENTER);
 
-            avatarLabel.revalidate();
-            avatarLabel.repaint();
+            // QUAN TRỌNG: Set image vào avatarLabel field CÓ SẴN
+            // KHÔNG tạo AvatarLabel mới!
+            if (avatarLabel != null) {
+                avatarLabel.setImage(image);
+                avatarLabel.revalidate();
+                avatarLabel.repaint();
+
+                // Log để debug
+                System.out.println("✅ Image set to existing avatarLabel: " + image.getWidth() + "x" + image.getHeight());
+            } else {
+                System.err.println("❌ avatarLabel is null!");
+            }
+
         } catch (Exception ex) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Không thể hiển thị hình ảnh!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }

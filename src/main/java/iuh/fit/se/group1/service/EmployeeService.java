@@ -80,5 +80,7 @@ public class EmployeeService {
     public List<Employee> getEmployeeByKeyword(String keyword){
         return employeeRepository.findByIdOrNameOrPhoneNumber(keyword);
     }
-
+    public Employee getEmployeeById(Long employeeId) {
+        return employeeRepository.findById(employeeId);
+    }
 }
