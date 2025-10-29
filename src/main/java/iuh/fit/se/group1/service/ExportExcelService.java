@@ -29,14 +29,23 @@ public class ExportExcelService {
      */
     public static void exportTableToExcel(Component parent, JTable table, String sheetName, String defaultFileName) {
         try {
-            // Tạo file chooser
+            // Tạo file chooser với thư mục mặc định là Desktop hoặc Documents
             JFileChooser fileChooser = new JFileChooser();
+            
+            // Set thư mục mặc định là Desktop
+            String userHome = System.getProperty("user.home");
+            java.io.File desktopDir = new java.io.File(userHome, "Desktop");
+            if (!desktopDir.exists()) {
+                desktopDir = new java.io.File(userHome, "Documents");
+            }
+            fileChooser.setCurrentDirectory(desktopDir);
+            
             fileChooser.setDialogTitle("Lưu file Excel");
 
             // Tên file mặc định với ngày hiện tại
             String fileName = defaultFileName + "_" +
                     LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
-            fileChooser.setSelectedFile(new java.io.File(fileName));
+            fileChooser.setSelectedFile(new java.io.File(desktopDir, fileName));
 
             // Chỉ cho phép file .xlsx
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx");

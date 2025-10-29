@@ -12,6 +12,7 @@ import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
+import iuh.fit.se.group1.service.ExportExcelService;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -95,6 +96,15 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+//         private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
+//     ExportExcelService.exportTableToExcel(
+//         this,
+//         tblEmployee.getTbl(),
+//         "Danh sách nhân viên",
+//         "DanhSachNhanVien",
+//         true
+//     );
+// }   
 
         String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
