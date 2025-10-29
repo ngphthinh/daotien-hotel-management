@@ -7,7 +7,9 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.service.RoleService;
+import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
@@ -21,8 +23,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -32,6 +37,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import iuh.fit.se.group1.util.Constants;
+import java.io.File;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
@@ -91,6 +97,24 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(e -> {
+    JFileChooser chooser = new JFileChooser();
+    chooser.setDialogTitle("Chọn file Excel nhân viên");
+    int result = chooser.showOpenDialog(this);
+    if (result == JFileChooser.APPROVE_OPTION) {
+        File selectedFile = chooser.getSelectedFile();
+        ImportExcelService importService = new ImportExcelService();
+        java.util.List<Employee> importedEmployees = importService.importEmployeesFromExcel(selectedFile);
+
+        if (importedEmployees.isEmpty()) {
+            Message.showMessage("Thông báo", "Không có dữ liệu hợp lệ trong file Excel!");
+        } else {
+            Message.showMessage("Thành công", "Đã nhập " + importedEmployees.size() + " nhân viên!");
+            loadTable(employeeService.getAllEmployees());
+        }
+    }
+});
+
 
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
@@ -122,30 +146,45 @@ public class EmployeeManagement extends javax.swing.JPanel {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                // SỬA: Đổi từ tblPromotion sang tblEmployee
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-                // SỬA: Đổi tên biến và logic lấy dữ liệu Employee
                 Long employeeId = (Long) model.getValueAt(row, 0);
-                String fullName = (String) model.getValueAt(row, 1);
-                String gender = (String) model.getValueAt(row, 2);
-                String role = (String) model.getValueAt(row, 3);
-                String phone = (String) model.getValueAt(row, 4);
 
-                // SỬA: Đổi từ InfoPromotionModal sang InfoEmployeeModal
+                // Lấy thông tin đầy đủ từ database
+                Employee employee = employeeService.getEmployeeById(employeeId);
+
+                if (employee == null) {
+                    Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
+                    return;
+                }
+
                 InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
                 modal.getLblTitle().setText("Cập nhật nhân viên");
                 modal.getBtnSave().setText("Cập nhật");
 
-                // SỬA: Set giá trị cho Employee modal
-                modal.getLblCode().setText(String.valueOf(employeeId));
-                modal.getTxtName().setText(fullName);
-                modal.getTxtPhone().setText(phone);
-                modal.getCmbGender().setSelectedItem(gender);
-                modal.getCmbPosition().setSelectedItem(role);
+                // Set giá trị cho Employee modal
+                modal.getLblCode().setText(String.valueOf(employee.getEmployeeId()));
+                modal.getTxtName().setText(employee.getFullName());
+                modal.getTxtPhone().setText(employee.getPhone());
+                modal.getTxtEmail().setText(employee.getEmail());
+                modal.getTxtCitizen().setText(employee.getCitizenId());
+                modal.getTxtHireDate().setText(employee.getHireDate().format(Constants.DATE_FORMATTER));
+
+                String genderStr = employee.isGender() ? "Nữ" : "Nam";
+                modal.getCmbGender().setSelectedItem(genderStr);
+
+                String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
+                        ? employee.getAccount().getRole().getRoleName()
+                        : "N/A";
+                modal.getCmbPosition().setSelectedItem(roleName);
+
+                // Load avatar hiện tại
+                AvatarLabel avatarLabel = modal.getAvatarLabel();
+                if (avatarLabel != null && employee.getAvt() != null && employee.getAvt().length > 0) {
+                    avatarLabel.setImageFromBytes(employee.getAvt());
+                }
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 modal.saveData(ae -> {
-                    // SỬA: Đổi message
                     String title = "Xác nhận cập nhật nhân viên";
                     String message = "Bạn có chắc chắn muốn cập nhật nhân viên này không?";
                     Message.showConfirm(title, message, () -> {
@@ -154,28 +193,39 @@ public class EmployeeManagement extends javax.swing.JPanel {
                             return;
                         }
 
-                        // SỬA: Tạo Employee object thay vì Promotion
-                        Employee employee = new Employee();
-                        employee.setEmployeeId(employeeId);
-                        employee.setFullName(result.fullName);
-                        employee.setPhone(result.phone);
-                        employee.setEmail(result.email);
-                        employee.setGender(result.gender);
-                        employee.setCitizenId(result.citizenId);
-                        employee.setHireDate(result.hireDate);
+                        // Tạo Employee object
+                        Employee employeeUpdate = new Employee();
+                        employeeUpdate.setEmployeeId(employeeId);
+                        employeeUpdate.setFullName(result.fullName);
+                        employeeUpdate.setPhone(result.phone);
+                        employeeUpdate.setEmail(result.email);
+                        employeeUpdate.setGender(result.gender);
+                        employeeUpdate.setCitizenId(result.citizenId);
+                        employeeUpdate.setHireDate(result.hireDate);
+                        employeeUpdate.setAccount(employee.getAccount()); // Giữ nguyên account
 
-                        // SỬA: Gọi employeeService
-                        Employee entitySave = employeeService.updateEmployee(employee);
+                        // Lấy avatar từ AvatarLabel
+                        AvatarLabel avt = modal.getAvatarLabel();
+                        if (avt != null) {
+                            byte[] avtBytes = avt.getImageAsBytes("jpg");
+                            if (avtBytes != null) {
+                                employeeUpdate.setAvt(avtBytes);
+                                log.info("Avatar updated for employee: {}", employeeId);
+                            }
+                        }
 
-                        // SỬA: Update giá trị Employee vào table
-                        String genderStr = entitySave.isGender() ? "Nữ" : "Nam";
-                        String roleName = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
+                        // Gọi employeeService
+                        Employee entitySave = employeeService.updateEmployee(employeeUpdate);
+
+                        // Update giá trị Employee vào table
+                        String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
+                        String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
                                 ? entitySave.getAccount().getRole().getRoleName()
                                 : "N/A";
 
                         model.setValueAt(entitySave.getFullName(), row, 1);
-                        model.setValueAt(genderStr, row, 2);
-                        model.setValueAt(roleName, row, 3);
+                        model.setValueAt(genderStr2, row, 2);
+                        model.setValueAt(roleName2, row, 3);
                         model.setValueAt(entitySave.getPhone(), row, 4);
 
                         GlassPanePopup.closePopupLast();
@@ -215,21 +265,58 @@ public class EmployeeManagement extends javax.swing.JPanel {
             public void onView(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
                 Long employeeId = (Long) model.getValueAt(row, 0);
-                String fullName = (String) model.getValueAt(row, 1);
-                String gender = (String) model.getValueAt(row, 2);
-                String role = (String) model.getValueAt(row, 3);
-                String phone = (String) model.getValueAt(row, 4);
+
+                // Lấy thông tin đầy đủ từ database
+                Employee employee = employeeService.getEmployeeById(employeeId);
+
+                if (employee == null) {
+                    Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
+                    return;
+                }
 
                 InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
                 modal.getLblTitle().setText("Thông tin nhân viên");
                 modal.getBtnSave().setText("Xong");
 
-                modal.getLblCode().setText(String.valueOf(employeeId));
-                modal.getTxtName().setText(fullName);
-                modal.getTxtPhone().setText(phone);
-                modal.getCmbGender().setSelectedItem(gender);
-                modal.getCmbPosition().setSelectedItem(role);
+                modal.getLblCode().setText(String.valueOf(employee.getEmployeeId()));
+                modal.getTxtName().setText(employee.getFullName());
+                modal.getTxtPhone().setText(employee.getPhone());
+                modal.getTxtEmail().setText(employee.getEmail());
+                modal.getTxtCitizen().setText(employee.getCitizenId());
+                modal.getTxtHireDate().setText(employee.getHireDate().format(Constants.DATE_FORMATTER));
 
+                String genderStr = employee.isGender() ? "Nữ" : "Nam";
+                modal.getCmbGender().setSelectedItem(genderStr);
+
+                String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
+                        ? employee.getAccount().getRole().getRoleName()
+                        : "N/A";
+                modal.getCmbPosition().setSelectedItem(roleName);
+
+                // Hiển thị avatar từ database
+                AvatarLabel avatarLabel = modal.getAvatarLabel(); // Cần thêm getter cho AvatarLabel trong InfoEmployeeModal
+                if (avatarLabel != null) {
+                    if (employee.getAvt() != null && employee.getAvt().length > 0) {
+                        try {
+                            // Convert byte array sang BufferedImage
+                            ByteArrayInputStream bais = new ByteArrayInputStream(employee.getAvt());
+                            BufferedImage image = ImageIO.read(bais);
+                            if (image != null) {
+                                avatarLabel.setImage(image);
+                                log.info("Avatar loaded successfully for employee: {}", employeeId);
+                            } else {
+                                log.warn("Failed to read image from byte array for employee: {}", employeeId);
+                            }
+                        } catch (Exception e) {
+                            log.error("Error loading avatar image: ", e);
+                        }
+                    } else {
+                        // Reset về ảnh mặc định nếu không có avatar
+                        log.info("No avatar found for employee: {}, using default image", employeeId);
+                    }
+                }
+                modal.getBtnChooseImg().setVisible(false);
+                // Disable các trường nhập liệu
                 modal.getTxtName().setEditable(false);
                 modal.getTxtPhone().setEditable(false);
                 modal.getTxtEmail().setEditable(false);
@@ -499,7 +586,18 @@ if (position == 0) {
             employee.setGender(result.gender);
             employee.setCitizenId(result.citizenId);
             employee.setHireDate(result.hireDate);
-
+            AvatarLabel avatarLabel = modal.getAvatarLabel();
+            if (avatarLabel != null) {
+                byte[] avtBytes = avatarLabel.getImageAsBytes("jpg");
+                if (avtBytes != null && avtBytes.length > 0) {
+                    employee.setAvt(avtBytes);
+                    log.info("Avatar set for new employee, size: {} bytes", avtBytes.length);
+                } else {
+                    log.warn("No avatar data from AvatarLabel");
+                }
+            } else {
+                log.warn("AvatarLabel is null in modal");
+            }
             Employee employeeSave = employeeService.createEmployee(employee, roleId);
 
             if (employeeSave == null) {
@@ -519,6 +617,7 @@ if (position == 0) {
                     employeeSave.getAccount().getRole().getRoleName(),
                     employeeSave.getPhone()
             });
+            Message.showMessage("Thành công", "Thêm nhân viên thành công!");
         } catch (Exception e) {
             log.error("Error creating employee: ", e);
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());

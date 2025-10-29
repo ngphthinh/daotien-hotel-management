@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ public class SideBar extends javax.swing.JPanel {
         return footer1;
     }
     
-    public JLabel getLblAvt(){
+    public AvatarLabel getLblAvt(){
        return footer1.geLblAvt();
     }
 

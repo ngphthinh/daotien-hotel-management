@@ -2,7 +2,9 @@ package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.entity.Customer;
+import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.Promotion;
+import iuh.fit.se.group1.enums.Role;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -302,4 +304,78 @@ public class ImportExcelService {
         }
         return str.trim();
     }
+    
+public List<Employee> importEmployeesFromExcel(File file) {
+    List<Employee> employees = new ArrayList<>();
+    try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
+
+        Sheet sheet = workbook.getSheetAt(0);
+        if (sheet == null) {
+            return employees;
+        }
+
+        Row header = sheet.getRow(0);
+        boolean hasSttColumn = false;
+        if (header != null && header.getCell(0) != null) {
+            String firstHeader = header.getCell(0).getStringCellValue().trim();
+            if (firstHeader.equalsIgnoreCase("STT")) {
+                hasSttColumn = true;
+            }
+        }
+
+        int startCol = hasSttColumn ? 1 : 0; 
+
+        EmployeeService employeeService = new EmployeeService();
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) continue;
+
+            String employeeCodeStr = getCellValue(row.getCell(startCol));         
+            String fullName        = getCellValue(row.getCell(startCol + 1));      
+            String genderStr       = getCellValue(row.getCell(startCol + 2));     
+            String roleName        = getCellValue(row.getCell(startCol + 3));    
+            String phone           = getCellValue(row.getCell(startCol + 4));      
+
+            if (fullName.isEmpty() || phone.isEmpty()) continue;
+
+            Long employeeId = null;
+            try {
+                if (!employeeCodeStr.isEmpty()) {
+                    employeeId = Long.parseLong(employeeCodeStr.replaceAll("\\D", ""));
+                }
+            } catch (NumberFormatException ex) {
+                System.err.println("⚠️ Mã nhân viên không hợp lệ ở dòng " + (i + 1) + ": " + employeeCodeStr);
+            }
+
+            Employee e = new Employee();
+            if (employeeId != null) {
+                e.setEmployeeId(employeeId);
+            }
+            e.setFullName(fullName);
+            e.setGender("Nữ".equalsIgnoreCase(genderStr));
+            e.setPhone(phone);
+            e.setHireDate(LocalDate.now());
+            e.setEmail("");
+            e.setCitizenId("");
+
+            String roleId = Role.RECEPTIONIST.toString();
+            if (roleName.equalsIgnoreCase("Quản lý") || roleName.equalsIgnoreCase("Manager")) {
+                roleId = Role.MANAGER.toString();
+            }
+
+            Employee saved = employeeService.createEmployee(e, roleId);
+            if (saved != null) {
+                employees.add(saved);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return employees;
+}
+
+
+
 }

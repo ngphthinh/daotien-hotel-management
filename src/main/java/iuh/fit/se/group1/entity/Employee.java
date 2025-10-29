@@ -12,6 +12,7 @@ public class Employee {
     private String citizenId;
     private LocalDate hireDate;
     private Account account;
+    private byte[] avt;
     private LocalDate createdAt;
 
     public Employee() {
@@ -21,8 +22,9 @@ public class Employee {
         this.employeeId = employeeId;
     }
 
-    public Employee(Long employeeId, String fullName, String phone, String email, boolean gender, String citizenId,
-                    LocalDate hireDate, Account account, LocalDate createdAt) {
+
+    public Employee(Long employeeId, String fullName, String phone, String email, boolean gender, String citizenId, LocalDate hireDate, Account account, byte[] avt, LocalDate createdAt) {
+
         this.employeeId = employeeId;
         this.fullName = fullName;
         this.phone = phone;
@@ -31,8 +33,18 @@ public class Employee {
         this.citizenId = citizenId;
         this.hireDate = hireDate;
         this.account = account;
+        this.avt = avt;
         this.createdAt = createdAt;
     }
+
+    public byte[] getAvt() {
+        return avt;
+    }
+
+    public void setAvt(byte[] avt) {
+        this.avt = avt;
+    }
+
     public Long getEmployeeId() {
         return employeeId;
     }
