@@ -40,7 +40,7 @@ import javax.swing.table.TableRowSorter;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.LoggerFactory;
-
+import iuh.fit.se.group1.service.ExportExcelService;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
@@ -92,6 +92,15 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnAddCustomer.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnExport.addActionListener(e -> {
+    ExportExcelService.exportTableToExcel(
+        this,
+        tblCustomer.getTbl(),
+        "Danh sách khách hàng",
+        "DanhSachKhachHang",
+        true
+    );
+});
         headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khách hàng</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
@@ -283,6 +292,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
     public void changedUpdate(DocumentEvent e) {
         filterTable();
     }
+    
 
     private void filterTable() {
     String keyword = headerCustom1.getSearchText().trim();
@@ -342,6 +352,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             }
         });
     }
+    
 
     private void searchCustomer() {
         String keyword = headerCustom1.getSearchText().trim();
