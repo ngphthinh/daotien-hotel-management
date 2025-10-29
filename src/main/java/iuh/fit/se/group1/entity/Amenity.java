@@ -87,5 +87,13 @@ public class Amenity {
 		Amenity other = (Amenity) obj;
 		return Objects.equals(amenityId, other.amenityId);
 	}
+
+    public void setAmenityId(String maDV) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void setPrice(double giaDV) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }

@@ -7,6 +7,7 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.entity.Promotion;
 import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.service.PromotionService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
@@ -26,6 +27,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import iuh.fit.se.group1.util.Constants;
+import java.io.File;
+import java.util.List;
+import javax.swing.JFileChooser;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
@@ -38,6 +42,7 @@ import raven.glasspanepopup.GlassPanePopup;
  * @author Windows
  */
 public class PromotionManagement extends javax.swing.JPanel {
+
     private static final Logger log = LoggerFactory.getLogger(PromotionManagement.class);
     private final PromotionService promotionService;
 
@@ -50,6 +55,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         promotionService = new PromotionService();
         loadTable(promotionService.getAllPromotions());
     }
+
     private void loadTable(java.util.List<Promotion> promotions) {
         DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
         model.setRowCount(0);
@@ -66,7 +72,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         }
     }
 
-    private void custom(){
+    private void custom() {
         btnAddPromotion.setBackground(new Color(108, 165, 200));
         btnAddPromotion.setForeground(Color.WHITE);
         btnAddPromotion.setBorderRadius(10);
@@ -74,11 +80,27 @@ public class PromotionManagement extends javax.swing.JPanel {
         btnExport.setBackground(new Color(13, 200, 7));
         btnExport.setForeground(Color.WHITE);
         btnExport.setBorderRadius(10);
-        
+
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
-        
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Promotion> imported = importService.importPromotionsFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    promotionService.getAllPromotions().addAll(imported);
+                    loadTable(promotionService.getAllPromotions());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " khuyến mãi!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
+
         btnAddPromotion.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
@@ -87,14 +109,14 @@ public class PromotionManagement extends javax.swing.JPanel {
                 "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
         String cols[] = {
-                "Mã KM",
-                "Tên KM",
-                "Giá KM",
-                "% Giảm",
-                "Ngày bắt đầu",
-                "Ngày kết thúc",
-                "Ngày tạo",
-                "Chức năng"
+            "Mã KM",
+            "Tên KM",
+            "Giá KM",
+            "% Giảm",
+            "Ngày bắt đầu",
+            "Ngày kết thúc",
+            "Ngày tạo",
+            "Chức năng"
         };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblPromotion.getTbl().setModel(model);
@@ -134,7 +156,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                         if (!result.valid) {
                             return;
                         }
-                        
+
                         Promotion promotion = new Promotion();
                         promotion.setPromotionId(id);
                         promotion.setPromotionName(result.name);
@@ -143,12 +165,12 @@ public class PromotionManagement extends javax.swing.JPanel {
                         promotion.setDescription(result.description);
                         promotion.setStartDate(result.startDate);
                         promotion.setEndDate(result.endDate);
-                        
+
                         Promotion entitySave = promotionService.updatePromotion(promotion);
 
                         model.setValueAt(entitySave.getPromotionName(), row, 1);
                         model.setValueAt(Constants.VND_FORMAT.format(entitySave.getDiscountPrice()), row, 2);
-                        model.setValueAt(entitySave.getDiscountPercent()+ " %", row, 3);
+                        model.setValueAt(entitySave.getDiscountPercent() + " %", row, 3);
                         model.setValueAt(entitySave.getStartDate().format(Constants.DATE_FORMATTER), row, 4);
                         model.setValueAt(entitySave.getEndDate().format(Constants.DATE_FORMATTER), row, 5);
                         // Cột 6 là createdAt - không cập nhật
@@ -234,6 +256,7 @@ public class PromotionManagement extends javax.swing.JPanel {
 
         });
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -344,18 +367,19 @@ public class PromotionManagement extends javax.swing.JPanel {
             DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
             // SỬA: Thêm đủ 7 cột dữ liệu (cột 8 là action tự động)
             model.addRow(new Object[]{
-                    entitySave.getPromotionId(),                          // Cột 0
-                    entitySave.getPromotionName(),                        // Cột 1
-                    Constants.VND_FORMAT.format(promotion.getDiscountPrice()),    // Cột 2
-                    entitySave.getDiscountPercent() + " %",                      // Cột 3
-                    entitySave.getStartDate().format(Constants.DATE_FORMATTER),     // Cột 4
-                    entitySave.getEndDate().format(Constants.DATE_FORMATTER),       // Cột 5
-                    entitySave.getCreatedAt().format(Constants.DATE_FORMATTER)      // Cột 6
+                entitySave.getPromotionId(), // Cột 0
+                entitySave.getPromotionName(), // Cột 1
+                Constants.VND_FORMAT.format(promotion.getDiscountPrice()), // Cột 2
+                entitySave.getDiscountPercent() + " %", // Cột 3
+                entitySave.getStartDate().format(Constants.DATE_FORMATTER), // Cột 4
+                entitySave.getEndDate().format(Constants.DATE_FORMATTER), // Cột 5
+                entitySave.getCreatedAt().format(Constants.DATE_FORMATTER) // Cột 6
             });
             GlassPanePopup.closePopupLast();
         }
     }
-     private static Valid getValid(InfoPromotionModal modal) {
+
+    private static Valid getValid(InfoPromotionModal modal) {
         String name = modal.getTxtName().getText().trim();
         String priceStr = modal.getTxtPrice().getText().trim();
         String percentStr = modal.getTxtDiscountPersent().getText().trim();
@@ -389,53 +413,53 @@ public class PromotionManagement extends javax.swing.JPanel {
             valid = false;
         }
 
-         BigDecimal discountPrice = BigDecimal.ZERO;
-         boolean hasPrice = false;
-         if (!priceStr.isEmpty()) {
-             try {
-                 discountPrice = new BigDecimal(priceStr);
-                 if (discountPrice.compareTo(BigDecimal.ZERO) <= 0) {
-                     modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
-                     valid = false;
-                 } else {
-                     hasPrice = true;
-                 }
-             } catch (Exception e) {
-                 modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
-                 valid = false;
-                 log.error("Lỗi chuyển đổi giá khuyến mãi: ", e);
-             }
-         }
+        BigDecimal discountPrice = BigDecimal.ZERO;
+        boolean hasPrice = false;
+        if (!priceStr.isEmpty()) {
+            try {
+                discountPrice = new BigDecimal(priceStr);
+                if (discountPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                    modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
+                    valid = false;
+                } else {
+                    hasPrice = true;
+                }
+            } catch (Exception e) {
+                modal.getLblErrolPrice().setText("Giá phải là số hợp lệ!");
+                valid = false;
+                log.error("Lỗi chuyển đổi giá khuyến mãi: ", e);
+            }
+        }
 
         // Validate discount percent
-         float discountPercent = 0;
-         boolean hasPercent = false;
-         if (!percentStr.isEmpty()) {
-             try {
-                 discountPercent = Float.parseFloat(percentStr);
-                 if (discountPercent <= 0 || discountPercent > 100) {
-                     modal.getLblErrolDiscountPersent().setText("Phần trăm phải từ 0-100!");
-                     valid = false;
-                 } else {
-                     hasPercent = true;
-                 }
-             } catch (Exception e) {
-                 modal.getLblErrolDiscountPersent().setText("Phần trăm phải là số hợp lệ!");
-                 valid = false;
-                 log.error("Lỗi chuyển đổi phần trăm: ", e);
-             }
-         }
+        float discountPercent = 0;
+        boolean hasPercent = false;
+        if (!percentStr.isEmpty()) {
+            try {
+                discountPercent = Float.parseFloat(percentStr);
+                if (discountPercent <= 0 || discountPercent > 100) {
+                    modal.getLblErrolDiscountPersent().setText("Phần trăm phải từ 0-100!");
+                    valid = false;
+                } else {
+                    hasPercent = true;
+                }
+            } catch (Exception e) {
+                modal.getLblErrolDiscountPersent().setText("Phần trăm phải là số hợp lệ!");
+                valid = false;
+                log.error("Lỗi chuyển đổi phần trăm: ", e);
+            }
+        }
 
-         // 🔹 Kiểm tra chỉ được nhập 1 trong 2
-         if (hasPrice && hasPercent) {
-             modal.getLblErrolPrice().setText("Chỉ được nhập giá hoặc phần trăm!");
-             modal.getLblErrolDiscountPersent().setText("Chỉ được nhập giá hoặc phần trăm!");
-             valid = false;
-         } else if (!hasPrice && !hasPercent) {
-             modal.getLblErrolPrice().setText("Phải nhập giá hoặc phần trăm!");
-             modal.getLblErrolDiscountPersent().setText("Phải nhập giá hoặc phần trăm!");
-             valid = false;
-         }
+        // 🔹 Kiểm tra chỉ được nhập 1 trong 2
+        if (hasPrice && hasPercent) {
+            modal.getLblErrolPrice().setText("Chỉ được nhập giá hoặc phần trăm!");
+            modal.getLblErrolDiscountPersent().setText("Chỉ được nhập giá hoặc phần trăm!");
+            valid = false;
+        } else if (!hasPrice && !hasPercent) {
+            modal.getLblErrolPrice().setText("Phải nhập giá hoặc phần trăm!");
+            modal.getLblErrolDiscountPersent().setText("Phải nhập giá hoặc phần trăm!");
+            valid = false;
+        }
 
         // Validate dates
         LocalDate startDate = null;
@@ -464,13 +488,14 @@ public class PromotionManagement extends javax.swing.JPanel {
         return new Valid(name, valid, discountPrice, discountPercent, description, startDate, endDate);
     }
 
-    private record Valid( String name, 
-        boolean valid, 
-        BigDecimal discountPrice, 
-        float discountPercent,
-        String description,
-        LocalDate startDate,
-        LocalDate endDate) {
+    private record Valid(String name,
+            boolean valid,
+            BigDecimal discountPrice,
+            float discountPercent,
+            String description,
+            LocalDate startDate,
+            LocalDate endDate) {
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

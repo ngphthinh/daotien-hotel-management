@@ -170,11 +170,11 @@ public class CustomerManagement extends javax.swing.JPanel {
                     Customer updated = customerService.updateCustomer(customer);
                     if (updated != null) {
                         int modelRow = tblCustomer.getTbl().convertRowIndexToModel(row);
-model.setValueAt(updated.getFullName(), modelRow, 1);
-model.setValueAt(updated.isGender() ? "Nam" : "Nữ", modelRow, 2);
-model.setValueAt(updated.getEmail(), modelRow, 3);
-model.setValueAt(updated.getCitizenId(), modelRow, 4);
-model.setValueAt(updated.getPhone(), modelRow, 5);
+                        model.setValueAt(updated.getFullName(), modelRow, 1);
+                        model.setValueAt(updated.isGender() ? "Nam" : "Nữ", modelRow, 2);
+                        model.setValueAt(updated.getEmail(), modelRow, 3);
+                        model.setValueAt(updated.getCitizenId(), modelRow, 4);
+                        model.setValueAt(updated.getPhone(), modelRow, 5);
 
                         GlassPanePopup.closePopupLast();
                     } else {
@@ -277,60 +277,59 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             }
         });
         headerCustom1.handleSearch(new DocumentListener() {
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        filterTable();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        filterTable();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        filterTable();
-    }
-
-    private void filterTable() {
-    String keyword = headerCustom1.getSearchText().trim();
-    TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
-    if (keyword.isEmpty()) {
-        sorter.setRowFilter(null); 
-    } else {
-        sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
             @Override
-            public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
-                Object value = entry.getValue(0); 
-                if (value != null) {
-                    return value.toString().contains(keyword); 
-                }
-                return false;
+            public void insertUpdate(DocumentEvent e) {
+                filterTable();
             }
-        });
-    }
-}
 
-});
-        
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterTable();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterTable();
+            }
+
+            private void filterTable() {
+                String keyword = headerCustom1.getSearchText().trim();
+                TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
+                if (keyword.isEmpty()) {
+                    sorter.setRowFilter(null);
+                } else {
+                    sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                        @Override
+                        public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                            Object value = entry.getValue(0);
+                            if (value != null) {
+                                return value.toString().contains(keyword);
+                            }
+                            return false;
+                        }
+                    });
+                }
+            }
+
+        });
+
         btnImport.addActionListener(ev -> {
             JFileChooser fileChooser = new JFileChooser();
-    int result = fileChooser.showOpenDialog(this);
-    if (result == JFileChooser.APPROVE_OPTION) {
-        File file = fileChooser.getSelectedFile();
-        ImportExcelService importService = new ImportExcelService();
-        List<Customer> imported = importService.importCustomersFromExcel(file);
-        if (imported != null && !imported.isEmpty()) {
-            customerService.getAllCustomer().addAll(imported);
-            loadTable(customerService.getAllCustomer());
-            Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
-        } else {
-            Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
-        }
-    }
-});
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Customer> imported = importService.importCustomersFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    customerService.getAllCustomer().addAll(imported);
+                    loadTable(customerService.getAllCustomer());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
-        
         cmbGender.addActionListener(ev -> {
             String selected = (String) cmbGender.getSelectedItem();
             filterCustomerTable(selected);
@@ -620,7 +619,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             ) {
 
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddCustomer;
     private iuh.fit.se.group1.ui.component.custom.Button btnExport;

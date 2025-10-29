@@ -126,4 +126,5 @@ public class Promotion {
     public int hashCode() {
         return Objects.hashCode(promotionId);
     }
+
 }
