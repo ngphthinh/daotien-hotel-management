@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.CircleLabel;
@@ -33,7 +34,45 @@ public class ProfileButton extends javax.swing.JPanel {
         btnSignOut.setBorder(new EmptyBorder(10,0,0,0));
         btnSignOut.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
-
+    public void setEmployeeInfo(Employee employee) {
+        if (employee != null) {
+            if (employee.getFullName() != null && !employee.getFullName().isEmpty()) {
+                lblFullName.setText(employee.getFullName());
+            }
+            if (employee.getAccount() != null &&
+                    employee.getAccount().getRole() != null &&
+                    employee.getAccount().getRole().getRoleName() != null) {
+                lblRoleName.setText(employee.getAccount().getRole().getRoleName());
+            }
+            if (employee.getAvt() != null && employee.getAvt().length > 0) {
+                lblAvartar.setImageFromBytes(employee.getAvt());
+            } else {
+                lblAvartar.resetToDefault();
+            }
+        }
+    }
+    public void updateAvatar(byte[] avatarBytes) {
+        if (avatarBytes != null && avatarBytes.length > 0) {
+            lblAvartar.setImageFromBytes(avatarBytes);
+        } else {
+            lblAvartar.resetToDefault();
+        }
+    }
+    public void setFullName(String fullName) {
+        if (fullName != null && !fullName.isEmpty()) {
+            lblFullName.setText(fullName);
+        }
+    }
+    public void setRoleName(String roleName) {
+        if (roleName != null && !roleName.isEmpty()) {
+            lblRoleName.setText(roleName);
+        }
+    }
+    public void resetToDefault() {
+        lblFullName.setText("Chưa có tên nhân viên");
+        lblRoleName.setText("Chưa có vai trò");
+        lblAvartar.resetToDefault();
+    }
     
     public Button getBtnSignOut() {
         return btnSignOut;

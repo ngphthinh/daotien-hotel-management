@@ -107,16 +107,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return null;
     }
 
-//    @Override
-//    public void deleteById(Long aLong) {
-//        String sql = "DELETE FROM Employee WHERE employeeId = ?";
-//        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-//            preparedStatement.setLong(1, aLong);
-//            preparedStatement.executeUpdate();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 @Override
 public void deleteById(Long aLong) {
     String sqlGetAccountId = "SELECT accountId FROM Employee WHERE employeeId = ?";
@@ -124,12 +114,8 @@ public void deleteById(Long aLong) {
     String sqlDeleteAccount = "DELETE FROM Account WHERE accountId = ?";
 
     try {
-        // Bắt đầu transaction
         connection.setAutoCommit(false);
-
         Long accountId = null;
-
-        // Lấy accountId trước khi xóa employee
         try (PreparedStatement psGetAccount = connection.prepareStatement(sqlGetAccountId)) {
             psGetAccount.setLong(1, aLong);
             try (ResultSet rs = psGetAccount.executeQuery()) {
@@ -138,25 +124,18 @@ public void deleteById(Long aLong) {
                 }
             }
         }
-
-        // Xóa employee trước
         try (PreparedStatement psDeleteEmployee = connection.prepareStatement(sqlDeleteEmployee)) {
             psDeleteEmployee.setLong(1, aLong);
             psDeleteEmployee.executeUpdate();
         }
-
-        // Xóa account nếu có
         if (accountId != null && accountId > 0) {
             try (PreparedStatement psDeleteAccount = connection.prepareStatement(sqlDeleteAccount)) {
                 psDeleteAccount.setLong(1, accountId);
                 psDeleteAccount.executeUpdate();
             }
         }
-
-        // Commit transaction
         connection.commit();
         connection.setAutoCommit(true);
-
     } catch (SQLException e) {
         try {
             connection.rollback();

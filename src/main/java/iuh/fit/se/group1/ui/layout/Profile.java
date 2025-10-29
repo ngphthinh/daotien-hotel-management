@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
+
+import iuh.fit.se.group1.entity.Employee;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 /**
@@ -14,17 +16,17 @@ import org.kordamp.ikonli.swing.FontIcon;
  * @author Windows
  */
 public class Profile extends javax.swing.JPanel {
-    private JTextField emailField;
-    private JTextField loginNameField;
-    private JTextField phoneField;
-    private JComboBox<String> genderCombo;
-    private JComboBox<String> positionCombo;
-    private JTextField birthdateField;
-    private JButton changePasswordBtn;
+    private JTextField txtEmail;
+    private JTextField txtUserName;
+    private JTextField txtPhone;
+    private JComboBox<String> cmbGender;
+    private JComboBox<String> cmbRole;
+    private JTextField txtHireDate;
+    private JButton btnChangePass;
 
     // Info labels
-    private JLabel nameLabel;
-    private JLabel idLabel;
+    private JLabel lblName;
+    private JLabel lblId;
     private static final Color PRIMARY_BLUE = new Color(108, 165, 200);
     private static final Color ACCENT_BLUE = new Color(66, 133, 244);
     private static final Color SUCCESS_GREEN = new Color(76, 175, 80);
@@ -39,67 +41,106 @@ public class Profile extends javax.swing.JPanel {
      */
     public Profile() {
         initComponents();
-        headerShift1.getLblTile().setText("Quản lý nhân viên");
-        headerShift1.getLblSubTitle().setText("> Thông tin nhân viên");
+        headerShift.getLblTile().setText("Quản lý nhân viên");
+        headerShift.getLblSubTitle().setText("> Thông tin nhân viên");
         setupMainLayout();
         setupHeaderPanel();
         setupFormPanel();
     }
+    public void setEmployeeInfo(Employee employee) {
+        if (employee == null) {
+            return;
+        }
+        if (employee.getFullName() != null) {
+            lblName.setText(employee.getFullName());
+        }
+        if (employee.getEmployeeId() != null) {
+            lblId.setText(String.valueOf(employee.getEmployeeId()));
+        }
+        if (employee.getAvt() != null && employee.getAvt().length > 0) {
+            avatarLabel.setImageFromBytes(employee.getAvt());
+        } else {
+            avatarLabel.resetToDefault();
+        }
+        if (employee.getEmail() != null) {
+            txtEmail.setText(employee.getEmail());
+        }
+        if (employee.getPhone() != null) {
+            txtPhone.setText(employee.getPhone());
+        }
+        if (employee.isGender()) {
+            cmbGender.setSelectedItem("Nam");
+        } else {
+            cmbGender.setSelectedItem("Nữ");
+        }
+        if (employee.getAccount() != null
+                && employee.getAccount().getRole() != null
+                && employee.getAccount().getRole().getRoleName() != null) {
+            cmbRole.setSelectedItem(employee.getAccount().getRole().getRoleName());
+        }
+        if (employee.getHireDate() != null) {
+            txtHireDate.setText(employee.getHireDate().toString());
+        }
+        if (employee.getAccount() != null && employee.getAccount().getUsername() != null) {
+            txtUserName.setText(employee.getAccount().getUsername());
+        }
+        System.out.println("Đã cập nhật thông tin employee lên Profile: " + employee.getFullName());
+    }
     private void setupMainLayout() {
         setLayout(new BorderLayout());
         setBackground(BG_LIGHT);
-        add(headerShift1, BorderLayout.NORTH);
+        add(headerShift, BorderLayout.NORTH);
 
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(BG_LIGHT);
         
-        jPanel1.setPreferredSize(new Dimension(0, 220));
-        contentPanel.add(jPanel1, BorderLayout.NORTH);
+        pnlHead.setPreferredSize(new Dimension(0, 220));
+        contentPanel.add(pnlHead, BorderLayout.NORTH);
         
-        jPanel2 = new JPanel(new BorderLayout());
-        jPanel2.setBackground(BG_LIGHT);
-        jPanel2.setOpaque(true);
+        pnlBody = new JPanel(new BorderLayout());
+        pnlBody.setBackground(BG_LIGHT);
+        pnlBody.setOpaque(true);
         
-        contentPanel.add(jPanel2, BorderLayout.CENTER);
+        contentPanel.add(pnlBody, BorderLayout.CENTER);
         
         add(contentPanel, BorderLayout.CENTER);
     }
     private void setupHeaderPanel() {
-        jPanel1.setLayout(null);
-        jPanel1.setBackground(PRIMARY_BLUE);
+        pnlHead.setLayout(null);
+        pnlHead.setBackground(PRIMARY_BLUE);
 
         // Avatar
-        avatarLabel1.setBounds(60, 25, 150, 150);
-        avatarLabel1.setPreferredSize(new Dimension(150, 150));
-        jPanel1.add(avatarLabel1);
+        avatarLabel.setBounds(60, 25, 150, 150);
+        avatarLabel.setPreferredSize(new Dimension(150, 150));
+        pnlHead.add(avatarLabel);
 
         // Tên nhân viên
-        nameLabel = new JLabel("Nguyễn Trần Quốc Việt");
-        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
-        nameLabel.setForeground(Color.WHITE);
-        nameLabel.setBounds(240, 60, 500, 40);
-        jPanel1.add(nameLabel);
+        lblName = new JLabel("Nguyễn Trần Quốc Việt");
+        lblName.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        lblName.setForeground(Color.WHITE);
+        lblName.setBounds(240, 60, 500, 40);
+        pnlHead.add(lblName);
 
         // Mã nhân viên
-        idLabel = new JLabel("NV00947263554");
-        idLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-        idLabel.setForeground(new Color(230, 240, 250));
-        idLabel.setBounds(240, 100, 200, 25);
-        jPanel1.add(idLabel);
+        lblId = new JLabel("NV00947263554");
+        lblId.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblId.setForeground(new Color(230, 240, 250));
+        lblId.setBounds(240, 100, 200, 25);
+        pnlHead.add(lblId);
 
         JLabel role = createRole("Nhân viên quản lý");
         role.setBounds(240, 130, 130, 28);
-        jPanel1.add(role);
+        pnlHead.add(role);
 
         // Nút Đổi mật khẩu
-        changePasswordBtn = createModernButton("Đổi mật khẩu", ACCENT_BLUE, 140);
-        changePasswordBtn.setBounds(800, 70, 160, 40);
-        changePasswordBtn.addActionListener(e -> handleChangePassword());
-        jPanel1.add(changePasswordBtn);
+        btnChangePass = createModernButton("Đổi mật khẩu", ACCENT_BLUE, 140);
+        btnChangePass.setBounds(800, 70, 160, 40);
+        btnChangePass.addActionListener(e -> handleChangePassword());
+        pnlHead.add(btnChangePass);
     }
      private void setupFormPanel() {
-        jPanel2.setLayout(new BorderLayout());
-        jPanel2.setBackground(BG_LIGHT);
+        pnlBody.setLayout(new BorderLayout());
+        pnlBody.setBackground(BG_LIGHT);
         // Form container
         JPanel formContainer = new JPanel() {
             @Override
@@ -128,7 +169,7 @@ public class Profile extends javax.swing.JPanel {
         formContainer.add(divider);
         
         buildFormFields(formContainer);
-        jPanel2.add(formContainer, BorderLayout.CENTER);
+        pnlBody.add(formContainer, BorderLayout.CENTER);
     }
     private void buildFormFields(JPanel container) {
         int leftColX = 30;
@@ -141,31 +182,31 @@ public class Profile extends javax.swing.JPanel {
         
         // Row 1: Gender and Position
         addFormField(container, "Giới tính", leftColX, startY, fieldWidth, fieldHeight, labelHeight, () -> {
-            genderCombo = createStyledComboBox(new String[]{"Nam", "Nữ", "Khác"});
-            return genderCombo;
+            cmbGender = createStyledComboBox(new String[]{"Nam", "Nữ", "Khác"});
+            return cmbGender;
         });
         
         addFormField(container, "Chức vụ", rightColX, startY, fieldWidth, fieldHeight, labelHeight, () -> {
-            positionCombo = createStyledComboBox(new String[]{"Nhân viên", "Quản lý", "Giám đốc"});
-            return positionCombo;
+            cmbRole = createStyledComboBox(new String[]{"Nhân viên", "Quản lý", "Giám đốc"});
+            return cmbRole;
         });
         
         // Row 2: Email and Start Date
         int row2Y = startY + rowGap;
         addFormField(container, "Email", leftColX, row2Y, fieldWidth, fieldHeight, labelHeight, () -> {
-            emailField = createStyledTextField("example@company.com");
-            return emailField;
+            txtEmail = createStyledTextField("example@company.com");
+            return txtEmail;
         });
         
         addFormField(container, "Ngày bắt đầu", rightColX, row2Y, fieldWidth, fieldHeight, labelHeight, () -> {
-            birthdateField = createStyledTextField("DD/MM/YYYY");
-            birthdateField.setEditable(false); // KHÔNG CHO SỬA
+            txtHireDate = createStyledTextField("DD/MM/YYYY");
+            txtHireDate.setEditable(false); // KHÔNG CHO SỬA
             
             JPanel datePanel = new JPanel(new BorderLayout());
             datePanel.setBackground(Color.WHITE);
             datePanel.setOpaque(true);
-            birthdateField.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 8));
-            birthdateField.setBackground(Color.WHITE);
+            txtHireDate.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 8));
+            txtHireDate.setBackground(Color.WHITE);
             // Tạo icon lịch
             JLabel calendarIcon = new JLabel(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 16, new Color(100, 116, 139)));
             calendarIcon.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -174,7 +215,7 @@ public class Profile extends javax.swing.JPanel {
             calendarIcon.setPreferredSize(new Dimension(30, fieldHeight));
 
             // Thêm textfield và icon vào panel
-            datePanel.add(birthdateField, BorderLayout.CENTER);
+            datePanel.add(txtHireDate, BorderLayout.CENTER);
             datePanel.add(calendarIcon, BorderLayout.EAST);
             datePanel.setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createLineBorder(BORDER_COLOR, 1),
@@ -187,13 +228,13 @@ public class Profile extends javax.swing.JPanel {
         // Row 3
         int row3Y = row2Y + rowGap;
         addFormField(container, "Số điện thoại", leftColX, row3Y, fieldWidth, fieldHeight, labelHeight, () -> {
-            phoneField = createStyledTextField("XXX.XXXX.XXX");
-            return phoneField;
+            txtPhone = createStyledTextField("XXX.XXXX.XXX");
+            return txtPhone;
         });
         
         addFormField(container, "Tên đăng nhập", rightColX, row3Y, fieldWidth, fieldHeight, labelHeight, () -> {
-            loginNameField = createStyledTextField("username");
-            return loginNameField;
+            txtUserName = createStyledTextField("username");
+            return txtUserName;
         });
     }
     private void addFormField(JPanel container, String labelText, int x, int y, 
@@ -265,7 +306,7 @@ public class Profile extends javax.swing.JPanel {
         JComboBox<String> combo = new JComboBox<>(items);
         combo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         combo.setBackground(Color.WHITE);
-        combo.setEnabled(true);
+        combo.setEnabled(false);
         combo.setForeground(TEXT_PRIMARY);
         combo.setBorder(BorderFactory.createEmptyBorder(5, 12, 5, 12));
         combo.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -366,15 +407,15 @@ public class Profile extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        headerShift1 = new iuh.fit.se.group1.ui.component.HeaderShift();
-        jPanel1 = new javax.swing.JPanel();
-        avatarLabel1 = new iuh.fit.se.group1.ui.component.custom.AvatarLabel();
-        jPanel2 = new javax.swing.JPanel();
+        headerShift = new iuh.fit.se.group1.ui.component.HeaderShift();
+        pnlHead = new javax.swing.JPanel();
+        avatarLabel = new iuh.fit.se.group1.ui.component.custom.AvatarLabel();
+        pnlBody = new javax.swing.JPanel();
 
-        jPanel1.setBackground(new java.awt.Color(108, 165, 200));
+        pnlHead.setBackground(new java.awt.Color(108, 165, 200));
 
-        javax.swing.GroupLayout avatarLabel1Layout = new javax.swing.GroupLayout(avatarLabel1);
-        avatarLabel1.setLayout(avatarLabel1Layout);
+        javax.swing.GroupLayout avatarLabel1Layout = new javax.swing.GroupLayout(avatarLabel);
+        avatarLabel.setLayout(avatarLabel1Layout);
         avatarLabel1Layout.setHorizontalGroup(
             avatarLabel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 60, Short.MAX_VALUE)
@@ -384,25 +425,25 @@ public class Profile extends javax.swing.JPanel {
             .addGap(0, 60, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(pnlHead);
+        pnlHead.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(104, 104, 104)
-                .addComponent(avatarLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(avatarLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(88, Short.MAX_VALUE)
-                .addComponent(avatarLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(avatarLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(67, 67, 67))
         );
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(pnlBody);
+        pnlBody.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 1200, Short.MAX_VALUE)
@@ -416,26 +457,26 @@ public class Profile extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(headerShift1, javax.swing.GroupLayout.DEFAULT_SIZE, 1200, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(headerShift, javax.swing.GroupLayout.DEFAULT_SIZE, 1200, Short.MAX_VALUE)
+            .addComponent(pnlHead, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlBody, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(headerShift1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(headerShift, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlHead, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(pnlBody, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel1;
-    private iuh.fit.se.group1.ui.component.HeaderShift headerShift1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private iuh.fit.se.group1.ui.component.custom.AvatarLabel avatarLabel;
+    private iuh.fit.se.group1.ui.component.HeaderShift headerShift;
+    private javax.swing.JPanel pnlHead;
+    private javax.swing.JPanel pnlBody;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.ui.component.menu.*;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
 
@@ -19,7 +20,7 @@ public class MainLayout extends JPanel {
     private JPanel pnlContent;
 
     private boolean isAdmin;
-
+    private ProfileButton profileButton;
     private Dashboard dashboard;
     private DashboardEmployee dashboardEmployee;
     private BookingPage bookingPage;
@@ -34,20 +35,31 @@ public class MainLayout extends JPanel {
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
 
+    private float alpha = 1f;
+    private SideBar sideBar;
+    private Employee currentEmployee;
     public MainLayout() {
         init();
         setOpaque(false);
         isAdmin = true;
         setAuth(isAdmin);
     }
-
+    public void setEmployeeInfo(Employee employee) {
+        this.currentEmployee = employee;
+        if (employee != null && sideBar != null) {
+            Footer footer = sideBar.getFooter1();
+            if (footer != null) {
+                footer.setEmployeeInfo(employee);
+            }
+        }
+    }
+    public Employee getCurrentEmployee() {
+        return currentEmployee;
+    }
     public void setAlpha(float alpha) {
         this.alpha = alpha;
         repaint();
     }
-
-    private float alpha = 1f;
-    private SideBar sideBar;
 
     @Override
     public void paint(Graphics grphcs) {
@@ -150,8 +162,11 @@ public class MainLayout extends JPanel {
         sideBar.getLblAvt().addMouseListener(new MouseListener(){
             @Override
             public void mouseClicked(MouseEvent e) {
-            
-                setMainContent(new Profile());
+                Profile profilePage = new Profile();
+                if (currentEmployee != null) {
+                    profilePage.setEmployeeInfo(currentEmployee);
+                }
+                setMainContent(profilePage);
             }
 
             @Override

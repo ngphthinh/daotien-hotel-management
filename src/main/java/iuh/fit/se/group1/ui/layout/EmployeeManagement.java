@@ -524,6 +524,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
     private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmployeeActionPerformed
 
         InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
+        modal.getLblCode().setVisible(false);
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -554,15 +555,17 @@ public class EmployeeManagement extends javax.swing.JPanel {
             int position = modal.getCmbPosition().getSelectedIndex();
             String roleId;
             if (position == 0) {
-                roleId = Role.MANAGER.toString();
-            } else {
                 roleId = Role.RECEPTIONIST.toString();
+            } else {
+                roleId = Role.MANAGER.toString();
             }
             Employee employee = new Employee();
             employee.setFullName(result.fullName);
             employee.setPhone(result.phone);
             employee.setEmail(result.email);
-            employee.setGender(result.gender);
+            int genderIndex = modal.getCmbGender().getSelectedIndex();
+            boolean gender = genderIndex == 0;
+            employee.setGender(gender);;
             employee.setCitizenId(result.citizenId);
             employee.setHireDate(result.hireDate);
             AvatarLabel avatarLabel = modal.getAvatarLabel();
