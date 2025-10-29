@@ -13,7 +13,6 @@ import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
-import iuh.fit.se.group1.service.ExportExcelService;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -36,12 +35,15 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+
 import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
+import iuh.fit.se.group1.service.ExportExcelService;
+
 
 /**
  * @author VienThieu
@@ -59,6 +61,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         roleService = new RoleService();
         loadTable(employeeService.getAllEmployees());
     }
+    
 
     private void loadTable(java.util.List<Employee> employees) {
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
@@ -100,15 +103,13 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
-//         private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
-//     ExportExcelService.exportTableToExcel(
-//         this,
-//         tblEmployee.getTbl(),
-//         "Danh sách nhân viên",
-//         "DanhSachNhanVien",
-//         true
-//     );
-// }   
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnExportActionPerformed(evt);
+        }
+        });
+        
+
 
         String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
@@ -223,7 +224,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 });
 
                 GlassPanePopup.showPopup(modal);
+                
             }
+            
 
             @Override
             public void onDelete(int row) {
@@ -539,6 +542,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent ae) {
                 GlassPanePopup.closePopupLast();
             }
+
         });
 
         modal.saveData(new ActionListener() {
@@ -551,6 +555,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }
+    
 
     private void saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
@@ -562,13 +567,12 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         try {
             int position = modal.getCmbPosition().getSelectedIndex();
-String roleId;
-if (position == 0) {
-    roleId = Role.RECEPTIONIST.toString(); 
-} else {
-    roleId = Role.MANAGER.toString();      
-}
-
+            String roleId;
+            if (position == 0) {
+                roleId = Role.MANAGER.toString();
+            } else {
+                roleId = Role.RECEPTIONIST.toString();
+            }
             Employee employee = new Employee();
             employee.setFullName(result.fullName);
             employee.setPhone(result.phone);
@@ -596,7 +600,7 @@ if (position == 0) {
             }
 
             DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-            String genderStr = employeeSave.isGender() ?  "Nam":"Nữ" ;
+            String genderStr = employeeSave.isGender() ? "Nữ" : "Nam";
 
             System.out.println(employeeSave);
 
@@ -613,12 +617,9 @@ if (position == 0) {
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
         }
     }
-//GEN-LAST:event_btnAddEmployeeActionPerformed
+    //GEN-LAST:event_btnAddEmployeeActionPerformed
 
-    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnExportActionPerformed
-
+    
     private void filterTable(String genderFilter, String positionFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl().getRowSorter();
 
@@ -736,5 +737,13 @@ if (position == 0) {
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom2;
     private javax.swing.JLabel lblTitleEmployee;
     private iuh.fit.se.group1.ui.component.table.Table tblEmployee;
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
+    ExportExcelService.exportTableToExcel(
+        this,
+        tblEmployee.getTbl(),
+        "Danh sách nhân viên",
+        "DanhSachNhanVien"
+    );
+}
     // End of variables declaration//GEN-END:variables
 }

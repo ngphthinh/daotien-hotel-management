@@ -26,6 +26,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import javax.swing.event.DocumentListener;
+import iuh.fit.se.group1.service.ExportExcelService;
+
+
 
 /**
  * @author THIS PC
@@ -70,6 +73,7 @@ public class AmenityManagement extends javax.swing.JPanel {
         btnAddAmenity.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        
         String cols[] = {"Mã dịch vụ", "Tên dịch vụ", "Giá dịch vụ", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblAmenity.getTbl().setModel(model);
@@ -345,8 +349,14 @@ public class AmenityManagement extends javax.swing.JPanel {
     }
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnExportActionPerformed
+    ExportExcelService.exportTableToExcel(
+        this,
+        tblAmenity.getTbl(),
+        "Danh sách dịch vụ",
+        "DanhSachDichVu",
+        true
+    );
+}//GEN-LAST:event_btnExportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
