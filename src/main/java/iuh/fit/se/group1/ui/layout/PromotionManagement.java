@@ -58,8 +58,8 @@ public class PromotionManagement extends javax.swing.JPanel {
             model.addRow(new Object[]{
                 promotion.getPromotionId(),
                 promotion.getPromotionName(),
-                Constants.VND_FORMAT.format(promotion.getDiscountPrice()),
-                promotion.getDiscountPercent() + " %",
+                promotion.getDiscountPrice(),
+                promotion.getDiscountPercent(),
                 promotion.getStartDate().format(Constants.DATE_FORMATTER),
                 promotion.getEndDate().format(Constants.DATE_FORMATTER),
                 promotion.getCreatedAt().format(Constants.DATE_FORMATTER)
@@ -88,8 +88,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         this,
         tblPromotion.getTbl(),
         "Danh sách khuyến mãi",
-        "DanhSachKhuyenMai",
-        true
+        "DanhSachKhuyenMai"
         );
         });
 
@@ -100,7 +99,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                 "Mã KM",
                 "Tên KM",
                 "Giá KM",
-                "% Giảm",
+                "Giảm giá (%)",
                 "Ngày bắt đầu",
                 "Ngày kết thúc",
                 "Ngày tạo",
@@ -157,8 +156,8 @@ public class PromotionManagement extends javax.swing.JPanel {
                         Promotion entitySave = promotionService.updatePromotion(promotion);
 
                         model.setValueAt(entitySave.getPromotionName(), row, 1);
-                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getDiscountPrice()), row, 2);
-                        model.setValueAt(entitySave.getDiscountPercent()+ " %", row, 3);
+                        model.setValueAt(entitySave.getDiscountPrice(), row, 2);
+                        model.setValueAt(entitySave.getDiscountPercent(), row, 3);
                         model.setValueAt(entitySave.getStartDate().format(Constants.DATE_FORMATTER), row, 4);
                         model.setValueAt(entitySave.getEndDate().format(Constants.DATE_FORMATTER), row, 5);
                         // Cột 6 là createdAt - không cập nhật
@@ -318,7 +317,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                 .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE)
                 .addGap(31, 31, 31))
         );
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void btnAddPromotionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPromotionActionPerformed
         InfoPromotionModal modal = new InfoPromotionModal();
@@ -356,8 +355,8 @@ public class PromotionManagement extends javax.swing.JPanel {
             model.addRow(new Object[]{
                     entitySave.getPromotionId(),                          // Cột 0
                     entitySave.getPromotionName(),                        // Cột 1
-                    Constants.VND_FORMAT.format(promotion.getDiscountPrice()),    // Cột 2
-                    entitySave.getDiscountPercent() + " %",                      // Cột 3
+                    entitySave.getDiscountPrice(),                        // Cột 2
+                    entitySave.getDiscountPercent(),                      // Cột 3
                     entitySave.getStartDate().format(Constants.DATE_FORMATTER),     // Cột 4
                     entitySave.getEndDate().format(Constants.DATE_FORMATTER),       // Cột 5
                     entitySave.getCreatedAt().format(Constants.DATE_FORMATTER)      // Cột 6

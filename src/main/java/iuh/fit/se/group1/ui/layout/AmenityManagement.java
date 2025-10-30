@@ -353,8 +353,7 @@ public class AmenityManagement extends javax.swing.JPanel {
         this,
         tblAmenity.getTbl(),
         "Danh sách dịch vụ",
-        "DanhSachDichVu",
-        true
+        "DanhSachDichVu"
     );
 }//GEN-LAST:event_btnExportActionPerformed
 

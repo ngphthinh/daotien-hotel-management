@@ -93,12 +93,11 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
-    ExportExcelService.exportTableToExcel(
+        ExportExcelService.exportTableToExcel(
         this,
         tblCustomer.getTbl(),
         "Danh sách khách hàng",
-        "DanhSachKhachHang",
-        true
+        "DanhSachKhachHang"
     );
 });
         headerCustom1.getLblTitle().setText(
@@ -186,6 +185,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 GlassPanePopup.showPopup(modal);
             }
+            
 
             @Override
             public void onDelete(int row) {
@@ -389,6 +389,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
         btnAddCustomer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddCustomerActionPerformed(evt);
+                
             }
         });
 
@@ -461,6 +462,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
         sorter.setRowFilter(rf);
         sorter.setSortKeys(null);
     }
+    
 
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddCustomerActionPerformed
         InfoCustomerModal modal = new InfoCustomerModal();
@@ -471,6 +473,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
                 GlassPanePopup.closePopupLast();
             }
         });
+    
 
         modal.saveData(new ActionListener() {
             @Override
