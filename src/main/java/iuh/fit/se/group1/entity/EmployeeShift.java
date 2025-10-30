@@ -13,12 +13,13 @@ public class EmployeeShift {
     private BigDecimal systemAmount;
     private	BigDecimal actualAmount;
     private	BigDecimal difference;
+    private LocalDate shiftDate;
     private LocalDate createdAt;
 
     public EmployeeShift() {
     }
 
-    public EmployeeShift(Long employeeShiftId, Employee employee, Shift shift, LocalDateTime closingTime, BigDecimal systemAmount, BigDecimal actualAmount, BigDecimal difference, LocalDate createdAt) {
+    public EmployeeShift(Long employeeShiftId, Employee employee, Shift shift, LocalDateTime closingTime, BigDecimal systemAmount, BigDecimal actualAmount, BigDecimal difference, LocalDate shiftDate, LocalDate createdAt) {
         this.employeeShiftId = employeeShiftId;
         this.employee = employee;
         this.shift = shift;
@@ -26,6 +27,7 @@ public class EmployeeShift {
         this.systemAmount = systemAmount;
         this.actualAmount = actualAmount;
         this.difference = difference;
+        this.shiftDate = shiftDate;
         this.createdAt = createdAt;
     }
 
@@ -91,6 +93,14 @@ public class EmployeeShift {
         this.difference = difference;
     }
 
+    public LocalDate getShiftDate() {
+        return shiftDate;
+    }
+
+    public void setShiftDate(LocalDate shiftDate) {
+        this.shiftDate = shiftDate;
+    }
+
     public LocalDate getCreatedAt() {
         return createdAt;
     }
@@ -120,6 +130,7 @@ public class EmployeeShift {
                 ", systemAmount=" + systemAmount +
                 ", actualAmount=" + actualAmount +
                 ", difference=" + difference +
+                ", shiftDate=" + shiftDate +
                 ", createdAt=" + createdAt +
                 '}';
     }

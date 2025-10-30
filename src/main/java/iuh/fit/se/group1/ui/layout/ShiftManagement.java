@@ -7,6 +7,13 @@ package iuh.fit.se.group1.ui.layout;
 import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
 import com.raven.datechooser.SelectedDate;
+import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.entity.EmployeeShift;
+import iuh.fit.se.group1.entity.Shift;
+import iuh.fit.se.group1.repository.ShiftRepository;
+import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.EmployeeShiftService;
+import iuh.fit.se.group1.service.ShiftService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.shift.ShiftCard;
 import iuh.fit.se.group1.ui.component.shift.ShiftList;
@@ -17,18 +24,30 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import org.imgscalr.Scalr;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
 
@@ -38,16 +57,184 @@ import raven.glasspanepopup.GlassPanePopup;
  * @author THIS PC
  */
 public class ShiftManagement extends javax.swing.JPanel {
-
+    private static final Logger log = LoggerFactory.getLogger(ShiftManagement.class);
     private DateChooser dateChooser;
+    private ShiftService shiftService;
+    private List<Shift> shifts;
+    private EmployeeShiftService employeeShiftService;
+    private EmployeeService employeeService;
 
     /**
      * Creates new form ShiftManagement
      */
     public ShiftManagement() {
         initComponents();
+        shiftService = new ShiftService();
+        employeeShiftService = new EmployeeShiftService();
+        employeeService = new EmployeeService();
+        loadShiftsFromDatabase();
+        setupDateChooser();
 
+        setupShiftCardButtons();
+        loadEmployeeShiftsByDate(LocalDate.now());
+    }
 
+    private void loadShiftsFromDatabase() {
+        try {
+            // Lấy tất cả shifts từ database
+            shifts = shiftService.getAllShifts();
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+            // Gán dữ liệu vào các ShiftCard tương ứng
+            ShiftCard[] shiftCards = {shiftCard1, shiftCard2, shiftCard3, shiftCard4};
+            Color[] colors = {Color.RED, new Color(51, 204, 255), Color.GREEN, Color.yellow};
+
+            for (int i = 0; i < Math.min(shifts.size(), shiftCards.length); i++) {
+                Shift shift = shifts.get(i);
+                ShiftCard card = shiftCards[i];
+
+                // Set màu header
+                card.setHeaderColor(colors[i]);
+
+                // Set tên ca
+                card.getLblShiftName().setText(shift.getName());
+
+                // Set thời gian ca làm việc
+                String startTime = shift.getStartTime().format(timeFormatter);
+                String endTime = shift.getEndTime().format(timeFormatter);
+                card.getLblTime().setText(startTime + " - " + endTime);
+            }
+
+            // Nếu không đủ 4 ca trong database, set giá trị mặc định cho các ca còn lại
+            if (shifts.size() < 4) {
+                String[] defaultNames = {"CA 01", "CA 02", "CA 03", "CA 04"};
+                String[] defaultTimes = {"00:00 - 06:00", "06:00 - 12:00", "12:00 - 18:00", "18:00 - 00:00"};
+
+                for (int i = shifts.size(); i < shiftCards.length; i++) {
+                    shiftCards[i].setHeaderColor(colors[i]);
+                    shiftCards[i].getLblShiftName().setText(defaultNames[i]);
+                    shiftCards[i].getLblTime().setText(defaultTimes[i]);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Message.showMessageNoCancel("Lỗi", "Không thể tải danh sách ca làm việc: " + e.getMessage());
+
+            // Fallback: Set giá trị mặc định nếu có lỗi
+            setDefaultShiftValues();
+        }
+    }
+    private void loadEmployeeShiftsByDate(LocalDate date) {
+        try {
+            if (shifts == null || shifts.isEmpty()) return;
+
+            ShiftCard[] shiftCards = {shiftCard1, shiftCard2, shiftCard3, shiftCard4};
+
+            // Load ảnh mặc định
+            BufferedImage defaultImage = null;
+            try {
+                URL defaultImg = getClass().getResource("/images/meomeo.jpg");
+                if (defaultImg != null) defaultImage = ImageIO.read(defaultImg);
+            } catch (Exception ex) {
+                log.error("Error loading default image", ex);
+            }
+
+            // Reset toàn bộ ShiftCard về mặc định
+            for (ShiftCard card : shiftCards) {
+                card.getLblName1().setText("Vui lòng thêm nhân viên");
+                card.getLblCode1().setText("Không có mã nhân viên");
+                card.getLblName2().setText("Vui lòng thêm nhân viên");
+                card.getLblCode2().setText("Không có mã nhân viên");
+                card.getPnlInforEmployee1().setVisible(true);
+                card.getPnlInforEmployee2().setVisible(true);
+                card.getBtnAdd().setVisible(true);
+
+                // Reset avatar về null trước khi set ảnh mặc định
+                card.getAvatarLabel1().setImage(null);
+                card.getAvatarLabel2().setImage(null);
+                if (defaultImage != null) {
+                    card.getAvatarLabel1().setImage(defaultImage);
+                    card.getAvatarLabel2().setImage(defaultImage);
+                }
+            }
+
+            // Lấy danh sách EmployeeShift theo ngày
+            List<EmployeeShift> employeeShifts = employeeShiftService.getAllShiftsByDate(date);
+            if (employeeShifts == null || employeeShifts.isEmpty()) {
+                // Ngày này không có nhân viên -> giữ mặc định
+                return;
+            }
+
+            // Nhóm EmployeeShift theo ShiftId
+            Map<Long, List<EmployeeShift>> shiftMap = employeeShifts.stream()
+                    .collect(Collectors.groupingBy(es -> es.getShift().getShiftId()));
+
+            // Load nhân viên vào ShiftCard
+            for (int i = 0; i < Math.min(shifts.size(), shiftCards.length); i++) {
+                Shift shift = shifts.get(i);
+                ShiftCard card = shiftCards[i];
+
+                List<EmployeeShift> employeesInShift = shiftMap.get(shift.getShiftId());
+                if (employeesInShift != null && !employeesInShift.isEmpty()) {
+                    for (int j = 0; j < Math.min(2, employeesInShift.size()); j++) {
+                        EmployeeShift es = employeesInShift.get(j);
+                        Employee employee = employeeService.getEmployeeById(es.getEmployee().getEmployeeId());
+                        if (employee == null) continue;
+
+                        String employeeName = employee.getFullName();
+                        String employeeCode = String.valueOf(employee.getEmployeeId());
+
+                        BufferedImage image = defaultImage;
+                        try {
+                            if (employee.getAvt() != null && employee.getAvt().length > 0) {
+                                image = ImageIO.read(new ByteArrayInputStream(employee.getAvt()));
+                                image = Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
+                            }
+                        } catch (Exception ex) {
+                            log.error("Error loading image for employee {}", employeeName, ex);
+                        }
+
+                        if (j == 0) {
+                            card.getLblName1().setText(employeeName);
+                            card.getLblCode1().setText(employeeCode);
+                            card.getAvatarLabel1().setImage(image);
+                            card.getPnlInforEmployee1().setVisible(true);
+                        } else {
+                            card.getLblName2().setText(employeeName);
+                            card.getLblCode2().setText(employeeCode);
+                            card.getAvatarLabel2().setImage(image);
+                            card.getPnlInforEmployee2().setVisible(true);
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Error loading shifts by date: ", e);
+        }
+    }
+
+    private void setDefaultShiftValues() {
+        shiftCard1.setHeaderColor(Color.RED);
+        shiftCard2.setHeaderColor(new Color(51, 204, 255));
+        shiftCard3.setHeaderColor(Color.GREEN);
+        shiftCard4.setHeaderColor(Color.yellow);
+
+        shiftCard1.getLblShiftName().setText("CA 01");
+        shiftCard1.getLblTime().setText("00:00 - 06:00");
+
+        shiftCard2.getLblShiftName().setText("CA 02");
+        shiftCard2.getLblTime().setText("06:00 - 12:00");
+
+        shiftCard3.getLblShiftName().setText("CA 03");
+        shiftCard3.getLblTime().setText("12:00 - 18:00");
+
+        shiftCard4.getLblShiftName().setText("CA 04");
+        shiftCard4.getLblTime().setText("18:00 - 00:00");
+    }
+
+    private void setupDateChooser() {
         txtDate.setEditable(false);
         txtDate.setFocusable(false);
         txtDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -56,14 +243,22 @@ public class ShiftManagement extends javax.swing.JPanel {
 
         dateChooser = new DateChooser();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         txtDate.setText(sdf.format(new Date()));
-        dateChooser.setDateFormat("dd/MM/yyyy");
+        dateChooser.setDateFormat("dd-MM-yyyy");
         dateChooser.toDay();
         dateChooser.setForeground(Constants.COLOR_ICON_MENU);
         dateChooser.addEventDateChooser((action, date) -> {
             if (action.getAction() == SelectedAction.DAY_SELECTED) {
                 dateChooser.hidePopup();
+                LocalDate selectedDate = LocalDate.of(
+                        date.getYear(),
+                        date.getMonth(),
+                        date.getDay()
+                );
+
+                // Load shifts theo ngày đã chọn
+                loadEmployeeShiftsByDate(selectedDate);
             }
         });
         dateChooser.setTextRefernce(txtDate);
@@ -73,28 +268,16 @@ public class ShiftManagement extends javax.swing.JPanel {
                 dateChooser.showPopup(txtDate, 0, txtDate.getHeight());
             }
         });
-        shiftCard1.setHeaderColor(Color.red);
-        shiftCard3.setHeaderColor(Color.GREEN);
-        shiftCard4.setHeaderColor(Color.yellow);
-        shiftCard1.getLblShiftName().setText("CA 01");
-        shiftCard1.getLblTime().setText("0H-6H");
-        shiftCard2.getLblShiftName().setText("CA 02");
-        shiftCard2.getLblTime().setText("6H-12H");
-        shiftCard3.getLblShiftName().setText("CA 03");
-        shiftCard3.getLblTime().setText("12H-18H");
-        shiftCard4.getLblShiftName().setText("CA 04");
-        shiftCard4.getLblTime().setText("18H-0H");
-        setupShiftCardButtons();
-    }
-    private void setupShiftCardButtons() {
-        // Gắn sự kiện cho từng ShiftCard
-        shiftCard1.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard1));
-        shiftCard3.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard3));
-        shiftCard2.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard2));
-        shiftCard4.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard4));
     }
 
-    private void handleAddEmployeesToShift(ShiftCard shiftCard) {
+    private void setupShiftCardButtons() {
+        shiftCard1.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard1, 0));
+        shiftCard2.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard2, 1));
+        shiftCard3.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard3, 2));
+        shiftCard4.getBtnAdd().addActionListener(e -> handleAddEmployeesToShift(shiftCard4, 3));
+    }
+
+    private void handleAddEmployeesToShift(ShiftCard shiftCard, int shiftIndex) {
         // Lấy danh sách nhân viên đã chọn từ ShiftList
         List<ShiftProfile> selectedProfiles = shiftList.getSelectedEmployees();
 
@@ -103,36 +286,82 @@ public class ShiftManagement extends javax.swing.JPanel {
             Message.showMessageNoCancel("Thông báo", "Vui lòng chọn đúng 2 nhân viên!");
             return;
         }
-        
-        // Cập nhật thông tin nhân viên vào ShiftCard
+
+        // Lấy thông tin nhân viên
         ShiftProfile profile1 = selectedProfiles.get(0);
         ShiftProfile profile2 = selectedProfiles.get(1);
-        // Lấy tên nhân viên và tên ca để hiển thị trong thông báo
         String name1 = profile1.getLblName().getText();
         String name2 = profile2.getLblName().getText();
-        String shiftName = shiftCard.getLblShiftName().getText(); // Giả sử ShiftCard có label tên ca
+        String shiftName = shiftCard.getLblShiftName().getText();
 
         // Hiển thị hộp xác nhận
         Message.showConfirm(
-        "Xác nhận",
-        "Bạn có chắc chắn muốn thêm " + name1 + " và " + name2 + " vào ca " + shiftName + " không?",
-            () -> {
-                // Đây là code sẽ thực thi khi người dùng nhấn OK
-                shiftCard.getLblName1().setText(name1);
-                shiftCard.getLblCode1().setText(profile1.getLblCode().getText());
-                shiftCard.getAvatarLabel1().setImage(profile1.getAvatarLabel().getImage());
+                "Xác nhận",
+                "Bạn có chắc chắn muốn thêm " + name1 + " và " + name2 + " vào ca " + shiftName + " không?",
+                () -> {
+                    try {
+                        // Lấy ngày đã chọn từ DateChooser
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                        Date selectedDate = sdf.parse(txtDate.getText());
+                        LocalDate shiftDate = selectedDate.toInstant()
+                                .atZone(java.time.ZoneId.systemDefault())
+                                .toLocalDate();
 
-                shiftCard.getLblName2().setText(name2);
-                shiftCard.getLblCode2().setText(profile2.getLblCode().getText());
-                shiftCard.getAvatarLabel2().setImage(profile2.getAvatarLabel().getImage());
+                        // Lấy Shift từ database (giả sử shifts đã được load)
+                        if (shiftIndex >= shifts.size()) {
+                            Message.showMessageNoCancel("Lỗi", "Ca làm việc không tồn tại!");
+                            return;
+                        }
+                        Shift shift = shifts.get(shiftIndex);
 
-                shiftCard.getPnlInforEmployee1().setVisible(true);
-                shiftCard.getPnlInforEmployee2().setVisible(true);
-                shiftCard.getBtnAdd().setVisible(true);
+                        // Lưu nhân viên 1 vào EmployeeShift
+                        EmployeeShift employeeShift1 = new EmployeeShift();
+                        Employee emp1 = new Employee();
+                        emp1.setEmployeeId(Long.parseLong(profile1.getLblCode().getText()));
+                        employeeShift1.setEmployee(emp1);
+                        employeeShift1.setShift(shift);
+                        employeeShift1.setShiftDate(shiftDate);
+                        employeeShift1.setClosingTime(shift.getEndTime());
+                        employeeShift1.setCreatedAt(LocalDate.now());
 
-                shiftList.clearAllSelections();
-                
-            }
+                        employeeShiftService.addEmployeeShift(employeeShift1);
+
+                        // Lưu nhân viên 2 vào EmployeeShift
+                        EmployeeShift employeeShift2 = new EmployeeShift();
+                        Employee emp2 = new Employee();
+                        emp2.setEmployeeId(Long.parseLong(profile2.getLblCode().getText()));
+                        employeeShift2.setEmployee(emp2);
+                        employeeShift2.setShift(shift);
+                        employeeShift2.setShiftDate(shiftDate);
+                        employeeShift2.setClosingTime(shift.getEndTime());
+                        employeeShift2.setCreatedAt(LocalDate.now());
+
+                        employeeShiftService.addEmployeeShift(employeeShift2);
+
+                        // Cập nhật UI
+                        shiftCard.getLblName1().setText(name1);
+                        shiftCard.getLblCode1().setText(profile1.getLblCode().getText());
+                        shiftCard.getAvatarLabel1().setImage(profile1.getAvatarLabel().getImage());
+
+                        shiftCard.getLblName2().setText(name2);
+                        shiftCard.getLblCode2().setText(profile2.getLblCode().getText());
+                        shiftCard.getAvatarLabel2().setImage(profile2.getAvatarLabel().getImage());
+
+                        shiftCard.getPnlInforEmployee1().setVisible(true);
+                        shiftCard.getPnlInforEmployee2().setVisible(true);
+                        shiftCard.getBtnAdd().setVisible(true);
+
+                        shiftList.clearAllSelections();
+
+                        Message.showMessageNoCancel("Thành công",
+                                "Đã thêm nhân viên vào " + shiftName + " thành công!");
+
+                    } catch (Exception e) {
+                        log.error("Error adding employees to shift: ", e);
+                        Message.showMessageNoCancel("Lỗi",
+                                "Không thể thêm nhân viên vào ca: " + e.getMessage());
+                    }
+                }
         );
     }
     /**
