@@ -105,23 +105,20 @@ public class ListOrder extends javax.swing.JPanel {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Số phòng", "Họ tên khách", "Số điện thoại"
+                "Mã phiếu đặt", "Số phòng", "Họ tên khách", "Số điện thoại"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setMinWidth(150);
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(150);
-            jTable1.getColumnModel().getColumn(0).setMaxWidth(150);
-            jTable1.getColumnModel().getColumn(2).setMinWidth(120);
-            jTable1.getColumnModel().getColumn(2).setPreferredWidth(120);
-            jTable1.getColumnModel().getColumn(2).setMaxWidth(120);
+            jTable1.getColumnModel().getColumn(1).setPreferredWidth(100);
+            jTable1.getColumnModel().getColumn(2).setPreferredWidth(180);
+            jTable1.getColumnModel().getColumn(3).setPreferredWidth(120);
         }
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N

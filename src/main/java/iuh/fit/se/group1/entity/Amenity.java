@@ -14,6 +14,11 @@ public class Amenity {
    
     }
 
+	public Amenity(Long amenityId,BigDecimal price) {
+		this.amenityId = amenityId;
+		this.price = price;
+	}
+
 	public Amenity(Long amenityId, String nameAmenity, BigDecimal price) {
 		this.amenityId = amenityId;
 		this.nameAmenity = nameAmenity;

@@ -4,38 +4,58 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.BookingDisplayDTO;
+import iuh.fit.se.group1.entity.Customer;
+import iuh.fit.se.group1.entity.Order;
+import iuh.fit.se.group1.service.BookingService;
+import iuh.fit.se.group1.service.OrderService;
 import iuh.fit.se.group1.ui.component.payment.CashPaymentModal;
 import iuh.fit.se.group1.ui.component.payment.TransferPaymentModal;
-import java.awt.BasicStroke;
+
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
-import java.awt.RenderingHints;
+import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
- *
  * @author Administrator
  */
 public class PaymentPage extends javax.swing.JPanel {
 
+//    private final BookingService bookingService;
+    private final OrderService orderService;
     /**
      * Creates new form OrderManagement
      */
     public PaymentPage() {
         initComponents();
+        custom();
+        orderService = new OrderService();
+        loadListBooking(orderService.findAllBookingDisplay());
+    }
 
+    public void setCustomer(Customer customer) {
+        infoPayment1.getTxtName().setText(customer.getFullName());
+        infoPayment1.getCboGender().setSelectedIndex(customer.isGender() ? 0 : 1);
+        infoPayment1.getTxtPhone().setText(customer.getPhone());
+    }
+
+    public void loadListBooking(List<BookingDisplayDTO> bookingDisplayDTOs){
+        DefaultTableModel defaultTableModel = (DefaultTableModel) listBooking.getTable().getModel();
+        defaultTableModel.setRowCount(0);
+        bookingDisplayDTOs.forEach(e-> defaultTableModel.addRow(new Object[]{
+                e.getBookingId(),
+                e.getRoomNumber(),
+                e.getCustomerName(),
+                e.getPhoneNumber()
+        }));
+    }
+
+    private void custom() {
         scrollPaneWin111.setOpaque(false);
         scrollPaneWin111.getViewport().setOpaque(false);
         scrollPaneWin111.setBorder(null);
@@ -64,24 +84,24 @@ public class PaymentPage extends javax.swing.JPanel {
 
         listBooking.hideOtherPanel();
 
-        javax.swing.GroupLayout layout = (javax.swing.GroupLayout) this.getLayout();
+        GroupLayout layout = (GroupLayout) this.getLayout();
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(headerBooking1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(scrollPaneWin111, GroupLayout.PREFERRED_SIZE, 700, GroupLayout.PREFERRED_SIZE)
                                 .addGap(5)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(headerBooking1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(headerBooking1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addGap(10)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(scrollPaneWin111, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
                         .addContainerGap()
         );
         int contentHeight = 1200; // chiều cao mong muốn, phải lớn hơn viewport
@@ -94,13 +114,15 @@ public class PaymentPage extends javax.swing.JPanel {
         // Thay tiêu đề cột
         model.setColumnIdentifiers(new Object[]{"Mã phụ thu", "Tên phụ thu", "Giá trị"});
         infoPayment1.getBtnCash().addActionListener(l -> {
-           var modal = new CashPaymentModal();
-               GlassPanePopup.showPopup(modal);
-        });
-        infoPayment1.getBtnTransfer().addActionListener(l->{
-            var modal= new TransferPaymentModal();
+            var modal = new CashPaymentModal();
             GlassPanePopup.showPopup(modal);
         });
+        infoPayment1.getBtnTransfer().addActionListener(l -> {
+            var modal = new TransferPaymentModal();
+            GlassPanePopup.showPopup(modal);
+        });
+
+
     }
 
     /**

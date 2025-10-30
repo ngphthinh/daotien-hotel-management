@@ -7,7 +7,9 @@ import org.kordamp.ikonli.swing.FontIcon;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -22,9 +24,7 @@ public class Constants {
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    public static final NumberFormat VND_FORMAT =
-            NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-
+    public static final DecimalFormat VND_FORMAT = new DecimalFormat("#,##0.## VND");
     public static final int HEIGHT_FRAME = 800;
     public static final int WIDTH_FRAME = 1400;
     public static final int BARS = 99;
@@ -58,4 +58,22 @@ public class Constants {
             default -> null;
         };
     }
+
+    public static double parseVND(String formatted) {
+        if (formatted == null || formatted.isEmpty()) return 0.0;
+        try {
+            // Loại bỏ ký tự không phải số hoặc dấu . , trước khi parse
+            String cleaned = formatted.replaceAll("[^\\d,\\.]", "");
+            return Double.parseDouble(cleaned.replace(",", ""));
+        } catch (NumberFormatException e) {
+            try {
+                // fallback: thử dùng parse của DecimalFormat
+                Number number = VND_FORMAT.parse(formatted);
+                return number.doubleValue();
+            } catch (ParseException ex) {
+                throw new RuntimeException("Không thể parse chuỗi tiền: " + formatted, ex);
+            }
+        }
+    }
+
 }

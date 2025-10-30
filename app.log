@@ -1,0 +1,28 @@
+Oct 29, 2025 8:33:27 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Room ID invalid format: 1hihi - For input string: "1hihi"
+Oct 29, 2025 8:33:32 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Room ID invalid format: 2hihi - For input string: "2hihi"
+Oct 29, 2025 8:33:37 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Room ID invalid format: 2hihi - For input string: "2hihi"
+Oct 29, 2025 9:49:15 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Oct 29, 2025 9:56:00 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Oct 29, 2025 10:01:25 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Oct 29, 2025 10:54:54 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Oct 29, 2025 11:24:43 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Oct 30, 2025 10:00:27 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Oct 30, 2025 10:08:44 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Oct 30, 2025 10:09:54 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+Oct 30, 2025 10:10:05 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+Oct 30, 2025 10:10:15 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+Oct 30, 2025 10:12:07 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details

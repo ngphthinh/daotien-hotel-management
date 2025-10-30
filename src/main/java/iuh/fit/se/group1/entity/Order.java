@@ -139,6 +139,10 @@ public class Order {
         this.bookings.add(booking);
     }
 
+    public BigDecimal getTotalAmountBooking(){
+        return bookings.stream().map(Booking::getTotalPrice).reduce(BigDecimal.ONE,BigDecimal::add);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Order order)) return false;
