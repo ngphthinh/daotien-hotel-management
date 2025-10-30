@@ -81,6 +81,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
+                        paymentPage.clearForm();
                         setMainContent(paymentPage);
                     } else if (index == 3 && subIndex == 1) {
                         setMainContent(shiftManagement);
@@ -138,7 +139,9 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
+                        paymentPage.clearForm();
                         setMainContent(paymentPage);
+
                     } else if (index == 3) {
                         setMainContent(new CloseShift());
                     } else {

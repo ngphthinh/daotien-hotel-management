@@ -63,10 +63,10 @@
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
               <Table columnCount="4" rowCount="4">
-                <Column editable="true" title="M&#xe3; phi&#x1ebf;u &#x111;&#x1eb7;t" type="java.lang.Object"/>
-                <Column editable="true" title="S&#x1ed1; ph&#xf2;ng" type="java.lang.Object"/>
+                <Column editable="true" title="M&#xe3; ho&#xe1; &#x111;&#x1a1;n" type="java.lang.Object"/>
                 <Column editable="true" title="H&#x1ecd; t&#xea;n kh&#xe1;ch" type="java.lang.Object"/>
                 <Column editable="true" title="S&#x1ed1; &#x111;i&#x1ec7;n tho&#x1ea1;i" type="java.lang.Object"/>
+                <Column editable="true" title="S&#x1ed1; ph&#xf2;ng" type="java.lang.Object"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -81,7 +81,7 @@
                   <Editor/>
                   <Renderer/>
                 </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="180" resizable="true">
+                <Column maxWidth="-1" minWidth="-1" prefWidth="130" resizable="true">
                   <Title/>
                   <Editor/>
                   <Renderer/>

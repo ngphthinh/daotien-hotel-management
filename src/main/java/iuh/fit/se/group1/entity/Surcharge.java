@@ -7,21 +7,18 @@ public class Surcharge {
     private long surchargeId;
     private String name;
     private BigDecimal price;
-    private long orderId;       
     private LocalDate createdAt;
 
-    public Surcharge(long surchargeId, String name, BigDecimal price, long orderId, LocalDate createdAt) {
+    public Surcharge(long surchargeId, String name, BigDecimal price, LocalDate createdAt) {
         this.surchargeId = surchargeId;
         this.name = name;
         this.price = price;
-        this.orderId = orderId;
         this.createdAt = createdAt;
     }
 
-    public Surcharge(String name, BigDecimal price, long orderId) {
+    public Surcharge(String name, BigDecimal price) {
         this.name = name;
         this.price = price;
-        this.orderId = orderId;
     }
 
     public Surcharge() {
@@ -51,13 +48,7 @@ public class Surcharge {
         this.price = price;
     }
 
-    public long getOrderId() {
-        return orderId;
-    }
 
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
-    }
 
     public LocalDate getCreatedAt() {
         return createdAt;
@@ -88,7 +79,6 @@ public class Surcharge {
                 "surchargeId=" + surchargeId +
                 ", name='" + name + '\'' +
                 ", price=" + price +
-                ", orderId=" + orderId +
                 ", createdAt=" + createdAt +
                 '}';
     }

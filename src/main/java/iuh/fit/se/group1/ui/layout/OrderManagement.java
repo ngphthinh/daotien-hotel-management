@@ -34,6 +34,7 @@ public class OrderManagement extends javax.swing.JPanel {
     private final OrderService orderService;
     private MainLayout parent;
     private PaymentPage paymentPage;
+
     /**
      * Creates new form OrderManagement
      */
@@ -47,6 +48,8 @@ public class OrderManagement extends javax.swing.JPanel {
     public void loadData(List<Order> orders) {
         DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
         model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
+
+        System.out.println(orders);
 
         for (Order order : orders) {
             model.addRow(new Object[]{

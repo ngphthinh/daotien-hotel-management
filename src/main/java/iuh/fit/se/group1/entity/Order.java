@@ -109,7 +109,6 @@ public class Order {
         this.promotion = promotion;
     }
 
-
     public LocalDate getCreatedAt() {
         return createdAt;
     }
@@ -124,7 +123,6 @@ public class Order {
                 "orderId=" + orderId +
                 ", orderDate=" + orderDate +
                 ", totalAmount=" + totalAmount +
-                ", employee=" + employee.getEmployeeId() +
                 ", orderType=" + orderType.getOrderTypeId() +
                 ", customer=" + customer.getCustomerId() +
                 ", promotion=" + promotion +

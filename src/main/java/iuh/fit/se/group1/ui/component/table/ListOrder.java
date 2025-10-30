@@ -111,13 +111,13 @@ public class ListOrder extends javax.swing.JPanel {
                 {null, null, null, null}
             },
             new String [] {
-                "Mã phiếu đặt", "Số phòng", "Họ tên khách", "Số điện thoại"
+                "Mã hoá đơn", "Họ tên khách", "Số điện thoại", "Số phòng"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(1).setPreferredWidth(100);
-            jTable1.getColumnModel().getColumn(2).setPreferredWidth(180);
+            jTable1.getColumnModel().getColumn(2).setPreferredWidth(130);
             jTable1.getColumnModel().getColumn(3).setPreferredWidth(120);
         }
 

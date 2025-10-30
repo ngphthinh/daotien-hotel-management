@@ -5,6 +5,7 @@ import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.OrderDetail;
 import iuh.fit.se.group1.entity.OrderType;
+import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.repository.OrderRepository;
 
 import java.math.BigDecimal;
@@ -67,7 +68,19 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
+    public List<Order> getAllOrdersUnPaid() {
+        return orderRepository.findAllByOrderUnPaid();
+    }
+
+    public Order getOrderById(Long id){
+        return orderRepository.findById(id);
+    }
+
     public List<BookingDisplayDTO> findAllBookingDisplay(){
         return orderRepository.findAllBookingDisplay();
+    }
+
+    public void updateOrderStatusToPaid(Long aLong, PaymentType eWallet, BigDecimal totalAmount) {
+        orderRepository.updateOrderStatusToPaid(aLong, eWallet, totalAmount);
     }
 }

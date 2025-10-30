@@ -17,4 +17,8 @@ public class OrderDetailService {
     public boolean saveOrderDetailsForOrder(Order savedOrder, List<OrderDetail> orderDetails) {
         return orderDetailRepository.save(savedOrder, orderDetails);
     }
+
+    public List<OrderDetail> getOrderDetailsByOrderId(Long orderId){
+        return orderDetailRepository.findByOrderId(orderId);
+    }
 }
