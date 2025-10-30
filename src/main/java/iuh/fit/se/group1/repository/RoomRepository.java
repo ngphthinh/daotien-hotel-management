@@ -8,10 +8,8 @@ import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +46,6 @@ public class RoomRepository implements Repository<Room, Long> {
             }
             ps.setDate(3, Date.valueOf(room.getCreateAt()));
             ps.setString(4, room.getRoomStatus().name());
-//        ps.setBigDecimal(5, room.getPrice());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {
@@ -77,7 +74,6 @@ public class RoomRepository implements Repository<Room, Long> {
             preparedStatement.setString(1, entity.getRoomNumber());
             preparedStatement.setString(2, entity.getRoomTypeId());
             preparedStatement.setString(3, entity.getRoomStatus().toString());
-//        preparedStatement.setBigDecimal(4, entity.getPrice() != null ? entity.getPrice() : BigDecimal.ZERO);
             preparedStatement.setLong(4, entity.getRoomId());
 
             int affectedRows = preparedStatement.executeUpdate();
@@ -115,7 +111,6 @@ public class RoomRepository implements Repository<Room, Long> {
 
                     room.setCreateAt(resultSet.getDate("createdAt") != null ? resultSet.getDate("createdAt").toLocalDate() : null);  // Null-safe
                     room.setRoomStatus(RoomStatus.fromString(resultSet.getString("roomStatus")));
-                    //room.setPrice(resultSet.getBigDecimal("price"));  // Nếu cột không tồn tại, sẽ null (không crash nếu schema OK)
                     return room;
                 }
             }
@@ -163,7 +158,6 @@ public class RoomRepository implements Repository<Room, Long> {
 
                 room.setCreateAt(resultSet.getDate("createdAt") != null ? resultSet.getDate("createdAt").toLocalDate() : null);
                 room.setRoomStatus(RoomStatus.fromString(resultSet.getString("roomStatus")));
-//                room.setPrice(resultSet.getBigDecimal("price"));
                 rooms.add(room);
             }
             log.info("Found {} rooms in total", rooms.size());  // Log để debug
@@ -201,7 +195,6 @@ public class RoomRepository implements Repository<Room, Long> {
                     room.setCreateAt(resultSet.getDate("createdAt") != null
                             ? resultSet.getDate("createdAt").toLocalDate()
                             : null);
-                    room.setPrice(resultSet.getBigDecimal("price"));
                     rooms.add(room);
                 }
             }

@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.JLabel;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
@@ -92,4 +93,8 @@ public class HeaderCustom extends javax.swing.JPanel {
     private javax.swing.JLabel lblTitle;
     private iuh.fit.se.group1.ui.component.SeachBar seachBar;
     // End of variables declaration//GEN-END:variables
+    public DocumentEvent getTxtSearch() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTxtSearch'");
+    }
 }

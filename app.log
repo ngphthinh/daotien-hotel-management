@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Oct 29, 2025 8:33:27 AM iuh.fit.se.group1.config.AppLogger error
 SEVERE: Room ID invalid format: 1hihi - For input string: "1hihi"
 Oct 29, 2025 8:33:32 AM iuh.fit.se.group1.config.AppLogger error
@@ -36,3 +37,7 @@ Oct 30, 2025 1:13:33 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 Oct 30, 2025 10:22:03 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
+=======
+thg 10 29, 2025 8:02:04 SA iuh.fit.se.group1.config.AppLogger error
+SEVERE: No enum constant for status: MAINTENANCE
+>>>>>>> d4d21a11835291d2199ae11003d6e75a5a982986
