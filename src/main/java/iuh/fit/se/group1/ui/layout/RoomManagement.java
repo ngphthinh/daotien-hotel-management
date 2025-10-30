@@ -1,4 +1,3 @@
-
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.Room;
@@ -6,6 +5,7 @@ import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.service.RoomTypeService;
+import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -34,11 +34,21 @@ public class RoomManagement extends javax.swing.JPanel {
     private String currentTypeFilter = "Tất cả";
     private String currentStatusFilter = "Tất cả";
 
+    private JLabel lblRoomType;
+    private JComboBox<String> cmbRoomType;
+    private JLabel lblHourPrice;
+    private JTextField txtHourPrice;
+    private JLabel lblNightPrice;
+    private JTextField txtNightPrice;
+    private JLabel lblDayPrice;
+    private JTextField txtDayPrice;
+
     public RoomManagement() {
         initServices();
         initComponents();
         custom();
         loadTable(roomService.getAllRooms());
+        setupPriceEditing();
     }
 
     private void initServices() {
@@ -51,6 +61,10 @@ public class RoomManagement extends javax.swing.JPanel {
         btnAddRoom.setForeground(Color.WHITE);
         btnAddRoom.setBorderRadius(10);
         btnAddRoom.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
+
+        btnUpdatePrice.setBackground(new Color(0, 150, 136));
+        btnUpdatePrice.setForeground(Color.WHITE);
+        btnUpdatePrice.setIcon(FontIcon.of(FontAwesomeSolid.SAVE, 17, Color.WHITE));
 
         btnExport.setBackground(new Color(13, 200, 7));
         btnExport.setForeground(Color.WHITE);
@@ -69,6 +83,63 @@ public class RoomManagement extends javax.swing.JPanel {
         setupSearchListener();
     }
 
+    private void setupPriceEditing() {
+        // Populate combo with room types
+        List<RoomType> types = roomTypeService.getAllRoomTypes();
+        String[] typeItems = new String[types.size()];
+        for (int i = 0; i < types.size(); i++) {
+            typeItems[i] = types.get(i).getName();
+        }
+        cmbRoomType = new JComboBox<>(typeItems);
+        cmbRoomType.setSelectedIndex(0); // Default to first type
+
+        // Sample prices (hardcoded as per user message; in real impl, load from DB)
+        // Assuming "Phòng đơn" and "Phòng đôi" with prices 120k hour, 500k night, 600k day
+        txtHourPrice.setText("120000");
+        txtNightPrice.setText("500000");
+        txtDayPrice.setText("600000");
+
+        // Initially non-editable
+        txtHourPrice.setEditable(false);
+        txtNightPrice.setEditable(false);
+        txtDayPrice.setEditable(false);
+
+        btnUpdatePrice.addActionListener(e -> {
+            // Enable editing
+            txtHourPrice.setEditable(true);
+            txtNightPrice.setEditable(true);
+            txtDayPrice.setEditable(true);
+
+            
+            String selectedType = (String) cmbRoomType.getSelectedItem();
+            try {
+                BigDecimal hour = new BigDecimal(txtHourPrice.getText().replaceAll("[^\\d]", ""));
+                BigDecimal night = new BigDecimal(txtNightPrice.getText().replaceAll("[^\\d]", ""));
+                BigDecimal day = new BigDecimal(txtDayPrice.getText().replaceAll("[^\\d]", ""));
+
+                JOptionPane.showMessageDialog(this, "Cập nhật giá cho " + selectedType + " thành công!");
+                
+                txtHourPrice.setEditable(false);
+                txtNightPrice.setEditable(false);
+                txtDayPrice.setEditable(false);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Giá phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+    
+        cmbRoomType.addActionListener(e -> {
+           
+            String selected = (String) cmbRoomType.getSelectedItem();
+            if ("Phòng đơn".equals(selected) || "Phòng đôi".equals(selected)) {
+                txtHourPrice.setText("120000");
+                txtNightPrice.setText("500000");
+                txtDayPrice.setText("600000");
+            }
+            
+        });
+    }
+
     private void loadTable(List<Room> rooms) {
         DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
         model.setRowCount(0);
@@ -77,7 +148,6 @@ public class RoomManagement extends javax.swing.JPanel {
                 room.getRoomId(),
                 room.getRoomNumber(),
                 room.getRoomType() != null ? room.getRoomType().getName() : "N/A",
-                room.getPrice() != null ? String.format("%,.0f", room.getPrice()) : "0",
                 room.getRoomStatus() != null ? room.getRoomStatus().toString() : "AVAILABLE",
                 ""
             });
@@ -86,7 +156,7 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void setupTableModel() {
-    String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Giá phòng", "Trạng thái", "Chức năng"};
+    String cols[] = {"Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng"};
     DefaultTableModel model = new DefaultTableModel(cols, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -97,12 +167,11 @@ public class RoomManagement extends javax.swing.JPanel {
     tblRoom.getTbl().setAutoCreateRowSorter(false);
     tblRoom.getTbl().getTableHeader().setReorderingAllowed(false);
 
-    tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(80);
-    tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(100);
-    tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(150);
-    tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(120);
-    tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(120);
-    tblRoom.getTbl().getColumnModel().getColumn(5).setPreferredWidth(100);
+    tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);
+    tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(120);
+    tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(170);
+    tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(140);
+    tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(140);
 }
 
     private void setupTableActions() {
@@ -117,7 +186,7 @@ public class RoomManagement extends javax.swing.JPanel {
                 handleDeleteRoom(row);
             }
         };
-        tblRoom.setTableActionColumn(tblRoom.getTbl(), 5, event, false);
+        tblRoom.setTableActionColumn(tblRoom.getTbl(), 4, event, false);
     }
 
     private void handleEditRoom(int row) {
@@ -125,25 +194,22 @@ public class RoomManagement extends javax.swing.JPanel {
         Long roomId = (Long) model.getValueAt(row, 0);
         String number = (String) model.getValueAt(row, 1);
         String type = (String) model.getValueAt(row, 2);
-        String price = (String) model.getValueAt(row, 3);
-        String status = (String) model.getValueAt(row, 4);
+        String status = (String) model.getValueAt(row, 3);
 
         RoomManagementModal modal = new RoomManagementModal();
         modal.getBtnSave().setText("Cập nhật");
         modal.getTxtNumberRoom().setText(number);
         modal.getCmbTypeRoom().setSelectedItem(type);
-        modal.getTxtPriceRoom().setText(price);
         modal.getCmbStatus().setSelectedItem(status);
 
         modal.closeModel(ae -> GlassPanePopup.closePopupLast());
         modal.saveData(ae -> {
             if (validateRoomData(modal, roomId)) {
                 String numberNew = modal.getTxtNumberRoom().getText().trim();
-                String priceNew = modal.getTxtPriceRoom().getText().trim();
                 String typeNew = (String) modal.getCmbTypeRoom().getSelectedItem();
                 String statusNew = (String) modal.getCmbStatus().getSelectedItem();
 
-                Room updatedRoom = roomService.updateRoom(createRoomFromModal(roomId, numberNew, typeNew, priceNew, statusNew));
+                Room updatedRoom = roomService.updateRoom(createRoomFromModal(roomId, numberNew, typeNew, statusNew));
                 if (updatedRoom != null) {
                     loadTable(roomService.getAllRooms());
                     GlassPanePopup.closePopupLast();
@@ -171,12 +237,8 @@ public class RoomManagement extends javax.swing.JPanel {
 
     private boolean validateRoomData(RoomManagementModal modal, Long roomId) {
         String number = modal.getTxtNumberRoom().getText().trim();
-        String price = modal.getTxtPriceRoom().getText().trim();
-
         modal.getLblErrolNumberRoom().setText("");
-        modal.getLblErrolPriceRoom().setText("");
         modal.getLblErrolNumberRoom().setForeground(Color.RED);
-        modal.getLblErrolPriceRoom().setForeground(Color.RED);
 
         boolean isValid = true;
 
@@ -190,22 +252,6 @@ public class RoomManagement extends javax.swing.JPanel {
             List<Room> existing = roomService.getRoomByKeyword(number);
             if (existing.stream().anyMatch(r -> !roomId.equals(r.getRoomId()) && r.getRoomNumber().equals(number))) {
                 modal.getLblErrolNumberRoom().setText("Số phòng đã tồn tại!");
-                isValid = false;
-            }
-        }
-
-        if (price.isEmpty()) {
-            modal.getLblErrolPriceRoom().setText("Giá phòng không được để trống!");
-            isValid = false;
-        } else {
-            try {
-                double priceValue = Double.parseDouble(price);
-                if (priceValue <= 0) {
-                    modal.getLblErrolPriceRoom().setText("Giá phòng phải lớn hơn 0!");
-                    isValid = false;
-                }
-            } catch (NumberFormatException ex) {
-                modal.getLblErrolPriceRoom().setText("Giá phòng phải là số hợp lệ!");
                 isValid = false;
             }
         }
@@ -246,7 +292,7 @@ public class RoomManagement extends javax.swing.JPanel {
     });
 
  
-    TableColumn colStatus = tblRoom.getTbl().getColumnModel().getColumn(4);
+    TableColumn colStatus = tblRoom.getTbl().getColumnModel().getColumn(3); // Fixed index for status
     colStatus.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(header.getBackground());
@@ -281,8 +327,8 @@ public class RoomManagement extends javax.swing.JPanel {
             int col = tblRoom.getTbl().columnAtPoint(e.getPoint());
             if (col == 2) {
                 showComboboxAtHeader(cmbType, 2);
-            } else if (col == 4) {
-                showComboboxAtHeader(cmbStatus, 4);
+            } else if (col == 3) { // Fixed for status column
+                showComboboxAtHeader(cmbStatus, 3);
             }
         }
 
@@ -342,7 +388,7 @@ public class RoomManagement extends javax.swing.JPanel {
             @Override
             public boolean include(Entry<? extends DefaultTableModel, ? extends Object> entry) {
                 String type = entry.getStringValue(2);
-                String status = entry.getStringValue(4);
+                String status = entry.getStringValue(3); // Fixed index
 
                 boolean typeMatches = currentTypeFilter.equals("Tất cả") || (type != null && type.equals(currentTypeFilter));
                 boolean statusMatches = currentStatusFilter.equals("Tất cả") || (status != null && status.equals(currentStatusFilter));
@@ -359,7 +405,7 @@ public class RoomManagement extends javax.swing.JPanel {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
                 int col = tblRoom.getTbl().columnAtPoint(e.getPoint());
-                if (col == 5) {
+                if (col == 4) { // Action column
                     tblRoom.getTbl().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblRoom.getTbl().setCursor(Cursor.getDefaultCursor());
@@ -403,16 +449,13 @@ public class RoomManagement extends javax.swing.JPanel {
         });
     }
 
-    private Room createRoomFromModal(Long roomId, String number, String typeName, String priceStr, String statusStr) {
+    private Room createRoomFromModal(Long roomId, String number, String typeName, String statusStr) {
     Room room = new Room();
     room.setRoomId(roomId != null ? roomId : 0);
     room.setRoomNumber(number);
-    room.setPrice(new BigDecimal(priceStr));
 
-    // ✅ Chuẩn hóa và so sánh an toàn hơn
     List<RoomType> allTypes = roomTypeService.getAllRoomTypes();
-    
-    // Debug: In ra tất cả loại phòng để kiểm tra
+
     System.out.println("=== DEBUG: Tìm loại phòng ===");
     System.out.println("Tên cần tìm: [" + typeName + "] (length: " + typeName.length() + ")");
     allTypes.forEach(rt -> {
@@ -459,9 +502,25 @@ public class RoomManagement extends javax.swing.JPanel {
         headerCustom = new iuh.fit.se.group1.ui.component.HeaderCustom();
         lblTitle = new javax.swing.JLabel();
         btnAddRoom = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnUpdatePrice = new javax.swing.JButton(); 
         tblRoom = new iuh.fit.se.group1.ui.component.table.Table();
         btnExport = new iuh.fit.se.group1.ui.component.custom.Button();
         btnImport = new iuh.fit.se.group1.ui.component.custom.Button();
+
+        // New components for price editing
+        lblRoomType = new JLabel("Tên loại phòng:");
+        lblRoomType.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cmbRoomType = new JComboBox<>();
+        lblHourPrice = new JLabel("Giá giờ:");
+        lblHourPrice.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtHourPrice = new JTextField(10);
+        lblNightPrice = new JLabel("Giá đêm:");
+        lblNightPrice.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtNightPrice = new JTextField(10);
+        lblDayPrice = new JLabel("Giá ngày:");
+        lblDayPrice.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtDayPrice = new JTextField(10);
+        btnUpdatePrice.setText("Cập nhật giá");
 
         setBackground(new java.awt.Color(241, 241, 241));
 
@@ -506,12 +565,32 @@ public class RoomManagement extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(36, 36, 36)
                 .addComponent(lblTitle)
-                .addGap(377, 377, 377)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 377, Short.MAX_VALUE)
                 .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnUpdatePrice, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE) // New button after add
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(36, 36, 36)
+                .addComponent(lblRoomType)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbRoomType, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblHourPrice)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtHourPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblNightPrice)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtNightPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblDayPrice)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDayPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(tblRoom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -523,9 +602,20 @@ public class RoomManagement extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUpdatePrice, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE) // New button
                     .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
+                .addGap(10, 10, 10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblRoomType)
+                    .addComponent(cmbRoomType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblHourPrice)
+                    .addComponent(txtHourPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNightPrice)
+                    .addComponent(txtNightPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDayPrice)
+                    .addComponent(txtDayPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
                 .addComponent(tblRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(8, Short.MAX_VALUE))
         );
@@ -538,10 +628,9 @@ public class RoomManagement extends javax.swing.JPanel {
             if (validateRoomData(modal, null)) {
                 String number = modal.getTxtNumberRoom().getText().trim();
                 String typeStr = (String) modal.getCmbTypeRoom().getSelectedItem();
-                String priceStr = modal.getTxtPriceRoom().getText().trim();
                 String statusStr = (String) modal.getCmbStatus().getSelectedItem();
 
-                Room newRoom = createRoomFromModal(null, number, typeStr, priceStr, statusStr);
+                Room newRoom = createRoomFromModal(null, number, typeStr, statusStr);
                 Room saved = roomService.createRoom(newRoom);
                 if (saved != null) {
                     loadTable(roomService.getAllRooms());
@@ -564,9 +653,11 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private iuh.fit.se.group1.ui.component.custom.Button btnAddRoom;
+    private JButton btnUpdatePrice; 
     private iuh.fit.se.group1.ui.component.custom.Button btnExport;
     private iuh.fit.se.group1.ui.component.custom.Button btnImport;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom;
     private javax.swing.JLabel lblTitle;
     private iuh.fit.se.group1.ui.component.table.Table tblRoom;
+
 }
