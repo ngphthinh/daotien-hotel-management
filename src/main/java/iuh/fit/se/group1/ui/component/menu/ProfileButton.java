@@ -33,6 +33,7 @@ public class ProfileButton extends javax.swing.JPanel {
         btnSignOut.setBackground(Constants.BACKGROUND_COLOR_MENU);
         btnSignOut.setBorder(new EmptyBorder(10,0,0,0));
         btnSignOut.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblAvartar.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
     public void setEmployeeInfo(Employee employee) {
         if (employee != null) {

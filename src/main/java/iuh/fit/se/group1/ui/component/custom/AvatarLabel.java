@@ -106,7 +106,7 @@ public class AvatarLabel extends JPanel {
         log.info("Image converted to Base64 successfully");
         return base64;
     }
-    boolean setImageFromBytes(byte[] imageBytes) {
+    public boolean setImageFromBytes(byte[] imageBytes) {
         if (imageBytes == null || imageBytes.length == 0) {
             log.warn("Image bytes is null or empty, resetting to default");
             resetToDefault();

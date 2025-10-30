@@ -27,6 +27,7 @@ public class Profile extends javax.swing.JPanel {
     // Info labels
     private JLabel lblName;
     private JLabel lblId;
+    private JLabel lblRole;
     private static final Color PRIMARY_BLUE = new Color(108, 165, 200);
     private static final Color ACCENT_BLUE = new Color(66, 133, 244);
     private static final Color SUCCESS_GREEN = new Color(76, 175, 80);
@@ -77,6 +78,7 @@ public class Profile extends javax.swing.JPanel {
                 && employee.getAccount().getRole() != null
                 && employee.getAccount().getRole().getRoleName() != null) {
             cmbRole.setSelectedItem(employee.getAccount().getRole().getRoleName());
+            lblRole.setText(employee.getAccount().getRole().getRoleName());
         }
         if (employee.getHireDate() != null) {
             txtHireDate.setText(employee.getHireDate().toString());
@@ -121,16 +123,22 @@ public class Profile extends javax.swing.JPanel {
         lblName.setBounds(240, 60, 500, 40);
         pnlHead.add(lblName);
 
+        JLabel lblIdTitle = new JLabel("Mã nhân viên:");
+        lblIdTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblIdTitle.setForeground(new Color(230, 240, 250));
+        lblIdTitle.setBounds(240, 100, 120, 25);
+        pnlHead.add(lblIdTitle);
+
         // Mã nhân viên
         lblId = new JLabel("NV00947263554");
         lblId.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblId.setForeground(new Color(230, 240, 250));
-        lblId.setBounds(240, 100, 200, 25);
+        lblId.setBounds(240+110, 100, 200, 25);
         pnlHead.add(lblId);
 
-        JLabel role = createRole("Nhân viên quản lý");
-        role.setBounds(240, 130, 130, 28);
-        pnlHead.add(role);
+        lblRole = createRole("Nhân viên quản lý");
+        lblRole.setBounds(240, 130, 130, 28);
+        pnlHead.add(lblRole);
 
         // Nút Đổi mật khẩu
         btnChangePass = createModernButton("Đổi mật khẩu", ACCENT_BLUE, 140);
@@ -182,12 +190,12 @@ public class Profile extends javax.swing.JPanel {
         
         // Row 1: Gender and Position
         addFormField(container, "Giới tính", leftColX, startY, fieldWidth, fieldHeight, labelHeight, () -> {
-            cmbGender = createStyledComboBox(new String[]{"Nam", "Nữ", "Khác"});
+            cmbGender = createStyledComboBox(new String[]{"Nam", "Nữ"});
             return cmbGender;
         });
         
         addFormField(container, "Chức vụ", rightColX, startY, fieldWidth, fieldHeight, labelHeight, () -> {
-            cmbRole = createStyledComboBox(new String[]{"Nhân viên", "Quản lý", "Giám đốc"});
+            cmbRole = createStyledComboBox(new String[]{"Nhân viên lễ tân", "Nhân viên quản lý"});
             return cmbRole;
         });
         
