@@ -24,39 +24,39 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel1" alignment="0" min="-2" pref="186" max="-2" attributes="0"/>
+                  <Component id="lblTitle" alignment="0" min="-2" pref="186" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jSeparator1" min="-2" pref="541" max="-2" attributes="0"/>
+                          <Component id="spn" min="-2" pref="541" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jLabel2" min="-2" pref="41" max="-2" attributes="0"/>
+                              <Component id="lblCitizen" min="-2" pref="41" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="textField1" min="-2" pref="197" max="-2" attributes="0"/>
+                              <Component id="txtCitizen" min="-2" pref="197" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jLabel3" min="-2" pref="88" max="-2" attributes="0"/>
+                              <Component id="lblCustomerName" min="-2" pref="88" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="textField2" min="-2" pref="192" max="-2" attributes="0"/>
+                              <Component id="txtCustomerName" min="-2" pref="192" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblEmail" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="textField5" min="-2" pref="192" max="-2" attributes="0"/>
+                              <Component id="txtEmail" min="-2" pref="192" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                              <Component id="jCheckBox1" min="-2" pref="134" max="-2" attributes="0"/>
+                              <Component id="cbDeposit" min="-2" pref="134" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblPhoneNumber" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="textField3" min="-2" pref="103" max="-2" attributes="0"/>
+                              <Component id="txtPhoneNumber" min="-2" pref="103" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblDob" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="textField4" min="-2" pref="130" max="-2" attributes="0"/>
+                              <Component id="txtDob" min="-2" pref="130" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jLabel6" min="-2" pref="58" max="-2" attributes="0"/>
+                              <Component id="lblGender" min="-2" pref="58" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="combobox1" min="-2" max="-2" attributes="0"/>
+                              <Component id="cboGender" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -69,32 +69,34 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <Component id="lblTitle" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
+              <Component id="spn" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel3" alignment="1" max="32767" attributes="0"/>
-                  <Component id="jLabel2" alignment="1" max="32767" attributes="0"/>
+                  <Component id="lblCustomerName" alignment="1" max="32767" attributes="0"/>
+                  <Component id="lblCitizen" alignment="1" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="textField1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textField2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtCitizen" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtCustomerName" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel4" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
-                  <Component id="textField3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel5" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
-                  <Component id="textField4" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel6" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
-                  <Component id="combobox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPhoneNumber" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+                  <Component id="txtPhoneNumber" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblDob" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+                  <Component id="txtDob" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblGender" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+                  <Component id="cboGender" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel7" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
-                  <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="textField5" alignment="1" min="-2" pref="26" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="txtEmail" alignment="1" min="-2" pref="26" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lblEmail" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+                      <Component id="cbDeposit" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace pref="22" max="32767" attributes="0"/>
           </Group>
@@ -102,7 +104,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="lblTitle">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="12" style="1"/>
@@ -118,7 +120,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JSeparator" name="jSeparator1">
+    <Component class="javax.swing.JSeparator" name="spn">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="33" green="ff" red="ff" type="rgb"/>
@@ -133,7 +135,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
+    <Component class="javax.swing.JLabel" name="lblCitizen">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="1"/>
@@ -141,7 +143,7 @@
         <Property name="text" type="java.lang.String" value="CCCD:"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtCitizen">
       <Properties>
         <Property name="borderColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="69" green="69" red="69" type="rgb"/>
@@ -151,7 +153,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel3">
+    <Component class="javax.swing.JLabel" name="lblCustomerName">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="1"/>
@@ -159,7 +161,7 @@
         <Property name="text" type="java.lang.String" value="T&#xea;n kh&#xe1;ch h&#xe0;ng:"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField2">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtCustomerName">
       <Properties>
         <Property name="borderColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="69" green="69" red="69" type="rgb"/>
@@ -169,7 +171,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel4">
+    <Component class="javax.swing.JLabel" name="lblPhoneNumber">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="1"/>
@@ -177,7 +179,7 @@
         <Property name="text" type="java.lang.String" value="S&#x1ed1; &#x111;i&#x1ec7;n tho&#x1ea1;i:"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField3">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtPhoneNumber">
       <Properties>
         <Property name="borderColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="69" green="69" red="69" type="rgb"/>
@@ -187,10 +189,10 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textField3ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPhoneNumberActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel5">
+    <Component class="javax.swing.JLabel" name="lblDob">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="1"/>
@@ -198,7 +200,7 @@
         <Property name="text" type="java.lang.String" value="Ng&#xe0;y sinh:"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField4">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtDob">
       <Properties>
         <Property name="borderColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="69" green="69" red="69" type="rgb"/>
@@ -208,7 +210,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel6">
+    <Component class="javax.swing.JLabel" name="lblGender">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="1"/>
@@ -216,7 +218,7 @@
         <Property name="text" type="java.lang.String" value="Gi&#x1edb;i t&#xed;nh:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel7">
+    <Component class="javax.swing.JLabel" name="lblEmail">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="1"/>
@@ -224,7 +226,7 @@
         <Property name="text" type="java.lang.String" value="Email: "/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField5">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtEmail">
       <Properties>
         <Property name="borderColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="69" green="69" red="69" type="rgb"/>
@@ -234,9 +236,9 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="combobox1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cboGender">
     </Component>
-    <Component class="javax.swing.JCheckBox" name="jCheckBox1">
+    <Component class="javax.swing.JCheckBox" name="cbDeposit">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="10" style="1"/>

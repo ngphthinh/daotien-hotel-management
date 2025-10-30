@@ -391,11 +391,11 @@ public class ShiftManagement extends javax.swing.JPanel {
 
         panelShiftCard.setBackground(new java.awt.Color(241, 241, 241));
 
-        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 30));
         lblTitle.setForeground(new java.awt.Color(102, 102, 102));
         lblTitle.setText("Danh sách ca làm");
 
-        txtDate.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtDate.setFont(new java.awt.Font("Segoe UI", 1, 14));
         txtDate.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         txtDate.addActionListener(new java.awt.event.ActionListener() {

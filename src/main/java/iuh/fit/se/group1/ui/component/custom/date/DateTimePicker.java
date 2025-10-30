@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.custom.date;
 
+import iuh.fit.se.group1.enums.BookingType;
 import raven.glasspanepopup.GlassPanePopup;
 
 import javax.swing.*;
@@ -53,17 +54,31 @@ public class DateTimePicker extends javax.swing.JPanel {
 
     }
 
-    public static void attachTo(JTextField textField){
+    public static void attachTo(JTextField textField, JComboBox<String> bookingType){
         textField.setEnabled(false);
         textField.setEditable(false);
+
+        Calendar now = Calendar.getInstance();
+        textField.setText(
+                now.get(Calendar.DAY_OF_MONTH) + "-" +
+                        (now.get(Calendar.MONTH) + 1) + "-" +
+                        now.get(Calendar.YEAR) + " " +
+                        String.format("%02d", now.get(Calendar.HOUR_OF_DAY)) + ":" +
+                        String.format("%02d", now.get(Calendar.MINUTE))
+        );
         textField.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 DateTimePicker picker = new DateTimePicker();
+
+                BookingType bookingTypeValue = BookingType.fromIndex(bookingType.getSelectedIndex());
+
+                picker.timePicker1.setVisible(BookingType.HOURLY.equals(bookingTypeValue));
+
                 GlassPanePopup.showPopup(picker);
                 picker.confirm(e -> {
-                    textField.setText(picker.cal.get(Calendar.DAY_OF_MONTH) + "/" +
-                            (picker.cal.get(Calendar.MONTH) + 1) + "/" +
+                    textField.setText(picker.cal.get(Calendar.DAY_OF_MONTH) + "-" +
+                            (picker.cal.get(Calendar.MONTH) + 1) + "-" +
                             picker.cal.get(Calendar.YEAR) + " " +
                             String.format("%02d",picker.timePicker1.getHour()) + ":" +
                             String.format("%02d",picker.timePicker1.getMinute()));
@@ -82,7 +97,13 @@ public class DateTimePicker extends javax.swing.JPanel {
     }
 
 
+    public TimePicker getTimePicker1() {
+        return timePicker1;
+    }
 
+    public void setTimePicker1(TimePicker timePicker1) {
+        this.timePicker1 = timePicker1;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

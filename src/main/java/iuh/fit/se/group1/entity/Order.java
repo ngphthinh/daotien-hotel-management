@@ -13,28 +13,53 @@ public class Order {
     private BigDecimal totalAmount;
     private Employee employee;
     private OrderType orderType;
+    private Customer customer;
     private Promotion promotion;
+    private BigDecimal deposit;
     private LocalDate createdAt;
+    private List<Booking> bookings;
 
     public Order() {
+        bookings = new java.util.ArrayList<>();
     }
 
-    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion, LocalDate createdAt) {
+    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Customer customer, Promotion promotion, BigDecimal deposit, LocalDate createdAt, List<Booking> bookings) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
         this.employee = employee;
         this.orderType = orderType;
+        this.customer = customer;
         this.promotion = promotion;
+        this.deposit = deposit;
         this.createdAt = createdAt;
+        this.bookings = bookings;
     }
 
-    public Order(BigDecimal totalAmount, Employee employee, OrderType orderType, Promotion promotion) {
-        this.totalAmount = totalAmount;
-        this.employee = employee;
-        this.orderType = orderType;
-        this.promotion = promotion;
+    public Customer getCustomer() {
+        return customer;
     }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public BigDecimal getDeposit() {
+        return deposit;
+    }
+
+    public void setDeposit(BigDecimal deposit) {
+        this.deposit = deposit;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
 
     public Long getOrderId() {
         return orderId;
@@ -99,13 +124,20 @@ public class Order {
                 "orderId=" + orderId +
                 ", orderDate=" + orderDate +
                 ", totalAmount=" + totalAmount +
-                ", employee=" + employee +
-                ", orderType=" + orderType +
+                ", employee=" + employee.getEmployeeId() +
+                ", orderType=" + orderType.getOrderTypeId() +
+                ", customer=" + customer.getCustomerId() +
                 ", promotion=" + promotion +
+                ", deposit=" + deposit +
                 ", createdAt=" + createdAt +
+                ", bookings=" + bookings +
                 '}';
     }
 
+    public void addBooking(Booking booking) {
+        booking.setOrder(this);
+        this.bookings.add(booking);
+    }
 
     @Override
     public boolean equals(Object o) {

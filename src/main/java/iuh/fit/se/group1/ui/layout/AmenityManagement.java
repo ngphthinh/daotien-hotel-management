@@ -26,6 +26,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import javax.swing.event.DocumentListener;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.util.List;
+import iuh.fit.se.group1.service.ImportExcelService;
 
 /**
  * @author THIS PC
@@ -66,6 +71,29 @@ public class AmenityManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Chọn file Excel để import dịch vụ");
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx"));
+
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+
+                ImportExcelService importService = new ImportExcelService();
+                List<Amenity> imported = importService.importAmenitiesFromExcel(file);
+
+                if (imported != null && !imported.isEmpty()) {
+                    List<Amenity> allAmenities = amenityService.getAllAmenities();
+                    allAmenities.addAll(imported);
+                    loadTable(allAmenities);
+
+                    Message.showInfo("Thành công", "Đã import " + imported.size() + " dịch vụ từ Excel!");
+                } else {
+                    Message.showError("Lỗi import", "Không có dữ liệu hợp lệ trong file Excel!");
+                }
+            }
+        });
 
         btnAddAmenity.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
@@ -270,7 +298,6 @@ public class AmenityManagement extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 
-
     private void btnAddAmenityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAmenityActionPerformed
 
         ServiceModal modal = new ServiceModal();
@@ -342,6 +369,7 @@ public class AmenityManagement extends javax.swing.JPanel {
     }
 
     private record Valid(String name, boolean valid, BigDecimal price) {
+
     }
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed

@@ -176,4 +176,45 @@ public class CustomerRepository implements Repository<Customer, Long> {
         return customers;
     }
 
+    public boolean isCitizenIdExists(String citizenId) {
+        String sql = "SELECT 1 FROM Customer WHERE citizenId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, citizenId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
+    public Customer findByCitizenId(String citizenId) {
+        String sql = "SELECT * FROM Customer WHERE citizenId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, citizenId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(resultSet.getLong("customerId"));
+                    customer.setFullName(resultSet.getString("fullName"));
+                    customer.setPhone(resultSet.getString("phone"));
+                    customer.setEmail(resultSet.getString("email"));
+                    customer.setCitizenId(resultSet.getString("citizenId"));
+                    customer.setGender(resultSet.getBoolean("gender"));
+                    customer.setAddress(resultSet.getString("address"));
+                    customer.setDateOfBirth(resultSet.getDate("dateOfBirth").toLocalDate());
+                    customer.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    return customer;
+                }
+            }
+        } catch (SQLException e) {
+            log.info("Error finding Customer by citizenId: ", e);
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }
