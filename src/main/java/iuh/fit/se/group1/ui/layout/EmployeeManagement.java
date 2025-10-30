@@ -110,6 +110,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         });
 
 
+
         String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
 
@@ -486,6 +487,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnExport.setText("Xuất Excel");
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnExport.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExportActionPerformed(evt);
             }
@@ -618,6 +620,15 @@ public class EmployeeManagement extends javax.swing.JPanel {
     }
     //GEN-LAST:event_btnAddEmployeeActionPerformed
 
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
+        ExportExcelService.exportTableToExcel(
+                this,
+                tblEmployee.getTbl(),
+                "Danh sách nhân viên",
+                "DanhSachNhanVien"
+        );
+    }
+
     private void filterTable(String genderFilter, String positionFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl().getRowSorter();
 
@@ -726,15 +737,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String email,
             LocalDate hireDate
     ) {
-    }
-
-    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
-        ExportExcelService.exportTableToExcel(
-                this,
-                tblEmployee.getTbl(),
-                "Danh sách nhân viên",
-                "DanhSachNhanVien"
-        );
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
