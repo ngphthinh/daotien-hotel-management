@@ -12,6 +12,7 @@ import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class RoomManagement extends javax.swing.JPanel {
     private String currentTypeFilter = "Tất cả";
     private String currentStatusFilter = "Tất cả";
 
-    // Fields cho giá fixed (2 loại phòng)
+
     private JLabel lblSingleType;
     private JLabel lblSingleHour, lblSingleNight, lblSingleDay;
     private JTextField txtSingleHour, txtSingleNight, txtSingleDay;
@@ -49,10 +50,15 @@ public class RoomManagement extends javax.swing.JPanel {
     public RoomManagement() {
         initServices();
         initComponents();
-        loadPricesFromFile();  // Load giá từ file trước
+        loadPricesFromFile();  
         custom();
         loadTable(roomService.getAllRooms());
-        setupFixedPrices();
+        try {
+            setupFixedPrices();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
     }
 
     private void initServices() {
@@ -87,24 +93,26 @@ public class RoomManagement extends javax.swing.JPanel {
         setupMouseListeners();
         setupSearchListener();
     }
+    
+    
 
-    private void setupFixedPrices() {
-        // Set editable ban đầu (sau khi load từ file)
+    private void setupFixedPrices() throws IOException {
+        
         txtSingleHour.setEditable(false); txtSingleNight.setEditable(false); txtSingleDay.setEditable(false);
         txtDoubleHour.setEditable(false); txtDoubleNight.setEditable(false); txtDoubleDay.setEditable(false);
 
-        // Action cho nút update
+       
         btnUpdatePrice.addActionListener(e -> {
             boolean isEditing = txtSingleHour.isEditable();
             if (!isEditing) {
-                // Enable edit
+                
                 txtSingleHour.setEditable(true); txtSingleNight.setEditable(true); txtSingleDay.setEditable(true);
                 txtDoubleHour.setEditable(true); txtDoubleNight.setEditable(true); txtDoubleDay.setEditable(true);
                 btnUpdatePrice.setText("Lưu giá");
                 return;
             }
 
-            // Lưu và disable
+           
             try {
                 BigDecimal singleHour = new BigDecimal(txtSingleHour.getText().replaceAll("[^\\d]", ""));
                 BigDecimal singleNight = new BigDecimal(txtSingleNight.getText().replaceAll("[^\\d]", ""));
@@ -114,8 +122,8 @@ public class RoomManagement extends javax.swing.JPanel {
                 BigDecimal doubleNight = new BigDecimal(txtDoubleNight.getText().replaceAll("[^\\d]", ""));
                 BigDecimal doubleDay = new BigDecimal(txtDoubleDay.getText().replaceAll("[^\\d]", ""));
 
-                // Lưu vào file properties
-                savePricesToFile(singleHour, singleNight, singleDay, doubleHour, doubleNight, doubleDay);
+                
+                savePricesToFile();
 
                 System.out.println("Lưu giá thành công vào prices.properties");
                 JOptionPane.showMessageDialog(this, "Cập nhật và lưu giá thành công!");
@@ -125,55 +133,52 @@ public class RoomManagement extends javax.swing.JPanel {
                 btnUpdatePrice.setText("Cập nhật giá");
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Giá phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi lưu file: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
 
-    // Method lưu vào file properties
-    private void savePricesToFile(BigDecimal singleHour, BigDecimal singleNight, BigDecimal singleDay,
-                                  BigDecimal doubleHour, BigDecimal doubleNight, BigDecimal doubleDay) throws IOException {
-        Properties props = new Properties();
+   private void savePricesToFile() {
+    Properties properties = new Properties();
+    try {
+        FileOutputStream output = new FileOutputStream("prices.properties");
 
-        // Lưu giá Phòng đơn
-        props.setProperty("Phòng đơn.giờ", singleHour.toString());
-        props.setProperty("Phòng đơn.đêm", singleNight.toString());
-        props.setProperty("Phòng đơn.ngày", singleDay.toString());
+        properties.setProperty("price.single.hourly", txtSingleHour.getText());
+        properties.setProperty("price.single.overnight", txtSingleNight.getText());
+        properties.setProperty("price.single.daily", txtSingleDay.getText());
 
-        // Lưu giá Phòng đôi
-        props.setProperty("Phòng đôi.giờ", doubleHour.toString());
-        props.setProperty("Phòng đôi.đêm", doubleNight.toString());
-        props.setProperty("Phòng đôi.ngày", doubleDay.toString());
+        properties.setProperty("price.double.hourly", txtDoubleHour.getText());
+        properties.setProperty("price.double.overnight", txtDoubleNight.getText());
+        properties.setProperty("price.double.daily", txtDoubleDay.getText());
 
-        // Ghi file
-        try (FileOutputStream fos = new FileOutputStream("prices.properties")) {
-            props.store(fos, "Giá phòng - Cập nhật lúc: " + new java.util.Date());
-        }
+        properties.store(output, null);
+        output.close();
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
 
-    // Method load từ file properties (gọi trong constructor)
-    private void loadPricesFromFile() {
-        Properties props = new Properties();
-        try (FileInputStream fis = new FileInputStream("prices.properties")) {
-            props.load(fis);
+   private void loadPricesFromFile() {
+    Properties properties = new Properties();
+    try {
+        File file = new File("prices.properties");
+        if (!file.exists()) return;
 
-            // Load cho Phòng đơn
-            txtSingleHour.setText(props.getProperty("Phòng đơn.giờ", "120000"));
-            txtSingleNight.setText(props.getProperty("Phòng đơn.đêm", "500000"));
-            txtSingleDay.setText(props.getProperty("Phòng đơn.ngày", "600000"));
+        FileInputStream input = new FileInputStream(file);
+        properties.load(input);
 
-            // Load cho Phòng đôi
-            txtDoubleHour.setText(props.getProperty("Phòng đôi.giờ", "120000"));
-            txtDoubleNight.setText(props.getProperty("Phòng đôi.đêm", "500000"));
-            txtDoubleDay.setText(props.getProperty("Phòng đôi.ngày", "600000"));
+        txtSingleHour.setText(properties.getProperty("price.single.hourly", ""));
+        txtSingleNight.setText(properties.getProperty("price.single.overnight", ""));
+        txtSingleDay.setText(properties.getProperty("price.single.daily", ""));
 
-            System.out.println("Đã load giá từ file prices.properties");
-        } catch (IOException e) {
-            System.out.println("Không tìm thấy file, dùng giá mặc định");
-            // Không crash, dùng default ở setupFixedPrices
-        }
+        txtDoubleHour.setText(properties.getProperty("price.double.hourly", ""));
+        txtDoubleNight.setText(properties.getProperty("price.double.overnight", ""));
+        txtDoubleDay.setText(properties.getProperty("price.double.daily", ""));
+
+        input.close();
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
 
     private void loadTable(List<Room> rooms) {
         DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
@@ -669,6 +674,53 @@ public class RoomManagement extends javax.swing.JPanel {
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("Export Excel clicked");
     }
+    
+    private void saveRoomPrices() {
+    Properties props = new Properties();
+    saveRoomPrices();
+
+    // Single
+    props.setProperty("price.single.hourly", txtSingleHour.getText().trim());
+    props.setProperty("price.single.overnight", txtSingleNight.getText().trim());
+    props.setProperty("price.single.daily", txtSingleDay.getText().trim());
+
+    // Double
+    props.setProperty("price.double.hourly", txtDoubleHour.getText().trim());
+    props.setProperty("price.double.overnight", txtDoubleNight.getText().trim());
+    props.setProperty("price.double.daily", txtDoubleDay.getText().trim());
+
+    try (FileOutputStream fos =
+             new FileOutputStream("src/main/resources/price.properties")) {
+        props.store(fos, null); // không ghi comment lên đầu file
+        JOptionPane.showMessageDialog(this, "Lưu giá phòng thành công!");
+    } catch (IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Lỗi khi lưu giá phòng!");
+    }
+    }
+
+    private void loadRoomPrices() {
+    Properties props = new Properties();
+    File file = new File("src/main/resources/price.properties");
+    if (!file.exists()) return;
+
+    try (FileInputStream fis = new FileInputStream(file)) {
+        props.load(fis);
+
+        txtSingleHour.setText(props.getProperty("price.single.hourly", "0"));
+        txtSingleNight.setText(props.getProperty("price.single.overnight", "0"));
+        txtSingleHour.setText(props.getProperty("price.single.daily", "0"));
+
+        txtDoubleHour.setText(props.getProperty("price.double.hourly", "0"));
+        txtDoubleNight.setText(props.getProperty("price.double.overnight", "0"));
+        txtDoubleDay.setText(props.getProperty("price.double.daily", "0"));
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("Import Excel clicked");
