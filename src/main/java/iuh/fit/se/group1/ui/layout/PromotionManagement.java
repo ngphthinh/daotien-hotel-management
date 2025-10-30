@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import raven.glasspanepopup.GlassPanePopup;
+import iuh.fit.se.group1.service.ExportExcelService;
 
 /**
  *
@@ -104,6 +105,15 @@ public class PromotionManagement extends javax.swing.JPanel {
         btnAddPromotion.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnExport.addActionListener(e -> {
+        ExportExcelService.exportTableToExcel(
+        this,
+        tblPromotion.getTbl(),
+        "Danh sách khuyến mãi",
+        "DanhSachKhuyenMai",
+        true
+        );
+        });
 
         headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khuyến mãi</span>");

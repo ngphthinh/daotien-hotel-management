@@ -89,7 +89,7 @@ public class ShiftList extends JPanel {
             }
             ShiftProfile shiftProfile = new ShiftProfile();
             shiftProfile.getLblName().setText(name);
-            shiftProfile.getLblCode().setText(code);
+            shiftProfile.getLblCode().setText( code);
             shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
             shiftProfile.setMaximumSize(new Dimension(303, 72));
             shiftProfile.setMinimumSize(new Dimension(0, 72));
