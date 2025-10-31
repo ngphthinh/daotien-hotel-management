@@ -35,8 +35,8 @@ public class ShiftRepository implements Repository<Shift,Long> {
         String sql = "Insert into Shift(name,startTime,endTime,createdAt) values (?,?,?,?);";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getName());
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(entity.getStartTime()));
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getEndTime()));
+            preparedStatement.setString(2,entity.getStartTime());
+            preparedStatement.setString(3,entity.getEndTime());
             if (entity.getCreatedAt() == null) {
                 entity.setCreatedAt(LocalDate.now());
             }
@@ -68,8 +68,8 @@ public class ShiftRepository implements Repository<Shift,Long> {
                     Shift shift = new Shift();
                     shift.setShiftId(resultSet.getLong("shiftId"));
                     shift.setName(resultSet.getString("name"));
-                    shift.setStartTime(resultSet.getTimestamp("startTime").toLocalDateTime());
-                    shift.setEndTime(resultSet.getTimestamp("endTime").toLocalDateTime());
+                    shift.setStartTime(resultSet.getString("startTime"));
+                    shift.setEndTime(resultSet.getString("endTime"));
                     shift.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     return shift;
                 }
@@ -105,8 +105,8 @@ public class ShiftRepository implements Repository<Shift,Long> {
                 Shift shift = new Shift();
                 shift.setShiftId(rs.getLong("shiftId"));
                 shift.setName(rs.getString("name"));
-                shift.setStartTime(rs.getTimestamp("startTime").toLocalDateTime());
-                shift.setEndTime(rs.getTimestamp("endTime").toLocalDateTime());
+                shift.setStartTime(rs.getString("startTime"));
+                shift.setEndTime(rs.getString("endTime"));
                 shift.setCreatedAt(rs.getDate("createdAt").toLocalDate());
                 shifts.add(shift);
             }
@@ -122,8 +122,8 @@ public class ShiftRepository implements Repository<Shift,Long> {
         String sql = "Update Shift set name=?, startTime=?, endTime=? where shiftId=?;";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, entity.getName());
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(entity.getStartTime()));
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getEndTime()));
+            preparedStatement.setString(2, entity.getStartTime());
+            preparedStatement.setString(3, entity.getEndTime());
             preparedStatement.setLong(4, entity.getShiftId());
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {

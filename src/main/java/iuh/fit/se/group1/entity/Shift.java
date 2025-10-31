@@ -7,18 +7,18 @@ import java.util.Objects;
 public class Shift {
     private Long shiftId;
     private String name;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private String startTime;
+    private String endTime;
     private LocalDate createdAt;
     public Shift() {
     }
 
-    public Shift(String name, Long shiftId, LocalDateTime startTime,  LocalDateTime endTime,LocalDate createdAt) {
-        this.name = name;
+    public Shift(Long shiftId, String name, String startTime, String endTime, LocalDate createdAt) {
         this.shiftId = shiftId;
+        this.name = name;
         this.startTime = startTime;
-        this.createdAt = createdAt;
         this.endTime = endTime;
+        this.createdAt = createdAt;
     }
 
     public Long getShiftId() {
@@ -36,16 +36,20 @@ public class Shift {
     public void setName(String name) {
         this.name = name;
     }
-    public LocalDateTime getStartTime() {
+
+    public String getStartTime() {
         return startTime;
     }
-    public void setStartTime(LocalDateTime startTime) {
+
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
-    public LocalDateTime getEndTime() {
+
+    public String getEndTime() {
         return endTime;
     }
-    public void setEndTime(LocalDateTime endTime) {
+
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
