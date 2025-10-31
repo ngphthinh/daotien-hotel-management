@@ -40,7 +40,12 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, entity.getEmployee().getEmployeeId());
             preparedStatement.setLong(2, entity.getShift().getShiftId());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getClosingTime()));
+            if (entity.getClosingTime() == null) {
+                preparedStatement.setNull(3, java.sql.Types.TIMESTAMP);
+            } else {
+                preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getClosingTime()));
+            }
+
 
             if (entity.getCreatedAt() == null) {
                 entity.setCreatedAt(LocalDate.now());
@@ -86,8 +91,10 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
                     Shift shift = new Shift();
                     shift.setShiftId(resultSet.getLong("shiftId"));
                     es.setShift(shift);
-
-                    es.setClosingTime(resultSet.getTimestamp("closingTime").toLocalDateTime());
+                    if (es.getClosingTime() == null) {
+                    } else {
+                        es.setClosingTime(resultSet.getTimestamp("closingTime").toLocalDateTime());
+                    }
                     es.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     es.setShiftDate(resultSet.getDate("shiftDate").toLocalDate());
                     return es;
@@ -152,7 +159,11 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, entity.getEmployee().getEmployeeId());
             preparedStatement.setLong(2, entity.getShift().getShiftId());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getClosingTime()));
+            if (entity.getClosingTime() != null) {
+                preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getClosingTime()));
+            } else {
+                preparedStatement.setNull(3, java.sql.Types.TIMESTAMP);
+            }
             preparedStatement.setDate(4, Date.valueOf(entity.getCreatedAt()));
             preparedStatement.setDate(5, Date.valueOf(entity.getShiftDate()));
             preparedStatement.setLong(6, entity.getEmployeeShiftId());
@@ -185,7 +196,13 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
                     shift.setShiftId(rs.getLong("shiftId"));
                     es.setShift(shift);
 
-                    es.setClosingTime(rs.getTimestamp("closingTime").toLocalDateTime());
+                    Timestamp closingTimeTs = rs.getTimestamp("closingTime");
+                    if (closingTimeTs != null) {
+                        es.setClosingTime(closingTimeTs.toLocalDateTime());
+                    } else {
+                        es.setClosingTime(null);
+                    }
+
                     es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
                     es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
 

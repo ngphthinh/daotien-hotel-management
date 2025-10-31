@@ -129,6 +129,14 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         }
     }
 
+    public JLabel getLblStatus() {
+        return lblStatus;
+    }
+
+    public void setLblStatus(JLabel lblStatus) {
+        this.lblStatus = lblStatus;
+    }
+
     public JLabel getLblTitle (){
         return lblTitle;
     }
@@ -207,6 +215,8 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
                 File selectedFile = fileChooser.getSelectedFile();
                 String imagePath = selectedFile.getAbsolutePath();
                 showImageInPanel(imagePath);
+                lblStatus.setText("Đã chọn avatar!");
+                lblStatus.setForeground(new Color(0, 153, 0));
             }
         });
         btnChooseImg.addMouseListener(new java.awt.event.MouseAdapter() {

@@ -243,6 +243,9 @@ public class MainLayout extends JPanel {
             paymentPage = new PaymentPage();
             shiftManagement = new ShiftManagement();
             employeeManagement = new EmployeeManagement();
+            if (shiftManagement.getShiftList() != null) {
+                employeeManagement.setShiftList(shiftManagement.getShiftList());
+            }
             customerManagement = new CustomerManagement();
             amenityManagement = new AmenityManagement();
             promotionManagement = new PromotionManagement();

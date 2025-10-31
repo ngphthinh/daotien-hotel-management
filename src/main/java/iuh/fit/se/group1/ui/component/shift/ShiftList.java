@@ -36,6 +36,13 @@ public class ShiftList extends JPanel {
      */
     public ShiftList() {
         initComponents();
+        custom();
+
+        // 🧩 Load dữ liệu nhân viên
+        loadEmployeesFromDatabase();
+    }
+
+    private void custom() {
         setPreferredSize(new Dimension(290, getPreferredSize().height));
         setLayout(new BorderLayout(0, 0));
         setOpaque(false);
@@ -58,9 +65,67 @@ public class ShiftList extends JPanel {
         lblTitle.setOpaque(false);
         add(lblTitle, BorderLayout.NORTH);
         add(scrollPaneWin111, BorderLayout.CENTER);
+    }
 
-        // 🧩 Load dữ liệu nhân viên
+    public void reloadEmployees() {
         loadEmployeesFromDatabase();
+    }
+    public void addNewEmployee(Employee employee) {
+        try {
+            String name = employee.getFullName();
+            String code = String.valueOf(employee.getEmployeeId());
+
+            // Nếu có ảnh base64 trong DB
+            BufferedImage image = null;
+            try {
+                if (employee.getAvt() != null && employee.getAvt().length > 0) {
+                    image = ImageIO.read(new ByteArrayInputStream(employee.getAvt()));
+                } else {
+                    // Ảnh mặc định
+                    URL defaultImg = getClass().getResource("/images/meomeo.jpg");
+                    if (defaultImg != null)
+                        image = ImageIO.read(defaultImg);
+                }
+            } catch (Exception ex) {
+                log.error("Error loading image for employee {}", name, ex);
+            }
+
+            ShiftProfile shiftProfile = new ShiftProfile();
+            shiftProfile.getLblName().setText(name);
+            shiftProfile.getLblCode().setText(code);
+            shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
+            shiftProfile.setMaximumSize(new Dimension(303, 72));
+            shiftProfile.setMinimumSize(new Dimension(0, 72));
+
+            if (image != null) {
+                BufferedImage resized = Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
+                shiftProfile.getAvatarLabel().setImage(resized);
+            }
+
+            pnlEmployees.add(shiftProfile);
+            JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+            separator.setAlignmentX(Component.LEFT_ALIGNMENT);
+            separator.setMaximumSize(new Dimension(303, 1));
+            separator.setForeground(new Color(180, 180, 180));
+            separator.setBackground(new Color(180, 180, 180));
+            separator.setOpaque(true);
+            pnlEmployees.add(separator);
+
+            shiftProfile.addMouseListener(shiftProfile);
+
+            pnlEmployees.revalidate();
+            pnlEmployees.repaint();
+
+            // Scroll xuống dưới cùng để thấy nhân viên mới
+            SwingUtilities.invokeLater(() -> {
+                JScrollBar vertical = scrollPaneWin111.getVerticalScrollBar();
+                vertical.setValue(vertical.getMaximum());
+            });
+
+            log.info("Added new employee to shift list: {}", name);
+        } catch (Exception ex) {
+            log.error("Error adding new employee to shift list: ", ex);
+        }
     }
     private void loadEmployeesFromDatabase() {
     try {
