@@ -6,6 +6,7 @@ import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.Promotion;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
+import iuh.fit.se.group1.entity.Surcharge;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.enums.RoomStatus;
 import org.apache.poi.ss.usermodel.*;
@@ -461,5 +462,69 @@ private String getCellValueRoom(Cell cell) {
         default -> "";
     };
 }
+SurchargeService surchargeService = new SurchargeService();
+
+public List<Surcharge> importSurchargesFromExcel(File file) {
+        List<Surcharge> surcharges = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            if (sheet == null) {
+                return surcharges;
+            }
+
+            Row header = sheet.getRow(0);
+            int startCol = 0;
+            if (header != null && header.getCell(0) != null) {
+                String firstHeader = header.getCell(0).getStringCellValue().trim();
+                if (firstHeader.equalsIgnoreCase("STT")) {
+                    startCol = 1;
+                }
+            }
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) {
+                    continue;
+                }
+
+                String maDVStr = getCellValue(row.getCell(startCol));
+                String tenDV = getCellValue(row.getCell(startCol + 1));
+                String giaStr = getCellValue(row.getCell(startCol + 2));
+
+                if (tenDV.isEmpty()) {
+                    continue;
+                }
+                BigDecimal giaDV = BigDecimal.ZERO;
+                try {
+                    giaDV = new BigDecimal(giaStr);
+                } catch (NumberFormatException e) {
+                    System.err.println("Lỗi định dạng giá tại dòng " + (i + 1) + ": " + giaStr);
+                }
+
+                Surcharge a = new Surcharge();
+                try {
+                    if (!maDVStr.isEmpty()) {
+                        a.setSurchargeId(Long.parseLong(maDVStr));
+                    }
+                } catch (NumberFormatException ex) {
+                    System.err.println("Mã dịch vụ không hợp lệ tại dòng " + (i + 1));
+                }
+
+                a.setName(tenDV);
+                a.setPrice(giaDV);
+                
+
+                Surcharge saved = surchargeService.createSurcharge(a);
+                if (saved != null) {
+                    surcharges.add(saved);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return surcharges;
+    }
 
 }

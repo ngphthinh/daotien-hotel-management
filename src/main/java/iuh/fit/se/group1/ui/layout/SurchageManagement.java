@@ -5,6 +5,7 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.Surcharge;
+import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.service.SurchargeService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.SurchageModal;
@@ -14,8 +15,10 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.List;
+import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
@@ -186,6 +189,22 @@ public class SurchageManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Surcharge> imported = importService.importSurchargesFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    surchargeService.getAllSurcharges().addAll(imported);
+                    loadTable(surchargeService.getAllSurcharges());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " phụ phí!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
         btnAddSurchage.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
