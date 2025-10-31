@@ -43,7 +43,7 @@ public class SurchageManagement extends javax.swing.JPanel {
     public SurchageManagement() {
         initComponents();
         custom();
-        surchargeService = new SurchargeService();
+        surchargeService = new SurchargeService(); 
         loadTable(surchargeService.getAllSurcharges());
     }
 
