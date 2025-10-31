@@ -35,7 +35,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-
 import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -43,12 +42,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 import iuh.fit.se.group1.service.ExportExcelService;
-
+import iuh.fit.se.group1.service.ImportExcelService;
+import java.io.File;
+import java.util.List;
 
 /**
  * @author VienThieu
  */
 public class EmployeeManagement extends javax.swing.JPanel {
+
     private static final Logger log = LoggerFactory.getLogger(EmployeeManagement.class);
     private final EmployeeService employeeService;
     private final RoleService roleService;
@@ -62,7 +64,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         loadTable(employeeService.getAllEmployees());
     }
 
-
     private void loadTable(java.util.List<Employee> employees) {
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
         model.setRowCount(0);
@@ -72,11 +73,11 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     ? employee.getAccount().getRole().getRoleName()
                     : "N/A";
             model.addRow(new Object[]{
-                    employee.getEmployeeId(),
-                    employee.getFullName(),
-                    genderStr,
-                    roleName,
-                    employee.getPhone()
+                employee.getEmployeeId(),
+                employee.getFullName(),
+                genderStr,
+                roleName,
+                employee.getPhone()
             });
         }
     }
@@ -86,7 +87,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         headerCustom2.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý nhân viên</span>"
-                        + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>"
+                + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>"
         );
         btnAddEmployee.setBackground(new Color(108, 165, 200));
         btnAddEmployee.setForeground(Color.WHITE);
@@ -99,6 +100,22 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Employee> imported = importService.importEmployeesFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    employeeService.getAllEmployees().addAll(imported);
+                    loadTable(employeeService.getAllEmployees());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
@@ -108,8 +125,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 btnExportActionPerformed(evt);
             }
         });
-
-
 
         String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
@@ -227,7 +242,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             }
 
-
             @Override
             public void onDelete(int row) {
                 // SỬA: Đổi message
@@ -324,7 +338,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 GlassPanePopup.showPopup(modal);
             }
         };
-
 
         tblEmployee.setTableActionColumn(tblEmployee.getTbl(), 5, event, true);
         tblEmployee.getTbl().getColumnModel().getColumn(0).setPreferredWidth(120);
@@ -557,7 +570,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }
 
-
     private void saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
 
@@ -606,11 +618,11 @@ public class EmployeeManagement extends javax.swing.JPanel {
             System.out.println(employeeSave);
 
             model.addRow(new Object[]{
-                    employeeSave.getEmployeeId(),
-                    employeeSave.getFullName(),
-                    genderStr,
-                    employeeSave.getAccount().getRole().getRoleName(),
-                    employeeSave.getPhone()
+                employeeSave.getEmployeeId(),
+                employeeSave.getFullName(),
+                genderStr,
+                employeeSave.getAccount().getRole().getRoleName(),
+                employeeSave.getPhone()
             });
             Message.showMessage("Thành công", "Thêm nhân viên thành công!");
         } catch (Exception e) {
@@ -618,8 +630,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
         }
     }
-    //GEN-LAST:event_btnAddEmployeeActionPerformed
-
+//GEN-LAST:event_btnAddEmployeeActionPerformed
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
         ExportExcelService.exportTableToExcel(
                 this,
@@ -736,7 +747,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String citizenId,
             String email,
             LocalDate hireDate
-    ) {
+            ) {
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

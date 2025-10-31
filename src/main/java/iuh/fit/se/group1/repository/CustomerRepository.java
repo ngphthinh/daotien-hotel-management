@@ -27,7 +27,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
 
     @Override
     public Customer save(Customer entity) {
-        String sql = "INSERT INTO Customer(fullName, phone,email,citizenId,gender,address,dateOfBirth, createdAt) VALUES (?, ?, ?,?,?,?,?,?)";
+        String sql = "INSERT INTO Customer(fullName, phone,email,citizenId,gender,dateOfBirth, createdAt) VALUES (?, ?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, entity.getFullName());
@@ -35,10 +35,9 @@ public class CustomerRepository implements Repository<Customer, Long> {
             preparedStatement.setString(3, entity.getEmail());
             preparedStatement.setString(4, entity.getCitizenId());
             preparedStatement.setBoolean(5, entity.isGender());
-            preparedStatement.setString(6, entity.getAddress());
-            preparedStatement.setDate(7, Date.valueOf(entity.getDateOfBirth()));
+            preparedStatement.setDate(6, Date.valueOf(entity.getDateOfBirth()));
             entity.setCreatedAt(LocalDate.now());
-            preparedStatement.setDate(8, Date.valueOf(entity.getCreatedAt()));
+            preparedStatement.setDate(7, Date.valueOf(entity.getCreatedAt()));
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -73,7 +72,6 @@ public class CustomerRepository implements Repository<Customer, Long> {
                     customer.setEmail(resultSet.getString("email"));
                     customer.setCitizenId(resultSet.getString("citizenId"));
                     customer.setGender(resultSet.getBoolean("gender"));
-                    customer.setAddress(resultSet.getString("address"));
                     customer.setDateOfBirth(resultSet.getDate("dateOfBirth").toLocalDate());
                     customer.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     return customer;
@@ -111,7 +109,6 @@ public class CustomerRepository implements Repository<Customer, Long> {
                     customer.setEmail(resultSet.getString("email"));
                     customer.setCitizenId(resultSet.getString("citizenId"));
                     customer.setGender(resultSet.getBoolean("gender"));
-                    customer.setAddress(resultSet.getString("address"));
                     customer.setDateOfBirth(resultSet.getDate("dateOfBirth").toLocalDate());
                     customer.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     customers.add(customer);
@@ -125,16 +122,15 @@ public class CustomerRepository implements Repository<Customer, Long> {
 
     @Override
     public Customer update(Customer entity) {
-        String sql = "UPDATE Customer SET fullName = ?, phone = ?, email = ?, citizenId = ?, gender = ?, address = ?, dateOfBirth = ? WHERE customerId = ?";
+        String sql = "UPDATE Customer SET fullName = ?, phone = ?, email = ?, citizenId = ?, gender = ?, dateOfBirth = ? WHERE customerId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, entity.getFullName());
             preparedStatement.setString(2, entity.getPhone());
             preparedStatement.setString(3, entity.getEmail());
             preparedStatement.setString(4, entity.getCitizenId());
             preparedStatement.setBoolean(5, entity.isGender());
-            preparedStatement.setString(6, entity.getAddress());
-            preparedStatement.setDate(7, Date.valueOf(entity.getDateOfBirth()));
-            preparedStatement.setLong(8, entity.getCustomerId());
+            preparedStatement.setDate(6, Date.valueOf(entity.getDateOfBirth()));
+            preparedStatement.setLong(7, entity.getCustomerId());
 
 
             int affectedRows = preparedStatement.executeUpdate();
@@ -164,7 +160,6 @@ public class CustomerRepository implements Repository<Customer, Long> {
                     customer.setEmail(resultSet.getString("email"));
                     customer.setCitizenId(resultSet.getString("citizenId"));
                     customer.setGender(resultSet.getBoolean("gender"));
-                    customer.setAddress(resultSet.getString("address"));
                     customer.setDateOfBirth(resultSet.getDate("dateOfBirth").toLocalDate());
                     customer.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     customers.add(customer);
@@ -205,7 +200,6 @@ public class CustomerRepository implements Repository<Customer, Long> {
                     customer.setEmail(resultSet.getString("email"));
                     customer.setCitizenId(resultSet.getString("citizenId"));
                     customer.setGender(resultSet.getBoolean("gender"));
-                    customer.setAddress(resultSet.getString("address"));
                     customer.setDateOfBirth(resultSet.getDate("dateOfBirth").toLocalDate());
                     customer.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     return customer;

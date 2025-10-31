@@ -21,13 +21,13 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
 
     @Override
     public Surcharge save(Surcharge entity) {
-        String sql = "INSERT INTO Surcharge (name, price,  createdAt) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Surcharge (name, price, createdAt) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setBigDecimal(2, entity.getPrice());
             entity.setCreatedAt(LocalDate.now());
-            preparedStatement.setDate(4, Date.valueOf(entity.getCreatedAt()));
+            preparedStatement.setDate(3, Date.valueOf(entity.getCreatedAt()));
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -120,8 +120,7 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
         List<Surcharge> surcharges = new ArrayList<>();
         String sql = "SELECT * FROM Surcharge";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql); ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 Surcharge surcharge = new Surcharge();
@@ -140,36 +139,36 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
             throw new RuntimeException(e);
         }
     }
-    
+
     public List<Surcharge> findBySurchargeNameOrId(String keyword) {
-    List<Surcharge> surcharges = new ArrayList<>();
-    String sql = """
+        List<Surcharge> surcharges = new ArrayList<>();
+        String sql = """
             SELECT * FROM Surcharge
             WHERE name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ?
                OR surchargeId LIKE ?
             ORDER BY surchargeId ASC, name ASC
             """;
 
-    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-        String likeKeyword = "%" + keyword + "%";
-        preparedStatement.setString(1, likeKeyword);
-        preparedStatement.setString(2, likeKeyword);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            String likeKeyword = "%" + keyword + "%";
+            preparedStatement.setString(1, likeKeyword);
+            preparedStatement.setString(2, likeKeyword);
 
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            while (resultSet.next()) {
-                Surcharge surcharge = new Surcharge();
-                surcharge.setSurchargeId(resultSet.getLong("surchargeId"));
-                surcharge.setName(resultSet.getString("name"));
-                surcharge.setPrice(resultSet.getBigDecimal("price"));
-                surcharge.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
-                surcharges.add(surcharge);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Surcharge surcharge = new Surcharge();
+                    surcharge.setSurchargeId(resultSet.getLong("surchargeId"));
+                    surcharge.setName(resultSet.getString("name"));
+                    surcharge.setPrice(resultSet.getBigDecimal("price"));
+                    surcharge.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    surcharges.add(surcharge);
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding Surcharge by name or ID", e);
         }
-    } catch (SQLException e) {
-        throw new RuntimeException("Error finding Surcharge by name or ID", e);
-    }
 
-    return surcharges;
-}
+        return surcharges;
+    }
 
 }

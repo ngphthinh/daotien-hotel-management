@@ -38,6 +38,8 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
 import iuh.fit.se.group1.service.ExportExcelService;
+import iuh.fit.se.group1.service.ImportExcelService;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 
 public class RoomManagement extends javax.swing.JPanel {
 
@@ -93,6 +95,22 @@ public class RoomManagement extends javax.swing.JPanel {
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Room> imported = importService.importRoomsFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    roomService.getAllRooms().addAll(imported);
+                    loadTable(roomService.getAllRooms());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
         setupTableModel();
         setupTableActions();

@@ -11,7 +11,6 @@ public class Customer {
     private String citizenId;
     private boolean gender; 
     private LocalDate dateOfBirth;
-    private String address;
     private LocalDate createdAt;
     
     public Customer() {
@@ -27,7 +26,6 @@ public class Customer {
 		this.citizenId = citizenId;
 		this.gender = gender;
 		this.dateOfBirth = dateOfBirth;
-		this.address = address;
 		this.createdAt = createdAt;
 	}
 
@@ -88,13 +86,7 @@ public class Customer {
 		this.dateOfBirth = dateOfBirth;
 	}
 
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
+	
 
 	public LocalDate getCreatedAt() {
 		return createdAt;
@@ -103,15 +95,9 @@ public class Customer {
 	public void setCreatedAt(LocalDate createdAt) {
 		this.createdAt = createdAt;
 	}
-	@Override
-	public String toString() {
-	    return "Customer{" + "customerId=" + customerId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + ", citizenId=" + citizenId + ", gender=" + (gender ? "Female" : "Male") + ", dateOfBirth=" + dateOfBirth + ", address=" + address + ", createdAt=" + createdAt + '}';
-	}
+	
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(citizenId);
-	}
+	
 
 	@Override
 	public boolean equals(Object obj) {
