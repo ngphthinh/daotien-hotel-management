@@ -93,27 +93,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         roleService = new RoleService();
         loadTable(employeeService.getAllEmployees());
     }
-
-    private void loadTable(java.util.List<Employee> employees) {
-        Table tblEmployee = null;
-        DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-        model.setRowCount(0);
-        for (Employee employee : employees) {
-            String genderStr = employee.isGender() ? "Nữ" : "Nam";
-            String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
-                    ? employee.getAccount().getRole().getRoleName()
-                    : "N/A";
-            model.addRow(new Object[] {
-                    employee.getEmployeeId(),
-                    employee.getFullName(),
-                    genderStr,
-                    roleName,
-                    employee.getPhone()
-
-            });
-        }
-    }
-
     private void custom() {
         headerCustom2.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
@@ -536,8 +515,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated
-    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         headerCustom2 = new iuh.fit.se.group1.ui.component.HeaderCustom();
@@ -615,6 +592,25 @@ public class EmployeeManagement extends javax.swing.JPanel {
                                 .addGap(25, 25, 25)
                                 .addComponent(tblEmployee, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
                                 .addGap(37, 37, 37)));
+    }
+    private void loadTable(java.util.List<Employee> employees) {
+       
+        DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
+        model.setRowCount(0);
+        for (Employee employee : employees) {
+            String genderStr = employee.isGender() ? "Nữ" : "Nam";
+            String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
+                    ? employee.getAccount().getRole().getRoleName()
+                    : "N/A";
+            model.addRow(new Object[] {
+                    employee.getEmployeeId(),
+                    employee.getFullName(),
+                    genderStr,
+                    roleName,
+                    employee.getPhone()
+
+            });
+        }
     }
 
     public static void exportModalToExcel(Component parent, InfoEmployeeModal modal) {
@@ -1087,13 +1083,17 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddEmployee;
     private iuh.fit.se.group1.ui.component.custom.Button btnExport;
     private iuh.fit.se.group1.ui.component.custom.Button btnImport;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom2;
     private javax.swing.JLabel lblTitleEmployee;
     private iuh.fit.se.group1.ui.component.table.Table tblEmployee;
+
+    public void setShiftList(ShiftList shiftList2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setShiftList'");
+    }
 
 }
 

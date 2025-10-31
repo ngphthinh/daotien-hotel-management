@@ -24,6 +24,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
+import iuh.fit.se.group1.service.ExportExcelService;
 
 /**
  *
@@ -86,7 +87,15 @@ public class SurchageManagement extends javax.swing.JPanel {
         });
 
         btnExport.setText("Xuất Excel");
-        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 12)); 
+        btnExport.addActionListener(e -> {
+            ExportExcelService.exportTableToExcel(
+                    this,
+                    tblSurchage.getTbl(),
+                    "Danh sách phụ phí",
+                    "DanhSachPhuPhi"
+            );
+        });
 
         btnImport.setText("Nhập excel");
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
