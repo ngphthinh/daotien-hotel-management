@@ -136,14 +136,12 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getTxtEmail().setText(customer.getEmail());
                 modal.getTxtCitizen().setText(customer.getCitizenId());
                 modal.getTxtPhone().setText(customer.getPhone());
-                modal.getTxtAddress().setText(customer.getAddress());
                 modal.getTxtDob().setText(customer.getDateOfBirth().format(Constants.DATE_FORMATTER));
 
                 modal.getLblErrolName().setText("");
                 modal.getLblErrolPhone().setText("");
                 modal.getLblErrolEmail().setText("");
                 modal.getLblErrolCitizen().setText("");
-                modal.getLblErrolAddress().setText("");
                 modal.getLblErrolDob().setText("");
 
                 Color red = Color.RED;
@@ -151,7 +149,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getLblErrolPhone().setForeground(red);
                 modal.getLblErrolEmail().setForeground(red);
                 modal.getLblErrolCitizen().setForeground(red);
-                modal.getLblErrolAddress().setForeground(red);
                 modal.getLblErrolDob().setForeground(red);
 
                 modal.saveData(ae -> {
@@ -163,7 +160,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                     customer.setPhone(rs.phone);
                     customer.setEmail(rs.email);
                     customer.setCitizenId(rs.citizen);
-                    customer.setAddress(rs.address);
                     customer.setGender(rs.gender);
                     customer.setDateOfBirth(rs.dob);
 
@@ -223,14 +219,12 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getTxtEmail().setText(customer.getEmail());
                 modal.getTxtCitizen().setText(customer.getCitizenId());
                 modal.getTxtPhone().setText(customer.getPhone());
-                modal.getTxtAddress().setText(customer.getAddress());
                 modal.getTxtDob().setText(customer.getDateOfBirth().format(Constants.DATE_FORMATTER));
 
                 modal.getTxtName().setEditable(false);
                 modal.getTxtPhone().setEditable(false);
                 modal.getTxtEmail().setEditable(false);
                 modal.getTxtCitizen().setEditable(false);
-                modal.getTxtAddress().setEditable(false);
                 modal.getTxtDob().setEditable(false);
                 modal.getCmbGender().setEnabled(false);
 
@@ -499,7 +493,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             customer.setEmail(rs.email);
             customer.setCitizenId(rs.citizen);
             customer.setPhone(rs.phone);
-            customer.setAddress(rs.address);
             customer.setDateOfBirth(rs.dob);
 
             Customer customerSave = customerService.createCustomer(customer);
@@ -530,7 +523,6 @@ public class CustomerManagement extends javax.swing.JPanel {
         String phone = modal.getTxtPhone().getText().trim();
         String email = modal.getTxtEmail().getText().trim();
         String citizen = modal.getTxtCitizen().getText().trim();
-        String address = modal.getTxtAddress().getText().trim();
         boolean gender = modal.getCmbGender().getSelectedItem() != null
                 && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nam");
         String dobStr = modal.getTxtDob().getText().trim();
@@ -539,14 +531,12 @@ public class CustomerManagement extends javax.swing.JPanel {
         modal.getLblErrolPhone().setText("");
         modal.getLblErrolEmail().setText("");
         modal.getLblErrolCitizen().setText("");
-        modal.getLblErrolAddress().setText("");
 
         Color red = Color.RED;
         modal.getLblErrolName().setForeground(red);
         modal.getLblErrolPhone().setForeground(red);
         modal.getLblErrolEmail().setForeground(red);
         modal.getLblErrolCitizen().setForeground(red);
-        modal.getLblErrolAddress().setForeground(red);
         boolean isValid = true;
 
         if (name.isEmpty()) {
@@ -577,11 +567,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             modal.getLblErrolCitizen().setText("CCCD/CMND phải gồm 12 chữ số!");
             isValid = false;
         }
-
-        if (address.isEmpty()) {
-            modal.getLblErrolAddress().setText("Vui lòng nhập địa chỉ");
-            isValid = false;
-        }
         LocalDate dob = null;
         try {
             if (!dobStr.isEmpty()) {
@@ -593,7 +578,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             modal.getLblErrolDob().setText("Ngày không hợp lệ (dd-MM-yyyy)!");
             isValid = false;
         }
-        return new Valid(name, isValid, phone, email, citizen, address, gender, dob);
+        return new Valid(name, isValid, phone, email, citizen, gender, dob);
     }
 
     private record Valid(
@@ -602,7 +587,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             String phone,
             String email,
             String citizen,
-            String address,
             boolean gender,
             LocalDate dob
     ) {
