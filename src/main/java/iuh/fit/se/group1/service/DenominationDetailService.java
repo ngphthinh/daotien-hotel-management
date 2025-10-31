@@ -5,17 +5,17 @@
  */
 package iuh.fit.se.group1.service;
 
-
 import iuh.fit.se.group1.entity.DenominationDetail;
 import iuh.fit.se.group1.repository.DenominationDetailRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @description
- * @author: Nguyen Tran Quoc Viet 
+ * @author: Nguyen Tran Quoc Viet
  * @version: 1.0
  * @created: 31/10/2025
  */
@@ -23,6 +23,11 @@ import java.util.List;
 public class DenominationDetailService {
     private static final Logger log = LoggerFactory.getLogger(DenominationDetailService.class);
     private final DenominationDetailRepository repository;
+
+    // Các mệnh giá tiền mặc định (VND)
+    private static final List<Long> DEFAULT_DENOMINATIONS = Arrays.asList(
+            500000L, 200000L, 100000L, 50000L, 20000L, 10000L, 5000L, 2000L, 1000L
+    );
 
     public DenominationDetailService() {
         this.repository = new DenominationDetailRepository();
@@ -80,11 +85,41 @@ public class DenominationDetailService {
 
     /**
      * Tìm tất cả mệnh giá theo employeeShiftId
+     * ĐÃ SỬA: Gọi repository thay vì đệ quy
      */
     public List<DenominationDetail> findByEmployeeShiftId(Long employeeShiftId) {
         if (employeeShiftId == null || employeeShiftId <= 0) {
             throw new IllegalArgumentException("Invalid employeeShiftId");
         }
-        return findByEmployeeShiftId(employeeShiftId);
+        return repository.findByEmployeeShiftId(employeeShiftId);
+    }
+
+    /**
+     * Lấy danh sách các mệnh giá tiền có sẵn
+     * Load từ database, nếu không có thì dùng mặc định
+     */
+    public List<Long> getAvailableDenominations() {
+        try {
+            List<Long> dbDenominations = repository.findAllDistinctDenominations();
+
+            if (dbDenominations != null && !dbDenominations.isEmpty()) {
+                log.info("Loaded {} denominations from database", dbDenominations.size());
+                return dbDenominations;
+            }
+
+            log.info("No denominations in database, using default values");
+            return DEFAULT_DENOMINATIONS;
+
+        } catch (Exception e) {
+            log.error("Error loading denominations from database, using defaults", e);
+            return DEFAULT_DENOMINATIONS;
+        }
+    }
+
+    /**
+     * Lấy danh sách mệnh giá mặc định
+     */
+    public List<Long> getDefaultDenominations() {
+        return DEFAULT_DENOMINATIONS;
     }
 }

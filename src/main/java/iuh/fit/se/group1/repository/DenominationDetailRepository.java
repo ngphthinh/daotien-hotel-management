@@ -165,7 +165,7 @@ public class DenominationDetailRepository implements Repository<DenominationDeta
     /**
      * Find all denomination details by employee shift
      */
-    public List<DenominationDetail> findByEmployeeShift(Long employeeShiftId) {
+    public List<DenominationDetail> findByEmployeeShiftId(Long employeeShiftId) {
         List<DenominationDetail> list = new ArrayList<>();
         String sql = "SELECT * FROM DenominationDetail WHERE employeeShiftId = ?;";
 
@@ -216,6 +216,32 @@ public class DenominationDetailRepository implements Repository<DenominationDeta
         } catch (SQLException e) {
             log.error("Error saving batch DenominationDetails: ", e);
             throw new RuntimeException(e);
+        }
+    }
+    // Thêm vào DenominationDetailRepository
+    /**
+     * Lấy danh sách các mệnh giá DISTINCT từ database (sử dụng JDBC)
+     */
+    public List<Long> findAllDistinctDenominations() {
+        List<Long> denominations = new ArrayList<>();
+        String sql = "SELECT DISTINCT denomination FROM DenominationDetail ORDER BY denomination DESC;";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String denomName = rs.getString("denomination");
+                DenominationLabel label = DenominationLabel.fromName(denomName);
+                if (label != null) {
+                    denominations.add(label.getValue());
+                }
+            }
+
+            return denominations;
+
+        } catch (SQLException e) {
+            log.error("Error finding distinct denominations: ", e);
+            return null;
         }
     }
 }
