@@ -54,7 +54,6 @@
                 // Tiền chênh lệch = Tiền trong két - (Doanh thu + 5,000,000)
                 BigDecimal difference = shiftClose.getCashInDrawer()
                         .subtract(shiftClose.getTotalRevenue().add(moneyOpenShift));
-
                 shiftClose.setDifference(difference);
             }
 

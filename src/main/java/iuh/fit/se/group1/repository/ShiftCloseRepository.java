@@ -36,9 +36,10 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
 
     @Override
     public ShiftClose save(ShiftClose entity) {
-        // Tự động tính toán difference trước khi lưu
         if (entity.getTotalRevenue() != null && entity.getCashInDrawer() != null) {
-            BigDecimal difference = entity.getCashInDrawer().subtract(entity.getTotalRevenue());
+            BigDecimal moneyOpenShift = new BigDecimal("5000000"); // 5 triệu đầu ca
+            BigDecimal difference = entity.getCashInDrawer()
+                    .subtract(entity.getTotalRevenue().add(moneyOpenShift));
             entity.setDifference(difference);
         } else {
             entity.setDifference(BigDecimal.ZERO);
