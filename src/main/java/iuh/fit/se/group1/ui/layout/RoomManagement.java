@@ -709,7 +709,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
     try (FileOutputStream fos =
              new FileOutputStream("src/main/resources/price.properties")) {
-        props.store(fos, null); // không ghi comment lên đầu file
+        props.store(fos, null); 
         JOptionPane.showMessageDialog(this, "Lưu giá phòng thành công!");
     } catch (IOException e) {
         e.printStackTrace();
