@@ -5,6 +5,7 @@ import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.service.RoomTypeService;
+import iuh.fit.se.group1.service.Properties;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
@@ -18,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Properties;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -201,51 +201,34 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void savePricesToFile() {
-        Properties properties = new Properties();
-        try {
-            FileOutputStream output = new FileOutputStream("prices.properties");
+        String filePath = "prices.properties";
+        Properties props = Properties.loadProperties(filePath);
 
-            properties.setProperty("/price.single.hourly", txtSingleHour.getText());
-            properties.setProperty("/price.single.overnight", txtSingleNight.getText());
-            properties.setProperty("/price.single.daily", txtSingleDay.getText());
-            properties.setProperty("/price.single.firsthour", txtSingleFirstHour.getText());
+        props.setProperty("/price.single.hourly", txtSingleHour.getText());
+        props.setProperty("/price.single.overnight", txtSingleNight.getText());
+        props.setProperty("/price.single.daily", txtSingleDay.getText());
+        props.setProperty("/price.single.firsthour", txtSingleFirstHour.getText());
 
-            properties.setProperty("/price.double.hourly", txtDoubleHour.getText());
-            properties.setProperty("/price.double.overnight", txtDoubleNight.getText());
-            properties.setProperty("/price.double.daily", txtDoubleDay.getText());
-            properties.setProperty("/price.double.firsthour", txtDoubleFirstHour.getText());
+        props.setProperty("/price.double.hourly", txtDoubleHour.getText());
+        props.setProperty("/price.double.overnight", txtDoubleNight.getText());
+        props.setProperty("/price.double.daily", txtDoubleDay.getText());
+        props.setProperty("/price.double.firsthour", txtDoubleFirstHour.getText());
 
-            properties.store(output, null);
-            output.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Properties.saveProperties(filePath, props);
     }
 
     private void loadPricesFromFile() {
-        Properties properties = new Properties();
-        try {
-            File file = new File("prices.properties");
-            if (!file.exists())
-                return;
+        String filePath = "prices.properties";
 
-            FileInputStream input = new FileInputStream(file);
-            properties.load(input);
+        txtSingleHour.setText(Properties.get(filePath, "/price.single.hourly"));
+        txtSingleNight.setText(Properties.get(filePath, "/price.single.overnight"));
+        txtSingleDay.setText(Properties.get(filePath, "/price.single.daily"));
+        txtSingleFirstHour.setText(Properties.get(filePath, "/price.single.firsthour"));
 
-            txtSingleHour.setText(properties.getProperty("/price.single.hourly", ""));
-            txtSingleNight.setText(properties.getProperty("/price.single.overnight", ""));
-            txtSingleDay.setText(properties.getProperty("/price.single.daily", ""));
-            txtSingleFirstHour.setText(properties.getProperty("/price.single.firsthour", ""));
-
-            txtDoubleHour.setText(properties.getProperty("/price.double.hourly", ""));
-            txtDoubleNight.setText(properties.getProperty("/price.double.overnight", ""));
-            txtDoubleDay.setText(properties.getProperty("/price.double.daily", ""));
-            txtDoubleFirstHour.setText(properties.getProperty("/price.double.firsthour", ""));
-
-            input.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        txtDoubleHour.setText(Properties.get(filePath, "/price.double.hourly"));
+        txtDoubleNight.setText(Properties.get(filePath, "/price.double.overnight"));
+        txtDoubleDay.setText(Properties.get(filePath, "/price.double.daily"));
+        txtDoubleFirstHour.setText(Properties.get(filePath, "/price.double.firsthour"));
     }
 
     private void loadTable(List<Room> rooms) {
