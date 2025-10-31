@@ -86,7 +86,6 @@ public class Customer {
 		this.dateOfBirth = dateOfBirth;
 	}
 
-
 	public LocalDate getCreatedAt() {
 		return createdAt;
 	}
@@ -98,12 +97,6 @@ public class Customer {
 	public String toString() {
 	    return "Customer{" + "customerId=" + customerId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + ", citizenId=" + citizenId + ", gender=" + (gender ? "Female" : "Male") + ", dateOfBirth=" + dateOfBirth + ", createdAt=" + createdAt + '}';
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(citizenId);
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

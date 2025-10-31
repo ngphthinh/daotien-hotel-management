@@ -23,6 +23,7 @@ import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.shift.ShiftList;
+import iuh.fit.se.group1.ui.component.table.Table;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.Color;
@@ -72,7 +73,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
+import iuh.fit.se.group1.service.ExportExcelService;
+import iuh.fit.se.group1.service.ImportExcelService;
+import java.io.File;
+import java.util.List;
+
 public class EmployeeManagement extends javax.swing.JPanel {
+
     private static final Logger log = LoggerFactory.getLogger(EmployeeManagement.class);
     private final EmployeeService employeeService;
     private final RoleService roleService;
@@ -87,12 +94,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
         loadTable(employeeService.getAllEmployees());
     }
 
-    public void setShiftList(ShiftList shiftList) {
-        this.shiftList = shiftList;
-    }
-
-
     private void loadTable(java.util.List<Employee> employees) {
+        Table tblEmployee = null;
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
         model.setRowCount(0);
         for (Employee employee : employees) {
@@ -106,6 +109,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     genderStr,
                     roleName,
                     employee.getPhone()
+
             });
         }
     }
@@ -115,7 +119,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         headerCustom2.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý nhân viên</span>"
-                        + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>");
+
+                + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>");
+
         btnAddEmployee.setBackground(new Color(108, 165, 200));
         btnAddEmployee.setForeground(Color.WHITE);
         btnAddEmployee.setBorderRadius(10);
@@ -127,6 +133,22 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Employee> imported = importService.importEmployeesFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    employeeService.getAllEmployees().addAll(imported);
+                    loadTable(employeeService.getAllEmployees());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
@@ -897,6 +919,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             System.out.println(employeeSave);
 
+
             model.addRow(new Object[] {
                     employeeSave.getEmployeeId(),
                     employeeSave.getFullName(),
@@ -917,7 +940,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         }
     }
 
-    // GEN-LAST:event_btnAddEmployeeActionPerformed
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -939,6 +961,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         return style;
     }
+
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
         ExportExcelService.exportTableToExcel(
@@ -1061,6 +1084,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String citizenId,
             String email,
             LocalDate hireDate) {
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1072,3 +1096,4 @@ public class EmployeeManagement extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.table.Table tblEmployee;
 
 }
+

@@ -41,6 +41,9 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.LoggerFactory;
 import iuh.fit.se.group1.service.ExportExcelService;
+import iuh.fit.se.group1.service.ImportExcelService;
+import java.io.File;
+import javax.swing.JFileChooser;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
@@ -65,12 +68,12 @@ public class CustomerManagement extends javax.swing.JPanel {
         for (Customer customer : customers) {
             String genderStr = customer.isGender() ? "Nữ" : "Nam";
             modal.addRow(new Object[]{
-                    customer.getCustomerId(),
-                    customer.getFullName(),
-                    genderStr,
-                    customer.getEmail(),
-                    customer.getCitizenId(),
-                    customer.getPhone()
+                customer.getCustomerId(),
+                customer.getFullName(),
+                genderStr,
+                customer.getEmail(),
+                customer.getCitizenId(),
+                customer.getPhone()
             });
 
         }
@@ -88,6 +91,22 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Customer> imported = importService.importCustomersFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    customerService.getAllCustomer().addAll(imported);
+                    loadTable(customerService.getAllCustomer());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
         btnAddCustomer.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
@@ -182,7 +201,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 GlassPanePopup.showPopup(modal);
             }
 
-
             @Override
             public void onDelete(int row) {
                 String title = "Xác nhận xóa khách hàng";
@@ -219,6 +237,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getTxtEmail().setText(customer.getEmail());
                 modal.getTxtCitizen().setText(customer.getCitizenId());
                 modal.getTxtPhone().setText(customer.getPhone());
+
                 modal.getTxtDob().setText(customer.getDateOfBirth().format(Constants.DATE_FORMATTER));
 
                 modal.getTxtName().setEditable(false);
@@ -287,7 +306,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 filterTable();
             }
 
-
             private void filterTable() {
                 String keyword = headerCustom1.getSearchText().trim();
                 TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
@@ -346,7 +364,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             }
         });
     }
-
 
     private void searchCustomer() {
         String keyword = headerCustom1.getSearchText().trim();
@@ -457,7 +474,6 @@ public class CustomerManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
     }
 
-
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddCustomerActionPerformed
         InfoCustomerModal modal = new InfoCustomerModal();
 
@@ -467,7 +483,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 GlassPanePopup.closePopupLast();
             }
         });
-
 
         modal.saveData(new ActionListener() {
             @Override
@@ -506,12 +521,12 @@ public class CustomerManagement extends javax.swing.JPanel {
             String genderStr = customer.isGender() ? "Nam" : "Nữ";
             System.out.println(customerSave);
             model.addRow(new Object[]{
-                    customerSave.getCustomerId(),
-                    customerSave.getFullName(),
-                    genderStr,
-                    customerSave.getEmail(),
-                    customerSave.getCitizenId(),
-                    customerSave.getPhone(),});
+                customerSave.getCustomerId(),
+                customerSave.getFullName(),
+                genderStr,
+                customerSave.getEmail(),
+                customerSave.getCitizenId(),
+                customerSave.getPhone(),});
         } catch (Exception e) {
 
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
@@ -589,7 +604,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             String citizen,
             boolean gender,
             LocalDate dob
-    ) {
+            ) {
 
     }
 

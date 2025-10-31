@@ -61,7 +61,6 @@ public class Main {
         customer.setDateOfBirth(LocalDate.now());
         customer.setGender(false);
         customer.setCitizenId("082205000810");
-        customer.setAddress("Hihis");
 
 
         Order order = new Order();

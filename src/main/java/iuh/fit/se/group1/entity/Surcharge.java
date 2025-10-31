@@ -20,6 +20,12 @@ public class Surcharge {
         this.name = name;
         this.price = price;
     }
+    
+    public Surcharge(long surchargeId, String name, BigDecimal price) {
+        this.surchargeId = surchargeId;
+        this.name = name;
+        this.price = price;
+    }
 
     public Surcharge() {
     }
