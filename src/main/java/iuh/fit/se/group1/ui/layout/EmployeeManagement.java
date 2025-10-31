@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.EmployeeService;
@@ -12,6 +13,7 @@ import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
+import iuh.fit.se.group1.ui.component.shift.ShiftList;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.Color;
@@ -53,6 +55,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
     private final EmployeeService employeeService;
     private final RoleService roleService;
     private int activeFilterColumn = -1;
+    private ShiftList shiftList;
 
     public EmployeeManagement() {
         initComponents();
@@ -61,7 +64,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
         roleService = new RoleService();
         loadTable(employeeService.getAllEmployees());
     }
-
+    public void setShiftList(ShiftList shiftList) {
+        this.shiftList = shiftList;
+    }
 
     private void loadTable(java.util.List<Employee> employees) {
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
@@ -184,31 +189,62 @@ public class EmployeeManagement extends javax.swing.JPanel {
                             return;
                         }
 
-                        // Tạo Employee object
+                        // Lấy giá trị mới từ modal
+                        String genderSelected = (String) modal.getCmbGender().getSelectedItem();
+                        boolean gender = "Nữ".equals(genderSelected); // true nếu là Nữ
+
+                        String roleSelected = (String) modal.getCmbPosition().getSelectedItem();
+                        String roleId = roleSelected.equalsIgnoreCase("Nhân viên quản lý")
+                                ? Role.MANAGER.toString()
+                                : Role.RECEPTIONIST.toString();
+
+                        // Lấy Role entity từ database
+                        iuh.fit.se.group1.entity.Role newRole = roleService.getRoleById(roleId);
+                        if (newRole == null) {
+                            Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
+                            return;
+                        }
+
+                        // Tạo đối tượng Employee mới để cập nhật
                         Employee employeeUpdate = new Employee();
                         employeeUpdate.setEmployeeId(employeeId);
                         employeeUpdate.setFullName(result.fullName);
                         employeeUpdate.setPhone(result.phone);
                         employeeUpdate.setEmail(result.email);
-                        employeeUpdate.setGender(result.gender);
                         employeeUpdate.setCitizenId(result.citizenId);
                         employeeUpdate.setHireDate(result.hireDate);
-                        employeeUpdate.setAccount(employee.getAccount()); // Giữ nguyên account
+                        employeeUpdate.setGender(gender); // Gán giới tính mới
 
-                        // Lấy avatar từ AvatarLabel
+                        // Cập nhật role cho account
+                        if (employee.getAccount() != null) {
+                            Account accountToUpdate = employee.getAccount();
+                            accountToUpdate.setRole(newRole); // Gán toàn bộ đối tượng Role mới
+                            employeeUpdate.setAccount(accountToUpdate);
+                        } else {
+                            Message.showMessage("Lỗi", "Nhân viên không có tài khoản!");
+                            return;
+                        }
+
+                        // Avatar mới
                         AvatarLabel avt = modal.getAvatarLabel();
                         if (avt != null) {
                             byte[] avtBytes = avt.getImageAsBytes("jpg");
-                            if (avtBytes != null) {
+                            if (avtBytes != null && avtBytes.length > 0) {
                                 employeeUpdate.setAvt(avtBytes);
                                 log.info("Avatar updated for employee: {}", employeeId);
+                            } else {
+                                // Giữ nguyên avatar cũ nếu không có avatar mới
+                                employeeUpdate.setAvt(employee.getAvt());
                             }
+                        } else {
+                            // Giữ nguyên avatar cũ nếu avatarLabel null
+                            employeeUpdate.setAvt(employee.getAvt());
                         }
 
-                        // Gọi employeeService
+                        // Gọi service update xuống database
                         Employee entitySave = employeeService.updateEmployee(employeeUpdate);
 
-                        // Update giá trị Employee vào table
+                        // Cập nhật lại table
                         String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
                         String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
                                 ? entitySave.getAccount().getRole().getRoleName()
@@ -219,9 +255,11 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         model.setValueAt(roleName2, row, 3);
                         model.setValueAt(entitySave.getPhone(), row, 4);
 
+                        Message.showMessage("Thành công", "Cập nhật nhân viên thành công!");
                         GlassPanePopup.closePopupLast();
                     });
                 });
+
 
                 GlassPanePopup.showPopup(modal);
 
@@ -249,6 +287,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         model.removeRow(rowDelete);
                         // SỬA: Gọi employeeService
                         employeeService.deleteEmployee(id);
+                        if (shiftList != null) {
+                            shiftList.reloadEmployees();
+                            log.info("Reloaded ShiftList after deleting employee: {}", id);
+                        }
                     }
                 });
             }
@@ -538,6 +580,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
     private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmployeeActionPerformed
 
         InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
+        modal.getLblCode().setVisible(false);
+        modal.getLblStatus().setText("Hãy chọn avatar!");
+        modal.getLblStatus().setForeground(Color.red);
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -549,30 +594,31 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                saveData(modal);
-                GlassPanePopup.closePopupAll();
+                boolean success = saveData(modal);
+                if (success) {
+                    GlassPanePopup.closePopupAll();
+                }
             }
         });
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }
 
-
-    private void saveData(InfoEmployeeModal modal) {
+    private boolean saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
 
         if (!result.valid) {
             Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào!");
-            return;
+            return false;
         }
 
         try {
             int position = modal.getCmbPosition().getSelectedIndex();
             String roleId;
             if (position == 0) {
-                roleId = Role.MANAGER.toString();
-            } else {
                 roleId = Role.RECEPTIONIST.toString();
+            } else {
+                roleId = Role.MANAGER.toString();
             }
             Employee employee = new Employee();
             employee.setFullName(result.fullName);
@@ -597,7 +643,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             if (employeeSave == null) {
                 Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
-                return;
+                return false;
             }
 
             DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
@@ -612,10 +658,16 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     employeeSave.getAccount().getRole().getRoleName(),
                     employeeSave.getPhone()
             });
+            if (shiftList != null) {
+                shiftList.addNewEmployee(employeeSave);
+                log.info("Notified ShiftList about new employee: {}", employeeSave.getFullName());
+            }
             Message.showMessage("Thành công", "Thêm nhân viên thành công!");
+            return true;
         } catch (Exception e) {
             log.error("Error creating employee: ", e);
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
+            return false;
         }
     }
     //GEN-LAST:event_btnAddEmployeeActionPerformed
@@ -649,7 +701,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
 
     }
-
     private static Valid getValid(InfoEmployeeModal modal) {
         String name = modal.getTxtName().getText().trim();
         String phone = modal.getTxtPhone().getText().trim();
@@ -657,9 +708,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
         String email = modal.getTxtEmail().getText().trim();
         String hireDateStr = modal.getTxtHireDate().getText().trim();
         boolean gender = modal.getCmbGender().getSelectedItem() != null
-                && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nam");
+                && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nữ");
 
-//         Reset lỗi
+        // Reset lỗi
         Color white = Color.WHITE;
         modal.getLblErrolName().setForeground(white);
         modal.getLblErrolPhone().setForeground(white);
@@ -667,48 +718,50 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.getLblErrolEmail().setForeground(white);
         modal.getLblErrolHireDate().setForeground(white);
 
-        Color red = Color.RED;
-        modal.getLblErrolName().setForeground(red);
-        modal.getLblErrolPhone().setForeground(red);
-        modal.getLblErrolCitizen().setForeground(red);
-        modal.getLblErrolEmail().setForeground(red);
-        modal.getLblErrolHireDate().setForeground(red);
-
         boolean valid = true;
+        Color red = Color.RED;
 
         // Tên
         if (name.isEmpty()) {
             modal.getLblErrolName().setText("Họ tên không được để trống!");
+            modal.getLblErrolName().setForeground(red);
             valid = false;
         } else if (name.length() < 2) {
             modal.getLblErrolName().setText("Họ tên quá ngắn!");
+            modal.getLblErrolName().setForeground(red);
             valid = false;
         }
 
         // Số điện thoại
         if (phone.isEmpty()) {
             modal.getLblErrolPhone().setText("Số điện thoại không được để trống!");
+            modal.getLblErrolPhone().setForeground(red);
             valid = false;
         } else if (!phone.matches("^0\\d{9}$")) {
             modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ!");
+            modal.getLblErrolPhone().setForeground(red);
             valid = false;
         }
 
         // CCCD
         if (citizenId.isEmpty()) {
             modal.getLblErrolCitizen().setText("CCCD không được để trống!");
+            modal.getLblErrolCitizen().setForeground(red);
             valid = false;
         } else if (!citizenId.matches("\\d{12}")) {
             modal.getLblErrolCitizen().setText("CCCD phải có 12 chữ số!");
+            modal.getLblErrolCitizen().setForeground(red);
             valid = false;
         }
 
         // Email
         if (email.isEmpty()) {
             modal.getLblErrolEmail().setText("Email không được để trống!");
+            modal.getLblErrolEmail().setForeground(red);
             valid = false;
         } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
             modal.getLblErrolEmail().setText("Email không hợp lệ!");
+            modal.getLblErrolEmail().setForeground(red);
             valid = false;
         }
 
@@ -721,12 +774,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
             }
         } catch (DateTimeParseException e) {
             modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd-MM-yyyy)!");
+            modal.getLblErrolHireDate().setForeground(red);
             valid = false;
             log.error("Error parsing hire date: ", e);
         }
 
         return new Valid(name, valid, gender, phone, citizenId, email, hireDate);
     }
+
 
     private record Valid(
             String fullName,

@@ -78,7 +78,9 @@ public class ShiftManagement extends javax.swing.JPanel {
         setupShiftCardButtons();
         loadEmployeeShiftsByDate(LocalDate.now());
     }
-
+    public ShiftList getShiftList() {
+        return shiftList;
+    }
     private void loadShiftsFromDatabase() {
         try {
             // Lấy tất cả shifts từ database
@@ -100,7 +102,6 @@ public class ShiftManagement extends javax.swing.JPanel {
                 card.getLblShiftName().setText(shift.getName());
 
                 // Set thời gian ca làm việc
-
 
                 String startTime = shift.getStartTime().substring(0,5);
                 String endTime = shift.getEndTime().substring(0,5);
