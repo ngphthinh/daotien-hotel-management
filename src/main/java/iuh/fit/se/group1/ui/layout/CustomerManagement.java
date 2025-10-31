@@ -65,12 +65,12 @@ public class CustomerManagement extends javax.swing.JPanel {
         for (Customer customer : customers) {
             String genderStr = customer.isGender() ? "Nữ" : "Nam";
             modal.addRow(new Object[]{
-                customer.getCustomerId(),
-                customer.getFullName(),
-                genderStr,
-                customer.getEmail(),
-                customer.getCitizenId(),
-                customer.getPhone()
+                    customer.getCustomerId(),
+                    customer.getFullName(),
+                    genderStr,
+                    customer.getEmail(),
+                    customer.getCitizenId(),
+                    customer.getPhone()
             });
 
         }
@@ -93,13 +93,13 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
-        ExportExcelService.exportTableToExcel(
-        this,
-        tblCustomer.getTbl(),
-        "Danh sách khách hàng",
-        "DanhSachKhachHang"
-    );
-});
+            ExportExcelService.exportTableToExcel(
+                    this,
+                    tblCustomer.getTbl(),
+                    "Danh sách khách hàng",
+                    "DanhSachKhachHang"
+            );
+        });
         headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khách hàng</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
@@ -170,11 +170,11 @@ public class CustomerManagement extends javax.swing.JPanel {
                     Customer updated = customerService.updateCustomer(customer);
                     if (updated != null) {
                         int modelRow = tblCustomer.getTbl().convertRowIndexToModel(row);
-model.setValueAt(updated.getFullName(), modelRow, 1);
-model.setValueAt(updated.isGender() ? "Nam" : "Nữ", modelRow, 2);
-model.setValueAt(updated.getEmail(), modelRow, 3);
-model.setValueAt(updated.getCitizenId(), modelRow, 4);
-model.setValueAt(updated.getPhone(), modelRow, 5);
+                        model.setValueAt(updated.getFullName(), modelRow, 1);
+                        model.setValueAt(updated.isGender() ? "Nam" : "Nữ", modelRow, 2);
+                        model.setValueAt(updated.getEmail(), modelRow, 3);
+                        model.setValueAt(updated.getCitizenId(), modelRow, 4);
+                        model.setValueAt(updated.getPhone(), modelRow, 5);
 
                         GlassPanePopup.closePopupLast();
                     } else {
@@ -185,7 +185,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 GlassPanePopup.showPopup(modal);
             }
-            
+
 
             @Override
             public void onDelete(int row) {
@@ -278,42 +278,42 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             }
         });
         headerCustom1.handleSearch(new DocumentListener() {
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        filterTable();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        filterTable();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        filterTable();
-    }
-    
-
-    private void filterTable() {
-    String keyword = headerCustom1.getSearchText().trim();
-    TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
-    if (keyword.isEmpty()) {
-        sorter.setRowFilter(null); 
-    } else {
-        sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
             @Override
-            public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
-                Object value = entry.getValue(0); 
-                if (value != null) {
-                    return value.toString().contains(keyword); 
-                }
-                return false;
+            public void insertUpdate(DocumentEvent e) {
+                filterTable();
             }
-        });
-    }
-}
 
-});
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterTable();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterTable();
+            }
+
+
+            private void filterTable() {
+                String keyword = headerCustom1.getSearchText().trim();
+                TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
+                if (keyword.isEmpty()) {
+                    sorter.setRowFilter(null);
+                } else {
+                    sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                        @Override
+                        public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                            Object value = entry.getValue(0);
+                            if (value != null) {
+                                return value.toString().contains(keyword);
+                            }
+                            return false;
+                        }
+                    });
+                }
+            }
+
+        });
 
         cmbGender.addActionListener(ev -> {
             String selected = (String) cmbGender.getSelectedItem();
@@ -352,7 +352,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             }
         });
     }
-    
+
 
     private void searchCustomer() {
         String keyword = headerCustom1.getSearchText().trim();
@@ -389,7 +389,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
         btnAddCustomer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddCustomerActionPerformed(evt);
-                
+
             }
         });
 
@@ -462,7 +462,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
         sorter.setRowFilter(rf);
         sorter.setSortKeys(null);
     }
-    
+
 
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddCustomerActionPerformed
         InfoCustomerModal modal = new InfoCustomerModal();
@@ -473,7 +473,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
                 GlassPanePopup.closePopupLast();
             }
         });
-    
+
 
         modal.saveData(new ActionListener() {
             @Override
@@ -513,12 +513,12 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             String genderStr = customer.isGender() ? "Nam" : "Nữ";
             System.out.println(customerSave);
             model.addRow(new Object[]{
-                customerSave.getCustomerId(),
-                customerSave.getFullName(),
-                genderStr,
-                customerSave.getEmail(),
-                customerSave.getCitizenId(),
-                customerSave.getPhone(),});
+                    customerSave.getCustomerId(),
+                    customerSave.getFullName(),
+                    genderStr,
+                    customerSave.getEmail(),
+                    customerSave.getCitizenId(),
+                    customerSave.getPhone(),});
         } catch (Exception e) {
 
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
@@ -605,7 +605,7 @@ model.setValueAt(updated.getPhone(), modelRow, 5);
             String address,
             boolean gender,
             LocalDate dob
-            ) {
+    ) {
 
     }
 

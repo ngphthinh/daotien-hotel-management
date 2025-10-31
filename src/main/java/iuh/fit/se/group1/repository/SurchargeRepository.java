@@ -21,12 +21,11 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
 
     @Override
     public Surcharge save(Surcharge entity) {
-        String sql = "INSERT INTO Surcharge (name, price, orderId, createdAt) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Surcharge (name, price,  createdAt) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setBigDecimal(2, entity.getPrice());
-            preparedStatement.setLong(3, entity.getOrderId());
             entity.setCreatedAt(LocalDate.now());
             preparedStatement.setDate(4, Date.valueOf(entity.getCreatedAt()));
 
@@ -52,13 +51,12 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
 
     @Override
     public Surcharge update(Surcharge entity) {
-        String sql = "UPDATE Surcharge SET name = ?, price = ?, orderId = ? WHERE surchargeId = ?";
+        String sql = "UPDATE Surcharge SET name = ?, price = ? WHERE surchargeId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setBigDecimal(2, entity.getPrice());
-            preparedStatement.setLong(3, entity.getOrderId());
-            preparedStatement.setLong(4, entity.getSurchargeId());
+            preparedStatement.setLong(3, entity.getSurchargeId());
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -86,7 +84,6 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
                     surcharge.setSurchargeId(resultSet.getLong("surchargeId"));
                     surcharge.setName(resultSet.getString("name"));
                     surcharge.setPrice(resultSet.getBigDecimal("price"));
-                    surcharge.setOrderId(resultSet.getLong("orderId"));
                     surcharge.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     return surcharge;
                 }
@@ -131,7 +128,6 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
                 surcharge.setSurchargeId(resultSet.getLong("surchargeId"));
                 surcharge.setName(resultSet.getString("name"));
                 surcharge.setPrice(resultSet.getBigDecimal("price"));
-                surcharge.setOrderId(resultSet.getLong("orderId"));
                 surcharge.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                 surcharges.add(surcharge);
             }
@@ -148,11 +144,11 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
     public List<Surcharge> findBySurchargeNameOrId(String keyword) {
     List<Surcharge> surcharges = new ArrayList<>();
     String sql = """
-        SELECT * FROM Surcharge
-        WHERE name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ?
-           OR CAST(surchargeId AS NVARCHAR) LIKE ?
-        ORDER BY surchargeId ASC, name ASC
-        """;
+            SELECT * FROM Surcharge
+            WHERE name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ?
+               OR surchargeId LIKE ?
+            ORDER BY surchargeId ASC, name ASC
+            """;
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
         String likeKeyword = "%" + keyword + "%";

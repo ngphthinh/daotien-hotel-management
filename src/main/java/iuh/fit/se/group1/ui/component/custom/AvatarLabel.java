@@ -24,28 +24,22 @@ public class AvatarLabel extends JPanel {
     private static final Logger log = LoggerFactory.getLogger(AvatarLabel.class);
     private BufferedImage image;
     private BufferedImage scaled;
-    private BufferedImage defaultImage; // Lưu ảnh mặc định riêng
+    private BufferedImage defaultImage;
 
     public AvatarLabel() {
-        this(true); // Mặc định load ảnh default
+        this(true);
     }
-
-    /**
-     * Constructor với tùy chọn load ảnh mặc định
-     * @param loadDefaultImage - true nếu muốn load ảnh mặc định, false nếu không
-     */
     public AvatarLabel(boolean loadDefaultImage) {
         setPreferredSize(new Dimension(60, 60));
-        setOpaque(false); // trong suốt nền
+        setOpaque(false);
 
         if (loadDefaultImage) {
             loadDefaultImage();
+            if (defaultImage != null) {
+                this.image = defaultImage;
+            }
         }
     }
-
-    /**
-     * Load ảnh mặc định từ resources
-     */
     private void loadDefaultImage() {
         try {
             URL url = getClass().getResource("/images/conmeo.jpg");
@@ -59,20 +53,19 @@ public class AvatarLabel extends JPanel {
             log.error("Error loading default avatar image: ", e);
         }
     }
-
-    /**
-     * Reset về ảnh mặc định
-     */
     public void resetToDefault() {
         if (defaultImage == null) {
             loadDefaultImage();
         }
-        this.image = this.defaultImage;
-        this.scaled = null;
-        repaint();
-        log.info("Avatar reset to default image");
+        if (defaultImage != null) {
+            this.image = defaultImage;
+            this.scaled = null;
+            repaint();
+            log.info("Avatar reset to default image");
+        } else {
+            log.warn("Default avatar not found when resetting");
+        }
     }
-
     public BufferedImage getImage() {
         return image;
     }
@@ -84,16 +77,10 @@ public class AvatarLabel extends JPanel {
             return;
         }
         this.image = image;
-        this.scaled = null; // reset, để lần sau vẽ sẽ resize lại theo kích thước mới
+        this.scaled = null;
         repaint();
         log.info("Avatar image updated successfully");
     }
-
-    /**
-     * Lấy ảnh dưới dạng byte array
-     * @param format - định dạng ảnh (png, jpg, etc.)
-     * @return byte array hoặc null nếu có lỗi
-     */
     public byte[] getImageAsBytes(String format) {
         if (image == null) {
             log.warn("No image to convert to bytes");
@@ -110,20 +97,6 @@ public class AvatarLabel extends JPanel {
             return null;
         }
     }
-
-    /**
-     * Lấy ảnh dưới dạng byte array với format mặc định là PNG
-     * @return byte array hoặc null nếu có lỗi
-     */
-    public byte[] getImageAsBytes() {
-        return getImageAsBytes("png");
-    }
-
-    /**
-     * Lấy ảnh dưới dạng Base64 string
-     * @param format - định dạng ảnh (png, jpg, etc.)
-     * @return Base64 string hoặc null nếu có lỗi
-     */
     public String getImageAsBase64(String format) {
         byte[] bytes = getImageAsBytes(format);
         if (bytes == null) {
@@ -133,20 +106,6 @@ public class AvatarLabel extends JPanel {
         log.info("Image converted to Base64 successfully");
         return base64;
     }
-
-    /**
-     * Lấy ảnh dưới dạng Base64 string với format mặc định là PNG
-     * @return Base64 string hoặc null nếu có lỗi
-     */
-    public String getImageAsBase64() {
-        return getImageAsBase64("png");
-    }
-
-    /**
-     * Set ảnh từ byte array
-     * @param imageBytes - byte array của ảnh
-     * @return true nếu thành công, false nếu có lỗi
-     */
     public boolean setImageFromBytes(byte[] imageBytes) {
         if (imageBytes == null || imageBytes.length == 0) {
             log.warn("Image bytes is null or empty, resetting to default");
@@ -173,29 +132,6 @@ public class AvatarLabel extends JPanel {
             return false;
         }
     }
-
-    /**
-     * Set ảnh từ Base64 string
-     * @param base64 - Base64 string của ảnh
-     * @return true nếu thành công, false nếu có lỗi
-     */
-    public boolean setImageFromBase64(String base64) {
-        if (base64 == null || base64.trim().isEmpty()) {
-            log.warn("Base64 string is null or empty, resetting to default");
-            resetToDefault();
-            return false;
-        }
-
-        try {
-            byte[] imageBytes = Base64.getDecoder().decode(base64);
-            return setImageFromBytes(imageBytes);
-        } catch (Exception e) {
-            log.error("Error loading image from Base64: ", e);
-            resetToDefault();
-            return false;
-        }
-    }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

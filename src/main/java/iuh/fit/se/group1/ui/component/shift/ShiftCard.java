@@ -263,7 +263,7 @@ public class ShiftCard extends javax.swing.JPanel {
 
         lblTime.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblTime.setText("13H-18H");
-        add(lblTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 40, 180, 50));
+        add(lblTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, 180, 50));
 
         btnAdd.setPreferredSize(new java.awt.Dimension(60, 60));
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -276,9 +276,9 @@ public class ShiftCard extends javax.swing.JPanel {
         pnlInforEmployee1.setBackground(new java.awt.Color(255, 255, 255));
 
         lblName1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lblName1.setText("Nguyễn Chí Tâm");
+        lblName1.setText("Vui lòng thêm nhân viên");
 
-        lblCode1.setText("NV732221213");
+        lblCode1.setText("Không có mã nhân viên");
 
         javax.swing.GroupLayout pnlInforEmployee1Layout = new javax.swing.GroupLayout(pnlInforEmployee1);
         pnlInforEmployee1.setLayout(pnlInforEmployee1Layout);
@@ -313,9 +313,9 @@ public class ShiftCard extends javax.swing.JPanel {
         pnlInforEmployee2.setBackground(new java.awt.Color(255, 255, 255));
 
         lblName2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lblName2.setText("Nguyễn Trần Phước Thịnh");
+        lblName2.setText("Vui lòng thêm nhân viên");
 
-        lblCode2.setText("NV213812731");
+        lblCode2.setText("Không có mã nhân viên");
 
         javax.swing.GroupLayout pnlInforEmployee2Layout = new javax.swing.GroupLayout(pnlInforEmployee2);
         pnlInforEmployee2.setLayout(pnlInforEmployee2Layout);

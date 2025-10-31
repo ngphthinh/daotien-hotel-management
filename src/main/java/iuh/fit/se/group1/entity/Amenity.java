@@ -14,6 +14,11 @@ public class Amenity {
    
     }
 
+	public Amenity(Long amenityId,BigDecimal price) {
+		this.amenityId = amenityId;
+		this.price = price;
+	}
+
 	public Amenity(Long amenityId, String nameAmenity, BigDecimal price) {
 		this.amenityId = amenityId;
 		this.nameAmenity = nameAmenity;
@@ -87,5 +92,13 @@ public class Amenity {
 		Amenity other = (Amenity) obj;
 		return Objects.equals(amenityId, other.amenityId);
 	}
+
+    public void setAmenityId(String maDV) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void setPrice(double giaDV) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }

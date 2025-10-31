@@ -6,15 +6,17 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.text.NumberFormatter;
+
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.text.NumberFormat;
+
+import java.text.DecimalFormat;
+
+
+
+
+import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
-import java.util.Locale;
+
 
 public class Constants {
     public static final Color FOREGROUND_COLOR_MENU = new Color(77, 134, 168);
@@ -27,9 +29,7 @@ public class Constants {
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    public static final NumberFormat VND_FORMAT =
-            NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-
+    public static final DecimalFormat VND_FORMAT = new DecimalFormat("#,##0.## VND");
     public static final int HEIGHT_FRAME = 800;
     public static final int WIDTH_FRAME = 1400;
     public static final int BARS = 99;
@@ -51,29 +51,7 @@ public class Constants {
             default -> null;
         };
     }
-    public static String bufferedImageToBase64(BufferedImage image, String format) {
-        if (image == null) return null;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ImageIO.write(image, format, baos);
-            byte[] bytes = baos.toByteArray();
-            return Base64.getEncoder().encodeToString(bytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-
-    public static BufferedImage base64ToBufferedImage(String base64) {
-        try {
-            byte[] imageBytes = Base64.getDecoder().decode(base64);
-            ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
-            return ImageIO.read(bais);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
     public static Icon getIconOfEmployee(int index) {
         return switch (index) {
             case 99 -> FontIcon.of(FontAwesomeSolid.BARS, 16, Constants.COLOR_ICON_MENU);
@@ -85,4 +63,22 @@ public class Constants {
             default -> null;
         };
     }
+
+    public static double parseVND(String formatted) {
+        if (formatted == null || formatted.isEmpty()) return 0.0;
+        try {
+            // Loại bỏ ký tự không phải số hoặc dấu . , trước khi parse
+            String cleaned = formatted.replaceAll("[^\\d,\\.]", "");
+            return Double.parseDouble(cleaned.replace(",", ""));
+        } catch (NumberFormatException e) {
+            try {
+                // fallback: thử dùng parse của DecimalFormat
+                Number number = VND_FORMAT.parse(formatted);
+                return number.doubleValue();
+            } catch (ParseException ex) {
+                throw new RuntimeException("Không thể parse chuỗi tiền: " + formatted, ex);
+            }
+        }
+    }
+
 }

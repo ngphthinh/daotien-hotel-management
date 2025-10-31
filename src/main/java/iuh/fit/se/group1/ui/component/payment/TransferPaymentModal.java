@@ -4,7 +4,10 @@
  */
 package iuh.fit.se.group1.ui.component.payment;
 
+import iuh.fit.se.group1.ui.component.custom.Button;
 import java.awt.Cursor;
+import javax.swing.*;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
@@ -15,6 +18,58 @@ import raven.glasspanepopup.GlassPanePopup;
  */
 public class TransferPaymentModal extends javax.swing.JPanel {
 
+    public JLabel getLblQrCode() {
+        return lblQrCode;
+    }
+
+    public void setLblQrCode(JLabel lblQrCode) {
+        this.lblQrCode = lblQrCode;
+    }
+
+    
+    public Button getBtnCheck() {
+        return btnCheck;
+    }
+
+    public void setBtnCheck(Button btnCheck) {
+        this.btnCheck = btnCheck;
+    }
+
+    public Button getBtnExit() {
+        return btnExit;
+    }
+
+    public void setBtnExit(Button btnExit) {
+        this.btnExit = btnExit;
+    }
+
+    public JLabel getLblTitle() {
+        return lblTitle;
+    }
+
+    public void setLblTitle(JLabel lblTitle) {
+        this.lblTitle = lblTitle;
+    }
+
+    public JLabel getLblTotaPrice() {
+        return lblTotaPrice;
+    }
+
+    public void setLblTotaPrice(JLabel lblTotaPrice) {
+        this.lblTotaPrice = lblTotaPrice;
+    }
+
+    public JPanel getPnlQRCode() {
+        return pnlQRCode;
+    }
+
+
+
+    public void setPnlQRCode(JPanel pnlQRCode) {
+        this.pnlQRCode = pnlQRCode;
+    }
+
+    
     /**
      * Creates new form TransferPaymentModal
      */
@@ -36,15 +91,19 @@ public class TransferPaymentModal extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
         btnExit = new iuh.fit.se.group1.ui.component.custom.Button();
+        pnlQRCode = new javax.swing.JPanel();
+        lblQrCode = new javax.swing.JLabel();
+        lblTotaPrice = new javax.swing.JLabel();
+        btnCheck = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(129, 129, 129));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Thanh toán chuyển khoản");
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitle.setText("Thanh toán chuyển khoản");
 
         btnExit.setBackground(new java.awt.Color(129, 129, 129));
         btnExit.setText(" ");
@@ -54,14 +113,43 @@ public class TransferPaymentModal extends javax.swing.JPanel {
             }
         });
 
+        pnlQRCode.setBackground(new java.awt.Color(255, 255, 255));
+        pnlQRCode.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout pnlQRCodeLayout = new javax.swing.GroupLayout(pnlQRCode);
+        pnlQRCode.setLayout(pnlQRCodeLayout);
+        pnlQRCodeLayout.setHorizontalGroup(
+            pnlQRCodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblQrCode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnlQRCodeLayout.setVerticalGroup(
+            pnlQRCodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblQrCode, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+        );
+
+        lblTotaPrice.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTotaPrice.setForeground(new java.awt.Color(255, 255, 255));
+        lblTotaPrice.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotaPrice.setText("Tổng tiền: 1234");
+
+        btnCheck.setBackground(new java.awt.Color(249, 115, 22));
+        btnCheck.setForeground(new java.awt.Color(255, 255, 255));
+        btnCheck.setText("Kiểm tra");
+        btnCheck.setBorderRadius(5);
+        btnCheck.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(55, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(74, 74, 74)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
+                    .addComponent(btnCheck, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlQRCode, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblTotaPrice, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE))
+                .addGap(25, 25, 25)
                 .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27))
         );
@@ -70,9 +158,15 @@ public class TransferPaymentModal extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
+                    .addComponent(lblTitle)
                     .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(189, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(pnlQRCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblTotaPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCheck, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -82,7 +176,11 @@ public class TransferPaymentModal extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.custom.Button btnCheck;
     private iuh.fit.se.group1.ui.component.custom.Button btnExit;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lblQrCode;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JLabel lblTotaPrice;
+    private javax.swing.JPanel pnlQRCode;
     // End of variables declaration//GEN-END:variables
 }

@@ -5,11 +5,14 @@
 package iuh.fit.se.group1.ui.component.shift;
 
 
+import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 import java.awt.Image;
+import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,20 +37,93 @@ public class ShiftList extends JPanel {
     public ShiftList() {
         initComponents();
         setPreferredSize(new Dimension(290, getPreferredSize().height));
-        addEmployees("Chó Thịnh đẹp trai", "CHOTHINH123", "/images/conmeo.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");
-        addEmployees("Tâm cute", "NV002", "/images/conmeo.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");addEmployees("Tâm cute", "NV002", "/images/avttest.jpg");
-        
+        setLayout(new BorderLayout(0, 0));
+        setOpaque(false);
+        scrollPaneWin111.setOpaque(false);
+        scrollPaneWin111.getViewport().setOpaque(false);
+        scrollPaneWin111.setBorder(null);
+        scrollPaneWin111.getViewport().setBorder(null);
+        scrollPaneWin111.setViewportBorder(null);
+        scrollPaneWin111.putClientProperty("JComponent.borderType", "none");
+        scrollPaneWin111.setBackground(new Color(255, 255, 255, 0));
+        scrollPaneWin111.getViewport().setBackground(new Color(255, 255, 255, 0));
+
+        // 🔧 Panel chứa nhân viên
+        pnlEmployees.setLayout(new BoxLayout(pnlEmployees, BoxLayout.Y_AXIS));
+        pnlEmployees.setBorder(null);
+        pnlEmployees.setAlignmentY(TOP_ALIGNMENT);
+        pnlEmployees.setOpaque(false);
+        pnlEmployees.setAlignmentX(LEFT_ALIGNMENT);
+
+        lblTitle.setOpaque(false);
+        add(lblTitle, BorderLayout.NORTH);
+        add(scrollPaneWin111, BorderLayout.CENTER);
+
+        // 🧩 Load dữ liệu nhân viên
+        loadEmployeesFromDatabase();
     }
+    private void loadEmployeesFromDatabase() {
+    try {
+        EmployeeRepository employeeRepository = new EmployeeRepository();
+        List<Employee> employees = employeeRepository.findAll();
+
+        pnlEmployees.removeAll();
+        pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
+        for (Employee e : employees) {
+            String name = e.getFullName();
+            String code = String.valueOf(e.getEmployeeId());
+
+            // Nếu có ảnh base64 trong DB
+            BufferedImage image = null;
+            try {
+                if (e.getAvt() != null && e.getAvt().length > 0) {
+                    image = ImageIO.read(new ByteArrayInputStream(e.getAvt()));
+                } else {
+                    // Ảnh mặc định
+                    URL defaultImg = getClass().getResource("/images/meomeo.jpg");
+                    if (defaultImg != null)
+                        image = ImageIO.read(defaultImg);
+                }
+            } catch (Exception ex) {
+                log.error("Error loading image for employee {}", name, ex);
+            }
+            ShiftProfile shiftProfile = new ShiftProfile();
+            shiftProfile.getLblName().setText(name);
+            shiftProfile.getLblCode().setText( code);
+            shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
+            shiftProfile.setMaximumSize(new Dimension(303, 72));
+            shiftProfile.setMinimumSize(new Dimension(0, 72));
+
+            if (image != null) {
+                BufferedImage resized = Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
+                shiftProfile.getAvatarLabel().setImage(resized);
+            }
+
+            pnlEmployees.add(shiftProfile);
+            JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+            separator.setAlignmentX(Component.LEFT_ALIGNMENT);
+            separator.setMaximumSize(new Dimension(303, 1));
+            separator.setForeground(new Color(180, 180, 180)); // 💪 đậm hơn
+            separator.setBackground(new Color(180, 180, 180));
+            separator.setOpaque(true);
+            pnlEmployees.add(separator);
+
+            shiftProfile.addMouseListener(shiftProfile);
+        }
+
+        pnlEmployees.revalidate();
+        pnlEmployees.repaint();
+        SwingUtilities.invokeLater(() -> {
+            scrollPaneWin111.getVerticalScrollBar().setValue(0);
+        });
+    } catch (Exception ex) {
+        log.error("Error loading employees: ", ex);
+    }
+}
 
     @Override
     protected void paintComponent(Graphics g) {
-    super.paintComponent(g); // ✅ Gọi đầu tiên để xóa nền mặc định
+    super.paintComponent(g);
 
     Graphics2D g2 = (Graphics2D) g.create();
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

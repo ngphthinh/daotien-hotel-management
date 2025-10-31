@@ -13,6 +13,7 @@ import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
@@ -118,6 +119,12 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
 
         String cols[] = { "Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng" };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
@@ -494,7 +501,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         btnExport.setText("Xuất Excel");
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnExport.addActionListener(e -> exportAllEmployeesToExcel());
+
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+
 
         btnImport.setText("Tải excel");
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -779,6 +793,7 @@ private static CellStyle createDataStyle(Workbook workbook, Font font) {
     }
 }
 
+
     private void saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
 
@@ -854,6 +869,15 @@ private static CellStyle createDataStyle(Workbook workbook) {
     style.setAlignment(HorizontalAlignment.LEFT);
     return style;
 }
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
+        ExportExcelService.exportTableToExcel(
+                this,
+                tblEmployee.getTbl(),
+                "Danh sách nhân viên",
+                "DanhSachNhanVien"
+        );
+    }
 
     private void filterTable(String genderFilter, String positionFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl()
@@ -975,5 +999,4 @@ private static CellStyle createDataStyle(Workbook workbook) {
     private javax.swing.JLabel lblTitleEmployee;
     private iuh.fit.se.group1.ui.component.table.Table tblEmployee;
 
-    // End of variables declaration//GEN-END:variables
 }

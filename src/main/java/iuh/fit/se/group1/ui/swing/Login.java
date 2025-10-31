@@ -387,11 +387,14 @@ public class Login extends javax.swing.JFrame {
 
 
             if (action) {
+                Employee employee = authenticateService.getEmployeeByAccountId(authenticate.getAccountId());
                 boolean isManager = authenticate.getRole().getRoleId().equals(Role.MANAGER.toString());
                 log.info("User '{}' login with role '{}'", authenticate.getUsername(), authenticate.getRole().getRoleId());
 
-                animatorLogin.start();
+
                 panelBody.setAuth(isManager);
+                panelBody.setEmployeeInfo(employee);
+                animatorLogin.start();
                 enableLogin(false);
             }
         }

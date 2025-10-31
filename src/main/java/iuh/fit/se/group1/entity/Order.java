@@ -109,7 +109,6 @@ public class Order {
         this.promotion = promotion;
     }
 
-
     public LocalDate getCreatedAt() {
         return createdAt;
     }
@@ -124,7 +123,6 @@ public class Order {
                 "orderId=" + orderId +
                 ", orderDate=" + orderDate +
                 ", totalAmount=" + totalAmount +
-                ", employee=" + employee.getEmployeeId() +
                 ", orderType=" + orderType.getOrderTypeId() +
                 ", customer=" + customer.getCustomerId() +
                 ", promotion=" + promotion +
@@ -137,6 +135,10 @@ public class Order {
     public void addBooking(Booking booking) {
         booking.setOrder(this);
         this.bookings.add(booking);
+    }
+
+    public BigDecimal getTotalAmountBooking(){
+        return bookings.stream().map(Booking::getTotalPrice).reduce(BigDecimal.ONE,BigDecimal::add);
     }
 
     @Override

@@ -1,6 +1,7 @@
 
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -19,7 +20,18 @@ public class Footer extends javax.swing.JPanel {
         initComponents();
                
     }
-    
+    public void setEmployeeInfo(Employee employee) {
+        profileButton.setEmployeeInfo(employee);
+    }
+    public void updateAvatar(byte[] avatarBytes) {
+        profileButton.updateAvatar(avatarBytes);
+    }
+    public void setFullName(String fullName) {
+        profileButton.setFullName(fullName);
+    }
+    public void setRoleName(String roleName) {
+        profileButton.setRoleName(roleName);
+    }
     public AvatarLabel geLblAvt(){
     return profileButton.getLblAvartar();}
     public JButton getBtnSignOut(){
