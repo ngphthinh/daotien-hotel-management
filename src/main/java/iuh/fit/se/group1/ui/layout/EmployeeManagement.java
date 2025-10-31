@@ -570,12 +570,12 @@ public class EmployeeManagement extends javax.swing.JPanel {
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }
 
-    private void saveData(InfoEmployeeModal modal) {
+    private boolean saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
 
         if (!result.valid) {
             Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào!");
-            return;
+            return false;
         }
 
         try {
@@ -609,7 +609,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             if (employeeSave == null) {
                 Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
-                return;
+                return false;
             }
 
             DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
@@ -629,6 +629,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             log.error("Error creating employee: ", e);
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
         }
+        return false;
     }
 //GEN-LAST:event_btnAddEmployeeActionPerformed
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {

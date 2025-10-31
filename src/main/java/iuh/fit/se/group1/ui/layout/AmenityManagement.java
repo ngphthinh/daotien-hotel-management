@@ -62,7 +62,7 @@ public class AmenityManagement extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
         model.setRowCount(0);
         for (Amenity amenity : amenities) {
-            model.addRow(new Object[]{amenity.getAmenityId(), amenity.getNameAmenity(), amenity.getPrice()});
+            model.addRow(new Object[]{amenity.getAmenityId(), amenity.getNameAmenity(), Constants.VND_FORMAT.format(amenity.getPrice())});
         }
     }
 
