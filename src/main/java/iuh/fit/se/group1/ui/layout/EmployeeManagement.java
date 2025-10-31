@@ -3,11 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package iuh.fit.se.group1.ui.layout;
+
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.CellStyle;
 import java.awt.Graphics2D;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
@@ -35,6 +37,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -119,12 +123,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
-
-        btnExport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportActionPerformed(evt);
-            }
-        });
 
         String cols[] = { "Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng" };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
@@ -501,14 +499,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         btnExport.setText("Xuất Excel");
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        btnExport.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportActionPerformed(evt);
-            }
-        });
-
+        btnExport.addActionListener(e -> exportAllEmployeesToExcel());
 
         btnImport.setText("Tải excel");
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -559,149 +550,155 @@ public class EmployeeManagement extends javax.swing.JPanel {
                                 .addGap(37, 37, 37)));
     }
 
-
     public static void exportModalToExcel(Component parent, InfoEmployeeModal modal) {
-    if (modal == null) return;
+        if (modal == null)
+            return;
 
-    // Lấy dữ liệu từ modal
-    String employeeId = modal.getLblCode().getText();
-    String fullName = modal.getTxtName().getText();
-    String phone = modal.getTxtPhone().getText();
-    String email = modal.getTxtEmail().getText();
-    String citizenId = modal.getTxtCitizen().getText();
-    String hireDateStr = modal.getTxtHireDate().getText();
-    String genderStr = modal.getCmbGender().getSelectedItem() != null
-            ? modal.getCmbGender().getSelectedItem().toString() : "N/A";
-    String position = modal.getCmbPosition().getSelectedItem() != null
-            ? modal.getCmbPosition().getSelectedItem().toString() : "N/A";
+        // Lấy dữ liệu từ modal
+        String employeeId = modal.getLblCode().getText();
+        String fullName = modal.getTxtName().getText();
+        String phone = modal.getTxtPhone().getText();
+        String email = modal.getTxtEmail().getText();
+        String citizenId = modal.getTxtCitizen().getText();
+        String hireDateStr = modal.getTxtHireDate().getText();
+        String genderStr = modal.getCmbGender().getSelectedItem() != null
+                ? modal.getCmbGender().getSelectedItem().toString()
+                : "N/A";
+        String position = modal.getCmbPosition().getSelectedItem() != null
+                ? modal.getCmbPosition().getSelectedItem().toString()
+                : "N/A";
 
-    LocalDate hireDate = LocalDate.now();
-    try {
-        hireDate = LocalDate.parse(hireDateStr, Constants.DATE_FORMATTER);
-    } catch (Exception e) {
-        hireDate = LocalDate.now();
-    }
-
-    // Avatar
-    AvatarLabel avatarLabel = modal.getAvatarLabel();
-    byte[] avatarBytes = avatarLabel != null ? avatarLabel.getImageAsBytes("png") : null;
-
-    // Chọn file lưu
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Chọn vị trí lưu file Excel");
-    fileChooser.setSelectedFile(new java.io.File("NhanVien_" + employeeId + ".xlsx"));
-    int userSelection = fileChooser.showSaveDialog(parent);
-    if (userSelection != JFileChooser.APPROVE_OPTION) return;
-
-    java.io.File fileToSave = fileChooser.getSelectedFile();
-    String filePath = fileToSave.getAbsolutePath();
-    if (!filePath.toLowerCase().endsWith(".xlsx")) filePath += ".xlsx";
-
-    try (Workbook workbook = new XSSFWorkbook()) {
-        Sheet sheet = workbook.createSheet("Nhân Viên");
-
-        // Tạo font Times New Roman size 16
-        Font font = workbook.createFont();
-        font.setFontName("Times New Roman");
-        font.setFontHeightInPoints((short) 16);
-
-        // Styles
-        CellStyle headerStyle = createHeaderStyle(workbook, font);
-        CellStyle dataStyle = createDataStyle(workbook, font);
-        CellStyle centerStyle = workbook.createCellStyle();
-        centerStyle.cloneStyleFrom(dataStyle);
-        centerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-        // Header
-        String[] headers = { "STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD", "Ngày tuyển dụng", "Avatar" };
-        Row headerRow = sheet.createRow(0);
-        headerRow.setHeightInPoints(30);
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
-        }
-
-        // Data
-        Row row = sheet.createRow(1);
-        row.setHeightInPoints(80);
-
-        int colIndex = 0;
-
-        // STT
-        Cell sttCell = row.createCell(colIndex++);
-        sttCell.setCellValue(1);
-        sttCell.setCellStyle(centerStyle);
-
-        // Các thông tin khác
-        String[] data = { employeeId, fullName, genderStr, position, phone, email, citizenId, hireDate.format(Constants.DATE_FORMATTER) };
-        for (String d : data) {
-            Cell cell = row.createCell(colIndex++);
-            cell.setCellValue(d);
-            cell.setCellStyle(dataStyle);
+        LocalDate hireDate = LocalDate.now();
+        try {
+            hireDate = LocalDate.parse(hireDateStr, Constants.DATE_FORMATTER);
+        } catch (Exception e) {
+            hireDate = LocalDate.now();
         }
 
         // Avatar
-        if (avatarBytes != null && avatarBytes.length > 0) {
-            BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(avatarBytes));
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ImageIO.write(bimg, "png", bos);
-            int pictureIdx = workbook.addPicture(bos.toByteArray(), Workbook.PICTURE_TYPE_PNG);
-            bos.close();
+        AvatarLabel avatarLabel = modal.getAvatarLabel();
+        byte[] avatarBytes = avatarLabel != null ? avatarLabel.getImageAsBytes("png") : null;
 
-            CreationHelper helper = workbook.getCreationHelper();
-            Drawing<?> drawing = sheet.createDrawingPatriarch();
-            ClientAnchor anchor = helper.createClientAnchor();
-            anchor.setCol1(colIndex);
-            anchor.setRow1(1);
-            Picture pict = drawing.createPicture(anchor, pictureIdx);
-            pict.resize(1.0);
+        // Chọn file lưu
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn vị trí lưu file Excel");
+        fileChooser.setSelectedFile(new java.io.File("NhanVien_" + employeeId + ".xlsx"));
+        int userSelection = fileChooser.showSaveDialog(parent);
+        if (userSelection != JFileChooser.APPROVE_OPTION)
+            return;
+
+        java.io.File fileToSave = fileChooser.getSelectedFile();
+        String filePath = fileToSave.getAbsolutePath();
+        if (!filePath.toLowerCase().endsWith(".xlsx"))
+            filePath += ".xlsx";
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Nhân Viên");
+
+            // Tạo font Times New Roman size 16
+            Font font = workbook.createFont();
+            font.setFontName("Times New Roman");
+            font.setFontHeightInPoints((short) 16);
+
+            // Styles
+            CellStyle headerStyle = createHeaderStyle(workbook, font);
+            CellStyle dataStyle = createDataStyle(workbook, font);
+            CellStyle centerStyle = workbook.createCellStyle();
+            centerStyle.cloneStyleFrom(dataStyle);
+            centerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+            // Header
+            String[] headers = { "STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
+                    "Ngày tuyển dụng", "Avatar" };
+            Row headerRow = sheet.createRow(0);
+            headerRow.setHeightInPoints(30);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Data
+            Row row = sheet.createRow(1);
+            row.setHeightInPoints(80);
+
+            int colIndex = 0;
+
+            // STT
+            Cell sttCell = row.createCell(colIndex++);
+            sttCell.setCellValue(1);
+            sttCell.setCellStyle(centerStyle);
+
+            // Các thông tin khác
+            String[] data = { employeeId, fullName, genderStr, position, phone, email, citizenId,
+                    hireDate.format(Constants.DATE_FORMATTER) };
+            for (String d : data) {
+                Cell cell = row.createCell(colIndex++);
+                cell.setCellValue(d);
+                cell.setCellStyle(dataStyle);
+            }
+
+            // Avatar
+            if (avatarBytes != null && avatarBytes.length > 0) {
+                BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(avatarBytes));
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ImageIO.write(bimg, "png", bos);
+                int pictureIdx = workbook.addPicture(bos.toByteArray(), Workbook.PICTURE_TYPE_PNG);
+                bos.close();
+
+                CreationHelper helper = workbook.getCreationHelper();
+                Drawing<?> drawing = sheet.createDrawingPatriarch();
+                ClientAnchor anchor = helper.createClientAnchor();
+                anchor.setCol1(colIndex);
+                anchor.setRow1(1);
+                Picture pict = drawing.createPicture(anchor, pictureIdx);
+                pict.resize(1.0);
+            }
+
+            // Auto-size cột
+            for (int i = 0; i <= headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            Message.showMessage("Thành công", "Xuất Excel thành công!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Message.showMessage("Lỗi", "Xuất Excel thất bại!");
         }
-
-        // Auto-size cột
-        for (int i = 0; i <= headers.length; i++) {
-            sheet.autoSizeColumn(i);
-            sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
-            workbook.write(fos);
-        }
-
-        Message.showMessage("Thành công", "Xuất Excel thành công!");
-    } catch (Exception e) {
-        e.printStackTrace();
-        Message.showMessage("Lỗi", "Xuất Excel thất bại!");
     }
-}
 
-// Header style với font tùy chỉnh
-private static CellStyle createHeaderStyle(Workbook workbook, Font font) {
-    CellStyle style = workbook.createCellStyle();
-    style.setFont(font);
-    style.setAlignment(HorizontalAlignment.CENTER);
-    style.setVerticalAlignment(VerticalAlignment.CENTER);
-    style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-    style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    style.setBorderBottom(BorderStyle.THIN);
-    style.setBorderTop(BorderStyle.THIN);
-    style.setBorderLeft(BorderStyle.THIN);
-    style.setBorderRight(BorderStyle.THIN);
-    font.setBold(true);
-    return style;
-}
+    // Header style với font tùy chỉnh
+    private static CellStyle createHeaderStyle(Workbook workbook, Font font) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        font.setBold(true);
+        return style;
+    }
 
-// Data style với font tùy chỉnh
-private static CellStyle createDataStyle(Workbook workbook, Font font) {
-    CellStyle style = workbook.createCellStyle();
-    style.setFont(font);
-    style.setVerticalAlignment(VerticalAlignment.CENTER);
-    style.setBorderBottom(BorderStyle.THIN);
-    style.setBorderTop(BorderStyle.THIN);
-    style.setBorderLeft(BorderStyle.THIN);
-    style.setBorderRight(BorderStyle.THIN);
-    return style;
-}
+    // Data style với font tùy chỉnh
+    private static CellStyle createDataStyle(Workbook workbook, Font font) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        return style;
+    }
 
     private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddEmployeeActionPerformed
 
@@ -726,73 +723,81 @@ private static CellStyle createDataStyle(Workbook workbook, Font font) {
     }
 
     private void exportAllEmployeesToExcel() {
-    java.util.List<Employee> employees = employeeService.getAllEmployees();
-    if (employees.isEmpty()) {
-        Message.showMessage("Thông báo", "Không có nhân viên để xuất Excel!");
-        return;
+        List<Employee> employees = employeeService.getAllEmployees();
+        if (employees == null || employees.isEmpty()) {
+            Message.showMessage("Thông báo", "Không có nhân viên để xuất Excel!");
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn vị trí lưu file Excel");
+        fileChooser.setSelectedFile(new File("DanhSachNhanVien.xlsx"));
+        if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+            return;
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String filePath = fileToSave.getAbsolutePath();
+        if (!filePath.toLowerCase().endsWith(".xlsx"))
+            filePath += ".xlsx";
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Nhân Viên");
+
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle dataStyle = createDataStyle(workbook);
+
+            // ======= THÊM CỘT STT =======
+            String[] headers = { "STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
+                    "Ngày tuyển dụng" };
+
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // ======= DỮ LIỆU =======
+            int rowIndex = 1;
+            int stt = 1;
+
+            for (Employee emp : employees) {
+                Row row = sheet.createRow(rowIndex++);
+
+                row.createCell(0).setCellValue(stt++); // STT
+                row.createCell(1).setCellValue(emp.getEmployeeId());
+                row.createCell(2).setCellValue(emp.getFullName());
+                row.createCell(3).setCellValue(emp.isGender() ? "Nữ" : "Nam");
+
+                String roleName = (emp.getAccount() != null && emp.getAccount().getRole() != null)
+                        ? emp.getAccount().getRole().getRoleName()
+                        : "N/A";
+                row.createCell(4).setCellValue(roleName);
+                row.createCell(5).setCellValue(emp.getPhone());
+                row.createCell(6).setCellValue(emp.getEmail());
+                row.createCell(7).setCellValue(emp.getCitizenId());
+                row.createCell(8).setCellValue(emp.getHireDate().format(Constants.DATE_FORMATTER));
+
+                for (int i = 0; i < headers.length; i++) {
+                    row.getCell(i).setCellStyle(dataStyle);
+                }
+            }
+
+            // Auto size
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            Message.showMessage("Thành công", "Xuất Excel toàn bộ nhân viên thành công!");
+        } catch (Exception ex) {
+            log.error("Lỗi xuất Excel toàn bộ nhân viên: ", ex);
+            Message.showMessage("Lỗi", "Xuất Excel thất bại!");
+        }
     }
-
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Chọn vị trí lưu file Excel");
-    fileChooser.setSelectedFile(new java.io.File("DanhSachNhanVien.xlsx"));
-    int userSelection = fileChooser.showSaveDialog(this);
-    if (userSelection != JFileChooser.APPROVE_OPTION) return;
-
-    java.io.File fileToSave = fileChooser.getSelectedFile();
-    String filePath = fileToSave.getAbsolutePath();
-    if (!filePath.toLowerCase().endsWith(".xlsx")) filePath += ".xlsx";
-
-    try (Workbook workbook = new XSSFWorkbook()) {
-        Sheet sheet = workbook.createSheet("Nhân Viên");
-
-        CellStyle headerStyle = createHeaderStyle(workbook);
-        CellStyle dataStyle = createDataStyle(workbook);
-        CellStyle centerStyle = workbook.createCellStyle();
-        centerStyle.cloneStyleFrom(dataStyle);
-        centerStyle.setAlignment(HorizontalAlignment.CENTER);
-
-        // Header
-        String[] headers = { "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD", "Ngày tuyển dụng" };
-        Row headerRow = sheet.createRow(0);
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
-        }
-
-        // Dữ liệu
-        int rowIndex = 1;
-        for (Employee e : employees) {
-            Row row = sheet.createRow(rowIndex++);
-            row.createCell(0).setCellValue(e.getEmployeeId());
-            row.createCell(1).setCellValue(e.getFullName());
-            row.createCell(2).setCellValue(e.isGender() ? "Nữ" : "Nam");
-            String roleName = e.getAccount() != null && e.getAccount().getRole() != null
-                    ? e.getAccount().getRole().getRoleName() : "N/A";
-            row.createCell(3).setCellValue(roleName);
-            row.createCell(4).setCellValue(e.getPhone());
-            row.createCell(5).setCellValue(e.getEmail());
-            row.createCell(6).setCellValue(e.getCitizenId());
-            row.createCell(7).setCellValue(e.getHireDate().format(Constants.DATE_FORMATTER));
-        }
-
-        // Auto-size cột
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-            sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
-            workbook.write(fos);
-        }
-
-        Message.showMessage("Thành công", "Xuất Excel toàn bộ nhân viên thành công!");
-    } catch (Exception e) {
-        log.error("Lỗi xuất Excel toàn bộ nhân viên: ", e);
-        Message.showMessage("Lỗi", "Xuất Excel thất bại!");
-    }
-}
-
 
     private void saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
@@ -854,29 +859,36 @@ private static CellStyle createDataStyle(Workbook workbook, Font font) {
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
         }
     }
-    // GEN-LAST:event_btnAddEmployeeActionPerformed
-    private static CellStyle createHeaderStyle(Workbook workbook) {
-    CellStyle style = workbook.createCellStyle();
-    style.setAlignment(HorizontalAlignment.CENTER);
-    var font = workbook.createFont();
-    font.setBold(true);
-    style.setFont(font);
-    return style;
-}
 
-private static CellStyle createDataStyle(Workbook workbook) {
-    CellStyle style = workbook.createCellStyle();
-    style.setAlignment(HorizontalAlignment.LEFT);
-    return style;
-}
+    // GEN-LAST:event_btnAddEmployeeActionPerformed
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 16);
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+
+    private CellStyle createDataStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 16);
+        style.setFont(font);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
         ExportExcelService.exportTableToExcel(
                 this,
                 tblEmployee.getTbl(),
                 "Danh sách nhân viên",
-                "DanhSachNhanVien"
-        );
+                "DanhSachNhanVien");
     }
 
     private void filterTable(String genderFilter, String positionFilter) {
