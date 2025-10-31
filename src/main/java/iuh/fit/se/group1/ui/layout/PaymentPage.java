@@ -4,38 +4,76 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.BookingDisplayDTO;
+import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.BookingType;
+import iuh.fit.se.group1.enums.PaymentType;
+import iuh.fit.se.group1.service.*;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+import iuh.fit.se.group1.ui.component.modal.CustomerModal;
 import iuh.fit.se.group1.ui.component.payment.CashPaymentModal;
 import iuh.fit.se.group1.ui.component.payment.TransferPaymentModal;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
-import java.awt.RenderingHints;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+import iuh.fit.se.group1.util.Constants;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
- *
  * @author Administrator
  */
 public class PaymentPage extends javax.swing.JPanel {
+
+    private final OrderService orderService;
+    private final OrderDetailService orderDetailService;
+    private final PaymentService paymentService;
+    private Order order;
 
     /**
      * Creates new form OrderManagement
      */
     public PaymentPage() {
         initComponents();
+        custom();
+        orderService = new OrderService();
+        orderDetailService = new OrderDetailService();
+        paymentService = new PaymentService();
+        loadListBooking(orderService.getAllOrders());
+        setTblSurcharge();
+    }
 
+    public void setCustomer(Customer customer) {
+        infoPayment1.getTxtName().setText(customer.getFullName());
+        infoPayment1.getCboGender().setSelectedIndex(customer.isGender() ? 0 : 1);
+        infoPayment1.getTxtPhone().setText(customer.getPhone());
+    }
+
+    public void loadListBooking(List<Order> orders) {
+        DefaultTableModel defaultTableModel = (DefaultTableModel) listBooking.getTable().getModel();
+        defaultTableModel.setRowCount(0);
+        orders.forEach(e -> {
+            String listRoom = e.getBookings().stream().map(b -> b.getRoom().getRoomNumber()).collect(Collectors.joining(","));
+            defaultTableModel.addRow(new Object[]{
+                    e.getOrderId(),
+                    e.getCustomer().getFullName(),
+                    e.getCustomer().getPhone(),
+                    listRoom
+            });
+        });
+    }
+
+    private void custom() {
         scrollPaneWin111.setOpaque(false);
         scrollPaneWin111.getViewport().setOpaque(false);
         scrollPaneWin111.setBorder(null);
@@ -64,24 +102,24 @@ public class PaymentPage extends javax.swing.JPanel {
 
         listBooking.hideOtherPanel();
 
-        javax.swing.GroupLayout layout = (javax.swing.GroupLayout) this.getLayout();
+        GroupLayout layout = (GroupLayout) this.getLayout();
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(headerBooking1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(headerBooking1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(scrollPaneWin111, GroupLayout.PREFERRED_SIZE, 700, GroupLayout.PREFERRED_SIZE)
                                 .addGap(5)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(headerBooking1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(headerBooking1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addGap(10)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(scrollPaneWin111, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+                                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
                         .addContainerGap()
         );
         int contentHeight = 1200; // chiều cao mong muốn, phải lớn hơn viewport
@@ -94,13 +132,211 @@ public class PaymentPage extends javax.swing.JPanel {
         // Thay tiêu đề cột
         model.setColumnIdentifiers(new Object[]{"Mã phụ thu", "Tên phụ thu", "Giá trị"});
         infoPayment1.getBtnCash().addActionListener(l -> {
-           var modal = new CashPaymentModal();
-               GlassPanePopup.showPopup(modal);
-        });
-        infoPayment1.getBtnTransfer().addActionListener(l->{
-            var modal= new TransferPaymentModal();
+            var modal = new CashPaymentModal();
             GlassPanePopup.showPopup(modal);
         });
+        infoPayment1.getBtnTransfer().addActionListener(l -> {
+            if (order == null) {
+                CustomDialog.showMessage(null, "Vui lòng chọn đơn hàng để thanh toán!", "Thông báo", CustomDialog.MessageType.WARNING);
+                return;
+            }
+            handlePaymentTransfer(order);
+        });
+
+        listBooking.getTable().getTableHeader().setReorderingAllowed(false);
+
+        listBooking.getTable().setCellSelectionEnabled(false);
+        listBooking.getTable().setRowSelectionAllowed(true);
+        listBooking.getTable().setColumnSelectionAllowed(false);
+
+        listBooking.getTable().addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = listBooking.getTable().getSelectedRow();
+                order = orderService.getOrderById(Long.valueOf(listBooking.getTable().getValueAt(row, 0).toString()));
+
+                BigDecimal totalRoomPrice = order.getBookings().stream()
+                        .map(Booking::getTotalPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal totalAmenityPrice = orderDetailService.getOrderDetailsByOrderId(order.getOrderId()).stream()
+                        .map(od -> od.getAmenity().getPrice().multiply(BigDecimal.valueOf(od.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal totalAmount = totalRoomPrice.add(totalAmenityPrice);
+
+                BigDecimal totalPromotion = BigDecimal.ZERO;
+
+
+                BigDecimal totalFinal = totalAmount.subtract(totalPromotion);
+
+                infoPayment1.getLblPriceTotal().setText(Constants.VND_FORMAT.format(totalAmount.doubleValue()));
+                infoPayment1.getLblPricePromotion().setText("-" + Constants.VND_FORMAT.format(totalPromotion.doubleValue()));
+                infoPayment1.getLblPricePayment().setText(Constants.VND_FORMAT.format(totalFinal.doubleValue()));
+
+                order.setTotalAmount(totalFinal);
+
+                setCustomer(order.getCustomer());
+                setTblRoom(order.getBookings());
+                setAmenityList(orderDetailService.getOrderDetailsByOrderId(order.getOrderId()));
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
+    }
+
+
+    private void handlePaymentTransfer(Order order) {
+        try {
+            String response = paymentService.createPayment(order);
+            String payUrl = paymentService.extractJsonValue(response, "payUrl");
+            String orderId = paymentService.extractJsonValue(response, "orderId");
+
+            var modal = new TransferPaymentModal();
+            if (payUrl != null && !payUrl.isEmpty()) {
+                modal.getLblQrCode().setIcon(new ImageIcon(paymentService.generateQRCodeImage(payUrl, 200, 200)));
+            } else {
+                CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR);
+            }
+
+            modal.getLblTotaPrice().setText("Tổng tiền: " + order.getTotalAmount());
+            JFrame frame = new JFrame("Thanh toán MoMo QR");
+            frame.setSize(300, 300);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLayout(new BorderLayout());
+            frame.setBackground(Color.WHITE);
+            JPanel pnlMain = new JPanel();
+            pnlMain.setBackground(Color.WHITE);
+            pnlMain.setLayout(new BorderLayout());
+            JLabel lblImage = new JLabel("", new ImageIcon(paymentService.generateQRCodeImage(payUrl, 250, 250)), SwingConstants.CENTER);
+            JLabel lblPrice = new JLabel("Tổng tiền: " + order.getTotalAmount(), SwingConstants.CENTER);
+            lblPrice.setFont(new Font("Segoe UI", Font.BOLD, 16));
+
+            pnlMain.add(lblImage, BorderLayout.CENTER);
+            pnlMain.add(lblPrice, BorderLayout.SOUTH);
+            frame.add(pnlMain, BorderLayout.CENTER);
+            frame.setVisible(true);
+
+            GlassPanePopup.showPopup(modal);
+
+            modal.getBtnCheck().addActionListener(e ->
+            {
+                try {
+                    if (orderId == null) {
+                        JOptionPane.showMessageDialog(null, "Chưa có đơn hàng nào!");
+                        return;
+                    }
+                    String responseCheck = paymentService.queryPayment(orderId);
+                    String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
+                    String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
+                    if (!"0".equals(responseCodeCheck)) {
+                        CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS);
+                        GlassPanePopup.closePopupAll();
+                        frame.dispose();
+                        // update trang thái
+
+                        orderService.updateOrderStatusToPaid(order.getOrderId(), PaymentType.E_WALLET, order.getTotalAmount());
+
+                        // Clear form
+                        clearForm();
+
+                    } else {
+                        CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Lỗi: " + ex.getMessage());
+                }
+            });
+
+        } catch (Exception e) {
+            CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố, vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR);
+        }
+    }
+
+    public void clearForm() {
+        infoPayment1.getTxtName().setText("");
+        infoPayment1.getCboGender().setSelectedIndex(0);
+        infoPayment1.getTxtPhone().setText("");
+        loadListBooking(orderService.getAllOrdersUnPaid());
+        infoPayment1.getLblPriceRoom().setText("0 VND");
+        infoPayment1.clearAmenity();
+        order = null;
+
+    }
+
+    private void setTblSurcharge() {
+        DefaultTableModel defaultTableModel = (DefaultTableModel) listSurcharge.getTable().getModel();
+        defaultTableModel.setRowCount(0);
+        SurchargeService surchargeService = new SurchargeService();
+        List<Surcharge> surcharges = surchargeService.getAllSurcharges();
+        System.out.println(surcharges);
+        for (var s : surcharges) {
+            defaultTableModel.addRow(new Object[]{
+                    s.getSurchargeId(),
+                    s.getName(),
+                    Constants.VND_FORMAT.format(s.getPrice())
+            });
+        }
+    }
+
+    private void setAmenityList(List<OrderDetail> orderDetailsByOrderId) {
+        infoPayment1.clearAmenity();
+        orderDetailsByOrderId.forEach(e -> infoPayment1.addAmenity(e.getAmenity().getNameAmenity(), Constants.VND_FORMAT.format(e.getAmenity().getPrice()), String.valueOf(e.getQuantity())));
+    }
+
+    private void setTblRoom(List<Booking> bookings) {
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        DefaultTableModel defaultTableModel = (DefaultTableModel) infoPayment1.getTblRoom().getModel();
+
+        defaultTableModel.setRowCount(0);
+        System.out.println(bookings);
+        for (var b : bookings) {
+            String time = getDuration(b.getCheckInDate(), b.getCheckOutDate(), b.getBookingType());
+            totalPrice = totalPrice.add(b.getTotalPrice());
+            defaultTableModel.addRow(new Object[]{
+                    b.getRoom().getRoomNumber(),
+                    b.getRoom().getRoomType().getName(),
+                    0,
+                    time,
+                    b.getTotalPrice()
+            });
+        }
+        infoPayment1.getLblPriceRoom().setText(Constants.VND_FORMAT.format(totalPrice));
+    }
+
+    private String getDuration(LocalDateTime checkInDate, LocalDateTime checkOutDate, BookingType bookingType) {
+        switch (bookingType) {
+            case HOURLY -> {
+                return ChronoUnit.HOURS.between(checkInDate, checkOutDate) + "Giờ";
+            }
+            case OVERNIGHT -> {
+                return "1 Đêm";
+            }
+            case DAILY -> {
+                return ChronoUnit.DAYS.between(checkInDate, checkInDate) + "Ngày";
+            }
+        }
+        return "N/A";
     }
 
     /**

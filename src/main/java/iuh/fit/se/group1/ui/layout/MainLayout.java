@@ -93,6 +93,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
+                        paymentPage.clearForm();
                         setMainContent(paymentPage);
                     } else if (index == 3 && subIndex == 1) {
                         setMainContent(shiftManagement);
@@ -108,6 +109,8 @@ public class MainLayout extends JPanel {
                         setMainContent(roomManagement);
                     } else if (index == 8) {
                         setMainContent(orderManagement);
+                        orderManagement.loadData();
+
                     } else if (index == 9 && subIndex == 1) {
                         setMainContent(revenueStatistics);
                     } else if (index == 9 && subIndex ==2) {
@@ -148,7 +151,9 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
+                        paymentPage.clearForm();
                         setMainContent(paymentPage);
+
                     } else if (index == 3) {
                         setMainContent(new CloseShift());
                     } else {
@@ -188,7 +193,7 @@ public class MainLayout extends JPanel {
         
     }
 
-    private void setMainContent(JPanel panel) {
+    public void setMainContent(JPanel panel) {
         pnlContent.removeAll();
         pnlContent.add(panel, BorderLayout.CENTER);
         pnlContent.revalidate();
@@ -243,6 +248,8 @@ public class MainLayout extends JPanel {
             promotionManagement = new PromotionManagement();
             roomManagement = new RoomManagement();
             orderManagement = new OrderManagement();
+            orderManagement.setParent(this);
+            orderManagement.setPaymentPage(paymentPage);
             checkForVersionPanel = new CheckForVersionPanel();
             revenueStatistics = new RevenueStatistics();
             setMainContent(dashboard);

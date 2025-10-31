@@ -10,7 +10,6 @@ import java.util.List;
 
 public class BookingRepository implements Repository<Booking, Long>{
 
-
     private final Connection connection;
 
     public BookingRepository() {
@@ -83,7 +82,7 @@ public class BookingRepository implements Repository<Booking, Long>{
 
     @Override
     public List<Booking> findAll() {
-        return List.of();
+        return null;
     }
 
     @Override

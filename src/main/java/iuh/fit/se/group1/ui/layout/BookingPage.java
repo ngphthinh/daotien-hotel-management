@@ -6,7 +6,11 @@ package iuh.fit.se.group1.ui.layout;
 
 
 import com.raven.datechooser.SelectedDate;
+import iuh.fit.se.group1.config.AppLogger;
+import iuh.fit.se.group1.config.BookingSessionCache;
+import iuh.fit.se.group1.dto.AmenityInfo;
 import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.service.BookingService;
 import iuh.fit.se.group1.service.CustomerService;
@@ -15,6 +19,9 @@ import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.ui.component.booking.InfoAmenityPanel;
 import iuh.fit.se.group1.ui.component.booking.InfoCustomerPanel;
 import iuh.fit.se.group1.ui.component.booking.InfoRoomPanel;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
+import iuh.fit.se.group1.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,11 +53,8 @@ public class BookingPage extends javax.swing.JPanel {
     private final CustomerService customerService;
     private int roomCount = 1;
 
-    private List<Room> rooms;
 
-    private List<Map<String, String>> bookingRooms;
-
-    private final Map<String, Integer> amenityIds = new HashMap<>();
+    private final Map<String, AmenityInfo> amenityIds = new HashMap<>();
 
     AtomicReference<Customer> customerAtomicReference = new AtomicReference<>();
 
@@ -64,7 +68,6 @@ public class BookingPage extends javax.swing.JPanel {
         customerService = new CustomerService();
         roomService = new RoomService();
         bookingService = new BookingService();
-        rooms = new ArrayList<>();
 
     }
 
@@ -73,7 +76,6 @@ public class BookingPage extends javax.swing.JPanel {
         addRoomPanel1.addAction(a ->
                 addNewRoom()
         );
-        infoRoomPanel1.getTxtRoomId().setText(roomCount + "hihi");
         infoRoomPanel1.getBtnClose().setVisible(false);
         headerBooking1.addAction(e -> createOrder());
 
@@ -102,9 +104,7 @@ public class BookingPage extends javax.swing.JPanel {
                     String amenityId = Objects.toString(listAmenity1.getTable1().getTbl().getValueAt(row, 0), "").trim();
                     String amenityName = Objects.toString(listAmenity1.getTable1().getTbl().getValueAt(row, 1), "").trim();
                     String amenityPrice = Objects.toString(listAmenity1.getTable1().getTbl().getValueAt(row, 2), "").trim();
-
                     addNewAmenity(amenityId, amenityName, amenityPrice);
-
                 }
             }
 
@@ -146,10 +146,26 @@ public class BookingPage extends javax.swing.JPanel {
             }
         });
 
-        infoRoomPanel1.getCboRoomType().addActionListener(e -> selectRoomAuto(infoRoomPanel1));
+        infoRoomPanel1.getCboRoomType().addActionListener(e -> selectRoom(infoRoomPanel1));
+        infoRoomPanel1.getTxtStartDate().addActionListener(e -> selectRoom(infoRoomPanel1));
+        infoRoomPanel1.getTxtEndDate().addActionListener(e -> selectRoom(infoRoomPanel1));
     }
 
-    private void selectRoomAuto(InfoRoomPanel infoRoomPanel) {
+
+    private void selectRoom(InfoRoomPanel infoRoomPanel) {
+        String currentRoomIdText = infoRoomPanel1.getTxtRoomId().getText().trim();
+        if (!currentRoomIdText.isEmpty()) {
+            try {
+                Long currentRoomId = Long.parseLong(currentRoomIdText);
+                BookingSessionCache.removePendingRoom(currentRoomId);
+            } catch (NumberFormatException ex) {
+                AppLogger.error("Room ID invalid format: " + currentRoomIdText, ex);
+            }
+        }
+        autoSelectAvailableRoom(infoRoomPanel);
+    }
+
+    private void autoSelectAvailableRoom(InfoRoomPanel infoRoomPanel) {
         //TODO: Chưa test được  test lại sao khi có hóa đơn
         String roomTypeId = infoRoomPanel.getCboRoomType().getSelectedIndex() == 0 ? "SINGLE" : "DOUBLE";
 
@@ -171,13 +187,14 @@ public class BookingPage extends javax.swing.JPanel {
         Room availableRoom = null;
         for (Room room : rooms) {
             boolean isAvailable = !bookingService.existsByRoomIdAndDate(room.getRoomId(), checkInDate, checkOutDate);
-            if (isAvailable) {
+            boolean isPending = BookingSessionCache.isRoomPending(room.getRoomId());
+            if (isAvailable && !isPending) {
                 availableRoom = room;
+                BookingSessionCache.addPendingRoom(room.getRoomId());
                 break;
             }
         }
 
-        // TODO: Kiểm tra có trong danh sach phòng đã chọn chưa
 
         // Nếu không có phòng nào trống trong ngày đó
         if (availableRoom == null) {
@@ -193,7 +210,9 @@ public class BookingPage extends javax.swing.JPanel {
     }
 
     private void createOrder() {
+
         Customer customer = customerAtomicReference.get();
+
         if (customer == null) {
             validCustomer(infoCustomerPanel1);
             customer = new Customer();
@@ -207,21 +226,45 @@ public class BookingPage extends javax.swing.JPanel {
             customer.setDateOfBirth(dateOfBirth);
         }
 
-
-        String roomTypeId = infoRoomPanel1.getCboRoomType().getSelectedIndex() == 0 ? "SINGLE" : "DOUBLE";
-
-
-//        List<Room> room = roomService.getRoomByStatusOrRoomType(roomTypeId, RoomStatus.AVAILABLE);
-
-
         Order order = new Order();
         order.setCustomer(customer);
         order.setOrderDate(LocalDateTime.now());
         order.setEmployee(new Employee(4L));
-        order.setOrderType(new OrderType(1L));
         order.setDeposit(BigDecimal.ZERO);
 
-//        List<Map<String, String>> bookingRooms = getBookingRooms();
+        for (var room : getBookingRooms()) {
+            Booking booking = new Booking();
+            booking.setEmployee(new Employee(4L));
+            booking.setBookingType(BookingType.fromIndex(Integer.parseInt(room.get("bookingType"))));
+            booking.setRoom(new Room(Long.parseLong(room.get("roomId"))));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+            LocalDateTime checkInDate = LocalDateTime.parse(room.get("startDate"), formatter);
+            LocalDateTime checkOutDate = LocalDateTime.parse(room.get("endDate"), formatter);
+            booking.setCheckInDate(checkInDate);
+            booking.setCheckOutDate(checkOutDate);
+
+            // tinh toan tien dua vao booking type va so ngay o va loai phong
+            booking.calcTotalPrice(room.get("roomType"));
+            order.addBooking(booking);
+        }
+
+        List<OrderDetail> orderDetails = new ArrayList<>();
+        for (var amenityEntry : amenityIds.entrySet()) {
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setAmenity(new Amenity(Long.parseLong(amenityEntry.getKey()), amenityEntry.getValue().getPrice()));
+            orderDetail.setQuantity(amenityEntry.getValue().getQuantity());
+            orderDetail.calcUnitPrice();
+            orderDetails.add(orderDetail);
+        }
+
+
+        if (orderService.createOrder(order, orderDetails) != null) {
+            CustomDialog.showMessage(null, "Tạo đơn đặt phòng thành công!",
+                    "Thông báo", CustomDialog.MessageType.INFO);
+        } else {
+            CustomDialog.showMessage(null, "Tạo đơn đặt phòng thất bại!",
+                    "Thông báo", CustomDialog.MessageType.ERROR);
+        }
 
 
     }
@@ -237,11 +280,15 @@ public class BookingPage extends javax.swing.JPanel {
                 String roomId = roomPanel.getTxtRoomId().getText().trim();
                 String startDate = roomPanel.getTxtStartDate().getText().trim();
                 String endDate = roomPanel.getTxtEndDate().getText().trim();
+                String bookingTypeIndex = String.valueOf(roomPanel.getCboBookingType().getSelectedIndex());
+                String roomTypeIndex = String.valueOf(roomPanel.getCboRoomType().getSelectedIndex());
                 if (!roomId.isEmpty() && !startDate.isEmpty() && !endDate.isEmpty()) {
                     rooms.add(Map.of(
                             "roomId", roomId,
                             "startDate", startDate,
-                            "endDate", endDate
+                            "endDate", endDate,
+                            "bookingType", bookingTypeIndex,
+                            "roomType", roomTypeIndex
                     ));
                 }
             }
@@ -273,17 +320,20 @@ public class BookingPage extends javax.swing.JPanel {
         if (amenityIds.containsKey(amenityId)) {
             for (Component comp : pnlListAmenityMain.getComponents()) {
                 if (comp instanceof InfoAmenityPanel panel && amenityId.equals(panel.getAmenityId())) {
-                    int newValue = amenityIds.merge(amenityId, 1, Integer::sum);
+                    AmenityInfo info = amenityIds.get(amenityId);
+                    int newValue = info.getQuantity() + 1;
+                    info.setQuantity(newValue);
                     panel.getNumberSpinner().setValue(newValue);
-                    return; // ✅ Thoát, không thêm mới panel
+                    return;
                 }
             }
         }
 
-        // Nếu chưa có: thêm mới
-        int quantity = 1;
-        amenityIds.put(amenityId, quantity);
 
+        // Nếu chưa có: thêm mới
+
+        int quantity = 1;
+        amenityIds.put(amenityId, new AmenityInfo(quantity, new BigDecimal(Constants.parseVND(amenityPrice))));
         InfoAmenityPanel newAmenity = new InfoAmenityPanel();
         newAmenity.setAmenityId(amenityId);
         newAmenity.getLblName().setText(amenityName);
@@ -291,19 +341,27 @@ public class BookingPage extends javax.swing.JPanel {
         newAmenity.getNumberSpinner().setValue(quantity);
 
         newAmenity.getNumberSpinner().addMinusActionListener(e -> {
-            int current = newAmenity.getNumberSpinner().getValue();
+            AmenityInfo info = amenityIds.get(amenityId);
+            if (info == null) return;
+
+            int current = info.getQuantity();
             if (current <= 1) {
+                // Xóa tiện ích khỏi danh sách nếu giảm về 0
                 amenityIds.remove(amenityId);
                 closeAmenityCard(newAmenity, pnlListAmenityMain);
             } else {
-                amenityIds.put(amenityId, current - 1);
+                // Giảm số lượng, giữ nguyên giá
+                info.setQuantity(current - 1);
                 newAmenity.getNumberSpinner().setValue(current - 1);
             }
         });
 
         newAmenity.getNumberSpinner().addPlusActionListener(e -> {
-            int newValue = newAmenity.getNumberSpinner().getValue() + 1;
-            amenityIds.put(amenityId, newValue);
+            AmenityInfo info = amenityIds.get(amenityId);
+            if (info == null) return;
+
+            int newValue = info.getQuantity() + 1;
+            info.setQuantity(newValue);
             newAmenity.getNumberSpinner().setValue(newValue);
         });
 
@@ -320,10 +378,11 @@ public class BookingPage extends javax.swing.JPanel {
 
         InfoRoomPanel newRoom = new InfoRoomPanel();
         newRoom.getLblTitle().setText(String.format("Phòng %02d", roomCount));
-        newRoom.getTxtRoomId().setText(roomCount + "hihi");
 
         newRoom.closeRoomCard(e -> closeRoomCard(newRoom));
-        newRoom.getCboRoomType().addActionListener(e-> selectRoomAuto(newRoom));
+        newRoom.getCboRoomType().addActionListener(e -> selectRoom(newRoom));
+        newRoom.getTxtStartDate().addActionListener(e -> selectRoom(newRoom));
+        newRoom.getTxtEndDate().addActionListener(e -> selectRoom(newRoom));
         // vị trí trước nút "Thêm phòng"
         int index = pnlListRoom.getComponentCount() - 1;
         pnlListRoom.add(newRoom, index);

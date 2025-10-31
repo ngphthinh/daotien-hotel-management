@@ -61,7 +61,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         roleService = new RoleService();
         loadTable(employeeService.getAllEmployees());
     }
-    
+
 
     private void loadTable(java.util.List<Employee> employees) {
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
@@ -108,7 +108,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 btnExportActionPerformed(evt);
             }
         });
-        
+
 
 
         String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
@@ -224,9 +224,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 });
 
                 GlassPanePopup.showPopup(modal);
-                
+
             }
-            
+
 
             @Override
             public void onDelete(int row) {
@@ -556,7 +556,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }
-    
+
 
     private void saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
@@ -628,7 +628,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 "DanhSachNhanVien"
         );
     }
-    
+
     private void filterTable(String genderFilter, String positionFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl().getRowSorter();
 

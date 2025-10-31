@@ -5,19 +5,11 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class OrderDetail {
-    private Long orderDetailId;
     private BigDecimal unitPrice;
     private Amenity amenity;
     private int quantity;
     private LocalDate createdAt;
 
-    public Long getOrderDetailId() {
-        return orderDetailId;
-    }
-
-    public void setOrderDetailId(Long orderDetailId) {
-        this.orderDetailId = orderDetailId;
-    }
 
     public BigDecimal getUnitPrice() {
         return unitPrice;
@@ -51,8 +43,7 @@ public class OrderDetail {
         this.createdAt = createdAt;
     }
 
-    public OrderDetail(Long orderDetailId, BigDecimal unitPrice, Amenity amenity, int quantity, LocalDate createdAt) {
-        this.orderDetailId = orderDetailId;
+    public OrderDetail(BigDecimal unitPrice, Amenity amenity, int quantity, LocalDate createdAt) {
         this.unitPrice = unitPrice;
         this.amenity = amenity;
         this.quantity = quantity;
@@ -69,15 +60,17 @@ public class OrderDetail {
     public OrderDetail() {
     }
 
-    public BigDecimal calcUnitPrice() {
-        //todo:
-        return null;
+    public void calcUnitPrice() {
+        if (amenity != null && amenity.getPrice() != null) {
+            this.unitPrice = amenity.getPrice().multiply(BigDecimal.valueOf(quantity));
+        } else {
+            this.unitPrice = BigDecimal.ZERO;
+        }
     }
 
     @Override
     public String toString() {
         return "OrderDetail{" +
-                "orderDetailId=" + orderDetailId +
                 ", unitPrice=" + unitPrice +
                 ", amenity=" + amenity +
                 ", quantity=" + quantity +
@@ -85,14 +78,5 @@ public class OrderDetail {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof OrderDetail that)) return false;
-        return Objects.equals(orderDetailId, that.orderDetailId);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(orderDetailId);
-    }
 }

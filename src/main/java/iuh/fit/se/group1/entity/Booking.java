@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 public class Booking {
     private Long bookingId;
@@ -41,8 +42,11 @@ public class Booking {
         this.setEmployee(employee);
         this.setRoom(room);
         this.setBookingType(bookingType);
-        this.setTotalPrice(calcTotalPrice());
         this.setCreatedAt(LocalDate.now());
+    }
+
+    public Booking() {
+
     }
 
     public Long getBookingId() {
@@ -96,7 +100,6 @@ public class Booking {
     }
 
 
-
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }
@@ -124,13 +127,80 @@ public class Booking {
         return Objects.hashCode(bookingId);
     }
 
-    public BigDecimal calcTotalPrice() {
-        //todo
-        return null;
+    public void calcTotalPrice(String roomTypeIndex) {
+        if (room == null || checkInDate == null || checkOutDate == null || bookingType == null) {
+            throw new IllegalStateException("Room, check-in date, check-out date, and booking type must be set before calculating total price.");
+        }
+
+        // Kiểm tra hợp lệ
+        if (!checkOutDate.isAfter(checkInDate)) {
+            throw new IllegalArgumentException("Check-out date must be after check-in date.");
+        }
+
+        boolean isHolidayPeriod = isHoliday(checkInDate.toLocalDate(), checkOutDate.toLocalDate());
+        BigDecimal totalPrice;
+
+        boolean isSingle = roomTypeIndex.equalsIgnoreCase("0");
+
+        switch (bookingType) {
+            case DAILY -> {
+                BigDecimal rate = isSingle ? BigDecimal.valueOf(300_000) : BigDecimal.valueOf(500_000);
+                long days = Math.max(1, java.time.Duration.between(checkInDate, checkOutDate).toDays());
+                totalPrice = rate.multiply(BigDecimal.valueOf(days));
+            }
+
+            case HOURLY -> {
+                BigDecimal baseRate = isSingle ? BigDecimal.valueOf(50_000) : BigDecimal.valueOf(80_000);
+                BigDecimal hourlyRate = isSingle ? BigDecimal.valueOf(20_000) : BigDecimal.valueOf(30_000);
+                long hours = java.time.Duration.between(checkInDate, checkOutDate).toHours();
+                if (hours < 1) hours = 1;
+                totalPrice = baseRate.add(hourlyRate.multiply(BigDecimal.valueOf(hours - 1)));
+            }
+
+            case OVERNIGHT -> {
+                totalPrice = isSingle ? BigDecimal.valueOf(250_000) : BigDecimal.valueOf(350_000);
+            }
+
+            default -> throw new IllegalArgumentException("Unknown booking type: " + bookingType);
+        }
+
+        // ✅ Phụ thu nếu rơi vào ngày lễ
+        if (isHolidayPeriod) {
+            BigDecimal surcharge = BigDecimal.valueOf(50_000);
+            totalPrice = totalPrice.add(surcharge);
+        }
+
+        this.totalPrice = totalPrice;
     }
 
-    private boolean isHoliday(LocalDate date) {
-        // TODO: kiểm tra ngày lễ
+    private boolean isHoliday(LocalDate startDate, LocalDate endDate) {
+        Set<String> FIXED_HOLIDAYS = Set.of(
+                "01-01", // Tết Dương lịch
+                "30-04", // Giải phóng miền Nam
+                "01-05", // Quốc tế Lao động
+                "02-09"  // Quốc khánh
+        );
+
+        LocalDate date = startDate;
+        while (!date.isAfter(endDate)) {
+            // Kiểm tra ngày dương lịch
+            String key = String.format("%02d-%02d", date.getDayOfMonth(), date.getMonthValue());
+            if (FIXED_HOLIDAYS.contains(key)) return true;
+
+            // Kiểm tra ngày âm lịch
+//            ChineseDate lunar = new ChineseDate(java.sql.Date.valueOf(date));
+//            int lunarDay = lunar.getDay();
+//            int lunarMonth = lunar.getMonth();
+//
+//            // Giỗ Tổ (10/3 AL)
+//            if (lunarMonth == 3 && lunarDay == 10) return true;
+//
+//            // Tết Nguyên Đán (29,30 tháng Chạp + 1–5 tháng Giêng)
+//            if ((lunarMonth == 12 && (lunarDay == 29 || lunarDay == 30)) ||
+//                    (lunarMonth == 1 && lunarDay <= 5)) return true;
+
+            date = date.plusDays(1);
+        }
         return false;
     }
 

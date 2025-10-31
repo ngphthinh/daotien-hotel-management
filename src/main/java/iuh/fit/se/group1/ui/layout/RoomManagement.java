@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -28,9 +29,15 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
+import iuh.fit.se.group1.service.ExportExcelService;
 
 public class RoomManagement extends javax.swing.JPanel {
 
@@ -551,18 +558,23 @@ public class RoomManagement extends javax.swing.JPanel {
         txtDoubleNight = new JTextField(8);
         txtDoubleDay = new JTextField(8);
 
-        // Tạo JPanel cho phần giá (2 rows)
-        JPanel pricePanel = new JPanel(new GridLayout(2, 6, 5, 5));  // 2 rows, 6 cols: type + 3 (label + field)
-        pricePanel.setBorder(BorderFactory.createTitledBorder("Cập nhật giá loại phòng"));
+        
+        JPanel pricePanel = new JPanel(new GridLayout(2, 6, 5, 5));  
         pricePanel.setBackground(new Color(241, 241, 241));
 
-        // Row 1: Phòng đơn
+        TitledBorder titledBorder = BorderFactory.createTitledBorder("Cập nhật giá loại phòng");
+        titledBorder.setTitleFont(new Font("Segoe UI", Font.BOLD, 16)); 
+        pricePanel.setBorder(titledBorder);
+        
+
+
+        
         pricePanel.add(lblSingleType);
         pricePanel.add(lblSingleHour); pricePanel.add(txtSingleHour);
         pricePanel.add(lblSingleNight); pricePanel.add(txtSingleNight);
         pricePanel.add(lblSingleDay); pricePanel.add(txtSingleDay);
 
-        // Row 2: Phòng đôi
+        
         pricePanel.add(lblDoubleType);
         pricePanel.add(lblDoubleHour); pricePanel.add(txtDoubleHour);
         pricePanel.add(lblDoubleNight); pricePanel.add(txtDoubleNight);
@@ -589,11 +601,15 @@ public class RoomManagement extends javax.swing.JPanel {
 
         btnExport.setText("Xuất excel");
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        btnExport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportActionPerformed(evt);
-            }
+        btnExport.addActionListener(e -> {
+        ExportExcelService.exportTableToExcel(
+                this,
+                tblRoom.getTbl(),
+                "DanhSachPhong",
+                "DanhSachPhong"
+            );
         });
+
 
         btnImport.setText("Tải excel");
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14));
@@ -647,6 +663,11 @@ public class RoomManagement extends javax.swing.JPanel {
                 .addContainerGap(8, Short.MAX_VALUE))
         );
     }
+    private void exportTableToExcel(RoomManagement roomManagement, JTable tbl, String string, String string2,
+            boolean b) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'exportTableToExcel'");
+    }
 
     private void btnAddRoomActionPerformed(java.awt.event.ActionEvent evt) {
         RoomManagementModal modal = new RoomManagementModal();
@@ -671,9 +692,6 @@ public class RoomManagement extends javax.swing.JPanel {
         GlassPanePopup.showPopup(modal);
     }
 
-    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
-        System.out.println("Export Excel clicked");
-    }
     
     private void saveRoomPrices() {
     Properties props = new Properties();
@@ -726,7 +744,6 @@ public class RoomManagement extends javax.swing.JPanel {
         System.out.println("Import Excel clicked");
     }
 
-    // Variables declaration
     private iuh.fit.se.group1.ui.component.custom.Button btnAddRoom;
     private Button btnUpdatePrice;
     private iuh.fit.se.group1.ui.component.custom.Button btnExport;

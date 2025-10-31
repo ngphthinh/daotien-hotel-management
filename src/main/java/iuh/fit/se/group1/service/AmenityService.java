@@ -25,6 +25,7 @@ public class AmenityService {
     }
 
 
+
     public Amenity updateAmenity(Amenity amenity) {
         return amenityRepository.update(amenity);
     }

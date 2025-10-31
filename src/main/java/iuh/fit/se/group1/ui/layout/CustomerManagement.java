@@ -97,8 +97,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                     this,
                     tblCustomer.getTbl(),
                     "Danh sách khách hàng",
-                    "DanhSachKhachHang",
-                    true
+                    "DanhSachKhachHang"
             );
         });
         headerCustom1.getLblTitle().setText(
@@ -186,6 +185,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 GlassPanePopup.showPopup(modal);
             }
+
 
             @Override
             public void onDelete(int row) {
@@ -389,6 +389,7 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnAddCustomer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddCustomerActionPerformed(evt);
+
             }
         });
 
@@ -462,6 +463,7 @@ public class CustomerManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
     }
 
+
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddCustomerActionPerformed
         InfoCustomerModal modal = new InfoCustomerModal();
 
@@ -471,6 +473,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                 GlassPanePopup.closePopupLast();
             }
         });
+
 
         modal.saveData(new ActionListener() {
             @Override

@@ -13,6 +13,7 @@ import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
 import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -27,9 +28,11 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import iuh.fit.se.group1.util.Constants;
+
 import java.io.File;
 import java.util.List;
 import javax.swing.JFileChooser;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
@@ -39,7 +42,6 @@ import raven.glasspanepopup.GlassPanePopup;
 import iuh.fit.se.group1.service.ExportExcelService;
 
 /**
- *
  * @author Windows
  */
 public class PromotionManagement extends javax.swing.JPanel {
@@ -62,13 +64,13 @@ public class PromotionManagement extends javax.swing.JPanel {
         model.setRowCount(0);
         for (Promotion promotion : promotions) {
             model.addRow(new Object[]{
-                promotion.getPromotionId(),
-                promotion.getPromotionName(),
-                Constants.VND_FORMAT.format(promotion.getDiscountPrice()),
-                promotion.getDiscountPercent() + " %",
-                promotion.getStartDate().format(Constants.DATE_FORMATTER),
-                promotion.getEndDate().format(Constants.DATE_FORMATTER),
-                promotion.getCreatedAt().format(Constants.DATE_FORMATTER)
+                    promotion.getPromotionId(),
+                    promotion.getPromotionName(),
+                    promotion.getDiscountPrice(),
+                    promotion.getDiscountPercent(),
+                    promotion.getStartDate().format(Constants.DATE_FORMATTER),
+                    promotion.getEndDate().format(Constants.DATE_FORMATTER),
+                    promotion.getCreatedAt().format(Constants.DATE_FORMATTER)
             });
         }
     }
@@ -106,27 +108,27 @@ public class PromotionManagement extends javax.swing.JPanel {
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
-        ExportExcelService.exportTableToExcel(
-        this,
-        tblPromotion.getTbl(),
-        "Danh sách khuyến mãi",
-        "DanhSachKhuyenMai",
-        true
-        );
+            ExportExcelService.exportTableToExcel(
+                    this,
+                    tblPromotion.getTbl(),
+                    "Danh sách khuyến mãi",
+                    "DanhSachKhuyenMai"
+            );
         });
 
         headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
         String cols[] = {
-            "Mã KM",
-            "Tên KM",
-            "Giá KM",
-            "% Giảm",
-            "Ngày bắt đầu",
-            "Ngày kết thúc",
-            "Ngày tạo",
-            "Chức năng"
+                "Mã KM",
+                "Tên KM",
+                "Giá KM",
+                "% Giảm",
+                "Ngày bắt đầu",
+                "Ngày kết thúc",
+                "Ngày tạo",
+                "Chức năng"
+
         };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
         tblPromotion.getTbl().setModel(model);
@@ -179,8 +181,13 @@ public class PromotionManagement extends javax.swing.JPanel {
                         Promotion entitySave = promotionService.updatePromotion(promotion);
 
                         model.setValueAt(entitySave.getPromotionName(), row, 1);
+
                         model.setValueAt(Constants.VND_FORMAT.format(entitySave.getDiscountPrice()), row, 2);
                         model.setValueAt(entitySave.getDiscountPercent() + " %", row, 3);
+
+                        model.setValueAt(entitySave.getDiscountPrice(), row, 2);
+                        model.setValueAt(entitySave.getDiscountPercent(), row, 3);
+
                         model.setValueAt(entitySave.getStartDate().format(Constants.DATE_FORMATTER), row, 4);
                         model.setValueAt(entitySave.getEndDate().format(Constants.DATE_FORMATTER), row, 5);
                         // Cột 6 là createdAt - không cập nhật
@@ -309,39 +316,39 @@ public class PromotionManagement extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(lblTitle)
-                .addGap(307, 307, 307)
-                .addComponent(btnAddPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(headerCustom1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(36, 36, 36)
+                                .addComponent(lblTitle)
+                                .addGap(307, 307, 307)
+                                .addComponent(btnAddPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(headerCustom1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblTitle)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnAddPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(25, 25, 25)
-                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE)
-                .addGap(31, 31, 31))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(30, 30, 30)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(lblTitle)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(btnAddPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(25, 25, 25)
+                                .addComponent(tblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE)
+                                .addGap(31, 31, 31))
         );
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void btnAddPromotionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPromotionActionPerformed
         InfoPromotionModal modal = new InfoPromotionModal();
@@ -361,6 +368,7 @@ public class PromotionManagement extends javax.swing.JPanel {
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }//GEN-LAST:event_btnAddPromotionActionPerformed
+
     private void saveData(InfoPromotionModal modal) {
         Valid result = getValid(modal);
         if (result.valid) {
@@ -377,13 +385,22 @@ public class PromotionManagement extends javax.swing.JPanel {
             DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
             // SỬA: Thêm đủ 7 cột dữ liệu (cột 8 là action tự động)
             model.addRow(new Object[]{
-                entitySave.getPromotionId(), // Cột 0
-                entitySave.getPromotionName(), // Cột 1
-                Constants.VND_FORMAT.format(promotion.getDiscountPrice()), // Cột 2
-                entitySave.getDiscountPercent() + " %", // Cột 3
-                entitySave.getStartDate().format(Constants.DATE_FORMATTER), // Cột 4
-                entitySave.getEndDate().format(Constants.DATE_FORMATTER), // Cột 5
-                entitySave.getCreatedAt().format(Constants.DATE_FORMATTER) // Cột 6
+
+                    entitySave.getPromotionId(), // Cột 0
+                    entitySave.getPromotionName(), // Cột 1
+                    Constants.VND_FORMAT.format(promotion.getDiscountPrice()), // Cột 2
+                    entitySave.getDiscountPercent() + " %", // Cột 3
+                    entitySave.getStartDate().format(Constants.DATE_FORMATTER), // Cột 4
+                    entitySave.getEndDate().format(Constants.DATE_FORMATTER), // Cột 5
+                    entitySave.getCreatedAt().format(Constants.DATE_FORMATTER), // Cột 6
+                    entitySave.getPromotionId(),                          // Cột 0
+                    entitySave.getPromotionName(),                        // Cột 1
+                    entitySave.getDiscountPrice(),                        // Cột 2
+                    entitySave.getDiscountPercent(),                      // Cột 3
+                    entitySave.getStartDate().format(Constants.DATE_FORMATTER),     // Cột 4
+                    entitySave.getEndDate().format(Constants.DATE_FORMATTER),       // Cột 5
+                    entitySave.getCreatedAt().format(Constants.DATE_FORMATTER)      // Cột 6
+
             });
             GlassPanePopup.closePopupLast();
         }
@@ -499,12 +516,12 @@ public class PromotionManagement extends javax.swing.JPanel {
     }
 
     private record Valid(String name,
-            boolean valid,
-            BigDecimal discountPrice,
-            float discountPercent,
-            String description,
-            LocalDate startDate,
-            LocalDate endDate) {
+                         boolean valid,
+                         BigDecimal discountPrice,
+                         float discountPercent,
+                         String description,
+                         LocalDate startDate,
+                         LocalDate endDate) {
 
     }
 
