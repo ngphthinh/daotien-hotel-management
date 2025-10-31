@@ -11,6 +11,7 @@ import iuh.fit.se.group1.repository.EmployeeShiftRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,5 +68,17 @@ public class EmployeeShiftService {
     public List<EmployeeShift> getAllShiftsByDate(LocalDate date) {
         log.info("Fetching all shifts on date {}", date);
         return employeeShiftRepository.findByShiftDate(date);
+    }
+    public EmployeeShift getEmployeeShiftWithDetails(Long employeeShiftId) {
+        EmployeeShiftRepository repository = new EmployeeShiftRepository();
+        return repository.findByIdWithDetails(employeeShiftId);
+    }
+
+    /**
+     * Lấy tổng doanh thu của ca làm việc
+     */
+    public BigDecimal getTotalRevenueForShift(Long employeeShiftId) {
+        EmployeeShiftRepository repository = new EmployeeShiftRepository();
+        return repository.getTotalRevenueForShift(employeeShiftId);
     }
 }

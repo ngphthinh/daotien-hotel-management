@@ -4,9 +4,17 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.entity.EmployeeShift;
+import iuh.fit.se.group1.entity.ShiftClose;
+import iuh.fit.se.group1.service.DenominationDetailService;
+import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.EmployeeShiftService;
+import iuh.fit.se.group1.service.ShiftCloseService;
 import iuh.fit.se.group1.ui.component.HeaderShift;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote;
 import iuh.fit.se.group1.ui.component.shift.InfoShift;
 import iuh.fit.se.group1.ui.component.shift.MinPanel;
@@ -15,21 +23,49 @@ import iuh.fit.se.group1.ui.component.shift.MoneyInTheSafe;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author THIS PC
  */
 public class CloseShift extends javax.swing.JPanel {
-
+    private static final Logger log = LoggerFactory.getLogger(CloseShift.class);
+    private EmployeeShiftService employeeShiftService;
+    private DenominationDetailService denominationDetailService;
+    private EmployeeShift currentEmployeeShift;
+    private EmployeeService employeeService;
+    private BigDecimal totalRevenue = BigDecimal.ZERO;
 
     public CloseShift() {
         initComponents();
+        txtMoneyOpenShift.setEditable(false);
+        txtReality.setEditable(false);
+        txtSystem.setEditable(false);
+        initIcons();
+        initMoneyLabels();
+        employeeShiftService = new EmployeeShiftService();
+        employeeService= new EmployeeService();
+        clearForm();
+
+    }
+    private void initIcons() {
+        lblTitleMoneyOpenShift.setIcon(FontIcon.of(FontAwesomeSolid.MONEY_BILL_ALT, 20, Color.BLACK));
+        lblTitleMoneyOfSafe.setIcon(FontIcon.of(FontAwesomeSolid.COINS, 17, Color.BLACK));
+        lblCheckDifference.setIcon(FontIcon.of(FontAwesomeSolid.SHIELD_ALT, 17, Color.BLACK));
+        lblNote.setIcon(FontIcon.of(FontAwesomeSolid.PEN, 17, Color.BLACK));
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.WHITE));
+    }
+    private void initMoneyLabels() {
         money1.getLblMoney().setText("500.000đ");
         money2.getLblMoney().setText("200.000đ");
         money3.getLblMoney().setText("100.000đ");
@@ -39,14 +75,170 @@ public class CloseShift extends javax.swing.JPanel {
         money7.getLblMoney().setText("5.000đ");
         money8.getLblMoney().setText("2.000đ");
         money9.getLblMoney().setText("1.000đ");
-
-        lblTitleMoneyOpenShift.setIcon(FontIcon.of(FontAwesomeSolid.MONEY_BILL_ALT, 20, Color.BLACK.BLACK));
-        lblTitleMoneyOfSafe.setIcon(FontIcon.of(FontAwesomeSolid.COINS, 17, Color.BLACK));
-        lblCheckDifference.setIcon(FontIcon.of(FontAwesomeSolid.SHIELD_ALT, 17, Color.BLACK));
-        lblNote.setIcon(FontIcon.of(FontAwesomeSolid.PEN, 17, Color.BLACK));
-        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
-
     }
+    public void setCurrentEmployeeShift(EmployeeShift employeeShift) {
+        this.currentEmployeeShift = employeeShift;
+
+        if (employeeShift != null) {
+            try {
+                // 1. Load thông tin chi tiết ca làm việc
+                EmployeeShift detailedShift = employeeShiftService.getEmployeeShiftWithDetails(employeeShift.getEmployeeShiftId());
+
+                if (detailedShift != null) {
+                    // Hiển thị thông tin ca làm việc
+                    displayShiftInfo(detailedShift);
+                    txtMoneyOpenShift.setText("5.000.000 VND");
+
+                    // 3. Tính tổng doanh thu từ hóa đơn
+                    totalRevenue = employeeShiftService.getTotalRevenueForShift(employeeShift.getEmployeeShiftId());
+                    txtSystem.setText(formatCurrency(totalRevenue));
+
+                    // 4. Thiết lập sự kiện tính toán chênh lệch tự động
+                    setupAutoCalculation();
+                }
+
+            } catch (Exception e) {
+                log.error("Error loading shift data: ", e);
+                Message.showMessage("Lỗi", "Không thể tải thông tin ca làm việc: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Hiển thị thông tin ca làm việc lên UI
+     */
+    private void displayShiftInfo(EmployeeShift shift) {
+        if (shift.getEmployee() != null) {
+            infoShift1.setEmployeeName(shift.getEmployee().getFullName());
+            infoShift1.setEmployeeId(String.valueOf(shift.getEmployee().getEmployeeId()));
+        }
+
+        if (shift.getShift() != null) {
+            String shiftName = shift.getShift().getName();
+            String shiftTime = shift.getShift().getStartTime() + " - " + shift.getShift().getEndTime();
+            String shiftDate = shift.getShiftDate() != null
+                    ? shift.getShiftDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                    : "";
+            infoShift1.setShiftInfo(shiftName, shiftTime, shiftDate);
+        }
+    }
+
+
+    /**
+     * Thiết lập tính toán tự động khi nhập số tiền thực tế
+     */
+    private void setupAutoCalculation() {
+        txtReality.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                calculateDifference();
+            }
+        });
+        java.awt.event.KeyAdapter moneyKeyListener = new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                calculateTotalCashInDrawer();
+            }
+        };
+        money1.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money2.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money3.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money4.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money5.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money6.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money7.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money8.getTxtQuantity().addKeyListener(moneyKeyListener);
+        money9.getTxtQuantity().addKeyListener(moneyKeyListener);
+    }
+
+    /**
+     * Tính tổng tiền trong két dựa trên mệnh giá
+     */
+    private void calculateTotalCashInDrawer() {
+        try {
+            BigDecimal total = BigDecimal.ZERO;
+
+            total = total.add(calculateMoneyValue(money1, 500000));
+            total = total.add(calculateMoneyValue(money2, 200000));
+            total = total.add(calculateMoneyValue(money3, 100000));
+            total = total.add(calculateMoneyValue(money4, 50000));
+            total = total.add(calculateMoneyValue(money5, 20000));
+            total = total.add(calculateMoneyValue(money6, 10000));
+            total = total.add(calculateMoneyValue(money7, 5000));
+            total = total.add(calculateMoneyValue(money8, 2000));
+            total = total.add(calculateMoneyValue(money9, 1000));
+
+            lblPrice.setText(formatCurrency(total));
+            txtReality.setText(formatCurrency(total));
+
+            calculateDifference();
+
+        } catch (Exception e) {
+            log.error("Error calculating total cash: ", e);
+        }
+    }
+
+    /**
+     * Tính giá trị tiền của mỗi mệnh giá
+     */
+    private BigDecimal calculateMoneyValue(Money moneyPanel, int denomination) {
+        try {
+            String quantityText = moneyPanel.getTxtQuantity().getText();
+            if (quantityText != null && !quantityText.trim().isEmpty()) {
+                int quantity = Integer.parseInt(quantityText.trim());
+                return BigDecimal.valueOf(quantity * denomination);
+            }
+        } catch (NumberFormatException e) {
+            // Ignore invalid input
+        }
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * Tính toán chênh lệch giữa thực tế và hệ thống
+     */
+    private void calculateDifference() {
+        try {
+            BigDecimal reality = parseCurrency(txtReality.getText());
+            BigDecimal difference = reality.subtract(totalRevenue);
+
+            txtMoneyDifference.setText(formatCurrency(difference));
+            if (difference.compareTo(BigDecimal.ZERO) < 0) {
+                txtMoneyDifference.setForeground(new Color(255, 51, 0)); // Đỏ - thiếu tiền
+            } else if (difference.compareTo(BigDecimal.ZERO) > 0) {
+                txtMoneyDifference.setForeground(new Color(0, 153, 0)); // Xanh - thừa tiền
+            } else {
+                txtMoneyDifference.setForeground(Color.BLACK);
+            }
+
+        } catch (Exception e) {
+            log.error("Error calculating difference: ", e);
+        }
+    }
+
+    /**
+     * Format tiền tệ
+     */
+    private String formatCurrency(BigDecimal amount) {
+        if (amount == null) {
+            return "0 VND";
+        }
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+        return formatter.format(amount) + " VND";
+    }
+
+    /**
+     * Parse chuỗi tiền tệ thành BigDecimal
+     */
+    private BigDecimal parseCurrency(String text) {
+        if (text == null || text.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        String numberOnly = text.replaceAll("[^\\d]", "");
+        if (numberOnly.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return new BigDecimal(numberOnly);
+    }
+
 
     public OpenDifferenceNote getAtTheEnd1() {
         return atTheEnd1;
@@ -732,10 +924,70 @@ public class CloseShift extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRealityActionPerformed
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+        if (currentEmployeeShift == null) {
+            Message.showMessage("Lỗi", "Không tìm thấy thông tin ca làm việc!");
+            return;
+        }
 
+        // Xác nhận đóng ca
+        Message.showConfirm("Xác nhận đóng ca",
+                "Bạn có chắc chắn muốn đóng ca làm việc này?",
+                () -> {
+                    try {
+                        // 1. Tạo đối tượng ShiftClose
+                        ShiftClose shiftClose = new ShiftClose();
+                        shiftClose.setEmployeeShift(currentEmployeeShift);
+                        BigDecimal cashInDrawer = parseCurrency(txtReality.getText());
+                        shiftClose.setCashInDrawer(cashInDrawer);
+                        shiftClose.setTotalRevenue(totalRevenue);
+                        shiftClose.setNote(jTextArea1.getText());
+                        LocalDateTime now = LocalDateTime.now();
+                        shiftClose.setCreatedAt(now);
+                        ShiftCloseService shiftCloseService = new ShiftCloseService();
+                        ShiftClose savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
+                        String formattedTime = now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+                        String differenceText = formatCurrency(savedShiftClose.getDifference());
+
+                        String message = String.format(
+                                "Đóng ca làm việc thành công!<br>" +
+                                        "Thời gian đóng ca: %s<br>" +
+                                        "Tổng doanh thu: %s<br>" +
+                                        "Tiền trong két: %s<br>" +
+                                        "Chênh lệch: %s",
+                                formattedTime,
+                                formatCurrency(totalRevenue),
+                                formatCurrency(cashInDrawer),
+                                differenceText
+                        );
+                        CustomDialog.showMessage(null, message, "Đóng ca", CustomDialog.MessageType.SUCCESS, 500, 300);
+                        clearForm();
+
+                    } catch (Exception ex) {
+                        log.error("Error closing shift: ", ex);
+                        Message.showMessage("Lỗi", "Có lỗi xảy ra khi đóng ca: " + ex.getMessage());
+                    }
+                }
+        );
+
+    }//GEN-LAST:event_btnCloseActionPerformed
+    private void clearForm() {
+        txtReality.setText("");
+        jTextArea1.setText("");
+        money1.getTxtQuantity().setText("0");
+        money2.getTxtQuantity().setText("0");
+        money3.getTxtQuantity().setText("0");
+        money4.getTxtQuantity().setText("0");
+        money5.getTxtQuantity().setText("0");
+        money6.getTxtQuantity().setText("0");
+        money7.getTxtQuantity().setText("0");
+        money8.getTxtQuantity().setText("0");
+        money9.getTxtQuantity().setText("0");
+        lblPrice.setText("0 VND");
+        txtMoneyDifference.setText("0 VND");
+        txtReality.setText("5.000.000 VND");
+        txtSystem.setText("5.000.000 VND");
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd1;

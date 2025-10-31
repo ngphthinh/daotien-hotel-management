@@ -16,7 +16,21 @@ public enum DenominationLabel {
     private DenominationLabel (Long value){
         this.value = value;
     }
-
+    public long getValue() {
+        return value;
+    }
+    public static DenominationLabel fromName(String name) {
+        if (name == null) return null;
+        try {
+            return DenominationLabel.valueOf(name);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+    @Override
+    public String toString() {
+        return name(); // hoặc return Long.toString(value) tuỳ bạn muốn lưu tên hay giá trị
+    }
 
 
 

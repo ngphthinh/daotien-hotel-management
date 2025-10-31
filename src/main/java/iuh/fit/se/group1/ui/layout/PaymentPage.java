@@ -137,7 +137,7 @@ public class PaymentPage extends javax.swing.JPanel {
         });
         infoPayment1.getBtnTransfer().addActionListener(l -> {
             if (order == null) {
-                CustomDialog.showMessage(null, "Vui lòng chọn đơn hàng để thanh toán!", "Thông báo", CustomDialog.MessageType.WARNING);
+                CustomDialog.showMessage(null, "Vui lòng chọn đơn hàng để thanh toán!", "Thông báo", CustomDialog.MessageType.WARNING,300,200);
                 return;
             }
             handlePaymentTransfer(order);
@@ -215,7 +215,7 @@ public class PaymentPage extends javax.swing.JPanel {
             if (payUrl != null && !payUrl.isEmpty()) {
                 modal.getLblQrCode().setIcon(new ImageIcon(paymentService.generateQRCodeImage(payUrl, 200, 200)));
             } else {
-                CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR);
+                CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR,380,200);
             }
 
             modal.getLblTotaPrice().setText("Tổng tiền: " + order.getTotalAmount());
@@ -249,7 +249,7 @@ public class PaymentPage extends javax.swing.JPanel {
                     String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
                     String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
                     if (!"0".equals(responseCodeCheck)) {
-                        CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS);
+                        CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS,380,200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
                         // update trang thái
@@ -260,7 +260,7 @@ public class PaymentPage extends javax.swing.JPanel {
                         clearForm();
 
                     } else {
-                        CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING);
+                        CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING,380,200);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -269,7 +269,7 @@ public class PaymentPage extends javax.swing.JPanel {
             });
 
         } catch (Exception e) {
-            CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố, vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR);
+            CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố, vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR,380,200);
         }
     }
 

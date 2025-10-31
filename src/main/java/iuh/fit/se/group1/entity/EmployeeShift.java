@@ -9,7 +9,7 @@ public class EmployeeShift {
     private	Long employeeShiftId;
     private	Employee employee;
     private	Shift shift;
-    private LocalDateTime closingTime;
+    private ShiftClose shiftClose;
     private BigDecimal systemAmount;
     private	BigDecimal actualAmount;
     private	BigDecimal difference;
@@ -19,11 +19,11 @@ public class EmployeeShift {
     public EmployeeShift() {
     }
 
-    public EmployeeShift(Long employeeShiftId, Employee employee, Shift shift, LocalDateTime closingTime, BigDecimal systemAmount, BigDecimal actualAmount, BigDecimal difference, LocalDate shiftDate, LocalDate createdAt) {
+    public EmployeeShift(Long employeeShiftId, Employee employee, Shift shift, ShiftClose shiftClose, BigDecimal systemAmount, BigDecimal actualAmount, BigDecimal difference, LocalDate shiftDate, LocalDate createdAt) {
         this.employeeShiftId = employeeShiftId;
         this.employee = employee;
         this.shift = shift;
-        this.closingTime = closingTime;
+        this.shiftClose = shiftClose;
         this.systemAmount = systemAmount;
         this.actualAmount = actualAmount;
         this.difference = difference;
@@ -31,10 +31,17 @@ public class EmployeeShift {
         this.createdAt = createdAt;
     }
 
-    public EmployeeShift(Employee employee, Shift shift, LocalDateTime closingTime) {
+    public EmployeeShift(Employee employee, Shift shift) {
         this.employee = employee;
         this.shift = shift;
-        this.closingTime = closingTime;
+    }
+
+    public ShiftClose getShiftClose() {
+        return shiftClose;
+    }
+
+    public void setShiftClose(ShiftClose shiftClose) {
+        this.shiftClose = shiftClose;
     }
 
     public Long getEmployeeShiftId() {
@@ -59,14 +66,6 @@ public class EmployeeShift {
 
     public void setShift(Shift shift) {
         this.shift = shift;
-    }
-
-    public LocalDateTime getClosingTime() {
-        return closingTime;
-    }
-
-    public void setClosingTime(LocalDateTime closingTime) {
-        this.closingTime = closingTime;
     }
 
     public BigDecimal getSystemAmount() {
@@ -126,7 +125,6 @@ public class EmployeeShift {
                 "employeeShiftId=" + employeeShiftId +
                 ", employee=" + employee +
                 ", shift=" + shift +
-                ", closingTime=" + closingTime +
                 ", systemAmount=" + systemAmount +
                 ", actualAmount=" + actualAmount +
                 ", difference=" + difference +

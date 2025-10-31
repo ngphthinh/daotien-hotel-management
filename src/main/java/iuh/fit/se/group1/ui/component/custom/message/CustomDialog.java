@@ -11,10 +11,10 @@ public class CustomDialog extends JDialog {
 
     private int result = JOptionPane.CLOSED_OPTION;
 
-    public CustomDialog(Frame parent, String title, String message, MessageType type, boolean showCancel) {
+    public CustomDialog(Frame parent, String title, String message, MessageType type, boolean showCancel,int width, int height) {
         super(parent, title, true);
         setUndecorated(true);
-        setSize(380, 200);
+        setSize(width, height);
         setLocationRelativeTo(parent);
         setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 25, 25));
 
@@ -106,42 +106,19 @@ public class CustomDialog extends JDialog {
         return UIManager.getIcon(iconKey);
     }
 
-    public static int showMessage(Component parent, String message, String title, MessageType type) {
+    // Method showMessage to lớn hơn
+    public static int showMessage(Component parent, String message, String title, MessageType type, int width, int height) {
         Frame frame = JOptionPane.getFrameForComponent(parent);
-        CustomDialog dialog = new CustomDialog(frame, title, message, type, false);
+        CustomDialog dialog = new CustomDialog(frame, title, message, type, false, width, height);
         dialog.setVisible(true);
         return dialog.result;
     }
 
-    public static int showConfirm(Component parent, String message, String title, MessageType type) {
+    // Method showConfirm to lớn hơn
+    public static int showConfirm(Component parent, String message, String title, MessageType type, int width, int height) {
         Frame frame = JOptionPane.getFrameForComponent(parent);
-        CustomDialog dialog = new CustomDialog(frame, title, message, type, true);
+        CustomDialog dialog = new CustomDialog(frame, title, message, type, true, width, height);
         dialog.setVisible(true);
         return dialog.result;
-    }
-
-    // Demo
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Demo Custom Dialog");
-            frame.setSize(400, 300);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setLocationRelativeTo(null);
-
-            JButton btn = new JButton("Hiện thông báo");
-            btn.addActionListener(e -> {
-                int result = CustomDialog.showConfirm(frame,
-                        "Bạn có chắc chắn muốn xóa phòng này không?",
-                        "Xác nhận hành động",
-                        MessageType.WARNING);
-
-                if (result == JOptionPane.OK_OPTION)
-                    CustomDialog.showMessage(frame, "Xóa thành công!", "Thành công", MessageType.SUCCESS);
-            });
-
-            frame.setLayout(new FlowLayout());
-            frame.add(btn);
-            frame.setVisible(true);
-        });
     }
 }

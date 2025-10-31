@@ -9,12 +9,15 @@ package iuh.fit.se.group1.repository;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.Shift;
+import iuh.fit.se.group1.entity.ShiftClose;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,26 +39,21 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
 
     @Override
     public EmployeeShift save(EmployeeShift entity) {
-        String sql = "INSERT INTO EmployeeShift (employeeId, shiftId, closingTime, createdAt, shiftDate) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO EmployeeShift (employeeId, shiftId, createdAt, shiftDate) VALUES (?, ?, ?, ?);";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setLong(1, entity.getEmployee().getEmployeeId());
             preparedStatement.setLong(2, entity.getShift().getShiftId());
-            if (entity.getClosingTime() == null) {
-                preparedStatement.setNull(3, java.sql.Types.TIMESTAMP);
-            } else {
-                preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getClosingTime()));
-            }
 
 
             if (entity.getCreatedAt() == null) {
                 entity.setCreatedAt(LocalDate.now());
             }
-            preparedStatement.setDate(4, Date.valueOf(entity.getCreatedAt()));
+            preparedStatement.setDate(3, Date.valueOf(entity.getCreatedAt()));
 
             if (entity.getShiftDate() == null) {
                 entity.setShiftDate(LocalDate.now());
             }
-            preparedStatement.setDate(5, Date.valueOf(entity.getShiftDate()));
+            preparedStatement.setDate(4, Date.valueOf(entity.getShiftDate()));
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -91,10 +89,6 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
                     Shift shift = new Shift();
                     shift.setShiftId(resultSet.getLong("shiftId"));
                     es.setShift(shift);
-                    if (es.getClosingTime() == null) {
-                    } else {
-                        es.setClosingTime(resultSet.getTimestamp("closingTime").toLocalDateTime());
-                    }
                     es.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
                     es.setShiftDate(resultSet.getDate("shiftDate").toLocalDate());
                     return es;
@@ -139,8 +133,6 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
                 Shift shift = new Shift();
                 shift.setShiftId(rs.getLong("shiftId"));
                 es.setShift(shift);
-
-                es.setClosingTime(rs.getTimestamp("closingTime").toLocalDateTime());
                 es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
                 es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
 
@@ -155,18 +147,13 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
 
     @Override
     public EmployeeShift update(EmployeeShift entity) {
-        String sql = "UPDATE EmployeeShift SET employeeId=?, shiftId=?, closingTime=?, createdAt=?, shiftDate=? WHERE employeeShiftId=?;";
+        String sql = "UPDATE EmployeeShift SET employeeId=?, shiftId=?, createdAt=?, shiftDate=? WHERE employeeShiftId=?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, entity.getEmployee().getEmployeeId());
             preparedStatement.setLong(2, entity.getShift().getShiftId());
-            if (entity.getClosingTime() != null) {
-                preparedStatement.setTimestamp(3, Timestamp.valueOf(entity.getClosingTime()));
-            } else {
-                preparedStatement.setNull(3, java.sql.Types.TIMESTAMP);
-            }
-            preparedStatement.setDate(4, Date.valueOf(entity.getCreatedAt()));
-            preparedStatement.setDate(5, Date.valueOf(entity.getShiftDate()));
-            preparedStatement.setLong(6, entity.getEmployeeShiftId());
+            preparedStatement.setDate(3, Date.valueOf(entity.getCreatedAt()));
+            preparedStatement.setDate(4, Date.valueOf(entity.getShiftDate()));
+            preparedStatement.setLong(5, entity.getEmployeeShiftId());
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -196,13 +183,6 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
                     shift.setShiftId(rs.getLong("shiftId"));
                     es.setShift(shift);
 
-                    Timestamp closingTimeTs = rs.getTimestamp("closingTime");
-                    if (closingTimeTs != null) {
-                        es.setClosingTime(closingTimeTs.toLocalDateTime());
-                    } else {
-                        es.setClosingTime(null);
-                    }
-
                     es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
                     es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
 
@@ -215,4 +195,145 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
         }
         return employeeShifts;
     }
+//    public EmployeeShift findWithShiftAndCloseById(Long employeeShiftId, Long shiftId) {
+//        String sql = """
+//
+//            SELECT es.*, e.fullName AS employeeName, s.name AS shiftName
+//            FROM
+//                EmployeeShift es
+//            JOIN Employee e ON es.
+//                employeeId = e.employeeId
+//                            JOIN Shift s ON s.shiftId = es.shiftId
+//            WHERE CAST(GETDATE() AS DATE) = es.shiftDate and s.shiftId = ? and e.employeeId = ?;
+//            """;
+//
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setLong(2, employeeShiftId);
+//            ps.setLong(1, shiftId);
+//            try (ResultSet rs = ps.executeQuery()) {
+//                if (rs.next()) {
+//                    // EmployeeShift
+//                    EmployeeShift es = new EmployeeShift();
+//                    es.setEmployeeShiftId(rs.getLong("employeeShiftId"));
+//                    es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
+//                    es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
+//
+//                    // Employee
+//                    Employee emp = new Employee();
+//                    emp.setEmployeeId(rs.getLong("employeeId"));
+//                    emp.setFullName(rs.getString("employeeName"));
+//                    es.setEmployee(emp);
+//
+//                    // Shift
+//                    Shift shift = new Shift();
+//                    shift.setShiftId(rs.getLong("shiftId"));
+//                    shift.setName(rs.getString("shiftName"));
+//                    es.setShift(shift);
+//
+//                    // ShiftClose (nếu có)
+//                    Long shiftCloseId = rs.getLong("shiftCloseId");
+//                    if (!rs.wasNull()) {
+//                        ShiftClose sc = new ShiftClose();
+//                        sc.setShiftCloseId(shiftCloseId);
+//                        sc.setTotalRevenue(rs.getBigDecimal("totalRevenue"));
+//                        sc.setCashInDrawer(rs.getBigDecimal("cashInDrawer"));
+//                        sc.setDifference(rs.getBigDecimal("difference"));
+//                        sc.setNote(rs.getString("note"));
+//                        sc.setCreatedAt(rs.getTimestamp("closeCreatedAt").toLocalDateTime());
+//                        es.setShiftClose(sc);
+//                    }
+//
+//                    return es;
+//                }
+//            }
+//            return null;
+//
+//        } catch (SQLException e) {
+//            log.error("Error finding EmployeeShift with Shift and ShiftClose: ", e);
+//            throw new RuntimeException(e);
+//        }
+//    }
+    // Thêm các phương thức sau vào EmployeeShiftRepository.java
+
+    /**
+     * Tìm EmployeeShift với thông tin đầy đủ của Employee và Shift
+     */
+    public EmployeeShift findByIdWithDetails(Long employeeShiftId) {
+        String sql = """
+        SELECT es.employeeShiftId, es.shiftDate, es.createdAt, es.employeeId, es.shiftId,
+               e.fullName AS employeeName, e.phone AS employeePhone, e.email AS employeeEmail,
+               s.name AS shiftName, s.startTime, s.endTime
+        FROM EmployeeShift es
+        JOIN Employee e ON es.employeeId = e.employeeId
+        JOIN Shift s ON es.shiftId = s.shiftId
+        WHERE es.employeeShiftId = ?
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, employeeShiftId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    EmployeeShift es = new EmployeeShift();
+                    es.setEmployeeShiftId(rs.getLong("employeeShiftId"));
+                    es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
+                    es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
+
+                    // Employee info
+                    Employee emp = new Employee();
+                    emp.setEmployeeId(rs.getLong("employeeId"));
+                    emp.setFullName(rs.getString("employeeName"));
+                    emp.setPhone(rs.getString("employeePhone"));
+                    emp.setEmail(rs.getString("employeeEmail"));
+                    es.setEmployee(emp);
+
+                    // Shift info
+                    Shift shift = new Shift();
+                    shift.setShiftId(rs.getLong("shiftId"));
+                    shift.setName(rs.getString("shiftName"));
+                    shift.setStartTime(rs.getString("startTime"));
+                    shift.setEndTime(rs.getString("endTime"));
+                    es.setShift(shift);
+
+                    return es;
+                }
+            }
+            return null;
+
+        } catch (SQLException e) {
+            log.error("Error finding EmployeeShift with details: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
+     * Lấy tổng doanh thu của ca làm việc từ các hóa đơn
+     */
+    public BigDecimal getTotalRevenueForShift(Long employeeShiftId) {
+        String sql = """
+        SELECT COALESCE(SUM(o.totalAmount), 0) AS totalRevenue
+        FROM Orders o
+        JOIN EmployeeShift es ON o.employeeId = es.employeeId
+        WHERE es.employeeShiftId = ?
+          AND CAST(o.createdAt AS DATE) = es.shiftDate
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, employeeShiftId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("totalRevenue");
+                }
+            }
+            return BigDecimal.ZERO;
+
+        } catch (SQLException e) {
+            log.error("Error getting total revenue for shift: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }

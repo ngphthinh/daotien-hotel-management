@@ -42,6 +42,14 @@ public class Money extends javax.swing.JPanel {
         this.txtMoney = txtMoney;
     }
 
+    public TextField getTxtQuantity() {
+        return txtMoney;
+    }
+
+    public void setTxtQuantity(TextField txtQuantity) {
+        this.txtMoney = txtQuantity;
+    }
+
 
     /**
      * Creates new form Money

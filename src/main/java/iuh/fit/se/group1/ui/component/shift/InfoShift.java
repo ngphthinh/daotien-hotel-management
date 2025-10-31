@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.shift;
 
+import iuh.fit.se.group1.ui.component.custom.TextField;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -23,6 +24,18 @@ public class InfoShift extends javax.swing.JPanel {
         setOpaque(false);
         lblTitle.setIcon(FontIcon.of(FontAwesomeSolid.CLOCK,20,Color.BLACK));
     }
+    public void setEmployeeName(String name) {
+        txtEmployee.setText(name);
+    }
+
+    public void setEmployeeId(String id) {
+        txtEmployee.setText(txtEmployee.getText() + " (Mã nhân viên: " + id + ")");
+    }
+
+    public void setShiftInfo(String name, String time, String date) {
+        txtShift.setText(name + " | " + time + " | " + date);
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

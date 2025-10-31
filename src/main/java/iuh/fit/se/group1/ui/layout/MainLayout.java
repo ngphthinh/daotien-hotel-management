@@ -1,6 +1,10 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.entity.EmployeeShift;
+import iuh.fit.se.group1.service.EmployeeShiftService;
+import iuh.fit.se.group1.service.ShiftCloseService;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
 
@@ -13,6 +17,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 public class MainLayout extends JPanel {
 
@@ -155,7 +161,30 @@ public class MainLayout extends JPanel {
                         setMainContent(paymentPage);
 
                     } else if (index == 3) {
-                        setMainContent(new CloseShift());
+                        if (currentEmployee == null) {
+                            Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
+                            return;
+                        }
+
+                        EmployeeShiftService employeeShiftService = new EmployeeShiftService();
+                        ShiftCloseService shiftCloseService = new ShiftCloseService();
+                        List<EmployeeShift> todayShifts = employeeShiftService.getShiftsByEmployeeAndDate(
+                                currentEmployee.getEmployeeId(),
+                                LocalDate.now()
+                        );
+                        EmployeeShift openShift = todayShifts.stream()
+                                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift).isEmpty())
+                                .findFirst()
+                                .orElse(null);
+
+                        if (openShift == null) {
+                            Message.showMessage("Thông báo", "Bạn chưa mở ca làm việc hôm nay hoặc tất cả ca đã đóng!");
+                        } else {
+                            CloseShift closeShiftPanel = new CloseShift();
+                            closeShiftPanel.setCurrentEmployeeShift(openShift);
+                            setMainContent(closeShiftPanel);
+                        }
+//                        setMainContent(new CloseShift());
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }

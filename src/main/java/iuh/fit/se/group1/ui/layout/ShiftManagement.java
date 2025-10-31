@@ -324,7 +324,6 @@ public class ShiftManagement extends javax.swing.JPanel {
                         employeeShift1.setEmployee(emp1);
                         employeeShift1.setShift(shift);
                         employeeShift1.setShiftDate(shiftDate);
-                        employeeShift1.setClosingTime(null);
                         employeeShift1.setCreatedAt(LocalDate.now());
 
                         employeeShiftService.addEmployeeShift(employeeShift1);
@@ -336,7 +335,6 @@ public class ShiftManagement extends javax.swing.JPanel {
                         employeeShift2.setEmployee(emp2);
                         employeeShift2.setShift(shift);
                         employeeShift2.setShiftDate(shiftDate);
-                        employeeShift2.setClosingTime(null);
                         employeeShift2.setCreatedAt(LocalDate.now());
 
                         employeeShiftService.addEmployeeShift(employeeShift2);

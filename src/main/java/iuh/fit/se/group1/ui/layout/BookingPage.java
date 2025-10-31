@@ -260,10 +260,10 @@ public class BookingPage extends javax.swing.JPanel {
 
         if (orderService.createOrder(order, orderDetails) != null) {
             CustomDialog.showMessage(null, "Tạo đơn đặt phòng thành công!",
-                    "Thông báo", CustomDialog.MessageType.INFO);
+                    "Thông báo", CustomDialog.MessageType.INFO,380,200);
         } else {
             CustomDialog.showMessage(null, "Tạo đơn đặt phòng thất bại!",
-                    "Thông báo", CustomDialog.MessageType.ERROR);
+                    "Thông báo", CustomDialog.MessageType.ERROR,380,200);
         }
 
 
