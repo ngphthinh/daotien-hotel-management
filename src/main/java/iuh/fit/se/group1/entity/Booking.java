@@ -5,6 +5,7 @@ import iuh.fit.se.group1.enums.BookingType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Set;
 
@@ -137,7 +138,6 @@ public class Booking {
             throw new IllegalArgumentException("Check-out date must be after check-in date.");
         }
 
-        boolean isHolidayPeriod = isHoliday(checkInDate.toLocalDate(), checkOutDate.toLocalDate());
         BigDecimal totalPrice;
 
         boolean isSingle = roomTypeIndex.equalsIgnoreCase("0");
@@ -163,13 +163,6 @@ public class Booking {
 
             default -> throw new IllegalArgumentException("Unknown booking type: " + bookingType);
         }
-
-        // ✅ Phụ thu nếu rơi vào ngày lễ
-        if (isHolidayPeriod) {
-            BigDecimal surcharge = BigDecimal.valueOf(50_000);
-            totalPrice = totalPrice.add(surcharge);
-        }
-
         this.totalPrice = totalPrice;
     }
 
@@ -202,6 +195,22 @@ public class Booking {
             date = date.plusDays(1);
         }
         return false;
+    }
+
+
+    public boolean isSurchargeCheckOut(){
+        switch (bookingType) {
+            case DAILY -> {
+                return LocalDateTime.now().isAfter(LocalDateTime.of(checkOutDate.toLocalDate(), LocalTime.of(12, 0)));
+            }
+            case HOURLY -> {
+                return LocalDateTime.now().isAfter(checkOutDate.plusMinutes(30));
+            }
+            case OVERNIGHT -> {
+                return isHoliday(checkInDate.toLocalDate(), checkOutDate.toLocalDate());
+            }
+            default -> throw new IllegalArgumentException("Unknown booking type: " + bookingType);
+        }
     }
 
     @Override

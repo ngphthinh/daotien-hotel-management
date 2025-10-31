@@ -2,14 +2,12 @@ package iuh.fit.se.group1.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
 
 public class OrderDetail {
     private BigDecimal unitPrice;
     private Amenity amenity;
     private int quantity;
     private LocalDate createdAt;
-
 
     public BigDecimal getUnitPrice() {
         return unitPrice;

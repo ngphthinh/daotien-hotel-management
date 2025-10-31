@@ -28,10 +28,10 @@ public class PromotionService {
 
 
     public Promotion getPromotionDiscountPriceMax() {
-        return promotionRepository.findAll();
+        return promotionRepository.findAllWithDiscountPriceMax();
     }
 
     public Promotion getPromotionDiscountPercentMax(){
-        return promotionRepository.findAllWithDiscountMax();
+        return promotionRepository.findAllWithDiscountPercentMax();
     }
 }

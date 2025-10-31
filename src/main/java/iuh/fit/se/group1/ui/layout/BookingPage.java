@@ -63,7 +63,6 @@ public class BookingPage extends javax.swing.JPanel {
         customerService = new CustomerService();
         roomService = new RoomService();
         bookingService = new BookingService();
-
     }
 
     private void custom() {

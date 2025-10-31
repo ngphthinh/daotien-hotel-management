@@ -2,6 +2,8 @@ package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.Surcharge;
 import iuh.fit.se.group1.repository.SurchargeRepository;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class SurchargeService {
@@ -34,4 +36,11 @@ public class SurchargeService {
     public Surcharge getSurchargeByName(String name) {
         return surchargeRepository.findBySurchargeName(name);
     }
+
+    public Surcharge getSurchargeById(Long surchargeId) {
+        return surchargeRepository.findById(surchargeId);
+    }
+
+//    public List<Surcharge> getSurchargeDetailsByOrderId(Long orderId) {
+//    }
 }

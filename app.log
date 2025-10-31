@@ -43,3 +43,25 @@ SEVERE: No enum constant for status: MAINTENANCE
 >>>>>>> d4d21a11835291d2199ae11003d6e75a5a982986
 Oct 31, 2025 11:01:08 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
+Oct 31, 2025 12:01:32 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:03:01 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:24:59 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:28:42 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:33:27 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:33:27 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:37:43 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:39:26 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:39:45 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 12:46:02 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2
+Oct 31, 2025 1:29:33 PM iuh.fit.se.group1.config.AppLogger info
+INFO: SurchargeDetail with Surcharge ID 7 already exists for Order ID 2

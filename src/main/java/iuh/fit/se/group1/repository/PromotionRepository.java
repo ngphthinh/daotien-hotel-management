@@ -171,7 +171,51 @@ public class PromotionRepository implements Repository<Promotion, Long>{
         return promotions;
     }
 
-//    public Promotion findAllWithDiscountMax() {
-//
-//    }
+    public Promotion findAllWithDiscountPriceMax() {
+        String sql = "SELECT TOP 1 * FROM Promotion where endDate > GETDATE() ORDER BY discountPrice DESC";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Promotion promotion = new Promotion();
+                    promotion.setPromotionId(resultSet.getLong("promotionId"));
+                    promotion.setPromotionName(resultSet.getString("promotionName"));
+                    promotion.setDescription(resultSet.getString("description"));
+                    promotion.setDiscountPercent(resultSet.getFloat("discountPercent"));
+                    promotion.setDiscountPrice(resultSet.getBigDecimal("discountPrice"));
+                    promotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
+                    promotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
+                    promotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    return promotion;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public Promotion findAllWithDiscountPercentMax() {
+        String sql = "SELECT TOP 1 * FROM Promotion where endDate > GETDATE() ORDER BY discountPercent DESC";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Promotion promotion = new Promotion();
+                    promotion.setPromotionId(resultSet.getLong("promotionId"));
+                    promotion.setPromotionName(resultSet.getString("promotionName"));
+                    promotion.setDescription(resultSet.getString("description"));
+                    promotion.setDiscountPercent(resultSet.getFloat("discountPercent"));
+                    promotion.setDiscountPrice(resultSet.getBigDecimal("discountPrice"));
+                    promotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
+                    promotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
+                    promotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    return promotion;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+
 }
