@@ -20,11 +20,7 @@ import iuh.fit.se.group1.ui.component.booking.InfoAmenityPanel;
 import iuh.fit.se.group1.ui.component.booking.InfoCustomerPanel;
 import iuh.fit.se.group1.ui.component.booking.InfoRoomPanel;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
-import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -46,7 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class BookingPage extends javax.swing.JPanel {
 
-    private static final Logger log = LoggerFactory.getLogger(BookingPage.class);
     private final OrderService orderService;
     private final BookingService bookingService;
     private final RoomService roomService;

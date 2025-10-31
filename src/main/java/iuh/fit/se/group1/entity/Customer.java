@@ -11,15 +11,13 @@ public class Customer {
     private String citizenId;
     private boolean gender; 
     private LocalDate dateOfBirth;
-    private String address;
     private LocalDate createdAt;
     
     public Customer() {
     }
 
 	public Customer(Long customerId, String fullName, String phone, String email, String citizenId, boolean gender,
-			LocalDate dateOfBirth, String address, LocalDate createdAt) {
-		super();
+			LocalDate dateOfBirth,  LocalDate createdAt) {
 		this.customerId = customerId;
 		this.fullName = fullName;
 		this.phone = phone;
@@ -27,7 +25,6 @@ public class Customer {
 		this.citizenId = citizenId;
 		this.gender = gender;
 		this.dateOfBirth = dateOfBirth;
-		this.address = address;
 		this.createdAt = createdAt;
 	}
 
@@ -88,13 +85,7 @@ public class Customer {
 		this.dateOfBirth = dateOfBirth;
 	}
 
-	public String getAddress() {
-		return address;
-	}
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
 
 	public LocalDate getCreatedAt() {
 		return createdAt;
@@ -105,7 +96,7 @@ public class Customer {
 	}
 	@Override
 	public String toString() {
-	    return "Customer{" + "customerId=" + customerId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + ", citizenId=" + citizenId + ", gender=" + (gender ? "Female" : "Male") + ", dateOfBirth=" + dateOfBirth + ", address=" + address + ", createdAt=" + createdAt + '}';
+	    return "Customer{" + "customerId=" + customerId + ", fullName=" + fullName + ", phone=" + phone + ", email=" + email + ", citizenId=" + citizenId + ", gender=" + (gender ? "Female" : "Male") + ", dateOfBirth=" + dateOfBirth + ", createdAt=" + createdAt + '}';
 	}
 
 	@Override

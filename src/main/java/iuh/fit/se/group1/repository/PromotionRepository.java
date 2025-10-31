@@ -170,5 +170,8 @@ public class PromotionRepository implements Repository<Promotion, Long>{
         }
         return promotions;
     }
-    
+
+//    public Promotion findAllWithDiscountMax() {
+//
+//    }
 }

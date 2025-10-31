@@ -172,4 +172,24 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
     return surcharges;
 }
 
+    public Surcharge findBySurchargeName(String name) {
+        String sql = "SELECT * FROM Surcharge WHERE name = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, name);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Surcharge surcharge = new Surcharge();
+                    surcharge.setSurchargeId(resultSet.getLong("surchargeId"));
+                    surcharge.setName(resultSet.getString("name"));
+                    surcharge.setPrice(resultSet.getBigDecimal("price"));
+                    surcharge.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    return surcharge;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error finding Surcharge by name: ", e);
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }

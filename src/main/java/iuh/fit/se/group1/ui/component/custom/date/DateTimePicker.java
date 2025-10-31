@@ -10,6 +10,7 @@ import raven.glasspanepopup.GlassPanePopup;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -59,13 +60,8 @@ public class DateTimePicker extends javax.swing.JPanel {
         textField.setEditable(false);
 
         Calendar now = Calendar.getInstance();
-        textField.setText(
-                now.get(Calendar.DAY_OF_MONTH) + "-" +
-                        (now.get(Calendar.MONTH) + 1) + "-" +
-                        now.get(Calendar.YEAR) + " " +
-                        String.format("%02d", now.get(Calendar.HOUR_OF_DAY)) + ":" +
-                        String.format("%02d", now.get(Calendar.MINUTE))
-        );
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        textField.setText(sdf.format(now.getTime()));
         textField.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -77,11 +73,13 @@ public class DateTimePicker extends javax.swing.JPanel {
 
                 GlassPanePopup.showPopup(picker);
                 picker.confirm(e -> {
-                    textField.setText(picker.cal.get(Calendar.DAY_OF_MONTH) + "-" +
-                            (picker.cal.get(Calendar.MONTH) + 1) + "-" +
-                            picker.cal.get(Calendar.YEAR) + " " +
-                            String.format("%02d",picker.timePicker1.getHour()) + ":" +
-                            String.format("%02d",picker.timePicker1.getMinute()));
+                    textField.setText(String.format("%02d-%02d-%d %02d:%02d",
+                            picker.cal.get(Calendar.DAY_OF_MONTH),
+                            picker.cal.get(Calendar.MONTH) + 1,
+                            picker.cal.get(Calendar.YEAR),
+                            picker.timePicker1.getHour(),
+                            picker.timePicker1.getMinute()
+                    ));
                     picker.closePicker();
                 });
             }

@@ -147,7 +147,7 @@ public class RoomManagement extends javax.swing.JPanel {
    private void savePricesToFile() {
     Properties properties = new Properties();
     try {
-        FileOutputStream output = new FileOutputStream("prices.properties");
+        FileOutputStream output = new FileOutputStream(getClass().getResource("/prices.properties").toString());
 
         properties.setProperty("price.single.hourly", txtSingleHour.getText());
         properties.setProperty("price.single.overnight", txtSingleNight.getText());
@@ -167,7 +167,7 @@ public class RoomManagement extends javax.swing.JPanel {
    private void loadPricesFromFile() {
     Properties properties = new Properties();
     try {
-        File file = new File("prices.properties");
+        File file = new File(getClass().getResource("/prices.properties").getFile());
         if (!file.exists()) return;
 
         FileInputStream input = new FileInputStream(file);

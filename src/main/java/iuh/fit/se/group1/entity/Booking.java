@@ -173,7 +173,7 @@ public class Booking {
         this.totalPrice = totalPrice;
     }
 
-    private boolean isHoliday(LocalDate startDate, LocalDate endDate) {
+    public boolean isHoliday(LocalDate startDate, LocalDate endDate) {
         Set<String> FIXED_HOLIDAYS = Set.of(
                 "01-01", // Tết Dương lịch
                 "30-04", // Giải phóng miền Nam

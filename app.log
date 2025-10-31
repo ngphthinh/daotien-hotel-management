@@ -41,3 +41,5 @@ INFO: Order created successfully with order details
 thg 10 29, 2025 8:02:04 SA iuh.fit.se.group1.config.AppLogger error
 SEVERE: No enum constant for status: MAINTENANCE
 >>>>>>> d4d21a11835291d2199ae11003d6e75a5a982986
+Oct 31, 2025 11:01:08 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details

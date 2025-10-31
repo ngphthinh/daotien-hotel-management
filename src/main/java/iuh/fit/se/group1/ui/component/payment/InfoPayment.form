@@ -90,6 +90,7 @@
               <Component id="pnlAmenity" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlSurcharge" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Component id="pnlPromotion" alignment="0" max="32767" attributes="0"/>
       </Group>
@@ -139,9 +140,9 @@
                   <Component id="lblPriceRoom" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="pnlSurcharge" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="pnlAmenity" min="-2" max="-2" attributes="0"/>
+                  <Component id="pnlSurcharge" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlPromotion" min="-2" max="-2" attributes="0"/>

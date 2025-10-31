@@ -28,6 +28,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import iuh.fit.se.group1.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
@@ -35,10 +37,13 @@ import raven.glasspanepopup.GlassPanePopup;
  */
 public class PaymentPage extends javax.swing.JPanel {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentPage.class);
     private final OrderService orderService;
     private final OrderDetailService orderDetailService;
     private final PaymentService paymentService;
     private Order order;
+    private final SurchargeService surchargeService;
+    private PromotionService promotionService;
 
     /**
      * Creates new form OrderManagement
@@ -49,6 +54,8 @@ public class PaymentPage extends javax.swing.JPanel {
         orderService = new OrderService();
         orderDetailService = new OrderDetailService();
         paymentService = new PaymentService();
+        surchargeService = new SurchargeService();
+        promotionService = new PromotionService();
         loadListBooking(orderService.getAllOrders());
         setTblSurcharge();
     }
@@ -179,6 +186,7 @@ public class PaymentPage extends javax.swing.JPanel {
                 setCustomer(order.getCustomer());
                 setTblRoom(order.getBookings());
                 setAmenityList(orderDetailService.getOrderDetailsByOrderId(order.getOrderId()));
+                setPromotion();
             }
 
             @Override
@@ -202,6 +210,11 @@ public class PaymentPage extends javax.swing.JPanel {
             }
         });
 
+    }
+
+    private void setPromotion() {
+        infoPayment1.clearPromotion();
+        promotionService.getPromotionDiscountPriceMax();
     }
 
 
@@ -280,6 +293,8 @@ public class PaymentPage extends javax.swing.JPanel {
         loadListBooking(orderService.getAllOrdersUnPaid());
         infoPayment1.getLblPriceRoom().setText("0 VND");
         infoPayment1.clearAmenity();
+        infoPayment1.clearSurcharge();
+        infoPayment1.clearPromotion();
         order = null;
 
     }
@@ -301,15 +316,24 @@ public class PaymentPage extends javax.swing.JPanel {
 
     private void setAmenityList(List<OrderDetail> orderDetailsByOrderId) {
         infoPayment1.clearAmenity();
-        orderDetailsByOrderId.forEach(e -> infoPayment1.addAmenity(e.getAmenity().getNameAmenity(), Constants.VND_FORMAT.format(e.getAmenity().getPrice()), String.valueOf(e.getQuantity())));
+        BigDecimal total = BigDecimal.ZERO;
+        for (var e : orderDetailsByOrderId) {
+            infoPayment1.addAmenity(e.getAmenity().getNameAmenity(),
+                    Constants.VND_FORMAT.format(e.getAmenity().getPrice()),
+                    String.valueOf(e.getQuantity()));
+            total = total.add(e.getAmenity().getPrice().multiply(BigDecimal.valueOf(e.getQuantity())));
+        }
+        BigDecimal totalSurcharge = BigDecimal.valueOf(Constants.parseVND(infoPayment1.getLblPriceASP().getText()));
+        infoPayment1.getLblPriceASP().setText(Constants.VND_FORMAT.format(totalSurcharge.add(total)));
+
     }
 
     private void setTblRoom(List<Booking> bookings) {
         BigDecimal totalPrice = BigDecimal.ZERO;
         DefaultTableModel defaultTableModel = (DefaultTableModel) infoPayment1.getTblRoom().getModel();
-
         defaultTableModel.setRowCount(0);
         System.out.println(bookings);
+        int countHoliday = 0;
         for (var b : bookings) {
             String time = getDuration(b.getCheckInDate(), b.getCheckOutDate(), b.getBookingType());
             totalPrice = totalPrice.add(b.getTotalPrice());
@@ -320,8 +344,26 @@ public class PaymentPage extends javax.swing.JPanel {
                     time,
                     b.getTotalPrice()
             });
+
+            if (b.isHoliday(b.getCheckInDate().toLocalDate(), b.getCheckOutDate().toLocalDate())) {
+                countHoliday++;
+            }
+
         }
+        BigDecimal total = BigDecimal.ZERO;
+        // thêm phụ phí ngày lễ
+        infoPayment1.clearSurcharge();
+        if (countHoliday != 0) {
+            Surcharge holidaySurcharge = surchargeService.getSurchargeByName("Phụ thu ngày lễ");
+            if (holidaySurcharge != null) {
+                total = holidaySurcharge.getPrice();
+                infoPayment1.addSurcharge(holidaySurcharge.getName(), Constants.VND_FORMAT.format(holidaySurcharge.getPrice()), String.valueOf(countHoliday));
+                total = total.multiply(BigDecimal.valueOf(countHoliday));
+            }
+        }
+        infoPayment1.getLblPriceASP().setText(Constants.VND_FORMAT.format(total.doubleValue()));
         infoPayment1.getLblPriceRoom().setText(Constants.VND_FORMAT.format(totalPrice));
+
     }
 
     private String getDuration(LocalDateTime checkInDate, LocalDateTime checkOutDate, BookingType bookingType) {

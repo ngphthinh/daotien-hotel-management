@@ -30,4 +30,8 @@ public class SurchargeService {
     public List<Surcharge> getSurchargeByKeyword(String keyword) {
         return surchargeRepository.findBySurchargeNameOrId(keyword);
     }
+
+    public Surcharge getSurchargeByName(String name) {
+        return surchargeRepository.findBySurchargeName(name);
+    }
 }

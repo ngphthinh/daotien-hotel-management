@@ -136,7 +136,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getTxtEmail().setText(customer.getEmail());
                 modal.getTxtCitizen().setText(customer.getCitizenId());
                 modal.getTxtPhone().setText(customer.getPhone());
-                modal.getTxtAddress().setText(customer.getAddress());
                 modal.getTxtDob().setText(customer.getDateOfBirth().format(Constants.DATE_FORMATTER));
 
                 modal.getLblErrolName().setText("");
@@ -163,7 +162,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                     customer.setPhone(rs.phone);
                     customer.setEmail(rs.email);
                     customer.setCitizenId(rs.citizen);
-                    customer.setAddress(rs.address);
                     customer.setGender(rs.gender);
                     customer.setDateOfBirth(rs.dob);
 
@@ -223,7 +221,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getTxtEmail().setText(customer.getEmail());
                 modal.getTxtCitizen().setText(customer.getCitizenId());
                 modal.getTxtPhone().setText(customer.getPhone());
-                modal.getTxtAddress().setText(customer.getAddress());
                 modal.getTxtDob().setText(customer.getDateOfBirth().format(Constants.DATE_FORMATTER));
 
                 modal.getTxtName().setEditable(false);
@@ -499,7 +496,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             customer.setEmail(rs.email);
             customer.setCitizenId(rs.citizen);
             customer.setPhone(rs.phone);
-            customer.setAddress(rs.address);
             customer.setDateOfBirth(rs.dob);
 
             Customer customerSave = customerService.createCustomer(customer);

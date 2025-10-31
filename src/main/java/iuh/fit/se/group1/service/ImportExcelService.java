@@ -56,7 +56,6 @@ public class ImportExcelService {
                 c.setEmail(getCellValue(row.getCell(startCol + 3)));
                 c.setCitizenId(getCellValue(row.getCell(startCol + 4)));
                 c.setPhone(getCellValue(row.getCell(startCol + 5)));
-                c.setAddress("");
                 c.setDateOfBirth(LocalDate.now());
 
                 Customer saved = customerService.createCustomer(c);

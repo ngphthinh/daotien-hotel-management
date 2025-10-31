@@ -25,4 +25,13 @@ public class PromotionService {
     public List<Promotion> getPromotionByKeyword(String keyword) {
         return promotionRepository.findByPromotionIdOrName(keyword);
     }
+
+
+    public Promotion getPromotionDiscountPriceMax() {
+        return promotionRepository.findAll();
+    }
+
+    public Promotion getPromotionDiscountPercentMax(){
+        return promotionRepository.findAllWithDiscountMax();
+    }
 }
