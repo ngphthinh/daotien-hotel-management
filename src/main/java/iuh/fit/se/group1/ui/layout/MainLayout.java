@@ -4,6 +4,7 @@ import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
+import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
@@ -40,6 +41,7 @@ public class MainLayout extends JPanel {
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
+    private CloseShift closeShift;
 
     private float alpha = 1f;
     private SideBar sideBar;
@@ -172,6 +174,7 @@ public class MainLayout extends JPanel {
                                 currentEmployee.getEmployeeId(),
                                 LocalDate.now()
                         );
+
                         EmployeeShift openShift = todayShifts.stream()
                                 .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift).isEmpty())
                                 .findFirst()
@@ -184,15 +187,14 @@ public class MainLayout extends JPanel {
                             closeShiftPanel.setCurrentEmployeeShift(openShift);
                             setMainContent(closeShiftPanel);
                         }
-//                        setMainContent(new CloseShift());
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
             }
         });
-        
-          
+
+
         sideBar.getLblAvt().addMouseListener(new MouseListener(){
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -232,7 +234,9 @@ public class MainLayout extends JPanel {
     public JButton getBtnSignOut() {
         return sideBar.getBtnSignOut();
     }
-
+    public Button getBtnClose() {
+        return closeShift.getBtnClose();
+    }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -286,6 +290,8 @@ public class MainLayout extends JPanel {
             revenueStatistics = new RevenueStatistics();
             setMainContent(dashboard);
         } else {
+
+
             dashboardEmployee = new DashboardEmployee();
             bookingPage = new BookingPage();
             paymentPage = new PaymentPage();

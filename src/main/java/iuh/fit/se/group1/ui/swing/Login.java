@@ -399,7 +399,6 @@ public class Login extends javax.swing.JFrame {
             }
         }
     }
-
     private void btnForgotPassActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnForgotPassActionPerformed
         var modal = new VerifyIdentityModal();
         var sendCodeModal = new SendResetCodeModal();
@@ -493,14 +492,19 @@ public class Login extends javax.swing.JFrame {
                 animatorBody.start();
             }
         });
+
+    }
+    private void hanleSubmitShiftClose(){
+        panelBody.getBtnClose().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                signIn=false;
+                clearLogin();
+                animatorBody.start();
+            }
+        });
     }
 
-
-    //    private void cmdSignOutActionPerformed(java.awt.event.ActionEvent evt) {
-//        signIn = false;
-//        clearLogin();
-//        animatorBody.start();
-//    }
     public void clearLogin() {
         txtUser.setText("");
         txtPass.setText("");
