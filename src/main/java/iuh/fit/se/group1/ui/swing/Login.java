@@ -492,7 +492,11 @@ public class Login extends javax.swing.JFrame {
                 animatorBody.start();
             }
         });
-
+        panelBody.setLogoutCallback(() -> {
+            signIn = false;
+            clearLogin();
+            animatorBody.start();
+        });
     }
 
     public void clearLogin() {

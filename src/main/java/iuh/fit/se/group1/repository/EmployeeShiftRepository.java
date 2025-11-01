@@ -167,7 +167,13 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
     }
     public List<EmployeeShift> findByShiftDate(LocalDate date) {
         List<EmployeeShift> employeeShifts = new ArrayList<>();
-        String sql = "SELECT * FROM EmployeeShift WHERE shiftDate = ?;";
+        String sql = "SELECT es.employeeShiftId, es.shiftDate, es.createdAt, es.employeeId, es.shiftId," +
+                "               e.fullName AS employeeName, e.phone AS employeePhone, e.email AS employeeEmail," +
+                "               s.name AS shiftName, s.startTime, s.endTime" +
+                "        FROM EmployeeShift es" +
+                "        JOIN Employee e ON es.employeeId = e.employeeId" +
+                "        JOIN Shift s ON es.shiftId = s.shiftId" +
+                "        where es.shiftDate=?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setDate(1, Date.valueOf(date));
             try (ResultSet rs = preparedStatement.executeQuery()) {
@@ -181,6 +187,9 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
 
                     Shift shift = new Shift();
                     shift.setShiftId(rs.getLong("shiftId"));
+                    shift.setName(rs.getString("shiftName"));
+                    shift.setStartTime(rs.getString("startTime"));
+                    shift.setEndTime(rs.getString("endTime"));
                     es.setShift(shift);
 
                     es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
@@ -195,66 +204,6 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
         }
         return employeeShifts;
     }
-//    public EmployeeShift findWithShiftAndCloseById(Long employeeShiftId, Long shiftId) {
-//        String sql = """
-//
-//            SELECT es.*, e.fullName AS employeeName, s.name AS shiftName
-//            FROM
-//                EmployeeShift es
-//            JOIN Employee e ON es.
-//                employeeId = e.employeeId
-//                            JOIN Shift s ON s.shiftId = es.shiftId
-//            WHERE CAST(GETDATE() AS DATE) = es.shiftDate and s.shiftId = ? and e.employeeId = ?;
-//            """;
-//
-//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-//            ps.setLong(2, employeeShiftId);
-//            ps.setLong(1, shiftId);
-//            try (ResultSet rs = ps.executeQuery()) {
-//                if (rs.next()) {
-//                    // EmployeeShift
-//                    EmployeeShift es = new EmployeeShift();
-//                    es.setEmployeeShiftId(rs.getLong("employeeShiftId"));
-//                    es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
-//                    es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
-//
-//                    // Employee
-//                    Employee emp = new Employee();
-//                    emp.setEmployeeId(rs.getLong("employeeId"));
-//                    emp.setFullName(rs.getString("employeeName"));
-//                    es.setEmployee(emp);
-//
-//                    // Shift
-//                    Shift shift = new Shift();
-//                    shift.setShiftId(rs.getLong("shiftId"));
-//                    shift.setName(rs.getString("shiftName"));
-//                    es.setShift(shift);
-//
-//                    // ShiftClose (nếu có)
-//                    Long shiftCloseId = rs.getLong("shiftCloseId");
-//                    if (!rs.wasNull()) {
-//                        ShiftClose sc = new ShiftClose();
-//                        sc.setShiftCloseId(shiftCloseId);
-//                        sc.setTotalRevenue(rs.getBigDecimal("totalRevenue"));
-//                        sc.setCashInDrawer(rs.getBigDecimal("cashInDrawer"));
-//                        sc.setDifference(rs.getBigDecimal("difference"));
-//                        sc.setNote(rs.getString("note"));
-//                        sc.setCreatedAt(rs.getTimestamp("closeCreatedAt").toLocalDateTime());
-//                        es.setShiftClose(sc);
-//                    }
-//
-//                    return es;
-//                }
-//            }
-//            return null;
-//
-//        } catch (SQLException e) {
-//            log.error("Error finding EmployeeShift with Shift and ShiftClose: ", e);
-//            throw new RuntimeException(e);
-//        }
-//    }
-    // Thêm các phương thức sau vào EmployeeShiftRepository.java
-
     /**
      * Tìm EmployeeShift với thông tin đầy đủ của Employee và Shift
      */

@@ -42,6 +42,7 @@ public class MainLayout extends JPanel {
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
     private CloseShift closeShift;
+    private Runnable logoutCallback;
 
     private float alpha = 1f;
     private SideBar sideBar;
@@ -75,7 +76,9 @@ public class MainLayout extends JPanel {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         super.paint(grphcs);
     }
-
+    public void setLogoutCallback(Runnable callback) {
+        this.logoutCallback = callback;
+    }
     private void init() {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME));
@@ -179,19 +182,25 @@ public class MainLayout extends JPanel {
                                 .orElse(null);
 
                         if (openShift == null) {
-                            Message.showMessage("Thông báo", "Bạn chưa mở ca làm việc hôm nay hoặc tất cả ca đã đóng!");
-                        } else {
-                            CloseShift closeShiftPanel = new CloseShift();
-                            closeShiftPanel.setCurrentEmployeeShift(openShift);
-                            setMainContent(closeShiftPanel);
+                            Message.showMessage("Thông báo",
+                                    "Bạn chưa mở ca làm việc hôm nay hoặc tất cả ca đã đóng!");
+                            return;
                         }
+
+                        // ✅ KIỂM TRA CA CÓ ĐANG HOẠT ĐỘNG KHÔNG
+                        if (!employeeShiftService.isShiftActive(openShift)) {
+                            String shiftTime = openShift.getShift().getStartTime() + " - " +
+                                    openShift.getShift().getEndTime();
+                            Message.showMessage("Cảnh báo",
+                                    "Ca làm việc (" + shiftTime + ") chưa bắt đầu hoặc đã kết thúc!\n");
+                        }
+                        openCloseShiftPanel(openShift);
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
             }
         });
-
 
         sideBar.getLblAvt().addMouseListener(new MouseListener(){
             @Override
@@ -221,6 +230,19 @@ public class MainLayout extends JPanel {
         });
         
     }
+    private void openCloseShiftPanel(EmployeeShift openShift) {
+        CloseShift closeShiftPanel = new CloseShift();
+        closeShiftPanel.setCurrentEmployeeShift(openShift);
+
+        // Set callback để đăng xuất khi đóng ca thành công
+        closeShiftPanel.setOnCloseShiftSuccess(() -> {
+            if (logoutCallback != null) {
+                logoutCallback.run();
+            }
+        });
+
+        setMainContent(closeShiftPanel);
+    }
 
     public void setMainContent(JPanel panel) {
         pnlContent.removeAll();
@@ -234,6 +256,9 @@ public class MainLayout extends JPanel {
     }
     public Button getBtnClose() {
         return closeShift.getBtnClose();
+    }
+    public void saveData() {
+        closeShift.saveData();
     }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

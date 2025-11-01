@@ -31,9 +31,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -61,6 +59,7 @@ public class CloseShift extends javax.swing.JPanel {
             DenominationLabel.VND_2000,
             DenominationLabel.VND_1000
     };
+    private Runnable onCloseShiftSuccess;
     public CloseShift() {
         this.employeeShiftService = new EmployeeShiftService();
         this.denominationDetailService = new DenominationDetailService();
@@ -662,8 +661,10 @@ public class CloseShift extends javax.swing.JPanel {
     public void setBtnClose(Button btnClose) {
         this.btnClose = btnClose;
     }
-
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+    public void setOnCloseShiftSuccess(Runnable callback) {
+        this.onCloseShiftSuccess = callback;
+    }
+    public void saveData(){
         if (currentEmployeeShift == null) {
             Message.showMessage("Lỗi", "Không tìm thấy thông tin ca làm việc!");
             return;
@@ -694,7 +695,7 @@ public class CloseShift extends javax.swing.JPanel {
                                         "Tổng doanh thu: %s<br>" +
                                         "Tiền trong két: %s<br>" +
                                         "Chênh lệch: %s<br>" +
-                                        "<span style='color:red; font-weight:bold;'>VUI LÒNG ĐĂNG XUẤT KHỎI HỆ THỐNG!</span>" +
+                                        "<span style='color:red; font-weight:bold;'>NHẤN OK HỆ THỐNG TỰ ĐĂNG XUẤT</span>" +
                                         "</html>",
                                 formattedTime,
                                 formatCurrency(totalRevenue),
@@ -703,7 +704,13 @@ public class CloseShift extends javax.swing.JPanel {
                         );
                         CustomDialog.showMessage(null, message, "Đóng ca", CustomDialog.MessageType.SUCCESS, 500, 280);
                         clearForm();
-
+                        if (onCloseShiftSuccess != null) {
+                            Timer timer = new Timer(0, e -> {
+                                onCloseShiftSuccess.run();
+                            });
+                            timer.setRepeats(false);
+                            timer.start();
+                        }
                     } catch (Exception ex) {
                         log.error("Error closing shift: ", ex);
                         Message.showMessage("Lỗi", "Có lỗi xảy ra khi đóng ca: " + ex.getMessage());
@@ -711,6 +718,9 @@ public class CloseShift extends javax.swing.JPanel {
                 }
         );
 
+    }
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+        saveData();
     }                                        
     private void saveDenominationDetails() {
         List<DenominationDetail> details = new ArrayList<>();
