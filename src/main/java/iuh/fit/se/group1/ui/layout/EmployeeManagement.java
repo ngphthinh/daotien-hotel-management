@@ -8,6 +8,7 @@ package iuh.fit.se.group1.ui.layout;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.CellStyle;
+
 import java.awt.Graphics2D;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -75,6 +76,7 @@ import raven.glasspanepopup.GlassPanePopup;
 
 import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.ImportExcelService;
+
 import java.io.File;
 import java.util.List;
 
@@ -93,13 +95,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
         roleService = new RoleService();
         loadTable(employeeService.getAllEmployees());
     }
+
     private void custom() {
         headerCustom2.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
         headerCustom2.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý nhân viên</span>"
 
-                + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>");
+                        + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>");
 
         btnAddEmployee.setBackground(new Color(108, 165, 200));
         btnAddEmployee.setForeground(Color.WHITE);
@@ -133,7 +136,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
 
-        String cols[] = { "Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng" };
+        String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
 
         tblEmployee.getTbl().setModel(model);
@@ -346,7 +349,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
                 // Hiển thị avatar từ database
                 AvatarLabel avatarLabel = modal.getAvatarLabel(); // Cần thêm getter cho AvatarLabel trong
-                                                                  // InfoEmployeeModal
+                // InfoEmployeeModal
                 if (avatarLabel != null) {
                     if (employee.getAvt() != null && employee.getAvt().length > 0) {
                         try {
@@ -431,8 +434,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
         });
 
         var header = tblEmployee.getTbl().getTableHeader();
-        Combobox<String> cmb = new Combobox<>(new String[] { "Tất cả", "Nam", "Nữ" });
-        Combobox<String> cmbChucVu = new Combobox<>(new String[] { "Tất cả", "Nhân viên lễ tân", "Nhân viên quản lý" });
+        Combobox<String> cmb = new Combobox<>(new String[]{"Tất cả", "Nam", "Nữ"});
+        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Tất cả", "Nhân viên lễ tân", "Nhân viên quản lý"});
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
@@ -593,8 +596,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
                                 .addComponent(tblEmployee, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
                                 .addGap(37, 37, 37)));
     }
+
     private void loadTable(java.util.List<Employee> employees) {
-       
+
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
         model.setRowCount(0);
         for (Employee employee : employees) {
@@ -602,7 +606,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
                     ? employee.getAccount().getRole().getRoleName()
                     : "N/A";
-            model.addRow(new Object[] {
+            model.addRow(new Object[]{
                     employee.getEmployeeId(),
                     employee.getFullName(),
                     genderStr,
@@ -671,8 +675,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
             centerStyle.setAlignment(HorizontalAlignment.CENTER);
 
             // Header
-            String[] headers = { "STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
-                    "Ngày tuyển dụng", "Avatar" };
+            String[] headers = {"STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
+                    "Ngày tuyển dụng", "Avatar"};
             Row headerRow = sheet.createRow(0);
             headerRow.setHeightInPoints(30);
             for (int i = 0; i < headers.length; i++) {
@@ -693,8 +697,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
             sttCell.setCellStyle(centerStyle);
 
             // Các thông tin khác
-            String[] data = { employeeId, fullName, genderStr, position, phone, email, citizenId,
-                    hireDate.format(Constants.DATE_FORMATTER) };
+            String[] data = {employeeId, fullName, genderStr, position, phone, email, citizenId,
+                    hireDate.format(Constants.DATE_FORMATTER)};
             for (String d : data) {
                 Cell cell = row.createCell(colIndex++);
                 cell.setCellValue(d);
@@ -815,8 +819,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
             CellStyle dataStyle = createDataStyle(workbook);
 
             // ======= THÊM CỘT STT =======
-            String[] headers = { "STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
-                    "Ngày tuyển dụng" };
+            String[] headers = {"STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
+                    "Ngày tuyển dụng"};
 
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < headers.length; i++) {
@@ -916,7 +920,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             System.out.println(employeeSave);
 
 
-            model.addRow(new Object[] {
+            model.addRow(new Object[]{
                     employeeSave.getEmployeeId(),
                     employeeSave.getFullName(),
                     genderStr,
@@ -990,6 +994,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
 
     }
+
     private static Valid getValid(InfoEmployeeModal modal) {
         String name = modal.getTxtName().getText().trim();
         String phone = modal.getTxtPhone().getText().trim();
@@ -1090,10 +1095,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
     private javax.swing.JLabel lblTitleEmployee;
     private iuh.fit.se.group1.ui.component.table.Table tblEmployee;
 
-    public void setShiftList(ShiftList shiftList2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setShiftList'");
-    }
 
 }
 
