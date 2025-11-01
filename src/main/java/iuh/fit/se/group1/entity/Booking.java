@@ -134,7 +134,7 @@ public class Booking {
         }
 
         // Kiểm tra hợp lệ
-        if (!checkOutDate.isAfter(checkInDate)) {
+        if (!checkOutDate.isAfter(checkInDate) && !bookingType.equals(BookingType.OVERNIGHT)) {
             throw new IllegalArgumentException("Check-out date must be after check-in date.");
         }
 

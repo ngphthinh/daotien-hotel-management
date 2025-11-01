@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.function.Consumer;
 
 /**
  *
@@ -55,8 +56,7 @@ public class DateTimePicker extends javax.swing.JPanel {
 
     }
 
-    public static void attachTo(JTextField textField, JComboBox<String> bookingType){
-        textField.setEnabled(false);
+    public static void attachTo(JTextField textField, JComboBox<String> bookingType, Runnable onSelected ){
         textField.setEditable(false);
 
         Calendar now = Calendar.getInstance();
@@ -81,6 +81,8 @@ public class DateTimePicker extends javax.swing.JPanel {
                             picker.timePicker1.getMinute()
                     ));
                     picker.closePicker();
+                    // Cần thực hiện 1 function từ ngoài truyền vào
+                    if (onSelected != null) onSelected.run();
                 });
             }
         });

@@ -47,7 +47,7 @@ public class BookingPage extends javax.swing.JPanel {
     private final RoomService roomService;
     private final CustomerService customerService;
     private int roomCount = 1;
-
+    private Employee currentEmployee;
 
     private final Map<String, AmenityInfo> amenityIds = new HashMap<>();
 
@@ -139,10 +139,9 @@ public class BookingPage extends javax.swing.JPanel {
                 customerAtomicReference.set(customer);
             }
         });
+        infoRoomPanel1.setOnSelect(this::selectRoom);
 
         infoRoomPanel1.getCboRoomType().addActionListener(e -> selectRoom(infoRoomPanel1));
-        infoRoomPanel1.getTxtStartDate().addActionListener(e -> selectRoom(infoRoomPanel1));
-        infoRoomPanel1.getTxtEndDate().addActionListener(e -> selectRoom(infoRoomPanel1));
     }
 
 
@@ -375,8 +374,7 @@ public class BookingPage extends javax.swing.JPanel {
 
         newRoom.closeRoomCard(e -> closeRoomCard(newRoom));
         newRoom.getCboRoomType().addActionListener(e -> selectRoom(newRoom));
-        newRoom.getTxtStartDate().addActionListener(e -> selectRoom(newRoom));
-        newRoom.getTxtEndDate().addActionListener(e -> selectRoom(newRoom));
+        newRoom.setOnSelect(this::selectRoom);
         // vị trí trước nút "Thêm phòng"
         int index = pnlListRoom.getComponentCount() - 1;
         pnlListRoom.add(newRoom, index);

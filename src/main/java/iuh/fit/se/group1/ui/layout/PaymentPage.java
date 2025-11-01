@@ -4,13 +4,11 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
-import iuh.fit.se.group1.ui.component.modal.CustomerModal;
 import iuh.fit.se.group1.ui.component.payment.CashPaymentModal;
 import iuh.fit.se.group1.ui.component.payment.TransferPaymentModal;
 
@@ -18,7 +16,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -141,8 +138,11 @@ public class PaymentPage extends javax.swing.JPanel {
         // Thay tiêu đề cột
         model.setColumnIdentifiers(new Object[]{"Mã phụ thu", "Tên phụ thu", "Giá trị"});
         infoPayment1.getBtnCash().addActionListener(l -> {
-            var modal = new CashPaymentModal();
-            GlassPanePopup.showPopup(modal);
+            if (order == null) {
+                CustomDialog.showMessage(null, "Vui lòng chọn đơn hàng để thanh toán!", "Thông báo", CustomDialog.MessageType.WARNING);
+                return;
+            }
+            handlePaymentCash(order);
         });
         infoPayment1.getBtnTransfer().addActionListener(l -> {
             if (order == null) {
@@ -273,6 +273,12 @@ public class PaymentPage extends javax.swing.JPanel {
         });
     }
 
+    private void handlePaymentCash(Order order) {
+        var modal = new CashPaymentModal();
+        modal.setTotalToPay(order.getTotalAmount().longValue());
+        GlassPanePopup.showPopup(modal);
+    }
+
     private Promotion setPromotion(BigDecimal totalAmount) {
         infoPayment1.clearPromotion();
 
@@ -369,6 +375,10 @@ public class PaymentPage extends javax.swing.JPanel {
         infoPayment1.getTxtPhone().setText("");
         loadListBooking(orderService.getAllOrdersUnPaid());
         infoPayment1.getLblPriceRoom().setText("0 VND");
+        infoPayment1.getLblPriceASP().setText("0 VND");
+        infoPayment1.getLblPriceTotal().setText("0 VND");
+        infoPayment1.getLblPricePromotion().setText("0 VND");
+        infoPayment1.getLblPricePayment().setText("0 VND");
         infoPayment1.clearAmenity();
         infoPayment1.clearSurcharge();
         infoPayment1.clearPromotion();

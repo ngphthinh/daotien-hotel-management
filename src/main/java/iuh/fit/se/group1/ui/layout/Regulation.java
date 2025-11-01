@@ -4,9 +4,9 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.ui.component.HeaderCustom;
+
 import javax.swing.JLabel;
-import javax.swing.JTextField;
+
 
 /**
  *
