@@ -6,6 +6,7 @@ package iuh.fit.se.group1.ui.component.shift;
 
 
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +131,7 @@ public class ShiftList extends JPanel {
     private void loadEmployeesFromDatabase() {
     try {
         EmployeeRepository employeeRepository = new EmployeeRepository();
-        List<Employee> employees = employeeRepository.findAll();
+        List<Employee> employees = employeeRepository.findAllByRoleId(Role.RECEPTIONIST.toString());
 
         pnlEmployees.removeAll();
         pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);

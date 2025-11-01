@@ -89,6 +89,7 @@ public class Login extends javax.swing.JFrame {
             // Panel body luôn full frame - thêm vào background sau khi frame đã hiện
             panelBody.setBounds(0, 0, w, h);
             background1.add(panelBody);
+            handleSignOut();
         });
 
 
@@ -142,7 +143,6 @@ public class Login extends javax.swing.JFrame {
         });
         GlassPanePopup.install(this);
         getContentPane().setBackground(new Color(245, 245, 245));
-        handleSignOut();
 
         btnForgotPass.setBorderPainted(false); // tắt viền
         btnForgotPass.setContentAreaFilled(false); // tắt nền mặc định
@@ -493,16 +493,6 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-    }
-    private void hanleSubmitShiftClose(){
-        panelBody.getBtnClose().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                signIn=false;
-                clearLogin();
-                animatorBody.start();
-            }
-        });
     }
 
     public void clearLogin() {
