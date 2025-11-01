@@ -41,13 +41,6 @@ public class InfoCustomerModal extends javax.swing.JPanel {
         this.btnClose = button2;
     }
 
-    public JLabel getLblErrolAddress() {
-        return lblErrolAddress;
-    }
-
-    public void setLblErrolAddress(JLabel lblErrolAddress) {
-        this.lblErrolAddress = lblErrolAddress;
-    }
 
     public JLabel getLblErrolCitizen() {
         return lblErrolCitizen;
@@ -99,13 +92,7 @@ public class InfoCustomerModal extends javax.swing.JPanel {
     
     
 
-    public TextField getTxtAddress() {
-        return txtAddress;
-    }
 
-    public void setTxtAddress(TextField txtAddress) {
-        this.txtAddress = txtAddress;
-    }
 
     public TextField getTxtCitizen() {
         return txtCitizen;
@@ -229,13 +216,11 @@ public class InfoCustomerModal extends javax.swing.JPanel {
         lblEmail = new javax.swing.JLabel();
         lblGender = new javax.swing.JLabel();
         lblCitizen = new javax.swing.JLabel();
-        lblAddress = new javax.swing.JLabel();
         lblDob = new javax.swing.JLabel();
         txtName = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtPhone = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtEmail = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtCitizen = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtAddress = new iuh.fit.se.group1.ui.component.custom.TextField();
         btnSave = new iuh.fit.se.group1.ui.component.custom.Button();
         txtDob = new iuh.fit.se.group1.ui.component.custom.TextField();
         btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
@@ -244,7 +229,6 @@ public class InfoCustomerModal extends javax.swing.JPanel {
         lblErrolPhone = new javax.swing.JLabel();
         lblErrolEmail = new javax.swing.JLabel();
         lblErrolCitizen = new javax.swing.JLabel();
-        lblErrolAddress = new javax.swing.JLabel();
         lblErrolDob = new javax.swing.JLabel();
         cmbGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
 
@@ -267,9 +251,6 @@ public class InfoCustomerModal extends javax.swing.JPanel {
 
         lblCitizen.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblCitizen.setText("Căn cước công dân:");
-
-        lblAddress.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblAddress.setText("Địa chỉ:");
 
         lblDob.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblDob.setText("Ngày sinh");
@@ -294,13 +275,6 @@ public class InfoCustomerModal extends javax.swing.JPanel {
         txtCitizen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCitizenActionPerformed(evt);
-            }
-        });
-
-        txtAddress.setText("Duyen Hai, Tra Vinh, Viet Nam");
-        txtAddress.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtAddressActionPerformed(evt);
             }
         });
 
@@ -347,10 +321,6 @@ public class InfoCustomerModal extends javax.swing.JPanel {
         lblErrolCitizen.setForeground(new java.awt.Color(255, 255, 255));
         lblErrolCitizen.setText("Căn cước công dân không hợp lệ");
 
-        lblErrolAddress.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-        lblErrolAddress.setForeground(new java.awt.Color(255, 255, 255));
-        lblErrolAddress.setText("Địa chỉ không hợp lệ");
-
         lblErrolDob.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         lblErrolDob.setForeground(new java.awt.Color(255, 255, 255));
         lblErrolDob.setText("Ngày sinh không hợp lệ");
@@ -377,12 +347,10 @@ public class InfoCustomerModal extends javax.swing.JPanel {
                             .addComponent(lblEmail)
                             .addComponent(lblPhone)
                             .addComponent(lblName)
-                            .addComponent(lblAddress)
                             .addComponent(lblDob))
                         .addGap(59, 59, 59)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtAddress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtDob, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -404,9 +372,7 @@ public class InfoCustomerModal extends javax.swing.JPanel {
                                         .addComponent(cmbGender, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
                                         .addComponent(txtCitizen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblErrolDob)
-                                    .addComponent(lblErrolAddress))
+                                .addComponent(lblErrolDob)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addGap(18, 18, 18)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -450,32 +416,23 @@ public class InfoCustomerModal extends javax.swing.JPanel {
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(5, 5, 5)
                 .addComponent(lblErrolEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblAddress))
-                .addGap(5, 5, 5)
-                .addComponent(lblErrolAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(iconDate)
+                .addGap(11, 11, 11)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblDob)
-                    .addComponent(txtDob, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(5, 5, 5)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtDob, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(iconDate)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblErrolDob)
-                .addGap(12, 12, 12)
+                .addGap(18, 18, 18)
                 .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtEmailActionPerformed
-
-    private void txtAddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAddressActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtAddressActionPerformed
 
     private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
         // TODO add your handling code here:
@@ -508,11 +465,9 @@ public class InfoCustomerModal extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.custom.Combobox cmbGender;
     private javax.swing.JLabel iconDate;
     private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JLabel lblAddress;
     private javax.swing.JLabel lblCitizen;
     private javax.swing.JLabel lblDob;
     private javax.swing.JLabel lblEmail;
-    private javax.swing.JLabel lblErrolAddress;
     private javax.swing.JLabel lblErrolCitizen;
     private javax.swing.JLabel lblErrolDob;
     private javax.swing.JLabel lblErrolEmail;
@@ -522,7 +477,6 @@ public class InfoCustomerModal extends javax.swing.JPanel {
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblPhone;
     private javax.swing.JLabel lblTitle;
-    private iuh.fit.se.group1.ui.component.custom.TextField txtAddress;
     private iuh.fit.se.group1.ui.component.custom.TextField txtCitizen;
     private iuh.fit.se.group1.ui.component.custom.TextField txtDob;
     private iuh.fit.se.group1.ui.component.custom.TextField txtEmail;

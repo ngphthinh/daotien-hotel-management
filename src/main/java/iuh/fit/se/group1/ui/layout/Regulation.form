@@ -34,8 +34,8 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="headerShift1" min="-2" pref="117" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="67" max="-2" attributes="0"/>
-              <Component id="lblRegulation" min="-2" pref="302" max="-2" attributes="0"/>
-              <EmptySpace pref="322" max="32767" attributes="0"/>
+              <Component id="lblRegulation" min="-2" pref="592" max="-2" attributes="0"/>
+              <EmptySpace pref="32" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

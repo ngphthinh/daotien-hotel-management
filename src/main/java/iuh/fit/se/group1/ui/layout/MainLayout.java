@@ -34,6 +34,7 @@ public class MainLayout extends JPanel {
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
+    private SurchageManagement surchageManagement;
 
     private float alpha = 1f;
     private SideBar sideBar;
@@ -111,21 +112,23 @@ public class MainLayout extends JPanel {
                         setMainContent(orderManagement);
                         orderManagement.loadData();
 
-                    } else if (index == 9 && subIndex == 1) {
+                    }else if (index == 9) {
+                        setMainContent(surchageManagement);
+                    }  else if (index == 10 && subIndex == 1) {
                         setMainContent(revenueStatistics);
-                    } else if (index == 9 && subIndex ==2) {
+                    } else if (index == 10 && subIndex ==2) {
                         setMainContent(new BookingTrend());
-                    } else if (index == 9 && subIndex ==3) {
+                    } else if (index == 10 && subIndex ==3) {
                         setMainContent(new StatisticsDetail());
-                    } else if (index == 10 && subIndex == 2) {
+                    } else if (index == 11 && subIndex == 2) {
                         setMainContent(new Regulation());
-                    } else if (index == 10 && subIndex == 3) {
+                    } else if (index == 11 && subIndex == 3) {
                         var modal = new CheckForVersionPanel();
                         GlassPanePopup.showPopup(modal);
                         modal.getBtnClose().addActionListener(e
                                 -> GlassPanePopup.closePopupLast()
                         );
-                    } else if (index == 10 && subIndex == 4) {
+                    } else if (index == 11 && subIndex == 4) {
                         try {
                             File htmlFile = new File("src/main/resources/static/about.html");
 
@@ -243,6 +246,9 @@ public class MainLayout extends JPanel {
             paymentPage = new PaymentPage();
             shiftManagement = new ShiftManagement();
             employeeManagement = new EmployeeManagement();
+            // if (shiftManagement.getShiftList() != null) {
+            //     employeeManagement.setShiftList(shiftManagement.getShiftList());
+            // }
             customerManagement = new CustomerManagement();
             amenityManagement = new AmenityManagement();
             promotionManagement = new PromotionManagement();
@@ -252,6 +258,7 @@ public class MainLayout extends JPanel {
             orderManagement.setPaymentPage(paymentPage);
             checkForVersionPanel = new CheckForVersionPanel();
             revenueStatistics = new RevenueStatistics();
+            surchageManagement = new SurchageManagement();
             setMainContent(dashboard);
         } else {
             dashboardEmployee = new DashboardEmployee();

@@ -38,13 +38,11 @@
                           <Component id="lblEmail" min="-2" max="-2" attributes="0"/>
                           <Component id="lblPhone" min="-2" max="-2" attributes="0"/>
                           <Component id="lblName" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblAddress" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="lblDob" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="txtEmail" alignment="0" max="32767" attributes="0"/>
-                          <Component id="txtAddress" alignment="0" max="32767" attributes="0"/>
                           <Component id="txtDob" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -73,10 +71,7 @@
                               </Group>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="lblErrolDob" min="-2" max="-2" attributes="0"/>
-                                  <Component id="lblErrolAddress" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="lblErrolDob" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -134,24 +129,19 @@
               </Group>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Component id="lblErrolEmail" min="-2" pref="14" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtAddress" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblAddress" alignment="3" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lblDob" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="txtDob" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="iconDate" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-              <Component id="lblErrolAddress" min="-2" pref="14" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="iconDate" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblDob" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDob" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="lblErrolDob" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="btnSave" min="-2" pref="33" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="23" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -205,14 +195,6 @@
         <Property name="text" type="java.lang.String" value="C&#x103;n c&#x1b0;&#x1edb;c c&#xf4;ng d&#xe2;n:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblAddress">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Segoe UI" size="12" style="1"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="&#x110;&#x1ecb;a ch&#x1ec9;:"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JLabel" name="lblDob">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -248,14 +230,6 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtCitizenActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtAddress">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Duyen Hai, Tra Vinh, Viet Nam"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtAddressActionPerformed"/>
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnSave">
@@ -341,17 +315,6 @@
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="C&#x103;n c&#x1b0;&#x1edb;c c&#xf4;ng d&#xe2;n kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblErrolAddress">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Segoe UI" size="10" style="0"/>
-        </Property>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="ff" green="ff" red="ff" type="rgb"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="&#x110;&#x1ecb;a ch&#x1ec9; kh&#xf4;ng h&#x1ee3;p l&#x1ec7;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblErrolDob">

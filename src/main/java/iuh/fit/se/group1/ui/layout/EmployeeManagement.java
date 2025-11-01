@@ -4,14 +4,26 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.CellStyle;
+import java.awt.Graphics2D;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+
+import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
+import iuh.fit.se.group1.ui.component.shift.ShiftList;
+import iuh.fit.se.group1.ui.component.table.Table;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.Color;
@@ -24,8 +36,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -35,24 +51,40 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-
 import iuh.fit.se.group1.util.Constants;
+
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Picture;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
+
 import iuh.fit.se.group1.service.ExportExcelService;
+import iuh.fit.se.group1.service.ImportExcelService;
+import java.io.File;
+import java.util.List;
 
-
-/**
- * @author VienThieu
- */
 public class EmployeeManagement extends javax.swing.JPanel {
+
     private static final Logger log = LoggerFactory.getLogger(EmployeeManagement.class);
     private final EmployeeService employeeService;
     private final RoleService roleService;
     private int activeFilterColumn = -1;
+    private ShiftList shiftList;
 
     public EmployeeManagement() {
         initComponents();
@@ -61,33 +93,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
         roleService = new RoleService();
         loadTable(employeeService.getAllEmployees());
     }
-
-
-    private void loadTable(java.util.List<Employee> employees) {
-        DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-        model.setRowCount(0);
-        for (Employee employee : employees) {
-            String genderStr = employee.isGender() ? "Nữ" : "Nam";
-            String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
-                    ? employee.getAccount().getRole().getRoleName()
-                    : "N/A";
-            model.addRow(new Object[]{
-                    employee.getEmployeeId(),
-                    employee.getFullName(),
-                    genderStr,
-                    roleName,
-                    employee.getPhone()
-            });
-        }
-    }
-
     private void custom() {
         headerCustom2.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
         headerCustom2.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý nhân viên</span>"
-                        + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>"
-        );
+
+                + "<span style='color:rgb(204,204,204);'> &gt; Thông tin nhân viên</span></html>");
+
         btnAddEmployee.setBackground(new Color(108, 165, 200));
         btnAddEmployee.setForeground(Color.WHITE);
         btnAddEmployee.setBorderRadius(10);
@@ -99,19 +112,28 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Employee> imported = importService.importEmployeesFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    employeeService.getAllEmployees().addAll(imported);
+                    loadTable(employeeService.getAllEmployees());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
         btnAddEmployee.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
-        btnExport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportActionPerformed(evt);
-            }
-        });
 
-
-
-        String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
+        String cols[] = { "Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng" };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
 
         tblEmployee.getTbl().setModel(model);
@@ -126,8 +148,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 sorter.setSortable(i, false);
             }
         }
-//        DefaultTableModel model = new DefaultTableModel(cols, 0);
-//        tblPromotion.getTbl().setModel(model);
+        // DefaultTableModel model = new DefaultTableModel(cols, 0);
+        // tblPromotion.getTbl().setModel(model);
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -184,31 +206,62 @@ public class EmployeeManagement extends javax.swing.JPanel {
                             return;
                         }
 
-                        // Tạo Employee object
+                        // Lấy giá trị mới từ modal
+                        String genderSelected = (String) modal.getCmbGender().getSelectedItem();
+                        boolean gender = "Nữ".equals(genderSelected); // true nếu là Nữ
+
+                        String roleSelected = (String) modal.getCmbPosition().getSelectedItem();
+                        String roleId = roleSelected.equalsIgnoreCase("Nhân viên quản lý")
+                                ? Role.MANAGER.toString()
+                                : Role.RECEPTIONIST.toString();
+
+                        // Lấy Role entity từ database
+                        iuh.fit.se.group1.entity.Role newRole = roleService.getRoleById(roleId);
+                        if (newRole == null) {
+                            Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
+                            return;
+                        }
+
+                        // Tạo đối tượng Employee mới để cập nhật
                         Employee employeeUpdate = new Employee();
                         employeeUpdate.setEmployeeId(employeeId);
                         employeeUpdate.setFullName(result.fullName);
                         employeeUpdate.setPhone(result.phone);
                         employeeUpdate.setEmail(result.email);
-                        employeeUpdate.setGender(result.gender);
                         employeeUpdate.setCitizenId(result.citizenId);
                         employeeUpdate.setHireDate(result.hireDate);
-                        employeeUpdate.setAccount(employee.getAccount()); // Giữ nguyên account
+                        employeeUpdate.setGender(gender); // Gán giới tính mới
 
-                        // Lấy avatar từ AvatarLabel
+                        // Cập nhật role cho account
+                        if (employee.getAccount() != null) {
+                            Account accountToUpdate = employee.getAccount();
+                            accountToUpdate.setRole(newRole); // Gán toàn bộ đối tượng Role mới
+                            employeeUpdate.setAccount(accountToUpdate);
+                        } else {
+                            Message.showMessage("Lỗi", "Nhân viên không có tài khoản!");
+                            return;
+                        }
+
+                        // Avatar mới
                         AvatarLabel avt = modal.getAvatarLabel();
                         if (avt != null) {
                             byte[] avtBytes = avt.getImageAsBytes("jpg");
-                            if (avtBytes != null) {
+                            if (avtBytes != null && avtBytes.length > 0) {
                                 employeeUpdate.setAvt(avtBytes);
                                 log.info("Avatar updated for employee: {}", employeeId);
+                            } else {
+                                // Giữ nguyên avatar cũ nếu không có avatar mới
+                                employeeUpdate.setAvt(employee.getAvt());
                             }
+                        } else {
+                            // Giữ nguyên avatar cũ nếu avatarLabel null
+                            employeeUpdate.setAvt(employee.getAvt());
                         }
 
-                        // Gọi employeeService
+                        // Gọi service update xuống database
                         Employee entitySave = employeeService.updateEmployee(employeeUpdate);
 
-                        // Update giá trị Employee vào table
+                        // Cập nhật lại table
                         String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
                         String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
                                 ? entitySave.getAccount().getRole().getRoleName()
@@ -219,14 +272,15 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         model.setValueAt(roleName2, row, 3);
                         model.setValueAt(entitySave.getPhone(), row, 4);
 
+                        Message.showMessage("Thành công", "Cập nhật nhân viên thành công!");
                         GlassPanePopup.closePopupLast();
                     });
                 });
 
+
                 GlassPanePopup.showPopup(modal);
 
             }
-
 
             @Override
             public void onDelete(int row) {
@@ -249,6 +303,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         model.removeRow(rowDelete);
                         // SỬA: Gọi employeeService
                         employeeService.deleteEmployee(id);
+                        if (shiftList != null) {
+                            shiftList.reloadEmployees();
+                            log.info("Reloaded ShiftList after deleting employee: {}", id);
+                        }
                     }
                 });
             }
@@ -287,7 +345,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 modal.getCmbPosition().setSelectedItem(roleName);
 
                 // Hiển thị avatar từ database
-                AvatarLabel avatarLabel = modal.getAvatarLabel(); // Cần thêm getter cho AvatarLabel trong InfoEmployeeModal
+                AvatarLabel avatarLabel = modal.getAvatarLabel(); // Cần thêm getter cho AvatarLabel trong
+                                                                  // InfoEmployeeModal
                 if (avatarLabel != null) {
                     if (employee.getAvt() != null && employee.getAvt().length > 0) {
                         try {
@@ -324,7 +383,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 GlassPanePopup.showPopup(modal);
             }
         };
-
 
         tblEmployee.setTableActionColumn(tblEmployee.getTbl(), 5, event, true);
         tblEmployee.getTbl().getColumnModel().getColumn(0).setPreferredWidth(120);
@@ -373,8 +431,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
         });
 
         var header = tblEmployee.getTbl().getTableHeader();
-        Combobox<String> cmb = new Combobox<>(new String[]{"Tất cả", "Nam", "Nữ"});
-        Combobox<String> cmbChucVu = new Combobox<>(new String[]{"Tất cả", "Nhân viên lễ tân", "Nhân viên quản lý"});
+        Combobox<String> cmb = new Combobox<>(new String[] { "Tất cả", "Nam", "Nữ" });
+        Combobox<String> cmbChucVu = new Combobox<>(new String[] { "Tất cả", "Nhân viên lễ tân", "Nhân viên quản lý" });
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
@@ -457,7 +515,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         headerCustom2 = new iuh.fit.se.group1.ui.component.HeaderCustom();
@@ -486,12 +543,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         btnExport.setText("Xuất Excel");
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnExport.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportActionPerformed(evt);
-            }
-        });
+        btnExport.addActionListener(e -> exportAllEmployeesToExcel());
 
         btnImport.setText("Tải excel");
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -505,39 +557,218 @@ public class EmployeeManagement extends javax.swing.JPanel {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addContainerGap()
-                                                .addComponent(tblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                                .addComponent(tblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 0,
+                                                        Short.MAX_VALUE))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addGap(36, 36, 36)
                                                 .addComponent(lblTitleEmployee)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        170, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(45, 45, 45)))
-                                .addContainerGap())
-        );
+                                .addContainerGap()));
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(headerCustom2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(headerCustom2, javax.swing.GroupLayout.PREFERRED_SIZE, 75,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(30, 30, 30)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(lblTitleEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(btnAddEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblTitleEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(25, 25, 25)
                                 .addComponent(tblEmployee, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
-                                .addGap(37, 37, 37))
-        );
-    }// </editor-fold>//GEN-END:initComponents
+                                .addGap(37, 37, 37)));
+    }
+    private void loadTable(java.util.List<Employee> employees) {
+       
+        DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
+        model.setRowCount(0);
+        for (Employee employee : employees) {
+            String genderStr = employee.isGender() ? "Nữ" : "Nam";
+            String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
+                    ? employee.getAccount().getRole().getRoleName()
+                    : "N/A";
+            model.addRow(new Object[] {
+                    employee.getEmployeeId(),
+                    employee.getFullName(),
+                    genderStr,
+                    roleName,
+                    employee.getPhone()
 
+            });
+        }
+    }
 
-    private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmployeeActionPerformed
+    public static void exportModalToExcel(Component parent, InfoEmployeeModal modal) {
+        if (modal == null)
+            return;
+
+        // Lấy dữ liệu từ modal
+        String employeeId = modal.getLblCode().getText();
+        String fullName = modal.getTxtName().getText();
+        String phone = modal.getTxtPhone().getText();
+        String email = modal.getTxtEmail().getText();
+        String citizenId = modal.getTxtCitizen().getText();
+        String hireDateStr = modal.getTxtHireDate().getText();
+        String genderStr = modal.getCmbGender().getSelectedItem() != null
+                ? modal.getCmbGender().getSelectedItem().toString()
+                : "N/A";
+        String position = modal.getCmbPosition().getSelectedItem() != null
+                ? modal.getCmbPosition().getSelectedItem().toString()
+                : "N/A";
+
+        LocalDate hireDate = LocalDate.now();
+        try {
+            hireDate = LocalDate.parse(hireDateStr, Constants.DATE_FORMATTER);
+        } catch (Exception e) {
+            hireDate = LocalDate.now();
+        }
+
+        // Avatar
+        AvatarLabel avatarLabel = modal.getAvatarLabel();
+        byte[] avatarBytes = avatarLabel != null ? avatarLabel.getImageAsBytes("png") : null;
+
+        // Chọn file lưu
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn vị trí lưu file Excel");
+        fileChooser.setSelectedFile(new java.io.File("NhanVien_" + employeeId + ".xlsx"));
+        int userSelection = fileChooser.showSaveDialog(parent);
+        if (userSelection != JFileChooser.APPROVE_OPTION)
+            return;
+
+        java.io.File fileToSave = fileChooser.getSelectedFile();
+        String filePath = fileToSave.getAbsolutePath();
+        if (!filePath.toLowerCase().endsWith(".xlsx"))
+            filePath += ".xlsx";
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Nhân Viên");
+
+            // Tạo font Times New Roman size 16
+            Font font = workbook.createFont();
+            font.setFontName("Times New Roman");
+            font.setFontHeightInPoints((short) 16);
+
+            // Styles
+            CellStyle headerStyle = createHeaderStyle(workbook, font);
+            CellStyle dataStyle = createDataStyle(workbook, font);
+            CellStyle centerStyle = workbook.createCellStyle();
+            centerStyle.cloneStyleFrom(dataStyle);
+            centerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+            // Header
+            String[] headers = { "STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
+                    "Ngày tuyển dụng", "Avatar" };
+            Row headerRow = sheet.createRow(0);
+            headerRow.setHeightInPoints(30);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Data
+            Row row = sheet.createRow(1);
+            row.setHeightInPoints(80);
+
+            int colIndex = 0;
+
+            // STT
+            Cell sttCell = row.createCell(colIndex++);
+            sttCell.setCellValue(1);
+            sttCell.setCellStyle(centerStyle);
+
+            // Các thông tin khác
+            String[] data = { employeeId, fullName, genderStr, position, phone, email, citizenId,
+                    hireDate.format(Constants.DATE_FORMATTER) };
+            for (String d : data) {
+                Cell cell = row.createCell(colIndex++);
+                cell.setCellValue(d);
+                cell.setCellStyle(dataStyle);
+            }
+
+            // Avatar
+            if (avatarBytes != null && avatarBytes.length > 0) {
+                BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(avatarBytes));
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ImageIO.write(bimg, "png", bos);
+                int pictureIdx = workbook.addPicture(bos.toByteArray(), Workbook.PICTURE_TYPE_PNG);
+                bos.close();
+
+                CreationHelper helper = workbook.getCreationHelper();
+                Drawing<?> drawing = sheet.createDrawingPatriarch();
+                ClientAnchor anchor = helper.createClientAnchor();
+                anchor.setCol1(colIndex);
+                anchor.setRow1(1);
+                Picture pict = drawing.createPicture(anchor, pictureIdx);
+                pict.resize(1.0);
+            }
+
+            // Auto-size cột
+            for (int i = 0; i <= headers.length; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            Message.showMessage("Thành công", "Xuất Excel thành công!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Message.showMessage("Lỗi", "Xuất Excel thất bại!");
+        }
+    }
+
+    // Header style với font tùy chỉnh
+    private static CellStyle createHeaderStyle(Workbook workbook, Font font) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        font.setBold(true);
+        return style;
+    }
+
+    // Data style với font tùy chỉnh
+    private static CellStyle createDataStyle(Workbook workbook, Font font) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        return style;
+    }
+
+    private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddEmployeeActionPerformed
 
         InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
+        modal.getLblCode().setVisible(false);
+        modal.getLblStatus().setText("Hãy chọn avatar!");
+        modal.getLblStatus().setForeground(Color.red);
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -549,30 +780,109 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                saveData(modal);
-                GlassPanePopup.closePopupAll();
+                boolean success = saveData(modal);
+                if (success) {
+                    GlassPanePopup.closePopupAll();
+                }
             }
         });
 
         raven.glasspanepopup.GlassPanePopup.showPopup(modal);
     }
 
+    private void exportAllEmployeesToExcel() {
+        List<Employee> employees = employeeService.getAllEmployees();
+        if (employees == null || employees.isEmpty()) {
+            Message.showMessage("Thông báo", "Không có nhân viên để xuất Excel!");
+            return;
+        }
 
-    private void saveData(InfoEmployeeModal modal) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn vị trí lưu file Excel");
+        fileChooser.setSelectedFile(new File("DanhSachNhanVien.xlsx"));
+        if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+            return;
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String filePath = fileToSave.getAbsolutePath();
+        if (!filePath.toLowerCase().endsWith(".xlsx"))
+            filePath += ".xlsx";
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Nhân Viên");
+
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle dataStyle = createDataStyle(workbook);
+
+            // ======= THÊM CỘT STT =======
+            String[] headers = { "STT", "Mã NV", "Họ tên", "Giới tính", "Chức vụ", "SĐT", "Email", "CCCD",
+                    "Ngày tuyển dụng" };
+
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // ======= DỮ LIỆU =======
+            int rowIndex = 1;
+            int stt = 1;
+
+            for (Employee emp : employees) {
+                Row row = sheet.createRow(rowIndex++);
+
+                row.createCell(0).setCellValue(stt++); // STT
+                row.createCell(1).setCellValue(emp.getEmployeeId());
+                row.createCell(2).setCellValue(emp.getFullName());
+                row.createCell(3).setCellValue(emp.isGender() ? "Nữ" : "Nam");
+
+                String roleName = (emp.getAccount() != null && emp.getAccount().getRole() != null)
+                        ? emp.getAccount().getRole().getRoleName()
+                        : "N/A";
+                row.createCell(4).setCellValue(roleName);
+                row.createCell(5).setCellValue(emp.getPhone());
+                row.createCell(6).setCellValue(emp.getEmail());
+                row.createCell(7).setCellValue(emp.getCitizenId());
+                row.createCell(8).setCellValue(emp.getHireDate().format(Constants.DATE_FORMATTER));
+
+                for (int i = 0; i < headers.length; i++) {
+                    row.getCell(i).setCellStyle(dataStyle);
+                }
+            }
+
+            // Auto size
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            Message.showMessage("Thành công", "Xuất Excel toàn bộ nhân viên thành công!");
+        } catch (Exception ex) {
+            log.error("Lỗi xuất Excel toàn bộ nhân viên: ", ex);
+            Message.showMessage("Lỗi", "Xuất Excel thất bại!");
+        }
+    }
+
+
+    private boolean saveData(InfoEmployeeModal modal) {
         Valid result = getValid(modal);
 
         if (!result.valid) {
             Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào!");
-            return;
+            return false;
         }
 
         try {
             int position = modal.getCmbPosition().getSelectedIndex();
             String roleId;
             if (position == 0) {
-                roleId = Role.MANAGER.toString();
-            } else {
                 roleId = Role.RECEPTIONIST.toString();
+            } else {
+                roleId = Role.MANAGER.toString();
             }
             Employee employee = new Employee();
             employee.setFullName(result.fullName);
@@ -597,7 +907,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             if (employeeSave == null) {
                 Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
-                return;
+                return false;
             }
 
             DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
@@ -605,32 +915,61 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             System.out.println(employeeSave);
 
-            model.addRow(new Object[]{
+
+            model.addRow(new Object[] {
                     employeeSave.getEmployeeId(),
                     employeeSave.getFullName(),
                     genderStr,
                     employeeSave.getAccount().getRole().getRoleName(),
                     employeeSave.getPhone()
             });
+            if (shiftList != null) {
+                shiftList.addNewEmployee(employeeSave);
+                log.info("Notified ShiftList about new employee: {}", employeeSave.getFullName());
+            }
             Message.showMessage("Thành công", "Thêm nhân viên thành công!");
+            return true;
         } catch (Exception e) {
             log.error("Error creating employee: ", e);
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
+            return false;
         }
     }
-    //GEN-LAST:event_btnAddEmployeeActionPerformed
+
+    private CellStyle createHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 16);
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+
+    private CellStyle createDataStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 16);
+        style.setFont(font);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
         ExportExcelService.exportTableToExcel(
                 this,
                 tblEmployee.getTbl(),
                 "Danh sách nhân viên",
-                "DanhSachNhanVien"
-        );
+                "DanhSachNhanVien");
     }
 
     private void filterTable(String genderFilter, String positionFilter) {
-        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl().getRowSorter();
+        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl()
+                .getRowSorter();
 
         RowFilter<DefaultTableModel, Object> rf = new RowFilter() {
             @Override
@@ -638,8 +977,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 String gender = entry.getStringValue(2);
                 String position = entry.getStringValue(3);
 
-                boolean genderMatches = genderFilter == null || genderFilter.equals("Tất cả") || gender.equals(genderFilter);
-                boolean positionMatches = positionFilter == null || positionFilter.equals("Tất cả") || position.equals(positionFilter);
+                boolean genderMatches = genderFilter == null || genderFilter.equals("Tất cả")
+                        || gender.equals(genderFilter);
+                boolean positionMatches = positionFilter == null || positionFilter.equals("Tất cả")
+                        || position.equals(positionFilter);
 
                 return genderMatches && positionMatches;
             }
@@ -649,7 +990,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
 
     }
-
     private static Valid getValid(InfoEmployeeModal modal) {
         String name = modal.getTxtName().getText().trim();
         String phone = modal.getTxtPhone().getText().trim();
@@ -657,9 +997,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
         String email = modal.getTxtEmail().getText().trim();
         String hireDateStr = modal.getTxtHireDate().getText().trim();
         boolean gender = modal.getCmbGender().getSelectedItem() != null
-                && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nam");
+                && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nữ");
 
-//         Reset lỗi
+        // Reset lỗi
         Color white = Color.WHITE;
         modal.getLblErrolName().setForeground(white);
         modal.getLblErrolPhone().setForeground(white);
@@ -667,48 +1007,50 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.getLblErrolEmail().setForeground(white);
         modal.getLblErrolHireDate().setForeground(white);
 
-        Color red = Color.RED;
-        modal.getLblErrolName().setForeground(red);
-        modal.getLblErrolPhone().setForeground(red);
-        modal.getLblErrolCitizen().setForeground(red);
-        modal.getLblErrolEmail().setForeground(red);
-        modal.getLblErrolHireDate().setForeground(red);
-
         boolean valid = true;
+        Color red = Color.RED;
 
         // Tên
         if (name.isEmpty()) {
             modal.getLblErrolName().setText("Họ tên không được để trống!");
+            modal.getLblErrolName().setForeground(red);
             valid = false;
         } else if (name.length() < 2) {
             modal.getLblErrolName().setText("Họ tên quá ngắn!");
+            modal.getLblErrolName().setForeground(red);
             valid = false;
         }
 
         // Số điện thoại
         if (phone.isEmpty()) {
             modal.getLblErrolPhone().setText("Số điện thoại không được để trống!");
+            modal.getLblErrolPhone().setForeground(red);
             valid = false;
         } else if (!phone.matches("^0\\d{9}$")) {
             modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ!");
+            modal.getLblErrolPhone().setForeground(red);
             valid = false;
         }
 
         // CCCD
         if (citizenId.isEmpty()) {
             modal.getLblErrolCitizen().setText("CCCD không được để trống!");
+            modal.getLblErrolCitizen().setForeground(red);
             valid = false;
         } else if (!citizenId.matches("\\d{12}")) {
             modal.getLblErrolCitizen().setText("CCCD phải có 12 chữ số!");
+            modal.getLblErrolCitizen().setForeground(red);
             valid = false;
         }
 
         // Email
         if (email.isEmpty()) {
             modal.getLblErrolEmail().setText("Email không được để trống!");
+            modal.getLblErrolEmail().setForeground(red);
             valid = false;
         } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
             modal.getLblErrolEmail().setText("Email không hợp lệ!");
+            modal.getLblErrolEmail().setForeground(red);
             valid = false;
         }
 
@@ -721,12 +1063,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
             }
         } catch (DateTimeParseException e) {
             modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd-MM-yyyy)!");
+            modal.getLblErrolHireDate().setForeground(red);
             valid = false;
             log.error("Error parsing hire date: ", e);
         }
 
         return new Valid(name, valid, gender, phone, citizenId, email, hireDate);
     }
+
 
     private record Valid(
             String fullName,
@@ -735,16 +1079,21 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String phone,
             String citizenId,
             String email,
-            LocalDate hireDate
-    ) {
+            LocalDate hireDate) {
+
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnAddEmployee;
     private iuh.fit.se.group1.ui.component.custom.Button btnExport;
     private iuh.fit.se.group1.ui.component.custom.Button btnImport;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom2;
     private javax.swing.JLabel lblTitleEmployee;
     private iuh.fit.se.group1.ui.component.table.Table tblEmployee;
-    // End of variables declaration//GEN-END:variables
+
+    public void setShiftList(ShiftList shiftList2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setShiftList'");
+    }
+
 }
+

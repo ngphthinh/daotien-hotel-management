@@ -51,75 +51,68 @@ public class Main {
     /// /        }
 //
 //    }
-    public static void main(String[] args) {
-        PromotionService promotionService = new PromotionService();
-        System.out.println(promotionService.getPromotionDiscountPercentMax());
-        System.out.println("=============");
-        System.out.println(promotionService.getPromotionDiscountPriceMax());
-    }
+    public static void main(String[] args) throws Exception {
+        OrderRepository orderRepository = new OrderRepository();
 
-//    public static void main(String[] args) throws Exception {
-//        OrderRepository orderRepository = new OrderRepository();
-//
-//        Customer customer = new Customer();
-//        customer.setEmail("ngphthinh@gmail.com");
-//        customer.setFullName("Nguyễn Phước Thịnh");
-//        customer.setPhone("0338687106");
-//        customer.setDateOfBirth(LocalDate.now());
-//        customer.setGender(false);
-//        customer.setCitizenId("082205000810");
-//
-//
-//        Order order = new Order();
-//
-//        order.setOrderDate(LocalDateTime.now());
-//        order.setCustomer(customer);
-//        order.setEmployee(new Employee(4L));
-//        order.setOrderType(new OrderType(1L, "sad", LocalDate.now()));
-//        order.setDeposit(BigDecimal.ZERO);
-//        order.setTotalAmount(new BigDecimal(2000));
-//
-//        PaymentService paymentService = new PaymentService();
-//
-//
-//        JFrame frame = new JFrame("Thanh toán MoMo QR");
-//        frame.setSize(400, 500);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setLayout(new BorderLayout());
-//
-//        JLabel lblImage = new JLabel("", SwingConstants.CENTER);
-//        JButton btnCheck = new JButton("Kiểm tra trạng thái");
-//
-//        frame.add(lblImage, BorderLayout.CENTER);
-//        frame.add(btnCheck, BorderLayout.SOUTH);
-//        frame.setVisible(true);
-//
-//        String response = paymentService.createPayment(order);
-//
-//        // Parse JSON thủ công thay vì dùng Gson
-//        String payUrl = paymentService.extractJsonValue(response, "payUrl");
-//        String orderId = paymentService.extractJsonValue(response, "orderId");
-//        String resultCode = paymentService.extractJsonValue(response, "resultCode");
-//
-//
-//        System.out.println("Order ID: " + orderId);
-//        System.out.println("Result Code: " + resultCode);
-//
-//        if (payUrl != null && !payUrl.isEmpty()) {
-//            lblImage.setIcon(new ImageIcon(paymentService.generateQRCodeImage(payUrl, 300, 300)));
-//            JOptionPane.showMessageDialog(frame, "QR Code đã tạo thành công!\nOrder ID: " + orderId);
-//        } else {
-//            JOptionPane.showMessageDialog(frame, "Không lấy được payUrl\nResponse: " + response);
-//        }
-//
-//
-////
-////
-////        Booking booking = new Booking(1L, LocalDateTime.now(), LocalDateTime.now(), new Employee(4L),new Room(1L), BookingType.HOURLY,BigDecimal.valueOf(2000l),LocalDate.now());
-////
-////        order.addBooking(booking);
-////        System.out.println(orderRepository.save(order));
+        Customer customer = new Customer();
+        customer.setEmail("ngphthinh@gmail.com");
+        customer.setFullName("Nguyễn Phước Thịnh");
+        customer.setPhone("0338687106");
+        customer.setDateOfBirth(LocalDate.now());
+        customer.setGender(false);
+        customer.setCitizenId("082205000810");
+
+
+        Order order = new Order();
+
+        order.setOrderDate(LocalDateTime.now());
+        order.setCustomer(customer);
+        order.setEmployee(new Employee(4L));
+        order.setOrderType(new OrderType(1L, "sad", LocalDate.now()));
+        order.setDeposit(BigDecimal.ZERO);
+        order.setTotalAmount(new BigDecimal(2000));
+
+        PaymentService paymentService = new PaymentService();
+
+
+        JFrame frame = new JFrame("Thanh toán MoMo QR");
+        frame.setSize(400, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        JLabel lblImage = new JLabel("", SwingConstants.CENTER);
+        JButton btnCheck = new JButton("Kiểm tra trạng thái");
+
+        frame.add(lblImage, BorderLayout.CENTER);
+        frame.add(btnCheck, BorderLayout.SOUTH);
+        frame.setVisible(true);
+
+        String response = paymentService.createPayment(order);
+
+        // Parse JSON thủ công thay vì dùng Gson
+        String payUrl = paymentService.extractJsonValue(response, "payUrl");
+        String orderId = paymentService.extractJsonValue(response, "orderId");
+        String resultCode = paymentService.extractJsonValue(response, "resultCode");
+
+
+        System.out.println("Order ID: " + orderId);
+        System.out.println("Result Code: " + resultCode);
+
+        if (payUrl != null && !payUrl.isEmpty()) {
+            lblImage.setIcon(new ImageIcon(paymentService.generateQRCodeImage(payUrl, 300, 300)));
+            JOptionPane.showMessageDialog(frame, "QR Code đã tạo thành công!\nOrder ID: " + orderId);
+        } else {
+            JOptionPane.showMessageDialog(frame, "Không lấy được payUrl\nResponse: " + response);
+        }
+
+
 //
 //
-//    }
+//        Booking booking = new Booking(1L, LocalDateTime.now(), LocalDateTime.now(), new Employee(4L),new Room(1L), BookingType.HOURLY,BigDecimal.valueOf(2000l),LocalDate.now());
+//
+//        order.addBooking(booking);
+//        System.out.println(orderRepository.save(order));
+
+
+    }
 }

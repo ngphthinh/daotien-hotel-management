@@ -37,14 +37,19 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.LoggerFactory;
 import iuh.fit.se.group1.service.ExportExcelService;
+import iuh.fit.se.group1.service.ImportExcelService;
+
+import java.io.File;
+import javax.swing.JFileChooser;
+
 import raven.glasspanepopup.GlassPanePopup;
 
 /**
- *
  * @author Windows
  */
 public class CustomerManagement extends javax.swing.JPanel {
@@ -88,6 +93,22 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Customer> imported = importService.importCustomersFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    customerService.getAllCustomer().addAll(imported);
+                    loadTable(customerService.getAllCustomer());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
         btnAddCustomer.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
@@ -142,7 +163,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getLblErrolPhone().setText("");
                 modal.getLblErrolEmail().setText("");
                 modal.getLblErrolCitizen().setText("");
-                modal.getLblErrolAddress().setText("");
                 modal.getLblErrolDob().setText("");
 
                 Color red = Color.RED;
@@ -150,7 +170,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getLblErrolPhone().setForeground(red);
                 modal.getLblErrolEmail().setForeground(red);
                 modal.getLblErrolCitizen().setForeground(red);
-                modal.getLblErrolAddress().setForeground(red);
                 modal.getLblErrolDob().setForeground(red);
 
                 modal.saveData(ae -> {
@@ -183,7 +202,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 GlassPanePopup.showPopup(modal);
             }
-
 
             @Override
             public void onDelete(int row) {
@@ -227,7 +245,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getTxtPhone().setEditable(false);
                 modal.getTxtEmail().setEditable(false);
                 modal.getTxtCitizen().setEditable(false);
-                modal.getTxtAddress().setEditable(false);
                 modal.getTxtDob().setEditable(false);
                 modal.getCmbGender().setEnabled(false);
 
@@ -290,7 +307,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 filterTable();
             }
 
-
             private void filterTable() {
                 String keyword = headerCustom1.getSearchText().trim();
                 TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl().getRowSorter();
@@ -349,7 +365,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             }
         });
     }
-
 
     private void searchCustomer() {
         String keyword = headerCustom1.getSearchText().trim();
@@ -460,7 +475,6 @@ public class CustomerManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
     }
 
-
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddCustomerActionPerformed
         InfoCustomerModal modal = new InfoCustomerModal();
 
@@ -470,7 +484,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                 GlassPanePopup.closePopupLast();
             }
         });
-
 
         modal.saveData(new ActionListener() {
             @Override
@@ -526,7 +539,6 @@ public class CustomerManagement extends javax.swing.JPanel {
         String phone = modal.getTxtPhone().getText().trim();
         String email = modal.getTxtEmail().getText().trim();
         String citizen = modal.getTxtCitizen().getText().trim();
-        String address = modal.getTxtAddress().getText().trim();
         boolean gender = modal.getCmbGender().getSelectedItem() != null
                 && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nam");
         String dobStr = modal.getTxtDob().getText().trim();
@@ -535,14 +547,12 @@ public class CustomerManagement extends javax.swing.JPanel {
         modal.getLblErrolPhone().setText("");
         modal.getLblErrolEmail().setText("");
         modal.getLblErrolCitizen().setText("");
-        modal.getLblErrolAddress().setText("");
 
         Color red = Color.RED;
         modal.getLblErrolName().setForeground(red);
         modal.getLblErrolPhone().setForeground(red);
         modal.getLblErrolEmail().setForeground(red);
         modal.getLblErrolCitizen().setForeground(red);
-        modal.getLblErrolAddress().setForeground(red);
         boolean isValid = true;
 
         if (name.isEmpty()) {
@@ -573,11 +583,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             modal.getLblErrolCitizen().setText("CCCD/CMND phải gồm 12 chữ số!");
             isValid = false;
         }
-
-        if (address.isEmpty()) {
-            modal.getLblErrolAddress().setText("Vui lòng nhập địa chỉ");
-            isValid = false;
-        }
         LocalDate dob = null;
         try {
             if (!dobStr.isEmpty()) {
@@ -589,7 +594,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             modal.getLblErrolDob().setText("Ngày không hợp lệ (dd-MM-yyyy)!");
             isValid = false;
         }
-        return new Valid(name, isValid, phone, email, citizen, address, gender, dob);
+        return new Valid(name, isValid, phone, email, citizen, gender, dob);
     }
 
     private record Valid(
@@ -598,7 +603,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             String phone,
             String email,
             String citizen,
-            String address,
             boolean gender,
             LocalDate dob
     ) {

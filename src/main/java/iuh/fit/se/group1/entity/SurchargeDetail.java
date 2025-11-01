@@ -3,6 +3,7 @@ package iuh.fit.se.group1.entity;
 import java.time.LocalDate;
 
 public class SurchargeDetail {
+
     private Surcharge surcharge;
     private int quantity;
     private LocalDate createdAt;
@@ -26,7 +27,6 @@ public class SurchargeDetail {
     }
 
 
-
     public void setSurcharge(Surcharge surcharge) {
         this.surcharge = surcharge;
     }
@@ -46,4 +46,6 @@ public class SurchargeDetail {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
+
+
 }

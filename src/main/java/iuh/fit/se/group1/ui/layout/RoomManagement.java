@@ -5,6 +5,7 @@ import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.service.RoomTypeService;
+import iuh.fit.se.group1.service.Properties;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
@@ -18,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Properties;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -38,6 +38,8 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
 import iuh.fit.se.group1.service.ExportExcelService;
+import iuh.fit.se.group1.service.ImportExcelService;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 
 public class RoomManagement extends javax.swing.JPanel {
 
@@ -46,18 +48,19 @@ public class RoomManagement extends javax.swing.JPanel {
     private String currentTypeFilter = "Tất cả";
     private String currentStatusFilter = "Tất cả";
 
-
     private JLabel lblSingleType;
     private JLabel lblSingleHour, lblSingleNight, lblSingleDay;
     private JTextField txtSingleHour, txtSingleNight, txtSingleDay;
     private JLabel lblDoubleType;
     private JLabel lblDoubleHour, lblDoubleNight, lblDoubleDay;
     private JTextField txtDoubleHour, txtDoubleNight, txtDoubleDay;
+    private JLabel lblSingleFirstHour, lblDoubleFirstHour;
+    private JTextField txtSingleFirstHour, txtDoubleFirstHour;
 
     public RoomManagement() {
         initServices();
         initComponents();
-        loadPricesFromFile();  
+        loadPricesFromFile();
         custom();
         loadTable(roomService.getAllRooms());
         try {
@@ -93,6 +96,22 @@ public class RoomManagement extends javax.swing.JPanel {
         btnImport.setForeground(Color.WHITE);
         btnImport.setBorderRadius(10);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
+        btnImport.addActionListener(ev -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                ImportExcelService importService = new ImportExcelService();
+                List<Room> imported = importService.importRoomsFromExcel(file);
+                if (imported != null && !imported.isEmpty()) {
+                    roomService.getAllRooms().addAll(imported);
+                    loadTable(roomService.getAllRooms());
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                } else {
+                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                }
+            }
+        });
 
         setupTableModel();
         setupTableActions();
@@ -100,103 +119,128 @@ public class RoomManagement extends javax.swing.JPanel {
         setupMouseListeners();
         setupSearchListener();
     }
-    
-    
 
     private void setupFixedPrices() throws IOException {
-        
-        txtSingleHour.setEditable(false); txtSingleNight.setEditable(false); txtSingleDay.setEditable(false);
-        txtDoubleHour.setEditable(false); txtDoubleNight.setEditable(false); txtDoubleDay.setEditable(false);
 
-       
+        txtSingleHour.setEditable(false);
+        txtSingleNight.setEditable(false);
+        txtSingleDay.setEditable(false);
+        txtDoubleHour.setEditable(false);
+        txtDoubleNight.setEditable(false);
+        txtDoubleDay.setEditable(false);
+        txtSingleFirstHour.setEditable(false);
+        txtDoubleFirstHour.setEditable(false);
+
         btnUpdatePrice.addActionListener(e -> {
             boolean isEditing = txtSingleHour.isEditable();
             if (!isEditing) {
-                
-                txtSingleHour.setEditable(true); txtSingleNight.setEditable(true); txtSingleDay.setEditable(true);
-                txtDoubleHour.setEditable(true); txtDoubleNight.setEditable(true); txtDoubleDay.setEditable(true);
+                txtSingleHour.setEditable(true);
+                txtSingleNight.setEditable(true);
+                txtSingleDay.setEditable(true);
+                txtDoubleHour.setEditable(true);
+                txtDoubleNight.setEditable(true);
+                txtDoubleDay.setEditable(true);
+                txtSingleFirstHour.setEditable(true);
+                txtDoubleFirstHour.setEditable(true);
                 btnUpdatePrice.setText("Lưu giá");
                 return;
             }
 
-           
             try {
-                BigDecimal singleHour = new BigDecimal(txtSingleHour.getText().replaceAll("[^\\d]", ""));
-                BigDecimal singleNight = new BigDecimal(txtSingleNight.getText().replaceAll("[^\\d]", ""));
-                BigDecimal singleDay = new BigDecimal(txtSingleDay.getText().replaceAll("[^\\d]", ""));
+                // Kiểm tra trống trước
+                JTextField[] fields = {
+                        txtSingleHour, txtSingleNight, txtSingleDay, txtSingleFirstHour,
+                        txtDoubleHour, txtDoubleNight, txtDoubleDay, txtDoubleFirstHour
+                };
+                for (JTextField f : fields) {
+                    if (f.getText().trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(RoomManagement.this, "Không được để trống giá phòng!", "Lỗi",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
 
-                BigDecimal doubleHour = new BigDecimal(txtDoubleHour.getText().replaceAll("[^\\d]", ""));
-                BigDecimal doubleNight = new BigDecimal(txtDoubleNight.getText().replaceAll("[^\\d]", ""));
-                BigDecimal doubleDay = new BigDecimal(txtDoubleDay.getText().replaceAll("[^\\d]", ""));
+                BigDecimal singleHour = new BigDecimal(txtSingleHour.getText().trim());
+                BigDecimal singleNight = new BigDecimal(txtSingleNight.getText().trim());
+                BigDecimal singleDay = new BigDecimal(txtSingleDay.getText().trim());
+                BigDecimal singleFirstHour = new BigDecimal(txtSingleFirstHour.getText().trim());
+                BigDecimal doubleHour = new BigDecimal(txtDoubleHour.getText().trim());
+                BigDecimal doubleNight = new BigDecimal(txtDoubleNight.getText().trim());
+                BigDecimal doubleDay = new BigDecimal(txtDoubleDay.getText().trim());
+                BigDecimal doubleFirstHour = new BigDecimal(txtDoubleFirstHour.getText().trim());
 
-                
+                // Kiểm tra >0
+                if (singleHour.compareTo(BigDecimal.ZERO) <= 0 ||
+                        singleNight.compareTo(BigDecimal.ZERO) <= 0 ||
+                        singleDay.compareTo(BigDecimal.ZERO) <= 0 ||
+                        singleFirstHour.compareTo(BigDecimal.ZERO) <= 0 ||
+                        doubleHour.compareTo(BigDecimal.ZERO) <= 0 ||
+                        doubleNight.compareTo(BigDecimal.ZERO) <= 0 ||
+                        doubleDay.compareTo(BigDecimal.ZERO) <= 0 ||
+                        doubleFirstHour.compareTo(BigDecimal.ZERO) <= 0) {
+
+                    JOptionPane.showMessageDialog(this, "Tất cả giá phòng phải lớn hơn 0!", "Lỗi",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 savePricesToFile();
 
-                System.out.println("Lưu giá thành công vào prices.properties");
                 JOptionPane.showMessageDialog(this, "Cập nhật và lưu giá thành công!");
 
-                txtSingleHour.setEditable(false); txtSingleNight.setEditable(false); txtSingleDay.setEditable(false);
-                txtDoubleHour.setEditable(false); txtDoubleNight.setEditable(false); txtDoubleDay.setEditable(false);
+                // Khóa lại các field
+                for (JTextField f : fields) {
+                    f.setEditable(false);
+                }
                 btnUpdatePrice.setText("Cập nhật giá");
+
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Giá phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
 
-   private void savePricesToFile() {
-    Properties properties = new Properties();
-    try {
-        FileOutputStream output = new FileOutputStream(getClass().getResource("/prices.properties").toString());
+    private void savePricesToFile() {
+        String filePath = "prices.properties";
+        Properties props = Properties.loadProperties(filePath);
 
-        properties.setProperty("price.single.hourly", txtSingleHour.getText());
-        properties.setProperty("price.single.overnight", txtSingleNight.getText());
-        properties.setProperty("price.single.daily", txtSingleDay.getText());
+        props.setProperty("/price.single.hourly", txtSingleHour.getText());
+        props.setProperty("/price.single.overnight", txtSingleNight.getText());
+        props.setProperty("/price.single.daily", txtSingleDay.getText());
+        props.setProperty("/price.single.firsthour", txtSingleFirstHour.getText());
 
-        properties.setProperty("price.double.hourly", txtDoubleHour.getText());
-        properties.setProperty("price.double.overnight", txtDoubleNight.getText());
-        properties.setProperty("price.double.daily", txtDoubleDay.getText());
+        props.setProperty("/price.double.hourly", txtDoubleHour.getText());
+        props.setProperty("/price.double.overnight", txtDoubleNight.getText());
+        props.setProperty("/price.double.daily", txtDoubleDay.getText());
+        props.setProperty("/price.double.firsthour", txtDoubleFirstHour.getText());
 
-        properties.store(output, null);
-        output.close();
-    } catch (Exception e) {
-        e.printStackTrace();
+        Properties.saveProperties(filePath, props);
     }
-}
 
-   private void loadPricesFromFile() {
-    Properties properties = new Properties();
-    try {
-        File file = new File(getClass().getResource("/prices.properties").getFile());
-        if (!file.exists()) return;
+    private void loadPricesFromFile() {
+        String filePath = "prices.properties";
 
-        FileInputStream input = new FileInputStream(file);
-        properties.load(input);
+        txtSingleHour.setText(Properties.get(filePath, "/price.single.hourly"));
+        txtSingleNight.setText(Properties.get(filePath, "/price.single.overnight"));
+        txtSingleDay.setText(Properties.get(filePath, "/price.single.daily"));
+        txtSingleFirstHour.setText(Properties.get(filePath, "/price.single.firsthour"));
 
-        txtSingleHour.setText(properties.getProperty("price.single.hourly", ""));
-        txtSingleNight.setText(properties.getProperty("price.single.overnight", ""));
-        txtSingleDay.setText(properties.getProperty("price.single.daily", ""));
-
-        txtDoubleHour.setText(properties.getProperty("price.double.hourly", ""));
-        txtDoubleNight.setText(properties.getProperty("price.double.overnight", ""));
-        txtDoubleDay.setText(properties.getProperty("price.double.daily", ""));
-
-        input.close();
-    } catch (Exception e) {
-        e.printStackTrace();
+        txtDoubleHour.setText(Properties.get(filePath, "/price.double.hourly"));
+        txtDoubleNight.setText(Properties.get(filePath, "/price.double.overnight"));
+        txtDoubleDay.setText(Properties.get(filePath, "/price.double.daily"));
+        txtDoubleFirstHour.setText(Properties.get(filePath, "/price.double.firsthour"));
     }
-}
 
     private void loadTable(List<Room> rooms) {
         DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
         model.setRowCount(0);
         for (Room room : rooms) {
             model.addRow(new Object[]{
-                room.getRoomId(),
-                room.getRoomNumber(),
-                room.getRoomType() != null ? room.getRoomType().getName() : "N/A",
-                room.getRoomStatus() != null ? room.getRoomStatus().toString() : "AVAILABLE",
-                ""
+                    room.getRoomId(),
+                    room.getRoomNumber(),
+                    room.getRoomType() != null ? room.getRoomType().getName() : "N/A",
+                    room.getRoomStatus() != null ? room.getRoomStatus().toString() : "AVAILABLE",
+                    ""
             });
         }
         System.out.println("UI Load: Found " + rooms.size() + " rooms from DB");
@@ -260,7 +304,8 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (updatedRoom != null) {
                     loadTable(roomService.getAllRooms());
                     GlassPanePopup.closePopupLast();
-                    JOptionPane.showMessageDialog(this, "Cập nhật thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Cập nhật thành công!", "Thành công",
+                            JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "Cập nhật thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
@@ -420,8 +465,10 @@ public class RoomManagement extends javax.swing.JPanel {
                 String type = entry.getStringValue(2);
                 String status = entry.getStringValue(3);
 
-                boolean typeMatches = currentTypeFilter.equals("Tất cả") || (type != null && type.equals(currentTypeFilter));
-                boolean statusMatches = currentStatusFilter.equals("Tất cả") || (status != null && status.equals(currentStatusFilter));
+                boolean typeMatches = currentTypeFilter.equals("Tất cả")
+                        || (type != null && type.equals(currentTypeFilter));
+                boolean statusMatches = currentStatusFilter.equals("Tất cả")
+                        || (status != null && status.equals(currentStatusFilter));
 
                 return typeMatches && statusMatches;
             }
@@ -512,8 +559,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
             throw new IllegalArgumentException(
                     "Không tìm thấy loại phòng: '" + typeName + "'\n" +
-                            "Các loại có sẵn: " + availableTypes
-            );
+                            "Các loại có sẵn: " + availableTypes);
         }
 
         room.setRoomType(type);
@@ -532,12 +578,11 @@ public class RoomManagement extends javax.swing.JPanel {
         headerCustom = new iuh.fit.se.group1.ui.component.HeaderCustom();
         lblTitle = new javax.swing.JLabel();
         btnAddRoom = new iuh.fit.se.group1.ui.component.custom.Button();
-        btnUpdatePrice = new iuh.fit.se.group1.ui.component.custom.Button();  // Custom Button
+        btnUpdatePrice = new iuh.fit.se.group1.ui.component.custom.Button(); // Custom Button
         tblRoom = new iuh.fit.se.group1.ui.component.table.Table();
         btnExport = new iuh.fit.se.group1.ui.component.custom.Button();
         btnImport = new iuh.fit.se.group1.ui.component.custom.Button();
 
-        // Khởi tạo fields cho giá fixed
         // Nhóm Phòng đơn
         lblSingleType = new JLabel("Phòng đơn:");
         lblSingleType.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -547,6 +592,9 @@ public class RoomManagement extends javax.swing.JPanel {
         txtSingleHour = new JTextField(8);
         txtSingleNight = new JTextField(8);
         txtSingleDay = new JTextField(8);
+        lblSingleFirstHour = new JLabel("Giá lần đầu/giờ:");
+        lblSingleFirstHour.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        txtSingleFirstHour = new JTextField(8);
 
         // Nhóm Phòng đôi
         lblDoubleType = new JLabel("Phòng đôi:");
@@ -557,28 +605,36 @@ public class RoomManagement extends javax.swing.JPanel {
         txtDoubleHour = new JTextField(8);
         txtDoubleNight = new JTextField(8);
         txtDoubleDay = new JTextField(8);
+        lblDoubleFirstHour = new JLabel("Giá lần đầu/giờ:");
+        lblDoubleFirstHour.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        txtDoubleFirstHour = new JTextField(8);
 
-        
-        JPanel pricePanel = new JPanel(new GridLayout(2, 6, 5, 5));  
+        JPanel pricePanel = new JPanel(new GridLayout(2, 6, 5, 5));
         pricePanel.setBackground(new Color(241, 241, 241));
 
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Cập nhật giá loại phòng");
-        titledBorder.setTitleFont(new Font("Segoe UI", Font.BOLD, 16)); 
+        titledBorder.setTitleFont(new Font("Segoe UI", Font.BOLD, 16));
         pricePanel.setBorder(titledBorder);
-        
 
-
-        
         pricePanel.add(lblSingleType);
-        pricePanel.add(lblSingleHour); pricePanel.add(txtSingleHour);
-        pricePanel.add(lblSingleNight); pricePanel.add(txtSingleNight);
-        pricePanel.add(lblSingleDay); pricePanel.add(txtSingleDay);
+        pricePanel.add(lblSingleHour);
+        pricePanel.add(txtSingleHour);
+        pricePanel.add(lblSingleNight);
+        pricePanel.add(txtSingleNight);
+        pricePanel.add(lblSingleDay);
+        pricePanel.add(txtSingleDay);
+        pricePanel.add(lblSingleFirstHour);
+        pricePanel.add(txtSingleFirstHour);
 
-        
         pricePanel.add(lblDoubleType);
-        pricePanel.add(lblDoubleHour); pricePanel.add(txtDoubleHour);
-        pricePanel.add(lblDoubleNight); pricePanel.add(txtDoubleNight);
-        pricePanel.add(lblDoubleDay); pricePanel.add(txtDoubleDay);
+        pricePanel.add(lblDoubleHour);
+        pricePanel.add(txtDoubleHour);
+        pricePanel.add(lblDoubleNight);
+        pricePanel.add(txtDoubleNight);
+        pricePanel.add(lblDoubleDay);
+        pricePanel.add(txtDoubleDay);
+        pricePanel.add(lblDoubleFirstHour);
+        pricePanel.add(txtDoubleFirstHour);
 
         setBackground(new java.awt.Color(241, 241, 241));
 
@@ -602,14 +658,12 @@ public class RoomManagement extends javax.swing.JPanel {
         btnExport.setText("Xuất excel");
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14));
         btnExport.addActionListener(e -> {
-        ExportExcelService.exportTableToExcel(
-                this,
-                tblRoom.getTbl(),
-                "DanhSachPhong",
-                "DanhSachPhong"
-            );
+            ExportExcelService.exportTableToExcel(
+                    this,
+                    tblRoom.getTbl(),
+                    "DanhSachPhong",
+                    "DanhSachPhong");
         });
-
 
         btnImport.setText("Tải excel");
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14));
@@ -625,47 +679,61 @@ public class RoomManagement extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(headerCustom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(lblTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnUpdatePrice, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(pricePanel, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(tblRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(headerCustom, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(36, 36, 36)
+                                .addComponent(lblTitle)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 160,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnUpdatePrice, javax.swing.GroupLayout.PREFERRED_SIZE, 140,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(36, 36, 36)
+                                .addComponent(pricePanel, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE,
+                                        Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addComponent(tblRoom, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headerCustom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnUpdatePrice, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10)
-                .addComponent(pricePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15)
-                .addComponent(tblRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(8, Short.MAX_VALUE))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(headerCustom, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(30, 30, 30)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 41,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnUpdatePrice, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(10, 10, 10)
+                                .addComponent(pricePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(15, 15, 15)
+                                .addComponent(tblRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 615,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(8, Short.MAX_VALUE)));
     }
+
     private void exportTableToExcel(RoomManagement roomManagement, JTable tbl, String string, String string2,
-            boolean b) {
-        // TODO Auto-generated method stub
+                                    boolean b) {
         throw new UnsupportedOperationException("Unimplemented method 'exportTableToExcel'");
     }
 
@@ -683,7 +751,8 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (saved != null) {
                     loadTable(roomService.getAllRooms());
                     GlassPanePopup.closePopupLast();
-                    JOptionPane.showMessageDialog(this, "Thêm phòng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Thêm phòng thành công!", "Thành công",
+                            JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "Thêm phòng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
@@ -691,54 +760,6 @@ public class RoomManagement extends javax.swing.JPanel {
         });
         GlassPanePopup.showPopup(modal);
     }
-
-    
-    private void saveRoomPrices() {
-    Properties props = new Properties();
-    saveRoomPrices();
-
-    // Single
-    props.setProperty("price.single.hourly", txtSingleHour.getText().trim());
-    props.setProperty("price.single.overnight", txtSingleNight.getText().trim());
-    props.setProperty("price.single.daily", txtSingleDay.getText().trim());
-
-    // Double
-    props.setProperty("price.double.hourly", txtDoubleHour.getText().trim());
-    props.setProperty("price.double.overnight", txtDoubleNight.getText().trim());
-    props.setProperty("price.double.daily", txtDoubleDay.getText().trim());
-
-    try (FileOutputStream fos =
-             new FileOutputStream("src/main/resources/price.properties")) {
-        props.store(fos, null); // không ghi comment lên đầu file
-        JOptionPane.showMessageDialog(this, "Lưu giá phòng thành công!");
-    } catch (IOException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Lỗi khi lưu giá phòng!");
-    }
-    }
-
-    private void loadRoomPrices() {
-    Properties props = new Properties();
-    File file = new File("src/main/resources/price.properties");
-    if (!file.exists()) return;
-
-    try (FileInputStream fis = new FileInputStream(file)) {
-        props.load(fis);
-
-        txtSingleHour.setText(props.getProperty("price.single.hourly", "0"));
-        txtSingleNight.setText(props.getProperty("price.single.overnight", "0"));
-        txtSingleHour.setText(props.getProperty("price.single.daily", "0"));
-
-        txtDoubleHour.setText(props.getProperty("price.double.hourly", "0"));
-        txtDoubleNight.setText(props.getProperty("price.double.overnight", "0"));
-        txtDoubleDay.setText(props.getProperty("price.double.daily", "0"));
-
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-
-
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("Import Excel clicked");
@@ -751,5 +772,5 @@ public class RoomManagement extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom;
     private javax.swing.JLabel lblTitle;
     private iuh.fit.se.group1.ui.component.table.Table tblRoom;
-    // End of variables declaration
+
 }
