@@ -20,7 +20,6 @@ public class MainLayout extends JPanel {
     private JPanel pnlContent;
 
     private boolean isAdmin;
-    private ProfileButton profileButton;
     private Dashboard dashboard;
     private DashboardEmployee dashboardEmployee;
     private BookingPage bookingPage;
@@ -39,24 +38,17 @@ public class MainLayout extends JPanel {
     private float alpha = 1f;
     private SideBar sideBar;
     private Employee currentEmployee;
+
     public MainLayout() {
         init();
         setOpaque(false);
-        isAdmin = true;
-        setAuth(isAdmin);
+        setAuth(true);
     }
-    public void setEmployeeInfo(Employee employee) {
-        this.currentEmployee = employee;
-        if (employee != null && sideBar != null) {
-            Footer footer = sideBar.getFooter1();
-            if (footer != null) {
-                footer.setEmployeeInfo(employee);
-            }
-        }
-    }
+
     public Employee getCurrentEmployee() {
         return currentEmployee;
     }
+
     public void setAlpha(float alpha) {
         this.alpha = alpha;
         repaint();
@@ -83,8 +75,7 @@ public class MainLayout extends JPanel {
         pnlMain.add(pnlContent, BorderLayout.CENTER);
         add(pnlMain, BorderLayout.CENTER);
 
-        
-        
+
         sideBar.getMenu1().setMenuEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
@@ -96,6 +87,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 2) {
                         paymentPage.clearForm();
                         setMainContent(paymentPage);
+
                     } else if (index == 3 && subIndex == 1) {
                         setMainContent(shiftManagement);
                     } else if (index == 3 && subIndex == 2) {
@@ -112,13 +104,13 @@ public class MainLayout extends JPanel {
                         setMainContent(orderManagement);
                         orderManagement.loadData();
 
-                    }else if (index == 9) {
+                    } else if (index == 9) {
                         setMainContent(surchageManagement);
-                    }  else if (index == 10 && subIndex == 1) {
+                    } else if (index == 10 && subIndex == 1) {
                         setMainContent(revenueStatistics);
-                    } else if (index == 10 && subIndex ==2) {
+                    } else if (index == 10 && subIndex == 2) {
                         setMainContent(new BookingTrend());
-                    } else if (index == 10 && subIndex ==3) {
+                    } else if (index == 10 && subIndex == 3) {
                         setMainContent(new StatisticsDetail());
                     } else if (index == 11 && subIndex == 2) {
                         setMainContent(new Regulation());
@@ -165,9 +157,9 @@ public class MainLayout extends JPanel {
                 }
             }
         });
-        
-          
-        sideBar.getLblAvt().addMouseListener(new MouseListener(){
+
+
+        sideBar.getLblAvt().addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Profile profilePage = new Profile();
@@ -179,21 +171,21 @@ public class MainLayout extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-             }
+            }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-             }
+            }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                }
+            }
 
             @Override
             public void mouseExited(MouseEvent e) {
-               }
+            }
         });
-        
+
     }
 
     public void setMainContent(JPanel panel) {
@@ -226,14 +218,14 @@ public class MainLayout extends JPanel {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            JFrame frame = new JFrame("Main Layout");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            GlassPanePopup.install(frame);
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
-            frame.setLocationRelativeTo(null);
-            frame.setContentPane(new MainLayout());
-            frame.setVisible(true);
-        }
+                    JFrame frame = new JFrame("Main Layout");
+                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    GlassPanePopup.install(frame);
+                    frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
+                    frame.setLocationRelativeTo(null);
+                    frame.setContentPane(new MainLayout());
+                    frame.setVisible(true);
+                }
         );
     }
 
@@ -243,7 +235,9 @@ public class MainLayout extends JPanel {
         if (isAdmin) {
             dashboard = new Dashboard();
             bookingPage = new BookingPage();
+            bookingPage.setCurrentEmployee(currentEmployee);
             paymentPage = new PaymentPage();
+            paymentPage.setCurrentEmployee(currentEmployee);
             shiftManagement = new ShiftManagement();
             employeeManagement = new EmployeeManagement();
             // if (shiftManagement.getShiftList() != null) {
@@ -263,9 +257,16 @@ public class MainLayout extends JPanel {
         } else {
             dashboardEmployee = new DashboardEmployee();
             bookingPage = new BookingPage();
+            bookingPage.setCurrentEmployee(currentEmployee);
             paymentPage = new PaymentPage();
+            paymentPage.setCurrentEmployee(currentEmployee);
             setMainContent(dashboardEmployee);
         }
 
+    }
+
+    public void setCurrentEmployee(Employee employee) {
+        this.currentEmployee = employee;
+        sideBar.getFooter1().setEmployeeInfo(employee);
     }
 }

@@ -64,6 +64,11 @@ public class Booking {
     }
 
     public void setCheckInDate(LocalDateTime checkInDate) {
+        if (bookingType != null && bookingType.equals(BookingType.DAILY)) {
+            this.checkInDate = checkInDate.withHour(14).withMinute(0).withSecond(0).withNano(0);
+        } else {
+            this.checkInDate = checkInDate;
+        }
         this.checkInDate = checkInDate;
     }
 
@@ -72,7 +77,13 @@ public class Booking {
     }
 
     public void setCheckOutDate(LocalDateTime checkOutDate) {
-        this.checkOutDate = checkOutDate;
+        if (bookingType != null && bookingType.equals(BookingType.DAILY)) {
+            this.checkOutDate = checkOutDate.withHour(12).withMinute(0).withSecond(0).withNano(0);
+        } else if (bookingType != null && bookingType.equals(BookingType.OVERNIGHT)) {
+            this.checkOutDate = checkOutDate.withHour(8).withMinute(0).withSecond(0).withNano(0);
+        }else {
+            this.checkOutDate = checkOutDate;
+        }
     }
 
     public Employee getEmployee() {
@@ -82,7 +93,6 @@ public class Booking {
     public void setEmployee(Employee employee) {
         this.employee = employee;
     }
-
 
     public Room getRoom() {
         return room;
@@ -198,7 +208,7 @@ public class Booking {
     }
 
 
-    public boolean isSurchargeCheckOut(){
+    public boolean isSurchargeCheckOut() {
         switch (bookingType) {
             case DAILY -> {
                 return LocalDateTime.now().isAfter(LocalDateTime.of(checkOutDate.toLocalDate(), LocalTime.of(12, 0)));

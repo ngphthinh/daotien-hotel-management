@@ -13,12 +13,15 @@ import iuh.fit.se.group1.ui.component.payment.CashPaymentModal;
 import iuh.fit.se.group1.ui.component.payment.TransferPaymentModal;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -42,6 +45,18 @@ public class PaymentPage extends javax.swing.JPanel {
     private final SurchargeService surchargeService;
     private PromotionService promotionService;
     private SurchargeDetailService surchargeDetailService;
+    private Employee currentEmployee;
+
+    private Map<Surcharge, Integer> surcharges = new HashMap<>();
+
+    public void addSurchargeId(Surcharge surcharge) {
+        surcharges.merge(surcharge, 1, Integer::sum);
+    }
+
+
+    public Employee getCurrentEmployee() {
+        return currentEmployee;
+    }
 
     /**
      * Creates new form OrderManagement
@@ -158,10 +173,11 @@ public class PaymentPage extends javax.swing.JPanel {
         listBooking.getTable().setRowSelectionAllowed(true);
         listBooking.getTable().setColumnSelectionAllowed(false);
 
-        listBooking.getTable().addMouseListener(new MouseListener() {
+        listBooking.getTable().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = listBooking.getTable().getSelectedRow();
+                clearForm();
                 order = orderService.getOrderById(Long.valueOf(listBooking.getTable().getValueAt(row, 0).toString()));
                 setCustomer(order.getCustomer());
                 setTblRoom(order.getBookings(), order.getOrderId());
@@ -194,12 +210,7 @@ public class PaymentPage extends javax.swing.JPanel {
                     order.setPromotion(null);
                     return;
                 }
-                BigDecimal totalPromotion = BigDecimal.ZERO;
-                if (promotion.getDiscountPrice().compareTo(BigDecimal.ZERO) > 0) {
-                    totalPromotion = promotion.getDiscountPrice();
-                } else {
-                    totalPromotion = totalAmount.multiply(BigDecimal.valueOf(promotion.getDiscountPercent()).divide(BigDecimal.valueOf(100)));
-                }
+                BigDecimal totalPromotion = totalAmount.multiply(BigDecimal.valueOf(promotion.getDiscountPercent()).divide(BigDecimal.valueOf(100)));
 
 //                List<SurchargeDetail> surchargeDetails = setSurchargeTime();
 
@@ -215,25 +226,6 @@ public class PaymentPage extends javax.swing.JPanel {
 
             }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         listSurcharge.getTable().addMouseListener(new MouseListener() {
@@ -242,13 +234,13 @@ public class PaymentPage extends javax.swing.JPanel {
                 int row = listSurcharge.getTable().getSelectedRow();
                 long surchargeId = Long.parseLong(listSurcharge.getTable().getValueAt(row, 0).toString());
                 Surcharge surcharge = surchargeService.getSurchargeById(surchargeId);
-
-                infoPayment1.addSurcharge(surcharge.getName(),
-                        Constants.VND_FORMAT.format(surcharge.getPrice()),
+                addSurchargeId(surcharge);
+                infoPayment1.addSurcharge(surcharge.getSurchargeId() + ": " + surcharge.getName(),
+                        surcharge.getPrice(),
                         "1");
-                BigDecimal totalSurcharge = BigDecimal.valueOf(Constants.parseVND(infoPayment1.getLblPriceASP().getText()));
+                BigDecimal totalSurcharge = BigDecimal.valueOf(Constants.parseVND(infoPayment1.getLblTotalAmenitiAndSurchargeValue().getText()));
                 totalSurcharge = totalSurcharge.add(surcharge.getPrice());
-                infoPayment1.getLblPriceASP().setText(Constants.VND_FORMAT.format(totalSurcharge));
+                infoPayment1.getLblTotalAmenitiAndSurchargeValue().setText(Constants.VND_FORMAT.format(totalSurcharge));
             }
 
             @Override
@@ -274,28 +266,50 @@ public class PaymentPage extends javax.swing.JPanel {
     }
 
     private void handlePaymentCash(Order order) {
-        var modal = new CashPaymentModal();
-        modal.setTotalToPay(order.getTotalAmount().longValue());
+        var modal = new CashPaymentModal(order.getTotalAmount().subtract(order.getDeposit()).longValue());
         GlassPanePopup.showPopup(modal);
+
+        modal.getBtnComplete().addActionListener(e -> {
+            if (modal.getMoneyGiven() < order.getTotalAmount().longValue()) {
+                CustomDialog.showMessage(null,
+                        "Khách đưa chưa đủ tiền!",
+                        "Thông báo", CustomDialog.MessageType.WARNING);
+                return;
+            }
+            long change = modal.getMoneyGiven() - order.getTotalAmount().longValue();
+            CustomDialog.showMessage(null,
+                    "Thanh toán thành công! Tiền thừa: " + Constants.VND_FORMAT.format(change),
+                    "Thông báo", CustomDialog.MessageType.SUCCESS);
+            saveOrder();
+            GlassPanePopup.closePopupAll();
+        });
+
+    }
+
+    private void saveOrder() {
+        // update trang thái
+        orderService.updateOrderStatusToPaid(order.getOrderId(), PaymentType.CASH, order.getTotalAmount());
+
+
+        surcharges.forEach((k, v) -> {
+            SurchargeDetail sd = new SurchargeDetail(k, v);
+            surchargeDetailService.save(sd, order.getOrderId());
+        });
+
+        // Clear form
+        clearForm();
     }
 
     private Promotion setPromotion(BigDecimal totalAmount) {
         infoPayment1.clearPromotion();
 
+        Promotion promotionDiscountPriceMax = promotionService.getPromotionByPrice(totalAmount);
 
-        Promotion promotionDiscountPriceMax = promotionService.getPromotionDiscountPriceMax();
-        Promotion discountPercentMax = promotionService.getPromotionDiscountPercentMax();
-
-
-        if (totalAmount.multiply(BigDecimal.valueOf(discountPercentMax.getDiscountPercent() / 100)).compareTo(promotionDiscountPriceMax.getDiscountPrice()) > 0) {
-            infoPayment1.addPromotion(discountPercentMax.getPromotionName(),
-                    discountPercentMax.getDiscountPercent() + "%", "1");
-            return discountPercentMax;
-        } else if (promotionDiscountPriceMax.getDiscountPrice().compareTo(BigDecimal.ZERO) > 0) {
+        if (promotionDiscountPriceMax != null) {
             infoPayment1.addPromotion(promotionDiscountPriceMax.getPromotionName(),
-                    Constants.VND_FORMAT.format(promotionDiscountPriceMax.getDiscountPrice()), "1");
+                    "- " + promotionDiscountPriceMax.getDiscountPercent() + "%",
+                    "1");
             return promotionDiscountPriceMax;
-
         }
         return null;
     }
@@ -306,7 +320,7 @@ public class PaymentPage extends javax.swing.JPanel {
             String response = paymentService.createPayment(order);
             String payUrl = paymentService.extractJsonValue(response, "payUrl");
             String orderId = paymentService.extractJsonValue(response, "orderId");
-
+            String priceFinal = order.getTotalAmount().subtract(order.getDeposit()).toString();
             var modal = new TransferPaymentModal();
             if (payUrl != null && !payUrl.isEmpty()) {
                 modal.getLblQrCode().setIcon(new ImageIcon(paymentService.generateQRCodeImage(payUrl, 200, 200)));
@@ -314,7 +328,7 @@ public class PaymentPage extends javax.swing.JPanel {
                 CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR);
             }
 
-            modal.getLblTotaPrice().setText("Tổng tiền: " + order.getTotalAmount());
+            modal.getLblTotaPrice().setText("Tổng tiền cần thanh toán: " + order.getTotalAmount().longValue() + "VND");
             JFrame frame = new JFrame("Thanh toán MoMo QR");
             frame.setSize(300, 300);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -324,7 +338,7 @@ public class PaymentPage extends javax.swing.JPanel {
             pnlMain.setBackground(Color.WHITE);
             pnlMain.setLayout(new BorderLayout());
             JLabel lblImage = new JLabel("", new ImageIcon(paymentService.generateQRCodeImage(payUrl, 250, 250)), SwingConstants.CENTER);
-            JLabel lblPrice = new JLabel("Tổng tiền: " + order.getTotalAmount(), SwingConstants.CENTER);
+            JLabel lblPrice = new JLabel("Tổng tiền cần thanh toán: " + order.getTotalAmount().longValue() + "VND", SwingConstants.CENTER);
             lblPrice.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
             pnlMain.add(lblImage, BorderLayout.CENTER);
@@ -348,13 +362,7 @@ public class PaymentPage extends javax.swing.JPanel {
                         CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
-                        // update trang thái
-
-                        orderService.updateOrderStatusToPaid(order.getOrderId(), PaymentType.E_WALLET, order.getTotalAmount());
-
-                        // Clear form
-                        clearForm();
-
+                        saveOrder();
                     } else {
                         CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING);
                     }
@@ -374,16 +382,15 @@ public class PaymentPage extends javax.swing.JPanel {
         infoPayment1.getCboGender().setSelectedIndex(0);
         infoPayment1.getTxtPhone().setText("");
         loadListBooking(orderService.getAllOrdersUnPaid());
-        infoPayment1.getLblPriceRoom().setText("0 VND");
-        infoPayment1.getLblPriceASP().setText("0 VND");
+        infoPayment1.getLblPriceRoomValue().setText("0 VND");
+        infoPayment1.getLblTotalAmenitiAndSurchargeValue().setText("0 VND");
         infoPayment1.getLblPriceTotal().setText("0 VND");
         infoPayment1.getLblPricePromotion().setText("0 VND");
         infoPayment1.getLblPricePayment().setText("0 VND");
-        infoPayment1.clearAmenity();
-        infoPayment1.clearSurcharge();
+        infoPayment1.clearAmenitiesAndSurcharges();
         infoPayment1.clearPromotion();
         order = null;
-
+        surcharges.clear();
     }
 
     private void setTblSurcharge() {
@@ -391,7 +398,6 @@ public class PaymentPage extends javax.swing.JPanel {
         defaultTableModel.setRowCount(0);
         SurchargeService surchargeService = new SurchargeService();
         List<Surcharge> surcharges = surchargeService.getAllSurcharges();
-        System.out.println(surcharges);
         for (var s : surcharges) {
             defaultTableModel.addRow(new Object[]{
                     s.getSurchargeId(),
@@ -402,17 +408,15 @@ public class PaymentPage extends javax.swing.JPanel {
     }
 
     private void setAmenityList(List<OrderDetail> orderDetailsByOrderId) {
-        infoPayment1.clearAmenity();
         BigDecimal total = BigDecimal.ZERO;
         for (var e : orderDetailsByOrderId) {
             infoPayment1.addAmenity(e.getAmenity().getNameAmenity(),
-                    Constants.VND_FORMAT.format(e.getAmenity().getPrice()),
+                    e.getAmenity().getPrice(),
                     String.valueOf(e.getQuantity()));
             total = total.add(e.getAmenity().getPrice().multiply(BigDecimal.valueOf(e.getQuantity())));
         }
-        BigDecimal totalSurcharge = BigDecimal.valueOf(Constants.parseVND(infoPayment1.getLblPriceASP().getText()));
-        infoPayment1.getLblPriceASP().setText(Constants.VND_FORMAT.format(totalSurcharge.add(total)));
-
+        BigDecimal totalSurcharge = BigDecimal.valueOf(Constants.parseVND(infoPayment1.getLblTotalAmenitiAndSurchargeValue().getText()));
+        infoPayment1.getLblTotalAmenitiAndSurchargeValue().setText(Constants.VND_FORMAT.format(totalSurcharge.add(total)));
     }
 
     private void setTblRoom(List<Booking> bookings, Long orderId) {
@@ -427,7 +431,7 @@ public class PaymentPage extends javax.swing.JPanel {
             defaultTableModel.addRow(new Object[]{
                     b.getRoom().getRoomNumber(),
                     b.getRoom().getRoomType().getName(),
-                    0,
+                    getPriceRoom(b.getRoom().getRoomType().getRoomTypeId(), b.getBookingType().toString()),
                     time,
                     b.getTotalPrice()
             });
@@ -439,20 +443,38 @@ public class PaymentPage extends javax.swing.JPanel {
         }
         BigDecimal total = BigDecimal.ZERO;
         // thêm phụ phí ngày lễ
-        infoPayment1.clearSurcharge();
         if (countHoliday != 0) {
             Surcharge holidaySurcharge = surchargeService.getSurchargeByName("Phụ thu ngày lễ");
             if (holidaySurcharge != null) {
                 total = holidaySurcharge.getPrice();
-                infoPayment1.addSurcharge(holidaySurcharge.getName(), Constants.VND_FORMAT.format(holidaySurcharge.getPrice()), String.valueOf(countHoliday));
+                addSurchargeId(holidaySurcharge);
+                infoPayment1.addSurcharge(holidaySurcharge.getName() + ": " + holidaySurcharge.getName(), holidaySurcharge.getPrice(), String.valueOf(countHoliday));
                 total = total.multiply(BigDecimal.valueOf(countHoliday));
                 surchargeDetailService.save(new SurchargeDetail(holidaySurcharge, countHoliday), orderId);
             }
         }
-        infoPayment1.getLblPriceASP().setText(Constants.VND_FORMAT.format(total.doubleValue()));
-        infoPayment1.getLblPriceRoom().setText(Constants.VND_FORMAT.format(totalPrice));
+        infoPayment1.getLblTotalAmenitiAndSurchargeValue().setText(Constants.VND_FORMAT.format(total.doubleValue()));
+        infoPayment1.getLblPriceRoomValue().setText(Constants.VND_FORMAT.format(totalPrice));
     }
 
+    private String getPriceRoom(String roomTypeId, String bookingType) {
+
+        String fileName = "prices.properties";
+
+        if (roomTypeId.equals("SINGLE")) {
+            return switch (BookingType.valueOf(bookingType)) {
+                case DAILY -> PropertiesService.get(fileName, "/price.single.daily");
+                case HOURLY -> PropertiesService.get(fileName, "/price.single.hourly");
+                case OVERNIGHT -> PropertiesService.get(fileName, "/price.single.overnight");
+            };
+        } else {
+            return switch (BookingType.valueOf(bookingType)) {
+                case DAILY -> PropertiesService.get(fileName, "/price.double.daily");
+                case HOURLY -> PropertiesService.get(fileName, "/price.double.hourly");
+                case OVERNIGHT -> PropertiesService.get(fileName, "/price.double.overnight");
+            };
+        }
+    }
 
     private String getDuration(LocalDateTime checkInDate, LocalDateTime checkOutDate, BookingType bookingType) {
         switch (bookingType) {
@@ -467,6 +489,11 @@ public class PaymentPage extends javax.swing.JPanel {
             }
         }
         return "N/A";
+    }
+
+
+    public void setCurrentEmployee(Employee currentEmployee) {
+        this.currentEmployee = currentEmployee;
     }
 
     /**

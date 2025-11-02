@@ -31,7 +31,6 @@ public class OrderService {
             return null;
         }
         // Lưu là đang sử li
-        order.setOrderType(new OrderType(2L));
         Order savedOrder = orderRepository.save(order);
         if (savedOrder == null) {
             AppLogger.info("Failed to save order");

@@ -236,7 +236,7 @@ public class Login extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(245, 245, 245));
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo64.png"))); // NOI18N
 
         txtUser.setBackground(new java.awt.Color(245, 245, 245));
         txtUser.setLabelText("Tên đăng nhập");
@@ -391,9 +391,8 @@ public class Login extends javax.swing.JFrame {
                 boolean isManager = authenticate.getRole().getRoleId().equals(Role.MANAGER.toString());
                 log.info("User '{}' login with role '{}'", authenticate.getUsername(), authenticate.getRole().getRoleId());
 
-
+                panelBody.setCurrentEmployee(employee);
                 panelBody.setAuth(isManager);
-                panelBody.setEmployeeInfo(employee);
                 animatorLogin.start();
                 enableLogin(false);
             }

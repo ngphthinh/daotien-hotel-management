@@ -21,7 +21,7 @@ public class InfoOrderPanel extends javax.swing.JPanel {
     public InfoOrderPanel() {
         initComponents();
         setOpaque(true);
-        
+        this.setMaximumSize(new Dimension(Integer.MAX_VALUE,50));
     }
 
     public JLabel getLblName() {

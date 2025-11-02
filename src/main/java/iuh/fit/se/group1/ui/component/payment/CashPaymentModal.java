@@ -26,7 +26,8 @@ public class CashPaymentModal extends JPanel {
     private JPanel pnlMoney;
     private iuh.fit.se.group1.ui.component.custom.TextField txtMoneyChange, txtMoneyGive;
 
-    public CashPaymentModal() {
+    public CashPaymentModal(long totalToPay) {
+        this.totalToPay = totalToPay;
         initComponents();
         setupUI();
         initSuggestedButtons();
@@ -54,7 +55,7 @@ public class CashPaymentModal extends JPanel {
         return shortDf.format(money);
     }
 
-    private String formatMoney(long value) {
+    public String formatMoney(long value) {
         return df.format(value);
     }
 
@@ -221,6 +222,9 @@ public class CashPaymentModal extends JPanel {
         GlassPanePopup.closePopupLast();
     }
 
+
+
+
     // ======================= GIAO DIỆN SWING ==========================
     @SuppressWarnings("unchecked")
     private void initComponents() {
@@ -230,6 +234,15 @@ public class CashPaymentModal extends JPanel {
 
         btnExit = new iuh.fit.se.group1.ui.component.custom.Button();
         btnExit.setBackground(new Color(129, 129, 129));
+
+        // ====== Thêm phần hiển thị tổng tiền ======
+        JLabel lblTotalTitle = new JLabel("Tổng cần thanh toán:");
+        lblTotalTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTotalTitle.setForeground(Color.WHITE);
+
+        JLabel lblTotalToPay = new JLabel(df.format(totalToPay));
+        lblTotalToPay.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblTotalToPay.setForeground(new Color(255, 215, 0)); // vàng nổi bật
 
         lblMoneyGive = new JLabel("Tiền khách đưa:");
         lblMoneyChange = new JLabel("Tiền thối:");
@@ -262,7 +275,6 @@ public class CashPaymentModal extends JPanel {
         btnComplete.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnComplete.setBorderRadius(5);
 
-
         // ===== Layout =====
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
@@ -273,6 +285,11 @@ public class CashPaymentModal extends JPanel {
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(pnlMoney, GroupLayout.PREFERRED_SIZE, 427, GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnComplete, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+                                        // --- Thêm phần tổng tiền ---
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(lblTotalTitle)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblTotalToPay, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(lblMoneyGive)
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -297,6 +314,11 @@ public class CashPaymentModal extends JPanel {
                                         .addComponent(btnExit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                         .addComponent(lblTitle))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                // --- Tổng tiền nằm ở đây ---
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblTotalTitle)
+                                        .addComponent(lblTotalToPay))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(lblMoneyGive)
                                         .addComponent(txtMoneyGive, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -309,4 +331,5 @@ public class CashPaymentModal extends JPanel {
                                 .addContainerGap(28, Short.MAX_VALUE))
         );
     }
+
 }

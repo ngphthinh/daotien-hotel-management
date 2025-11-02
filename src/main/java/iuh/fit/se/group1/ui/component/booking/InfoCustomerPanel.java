@@ -158,6 +158,7 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         txtEmail = new iuh.fit.se.group1.ui.component.custom.TextField();
         cboGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
         cbDeposit = new javax.swing.JCheckBox();
+        cbReserve = new javax.swing.JCheckBox();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -211,6 +212,13 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         cbDeposit.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
         cbDeposit.setText("Tiền cọc");
 
+        cbReserve.setText("Đặt trước phòng");
+        cbReserve.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbReserveActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -236,7 +244,9 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(27, 27, 27)
-                                .addComponent(cbDeposit, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(cbDeposit, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addComponent(cbReserve))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPhoneNumber)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -278,7 +288,8 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
                     .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(cbDeposit)))
+                        .addComponent(cbDeposit)
+                        .addComponent(cbReserve)))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -287,9 +298,39 @@ public class InfoCustomerPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtPhoneNumberActionPerformed
 
+    private void cbReserveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbReserveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbReserveActionPerformed
+
+    public JCheckBox getCbReserve() {
+        return cbReserve;
+    }
+
+    public void setCbReserve(JCheckBox cbReserve) {
+        this.cbReserve = cbReserve;
+    }
+
+    public JCheckBox getCbDeposit() {
+        return cbDeposit;
+    }
+
+    public void setCbDeposit(JCheckBox cbDeposit) {
+        this.cbDeposit = cbDeposit;
+    }
+
+    public void clearForm(){
+        txtCitizen.setText("");
+        txtCustomerName.setText("");
+        txtPhoneNumber.setText("");
+        txtDob.setText("");
+        txtEmail.setText("");
+        cboGender.setSelectedIndex(-1);
+        cbDeposit.setSelected(false);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cbDeposit;
+    private javax.swing.JCheckBox cbReserve;
     private iuh.fit.se.group1.ui.component.custom.Combobox cboGender;
     private javax.swing.JLabel lblCitizen;
     private javax.swing.JLabel lblCustomerName;

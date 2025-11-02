@@ -1,6 +1,5 @@
 package iuh.fit.se.group1.repository;
 
-import ch.qos.logback.core.joran.action.NewRuleAction;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
@@ -254,7 +253,7 @@ public class OrderRepository implements Repository<Order, Long> {
                 JOIN Room R ON B.roomId = R.roomId
                 JOIN Orders O ON B.orderId = O.orderId
                 JOIN Customer C ON O.customerId = C.customerId
-                WHERE orderTypeId != 1
+                WHERE orderTypeId = 2
                 """;
 
         List<BookingDisplayDTO> list = new ArrayList<>();
@@ -267,7 +266,6 @@ public class OrderRepository implements Repository<Order, Long> {
                 String roomNumber = rs.getString("roomNumber");
                 String customerName = rs.getString("customerName");
                 String phoneNumber = rs.getString("phone");
-
                 BookingDisplayDTO dto = new BookingDisplayDTO(bookingId, roomNumber, customerName, phoneNumber);
                 list.add(dto);
             }
@@ -309,7 +307,7 @@ public class OrderRepository implements Repository<Order, Long> {
                 JOIN Booking B ON O.orderId = B.orderId
                 JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
                 JOIN Room R ON B.roomId = R.roomId
-                WHERE O.orderTypeId != 1
+                WHERE O.orderTypeId = 2
                 """;
 
         List<Order> orders = new ArrayList<>();

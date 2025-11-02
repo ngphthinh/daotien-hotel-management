@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import iuh.fit.se.group1.entity.Promotion;
@@ -24,6 +25,10 @@ public class PromotionService {
     }
     public List<Promotion> getPromotionByKeyword(String keyword) {
         return promotionRepository.findByPromotionIdOrName(keyword);
+    }
+
+    public Promotion getPromotionByPrice(BigDecimal price) {
+        return promotionRepository.findByPrice(price);
     }
 
 

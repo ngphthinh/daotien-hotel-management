@@ -90,3 +90,17 @@ SEVERE: No enum constant for status: Phòng đơn
 Oct 31, 2025 4:11:56 PM iuh.fit.se.group1.config.AppLogger error
 SEVERE: No enum constant for status: Phòng đơn
 >>>>>>> 34196c62499f25e6fc4e62ebf4c0a5769eb09d45
+Nov 02, 2025 1:37:53 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Nov 02, 2025 10:10:19 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Nov 02, 2025 10:32:32 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Nov 02, 2025 10:33:27 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Nov 03, 2025 1:46:35 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+Nov 03, 2025 1:46:47 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+Nov 03, 2025 2:06:28 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details

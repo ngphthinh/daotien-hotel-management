@@ -5,35 +5,19 @@
 package iuh.fit.se.group1.ui.component.payment;
 
 import iuh.fit.se.group1.ui.component.booking.InfoOrderPanel;
-import iuh.fit.se.group1.ui.component.booking.InfoPromotionOrderPanel;
-import iuh.fit.se.group1.ui.component.booking.InfoRoomPanel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.TextField;
-import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
+import java.math.BigDecimal;
 import javax.swing.*;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
-/**
- * @author Administrator
- */
+
 public class InfoPayment extends javax.swing.JPanel {
 
-    public JLabel getIconAmenity() {
-        return iconAmenity;
-    }
-
-    public void setIconAmenity(JLabel iconAmenity) {
-        this.iconAmenity = iconAmenity;
-    }
 
     public JLabel getIconCustomer() {
         return iconCustomer;
@@ -41,14 +25,6 @@ public class InfoPayment extends javax.swing.JPanel {
 
     public void setIconCustomer(JLabel iconCustomer) {
         this.iconCustomer = iconCustomer;
-    }
-
-    public JLabel getIconPromotion() {
-        return iconPromotion;
-    }
-
-    public void setIconPromotion(JLabel iconPromotion) {
-        this.iconPromotion = iconPromotion;
     }
 
     public JLabel getIconRoom() {
@@ -59,21 +35,6 @@ public class InfoPayment extends javax.swing.JPanel {
         this.iconRoom = iconRoom;
     }
 
-    public JLabel getIconSurcharge() {
-        return iconSurcharge;
-    }
-
-    public void setIconSurcharge(JLabel iconSurcharge) {
-        this.iconSurcharge = iconSurcharge;
-    }
-
-    public JLabel getLblAmenity() {
-        return lblAmenity;
-    }
-
-    public void setLblAmenity(JLabel lblAmenity) {
-        this.lblAmenity = lblAmenity;
-    }
 
     public JLabel getLblCustomer() {
         return lblCustomer;
@@ -115,12 +76,8 @@ public class InfoPayment extends javax.swing.JPanel {
         this.lblPhone = lblPhone;
     }
 
-    public JLabel getLblPriceASP() {
-        return lblPriceASP;
-    }
-
-    public void setLblPriceASP(JLabel lblPriceASP) {
-        this.lblPriceASP = lblPriceASP;
+    public JLabel getLblTotalAmenitiAndSurchargeValue() {
+        return lblPriceTotal;
     }
 
     public JLabel getLblPricePayment() {
@@ -139,13 +96,10 @@ public class InfoPayment extends javax.swing.JPanel {
         this.lblPricePromotion = lblPricePromotion;
     }
 
-    public JLabel getLblPriceRoom() {
-        return lblPriceRoom;
+    public JLabel getLblPriceRoomValue() {
+        return lblPriceRoomValue;
     }
 
-    public void setLblPriceRoom(JLabel lblPriceRoom) {
-        this.lblPriceRoom = lblPriceRoom;
-    }
 
     public JLabel getLblPriceTotal() {
         return lblPriceTotal;
@@ -163,13 +117,6 @@ public class InfoPayment extends javax.swing.JPanel {
         this.lblPromotion = lblPromotion;
     }
 
-    public JLabel getLblPromotions() {
-        return lblPromotions;
-    }
-
-    public void setLblPromotions(JLabel lblPromotions) {
-        this.lblPromotions = lblPromotions;
-    }
 
     public JLabel getLblRoom() {
         return lblRoom;
@@ -179,21 +126,6 @@ public class InfoPayment extends javax.swing.JPanel {
         this.lblRoom = lblRoom;
     }
 
-    public JLabel getLblSurcharge() {
-        return lblSurcharge;
-    }
-
-    public void setLblSurcharge(JLabel lblSurcharge) {
-        this.lblSurcharge = lblSurcharge;
-    }
-
-    public JLabel getLblTotalASP() {
-        return lblTotalASP;
-    }
-
-    public void setLblTotalASP(JLabel lblTotalASP) {
-        this.lblTotalASP = lblTotalASP;
-    }
 
     public JLabel getLblTotalOrder() {
         return lblTotalOrder;
@@ -211,29 +143,6 @@ public class InfoPayment extends javax.swing.JPanel {
         this.lblTotalPayment = lblTotalPayment;
     }
 
-    public JLabel getLblTotalRoom() {
-        return lblTotalRoom;
-    }
-
-    public void setLblTotalRoom(JLabel lblTotalRoom) {
-        this.lblTotalRoom = lblTotalRoom;
-    }
-
-    public JPanel getPnlAmenities() {
-        return pnlAmenities;
-    }
-
-    public void setPnlAmenities(JPanel pnlAmenities) {
-        this.pnlAmenities = pnlAmenities;
-    }
-
-    public JPanel getPnlAmenity() {
-        return pnlAmenity;
-    }
-
-    public void setPnlAmenity(JPanel pnlAmenity) {
-        this.pnlAmenity = pnlAmenity;
-    }
 
     public JPanel getPnlPayment() {
         return pnlPayment;
@@ -243,37 +152,14 @@ public class InfoPayment extends javax.swing.JPanel {
         this.pnlPayment = pnlPayment;
     }
 
-    public JPanel getPnlPromotion() {
-        return pnlPromotion;
-    }
 
-    public void setPnlPromotion(JPanel pnlPromotion) {
-        this.pnlPromotion = pnlPromotion;
-    }
-
-    public JPanel getPnlPromotions() {
-        return pnlPromotions;
-    }
-
-    public void setPnlPromotions(JPanel pnlPromotions) {
-        this.pnlPromotions = pnlPromotions;
-    }
-
-    public JPanel getPnlSurcharge() {
-        return pnlSurcharge;
-    }
-
-    public void setPnlSurcharge(JPanel pnlSurcharge) {
-        this.pnlSurcharge = pnlSurcharge;
-    }
-
-    public JPanel getPnlSurcharges() {
-        return pnlSurcharges;
-    }
-
-    public void setPnlSurcharges(JPanel pnlSurcharges) {
-        this.pnlSurcharges = pnlSurcharges;
-    }
+//    public JPanel getPnlSurcharges() {
+//        return jPanel1;
+//    }
+//
+//    public void setPnlSurcharges(JPanel pnlSurcharges) {
+//        this.jPanel1 = pnlSurcharges;
+//    }
 
     public JScrollPane getScrRoom() {
         return scrRoom;
@@ -283,13 +169,6 @@ public class InfoPayment extends javax.swing.JPanel {
         this.scrRoom = scrRoom;
     }
 
-    public JSeparator getSprAmenity() {
-        return sprAmenity;
-    }
-
-    public void setSprAmenity(JSeparator sprAmenity) {
-        this.sprAmenity = sprAmenity;
-    }
 
     public JSeparator getSprCustomer() {
         return sprCustomer;
@@ -299,21 +178,6 @@ public class InfoPayment extends javax.swing.JPanel {
         this.sprCustomer = sprCustomer;
     }
 
-    public JSeparator getSprEnd() {
-        return sprEnd;
-    }
-
-    public void setSprEnd(JSeparator sprEnd) {
-        this.sprEnd = sprEnd;
-    }
-
-    public JSeparator getSprPromotion() {
-        return sprPromotion;
-    }
-
-    public void setSprPromotion(JSeparator sprPromotion) {
-        this.sprPromotion = sprPromotion;
-    }
 
     public JSeparator getSprRoom() {
         return sprRoom;
@@ -323,13 +187,6 @@ public class InfoPayment extends javax.swing.JPanel {
         this.sprRoom = sprRoom;
     }
 
-    public JSeparator getSprSurcharge() {
-        return sprSurcharge;
-    }
-
-    public void setSprSurcharge(JSeparator sprSurcharge) {
-        this.sprSurcharge = sprSurcharge;
-    }
 
     public JTable getTblRoom() {
         return tblRoom;
@@ -371,8 +228,8 @@ public class InfoPayment extends javax.swing.JPanel {
         setOpaque(false);
         iconCustomer.setIcon(FontIcon.of(FontAwesomeSolid.USER, 20, new java.awt.Color(131, 176, 212)));
         iconCustomer.setText("");
-        lblTotalOrder.setFont(new java.awt.Font("Segoe UI", 0, 12)); // không đậm
-        lblPromotion.setFont(new java.awt.Font("Segoe UI", 0, 12));
+        lblTotalOrder.setFont(new java.awt.Font("Segoe UI", Font.PLAIN, 12)); // không đậm
+        lblPromotion.setFont(new java.awt.Font("Segoe UI", Font.PLAIN, 12));
         iconRoom.setIcon(FontIcon.of(FontAwesomeSolid.BED, 20, new java.awt.Color(131, 176, 212)));
         iconRoom.setText("");
         txtPhone.setEditable(false);
@@ -382,16 +239,13 @@ public class InfoPayment extends javax.swing.JPanel {
         tblRoom.getTableHeader().setForeground(Color.BLACK);
         tblRoom.setRowHeight(30);
         tblRoom.getTableHeader().setPreferredSize(new java.awt.Dimension(0, 30));
-        iconAmenity.setIcon(FontIcon.of(FontAwesomeSolid.SNOWFLAKE, 20, new java.awt.Color(131, 176, 212)));
-        iconAmenity.setText("");
-        iconSurcharge.setIcon(FontIcon.of(FontAwesomeSolid.FILE_INVOICE_DOLLAR, 20, new java.awt.Color(131, 176, 212)));
-        iconSurcharge.setText("");
-        iconPromotion.setIcon(FontIcon.of(FontAwesomeSolid.TAGS, 20, new java.awt.Color(131, 176, 212)));
-        iconPromotion.setText("");
+//        lblAmenity.setIcon(FontIcon.of(FontAwesomeSolid.SNOWFLAKE, 20, new java.awt.Color(131, 176, 212)));
+//        lblSurcharge.setIcon(FontIcon.of(FontAwesomeSolid.FILE_INVOICE_DOLLAR, 20, new java.awt.Color(131, 176, 212)));
+//        lblPromition.setIcon(FontIcon.of(FontAwesomeSolid.TAGS, 20, new java.awt.Color(131, 176, 212)));
         cboGender.addItem("Nữ");
         cboGender.addItem("Nam");
         cboGender.setBackground(Color.WHITE);
-
+        infoPromotionOrderPanel1.setVisible(false);
     }
 
     public JButton getBtnCash() {
@@ -464,28 +318,14 @@ public class InfoPayment extends javax.swing.JPanel {
         iconRoom = new javax.swing.JLabel();
         scrRoom = new javax.swing.JScrollPane();
         tblRoom = new javax.swing.JTable();
-        lblTotalRoom = new javax.swing.JLabel();
-        lblPriceRoom = new javax.swing.JLabel();
-        pnlAmenity = new javax.swing.JPanel();
-        lblAmenity = new javax.swing.JLabel();
-        sprAmenity = new javax.swing.JSeparator();
-        iconAmenity = new javax.swing.JLabel();
-        pnlAmenities = new javax.swing.JPanel();
-        pnlSurcharge = new javax.swing.JPanel();
-        lblSurcharge = new javax.swing.JLabel();
-        iconSurcharge = new javax.swing.JLabel();
-        pnlSurcharges = new javax.swing.JPanel();
-        sprSurcharge = new javax.swing.JSeparator();
-        pnlPromotion = new javax.swing.JPanel();
-        lblPromotions = new javax.swing.JLabel();
-        iconPromotion = new javax.swing.JLabel();
-        sprPromotion = new javax.swing.JSeparator();
-        pnlPromotions = new javax.swing.JPanel();
-        sprEnd = new javax.swing.JSeparator();
-        lblTotalASP = new javax.swing.JLabel();
-        lblPriceASP = new javax.swing.JLabel();
         cboGender = new iuh.fit.se.group1.ui.component.custom.Combobox();
+        lblPriceRoom = new javax.swing.JLabel();
+        lblPriceRoomValue = new javax.swing.JLabel();
+        amenitySurchargePanel1 = new iuh.fit.se.group1.ui.component.payment.AmenitySurchargePanel();
+        lblPromotionTitle = new javax.swing.JLabel();
+        infoPromotionOrderPanel1 = new iuh.fit.se.group1.ui.component.booking.InfoPromotionOrderPanel();
 
+        setBackground(new java.awt.Color(241, 241, 241));
         setPreferredSize(new java.awt.Dimension(650, 643));
 
         lblCustomer.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -497,6 +337,7 @@ public class InfoPayment extends javax.swing.JPanel {
         lblName.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
         lblName.setText("Tên khách hàng:");
 
+        txtName.setBorderRadius(5);
         txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
@@ -509,6 +350,7 @@ public class InfoPayment extends javax.swing.JPanel {
         lblPhone.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
         lblPhone.setText("SĐT:");
 
+        txtPhone.setBorderRadius(5);
         txtPhone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPhoneActionPerformed(evt);
@@ -633,152 +475,25 @@ public class InfoPayment extends javax.swing.JPanel {
         ));
         scrRoom.setViewportView(tblRoom);
 
-        lblTotalRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblTotalRoom.setText("Tổng tiền:");
-
-        lblPriceRoom.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
-        lblPriceRoom.setText("0");
-
-        pnlAmenity.setBackground(new java.awt.Color(255, 255, 255));
-
-        lblAmenity.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblAmenity.setForeground(new java.awt.Color(131, 176, 212));
-        lblAmenity.setText("Dịch vụ đi kèm");
-
-        iconAmenity.setText("jLabel16");
-
-        pnlAmenities.setBackground(new java.awt.Color(255, 255, 255));
-        pnlAmenities.setLayout(new javax.swing.BoxLayout(pnlAmenities, javax.swing.BoxLayout.Y_AXIS));
-
-        javax.swing.GroupLayout pnlAmenityLayout = new javax.swing.GroupLayout(pnlAmenity);
-        pnlAmenity.setLayout(pnlAmenityLayout);
-        pnlAmenityLayout.setHorizontalGroup(
-            pnlAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(sprAmenity)
-            .addGroup(pnlAmenityLayout.createSequentialGroup()
-                .addGap(1, 1, 1)
-                .addComponent(iconAmenity)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblAmenity)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(pnlAmenities, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        pnlAmenityLayout.setVerticalGroup(
-            pnlAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlAmenityLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlAmenityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(iconAmenity))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sprAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlAmenities, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        pnlSurcharge.setBackground(new java.awt.Color(255, 255, 255));
-
-        lblSurcharge.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblSurcharge.setForeground(new java.awt.Color(131, 176, 212));
-        lblSurcharge.setText("Phụ phí");
-
-        iconSurcharge.setText("jLabel25");
-
-        pnlSurcharges.setBackground(new java.awt.Color(255, 255, 255));
-        pnlSurcharges.setLayout(new javax.swing.BoxLayout(pnlSurcharges, javax.swing.BoxLayout.Y_AXIS));
-
-        javax.swing.GroupLayout pnlSurchargeLayout = new javax.swing.GroupLayout(pnlSurcharge);
-        pnlSurcharge.setLayout(pnlSurchargeLayout);
-        pnlSurchargeLayout.setHorizontalGroup(
-            pnlSurchargeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlSurchargeLayout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addGroup(pnlSurchargeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlSurcharges, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(pnlSurchargeLayout.createSequentialGroup()
-                        .addComponent(iconSurcharge)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 217, Short.MAX_VALUE))
-                    .addComponent(sprSurcharge, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(0, 0, 0))
-        );
-        pnlSurchargeLayout.setVerticalGroup(
-            pnlSurchargeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlSurchargeLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlSurchargeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(iconSurcharge))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sprSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
-                .addComponent(pnlSurcharges, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        pnlPromotion.setBackground(new java.awt.Color(255, 255, 255));
-
-        lblPromotions.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblPromotions.setForeground(new java.awt.Color(131, 176, 212));
-        lblPromotions.setText("Khuyến mãi");
-
-        iconPromotion.setText("jLabel34");
-
-        pnlPromotions.setBackground(new java.awt.Color(255, 255, 255));
-        pnlPromotions.setLayout(new javax.swing.BoxLayout(pnlPromotions, javax.swing.BoxLayout.Y_AXIS));
-
-        javax.swing.GroupLayout pnlPromotionLayout = new javax.swing.GroupLayout(pnlPromotion);
-        pnlPromotion.setLayout(pnlPromotionLayout);
-        pnlPromotionLayout.setHorizontalGroup(
-            pnlPromotionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(sprPromotion)
-            .addGroup(pnlPromotionLayout.createSequentialGroup()
-                .addGap(2, 2, 2)
-                .addComponent(iconPromotion)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblPromotions, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPromotionLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlPromotions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        pnlPromotionLayout.setVerticalGroup(
-            pnlPromotionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPromotionLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlPromotionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPromotions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(iconPromotion))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sprPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlPromotions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        sprEnd.setForeground(new java.awt.Color(0, 0, 0));
-
-        lblTotalASP.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblTotalASP.setText("Tổng tiền:");
-
-        lblPriceASP.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
-        lblPriceASP.setText("0");
-
         cboGender.setBackground(new java.awt.Color(255, 255, 255));
         cboGender.setForeground(new java.awt.Color(0, 0, 0));
+
+        lblPriceRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblPriceRoom.setForeground(new java.awt.Color(0, 0, 0));
+        lblPriceRoom.setText("Tổng tiền");
+
+        lblPriceRoomValue.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        lblPriceRoomValue.setForeground(new java.awt.Color(0, 0, 0));
+        lblPriceRoomValue.setText("0");
+
+        lblPromotionTitle.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblPromotionTitle.setForeground(new java.awt.Color(131, 176, 212));
+        lblPromotionTitle.setText("Khuyến mãi áp dụng");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(iconRoom)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblRoom)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(sprRoom, javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -803,38 +518,30 @@ public class InfoPayment extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(10, 10, 10)
-                                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 62, Short.MAX_VALUE)))
+                                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(32, 32, 32)))
                 .addComponent(pnlPayment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(pnlAmenity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(scrRoom)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pnlPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(sprEnd))
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 434, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(lblTotalRoom)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblPriceRoom)
-                                .addGap(125, 125, 125))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(lblTotalASP)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblPriceASP, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(55, 55, 55))))))
-            .addComponent(scrRoom)
+                        .addGap(356, 356, 356)
+                        .addComponent(lblPriceRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblPriceRoomValue, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(iconRoom)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblRoom)))
+                .addContainerGap(40, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(amenitySurchargePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 631, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPromotionTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(infoPromotionOrderPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 603, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -853,9 +560,9 @@ public class InfoPayment extends javax.swing.JPanel {
                             .addComponent(lblName)
                             .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblGender)
-                            .addComponent(cboGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(cboGender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblGender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(8, 8, 8)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblPhone)
@@ -868,23 +575,17 @@ public class InfoPayment extends javax.swing.JPanel {
                 .addComponent(sprRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(8, 8, 8)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTotalRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblPriceRoom))
+                    .addComponent(lblPriceRoom)
+                    .addComponent(lblPriceRoomValue))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTotalASP)
-                    .addComponent(lblPriceASP))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnlPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(amenitySurchargePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(92, 92, 92)
+                .addComponent(lblPromotionTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sprEnd, javax.swing.GroupLayout.PREFERRED_SIZE, 4, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(162, 162, 162))
+                .addComponent(infoPromotionOrderPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(100, 100, 100))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -906,104 +607,66 @@ public class InfoPayment extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.payment.AmenitySurchargePanel amenitySurchargePanel1;
     private javax.swing.JButton btnCash;
     private javax.swing.JButton btnTransfer;
     private iuh.fit.se.group1.ui.component.custom.Combobox cboGender;
-    private javax.swing.JLabel iconAmenity;
     private javax.swing.JLabel iconCustomer;
-    private javax.swing.JLabel iconPromotion;
     private javax.swing.JLabel iconRoom;
-    private javax.swing.JLabel iconSurcharge;
-    private javax.swing.JLabel lblAmenity;
+    private iuh.fit.se.group1.ui.component.booking.InfoPromotionOrderPanel infoPromotionOrderPanel1;
     private javax.swing.JLabel lblCustomer;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblMethod;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblPhone;
-    private javax.swing.JLabel lblPriceASP;
     private javax.swing.JLabel lblPricePayment;
     private javax.swing.JLabel lblPricePromotion;
     private javax.swing.JLabel lblPriceRoom;
+    private javax.swing.JLabel lblPriceRoomValue;
     private javax.swing.JLabel lblPriceTotal;
     private javax.swing.JLabel lblPromotion;
-    private javax.swing.JLabel lblPromotions;
+    private javax.swing.JLabel lblPromotionTitle;
     private javax.swing.JLabel lblRoom;
-    private javax.swing.JLabel lblSurcharge;
-    private javax.swing.JLabel lblTotalASP;
     private javax.swing.JLabel lblTotalOrder;
     private javax.swing.JLabel lblTotalPayment;
-    private javax.swing.JLabel lblTotalRoom;
-    private javax.swing.JPanel pnlAmenities;
-    private javax.swing.JPanel pnlAmenity;
     private javax.swing.JPanel pnlPayment;
-    private javax.swing.JPanel pnlPromotion;
-    private javax.swing.JPanel pnlPromotions;
-    private javax.swing.JPanel pnlSurcharge;
-    private javax.swing.JPanel pnlSurcharges;
     private javax.swing.JScrollPane scrRoom;
-    private javax.swing.JSeparator sprAmenity;
     private javax.swing.JSeparator sprCustomer;
-    private javax.swing.JSeparator sprEnd;
-    private javax.swing.JSeparator sprPromotion;
     private javax.swing.JSeparator sprRoom;
-    private javax.swing.JSeparator sprSurcharge;
     private javax.swing.JTable tblRoom;
     private iuh.fit.se.group1.ui.component.custom.TextField txtName;
     private iuh.fit.se.group1.ui.component.custom.TextField txtPhone;
     // End of variables declaration//GEN-END:variables
 
-    public void addAmenity(String amenityName, String price, String quantity) {
+    public void addAmenity(String amenityName, BigDecimal price, String quantity) {
         InfoOrderPanel amenityOrderPanel = new InfoOrderPanel();
         amenityOrderPanel.getLblName().setText(amenityName);
-        amenityOrderPanel.getLblPrice().setText(price);
+        amenityOrderPanel.getLblPrice().setText(price.toString());
         amenityOrderPanel.getLblQuantity().setText(quantity);
-
-        pnlAmenities.add(amenityOrderPanel);
-        pnlAmenities.add(Box.createVerticalStrut(8));
-        pnlAmenities.revalidate();
-        pnlAmenities.repaint();
+        amenitySurchargePanel1.addAmenity(amenityOrderPanel, price);
     }
 
-    public void addSurcharge(String surchargeName, String price, String quantity) {
+    public void addSurcharge(String surchargeName, BigDecimal price, String quantity) {
         InfoOrderPanel surchargeOrderPanel = new InfoOrderPanel();
         surchargeOrderPanel.getLblName().setText(surchargeName);
-        surchargeOrderPanel.getLblPrice().setText(price);
+        surchargeOrderPanel.getLblPrice().setText(price.toString());
         surchargeOrderPanel.getLblQuantity().setText(quantity);
 
-        pnlSurcharges.add(surchargeOrderPanel);
-        pnlSurcharges.add(Box.createVerticalStrut(8));
-        pnlSurcharges.revalidate();
-        pnlSurcharges.repaint();
+        amenitySurchargePanel1.addSurcharge(surchargeOrderPanel, price);
     }
 
     public void addPromotion(String promotionName, String price, String quantity) {
-        InfoPromotionOrderPanel promotionPanel = new InfoPromotionOrderPanel();
-        promotionPanel.getLblName().setText(promotionName);
-        promotionPanel.getLblPrice().setText(price);
-        promotionPanel.getLblQuantity().setText(quantity);
-
-        pnlPromotions.add(promotionPanel);
-        pnlPromotions.add(Box.createVerticalStrut(8));
-
-        pnlPromotions.revalidate();
-        pnlPromotions.repaint();
+        infoPromotionOrderPanel1.setNamePromotion(promotionName);
+        infoPromotionOrderPanel1.setPrice(price);
+        infoPromotionOrderPanel1.setQuantity(quantity);
+        infoPromotionOrderPanel1.setVisible(true);
     }
 
-    public void clearAmenity() {
-        pnlAmenities.removeAll();
-        pnlAmenities.revalidate();
-        pnlAmenities.repaint();
-    }
-
-    public void clearSurcharge() {
-        pnlSurcharges.removeAll();
-        pnlSurcharges.revalidate();
-        pnlSurcharges.repaint();
+    public void clearAmenitiesAndSurcharges() {
+        amenitySurchargePanel1.clearAll();
     }
 
     public void clearPromotion() {
-        pnlPromotions.removeAll();
-        pnlPromotions.revalidate();
-        pnlPromotions.repaint();
+        infoPromotionOrderPanel1.setVisible(false);
     }
 }

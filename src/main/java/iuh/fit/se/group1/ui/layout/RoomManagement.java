@@ -3,9 +3,7 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.service.RoomService;
-import iuh.fit.se.group1.service.RoomTypeService;
-import iuh.fit.se.group1.service.Properties;
+import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
@@ -14,11 +12,10 @@ import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Properties;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -29,16 +26,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
-import iuh.fit.se.group1.service.ExportExcelService;
-import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 
 public class RoomManagement extends javax.swing.JPanel {
@@ -202,7 +192,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
     private void savePricesToFile() {
         String filePath = "prices.properties";
-        Properties props = Properties.loadProperties(filePath);
+        Properties props = PropertiesService.loadProperties(filePath);
 
         props.setProperty("/price.single.hourly", txtSingleHour.getText());
         props.setProperty("/price.single.overnight", txtSingleNight.getText());
@@ -214,21 +204,21 @@ public class RoomManagement extends javax.swing.JPanel {
         props.setProperty("/price.double.daily", txtDoubleDay.getText());
         props.setProperty("/price.double.firsthour", txtDoubleFirstHour.getText());
 
-        Properties.saveProperties(filePath, props);
+        PropertiesService.saveProperties(filePath, props);
     }
 
     private void loadPricesFromFile() {
         String filePath = "prices.properties";
 
-        txtSingleHour.setText(Properties.get(filePath, "/price.single.hourly"));
-        txtSingleNight.setText(Properties.get(filePath, "/price.single.overnight"));
-        txtSingleDay.setText(Properties.get(filePath, "/price.single.daily"));
-        txtSingleFirstHour.setText(Properties.get(filePath, "/price.single.firsthour"));
+        txtSingleHour.setText(PropertiesService.get(filePath, "/price.single.hourly"));
+        txtSingleNight.setText(PropertiesService.get(filePath, "/price.single.overnight"));
+        txtSingleDay.setText(PropertiesService.get(filePath, "/price.single.daily"));
+        txtSingleFirstHour.setText(PropertiesService.get(filePath, "/price.single.firsthour"));
 
-        txtDoubleHour.setText(Properties.get(filePath, "/price.double.hourly"));
-        txtDoubleNight.setText(Properties.get(filePath, "/price.double.overnight"));
-        txtDoubleDay.setText(Properties.get(filePath, "/price.double.daily"));
-        txtDoubleFirstHour.setText(Properties.get(filePath, "/price.double.firsthour"));
+        txtDoubleHour.setText(PropertiesService.get(filePath, "/price.double.hourly"));
+        txtDoubleNight.setText(PropertiesService.get(filePath, "/price.double.overnight"));
+        txtDoubleDay.setText(PropertiesService.get(filePath, "/price.double.daily"));
+        txtDoubleFirstHour.setText(PropertiesService.get(filePath, "/price.double.firsthour"));
     }
 
     private void loadTable(List<Room> rooms) {
