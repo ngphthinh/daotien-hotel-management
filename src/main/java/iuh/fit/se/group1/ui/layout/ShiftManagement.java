@@ -13,6 +13,7 @@ import iuh.fit.se.group1.entity.Shift;
 import iuh.fit.se.group1.repository.ShiftRepository;
 import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.service.EmployeeShiftService;
+import iuh.fit.se.group1.service.ShiftCloseService;
 import iuh.fit.se.group1.service.ShiftService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.shift.ShiftCard;
@@ -297,75 +298,116 @@ public class ShiftManagement extends javax.swing.JPanel {
         String name2 = profile2.getLblName().getText();
         String shiftName = shiftCard.getLblShiftName().getText();
 
-        // Hiển thị hộp xác nhận
-        Message.showConfirm(
-                "Xác nhận",
-                "Bạn có chắc chắn muốn thêm " + name1 + " và " + name2 + " vào ca " + shiftName + " không?",
-                () -> {
-                    try {
-                        // Lấy ngày đã chọn từ DateChooser
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                        Date selectedDate = sdf.parse(txtDate.getText());
-                        LocalDate shiftDate = selectedDate.toInstant()
-                                .atZone(java.time.ZoneId.systemDefault())
-                                .toLocalDate();
+        try {
+            // Lấy ngày đã chọn từ DateChooser
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            Date selectedDate = sdf.parse(txtDate.getText());
+            LocalDate shiftDate = selectedDate.toInstant()
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDate();
 
-                        // Lấy Shift từ database (giả sử shifts đã được load)
-                        if (shiftIndex >= shifts.size()) {
-                            Message.showMessageNoCancel("Lỗi", "Ca làm việc không tồn tại!");
-                            return;
-                        }
-                        Shift shift = shifts.get(shiftIndex);
+            // Lấy Shift từ database
+            if (shiftIndex >= shifts.size()) {
+                Message.showMessageNoCancel("Lỗi", "Ca làm việc không tồn tại!");
+                return;
+            }
+            Shift shift = shifts.get(shiftIndex);
 
-                        // Lưu nhân viên 1 vào EmployeeShift
-                        EmployeeShift employeeShift1 = new EmployeeShift();
-                        Employee emp1 = new Employee();
-                        emp1.setEmployeeId(Long.parseLong(profile1.getLblCode().getText()));
-                        employeeShift1.setEmployee(emp1);
-                        employeeShift1.setShift(shift);
-                        employeeShift1.setShiftDate(shiftDate);
-                        employeeShift1.setClosingTime(null);
-                        employeeShift1.setCreatedAt(LocalDate.now());
+            // ✅ KIỂM TRA XEM CA ĐÃ CÓ NHÂN VIÊN CHƯA
+            List<EmployeeShift> existingShifts = employeeShiftService.getAllShiftsByDate(shiftDate)
+                    .stream()
+                    .filter(es -> es.getShift().getShiftId().equals(shift.getShiftId()))
+                    .collect(Collectors.toList());
 
-                        employeeShiftService.addEmployeeShift(employeeShift1);
+            boolean hasExistingEmployees = existingShifts != null && !existingShifts.isEmpty();
 
-                        // Lưu nhân viên 2 vào EmployeeShift
-                        EmployeeShift employeeShift2 = new EmployeeShift();
-                        Employee emp2 = new Employee();
-                        emp2.setEmployeeId(Long.parseLong(profile2.getLblCode().getText()));
-                        employeeShift2.setEmployee(emp2);
-                        employeeShift2.setShift(shift);
-                        employeeShift2.setShiftDate(shiftDate);
-                        employeeShift2.setClosingTime(null);
-                        employeeShift2.setCreatedAt(LocalDate.now());
+            // ✅ KIỂM TRA CA ĐÃ ĐÓNG CHƯA (KHÔNG CHO PHÉP UPDATE NẾU ĐÃ ĐÓNG)
+            if (hasExistingEmployees) {
+                ShiftCloseService shiftCloseService = new ShiftCloseService();
+                boolean hasClosedShift = existingShifts.stream()
+                        .anyMatch(es -> !shiftCloseService.getShiftCloseByEmployeeShift(es).isEmpty());
 
-                        employeeShiftService.addEmployeeShift(employeeShift2);
-
-                        // Cập nhật UI
-                        shiftCard.getLblName1().setText(name1);
-                        shiftCard.getLblCode1().setText(profile1.getLblCode().getText());
-                        shiftCard.getAvatarLabel1().setImage(profile1.getAvatarLabel().getImage());
-
-                        shiftCard.getLblName2().setText(name2);
-                        shiftCard.getLblCode2().setText(profile2.getLblCode().getText());
-                        shiftCard.getAvatarLabel2().setImage(profile2.getAvatarLabel().getImage());
-
-                        shiftCard.getPnlInforEmployee1().setVisible(true);
-                        shiftCard.getPnlInforEmployee2().setVisible(true);
-                        shiftCard.getBtnAdd().setVisible(true);
-
-                        shiftList.clearAllSelections();
-
-                        Message.showMessageNoCancel("Thành công",
-                                "Đã thêm nhân viên vào " + shiftName + " thành công!");
-
-                    } catch (Exception e) {
-                        log.error("Error adding employees to shift: ", e);
-                        Message.showMessageNoCancel("Lỗi",
-                                "Không thể thêm nhân viên vào ca: " + e.getMessage());
-                    }
+                if (hasClosedShift) {
+                    Message.showMessageNoCancel("Không thể cập nhật",
+                            shiftName + " đã được đóng.\n" +
+                                    "Không thể thay đổi nhân viên sau khi đóng ca!");
+                    return;
                 }
-        );
+            }
+
+            // Tạo message xác nhận phù hợp
+            String confirmMessage;
+            if (hasExistingEmployees) {
+                confirmMessage = shiftName + " đã có nhân viên.\n" +
+                        "Bạn có muốn THAY THẾ bằng " + name1 + " và " + name2 + " không?";
+            } else {
+                confirmMessage = "Bạn có chắc chắn muốn thêm " + name1 + " và " + name2 +
+                        " vào ca " + shiftName + " không?";
+            }
+
+            // Hiển thị hộp xác nhận
+            Message.showConfirm("Xác nhận", confirmMessage, () -> {
+                try {
+                    // ✅ NẾU ĐÃ CÓ NHÂN VIÊN → XÓA HẾT TRƯỚC KHI THÊM MỚI
+                    if (hasExistingEmployees) {
+                        for (EmployeeShift es : existingShifts) {
+                            employeeShiftService.deleteEmployeeShift(es.getEmployeeShiftId());
+                            log.info("Deleted existing EmployeeShift: {}", es.getEmployeeShiftId());
+                        }
+                    }
+
+                    // Lưu nhân viên 1 vào EmployeeShift
+                    EmployeeShift employeeShift1 = new EmployeeShift();
+                    Employee emp1 = new Employee();
+                    emp1.setEmployeeId(Long.parseLong(profile1.getLblCode().getText()));
+                    employeeShift1.setEmployee(emp1);
+                    employeeShift1.setShift(shift);
+                    employeeShift1.setShiftDate(shiftDate);
+                    employeeShift1.setCreatedAt(LocalDate.now());
+                    employeeShiftService.addEmployeeShift(employeeShift1);
+
+                    // Lưu nhân viên 2 vào EmployeeShift
+                    EmployeeShift employeeShift2 = new EmployeeShift();
+                    Employee emp2 = new Employee();
+                    emp2.setEmployeeId(Long.parseLong(profile2.getLblCode().getText()));
+                    employeeShift2.setEmployee(emp2);
+                    employeeShift2.setShift(shift);
+                    employeeShift2.setShiftDate(shiftDate);
+                    employeeShift2.setCreatedAt(LocalDate.now());
+                    employeeShiftService.addEmployeeShift(employeeShift2);
+
+                    // Cập nhật UI
+                    shiftCard.getLblName1().setText(name1);
+                    shiftCard.getLblCode1().setText(profile1.getLblCode().getText());
+                    shiftCard.getAvatarLabel1().setImage(profile1.getAvatarLabel().getImage());
+
+                    shiftCard.getLblName2().setText(name2);
+                    shiftCard.getLblCode2().setText(profile2.getLblCode().getText());
+                    shiftCard.getAvatarLabel2().setImage(profile2.getAvatarLabel().getImage());
+
+                    shiftCard.getPnlInforEmployee1().setVisible(true);
+                    shiftCard.getPnlInforEmployee2().setVisible(true);
+                    shiftCard.getBtnAdd().setVisible(true);
+
+                    shiftList.clearAllSelections();
+
+                    String successMsg = hasExistingEmployees ?
+                            "Đã cập nhật nhân viên cho " + shiftName + " thành công!" :
+                            "Đã thêm nhân viên vào " + shiftName + " thành công!";
+
+                    Message.showMessageNoCancel("Thành công", successMsg);
+
+                } catch (Exception e) {
+                    log.error("Error adding/updating employees to shift: ", e);
+                    Message.showMessageNoCancel("Lỗi",
+                            "Không thể cập nhật nhân viên vào ca: " + e.getMessage());
+                }
+            });
+
+        } catch (Exception e) {
+            log.error("Error processing shift assignment: ", e);
+            Message.showMessageNoCancel("Lỗi", "Không thể xử lý: " + e.getMessage());
+        }
     }
     /**
      * This method is called from within the constructor to initialize the form.

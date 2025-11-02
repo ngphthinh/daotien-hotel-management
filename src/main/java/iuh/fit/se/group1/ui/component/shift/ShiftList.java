@@ -6,6 +6,7 @@ package iuh.fit.se.group1.ui.component.shift;
 
 
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +38,6 @@ public class ShiftList extends JPanel {
     public ShiftList() {
         initComponents();
         custom();
-
-        // 🧩 Load dữ liệu nhân viên
         loadEmployeesFromDatabase();
     }
 
@@ -130,7 +129,7 @@ public class ShiftList extends JPanel {
     private void loadEmployeesFromDatabase() {
     try {
         EmployeeRepository employeeRepository = new EmployeeRepository();
-        List<Employee> employees = employeeRepository.findAll();
+        List<Employee> employees = employeeRepository.findAllByRoleId(Role.RECEPTIONIST.toString());
 
         pnlEmployees.removeAll();
         pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
@@ -144,7 +143,6 @@ public class ShiftList extends JPanel {
                 if (e.getAvt() != null && e.getAvt().length > 0) {
                     image = ImageIO.read(new ByteArrayInputStream(e.getAvt()));
                 } else {
-                    // Ảnh mặc định
                     URL defaultImg = getClass().getResource("/images/meomeo.jpg");
                     if (defaultImg != null)
                         image = ImageIO.read(defaultImg);
@@ -168,7 +166,7 @@ public class ShiftList extends JPanel {
             JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
             separator.setAlignmentX(Component.LEFT_ALIGNMENT);
             separator.setMaximumSize(new Dimension(303, 1));
-            separator.setForeground(new Color(180, 180, 180)); // 💪 đậm hơn
+            separator.setForeground(new Color(180, 180, 180));
             separator.setBackground(new Color(180, 180, 180));
             separator.setOpaque(true);
             pnlEmployees.add(separator);

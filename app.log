@@ -42,6 +42,7 @@ thg 10 29, 2025 8:02:04 SA iuh.fit.se.group1.config.AppLogger error
 SEVERE: No enum constant for status: MAINTENANCE
 >>>>>>> d4d21a11835291d2199ae11003d6e75a5a982986
 <<<<<<< HEAD
+<<<<<<< HEAD
 Oct 31, 2025 11:01:08 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 Oct 31, 2025 12:01:32 PM iuh.fit.se.group1.config.AppLogger info
@@ -104,3 +105,7 @@ Nov 03, 2025 1:46:47 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order is missing required fields
 Nov 03, 2025 2:06:28 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
+=======
+Nov 01, 2025 12:43:34 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+>>>>>>> 034ae500b3d3317bdc84049e39181ae182a258c4

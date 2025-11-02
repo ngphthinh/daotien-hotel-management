@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.shift;
 
+import iuh.fit.se.group1.ui.component.custom.TextField;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -23,6 +24,18 @@ public class InfoShift extends javax.swing.JPanel {
         setOpaque(false);
         lblTitle.setIcon(FontIcon.of(FontAwesomeSolid.CLOCK,20,Color.BLACK));
     }
+    public void setEmployeeName(String name) {
+        txtEmployee.setText(name);
+    }
+
+    public void setEmployeeId(String id) {
+        txtEmployee.setText(txtEmployee.getText() + " (Mã nhân viên: " + id + ")");
+    }
+
+    public void setShiftInfo(String name, String time, String date) {
+        txtShift.setText(name + " | " + time + " | " + date);
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -76,9 +89,9 @@ public class InfoShift extends javax.swing.JPanel {
                             .addComponent(txtEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(65, 65, 65)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtShift, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(27, Short.MAX_VALUE))
+                            .addComponent(lblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtShift, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

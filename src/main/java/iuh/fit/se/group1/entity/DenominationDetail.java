@@ -5,34 +5,36 @@ import iuh.fit.se.group1.enums.DenominationLabel;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Denomination {
-    private	Long id;
+public class DenominationDetail {
+    private	Long denominationDetailId;
     private DenominationLabel denomination;
     private	int quantity;
+    private EmployeeShift employeeShift;
     private LocalDate createdAt;
 
-    public Denomination() {
+    public DenominationDetail() {
     }
 
-    public Denomination(Long id, DenominationLabel denomination, int quantity, LocalDate createdAt) {
-        this.id = id;
+    public DenominationDetail(Long denominationDetailId, DenominationLabel denomination, int quantity, EmployeeShift employeeShift, LocalDate createdAt) {
+        this.denominationDetailId = denominationDetailId;
         this.denomination = denomination;
         this.quantity = quantity;
+        this.employeeShift = employeeShift;
         this.createdAt = createdAt;
     }
 
-    public Denomination(DenominationLabel denomination, int quantity) {
+    public DenominationDetail(DenominationLabel denomination, int quantity) {
         this.denomination = denomination;
         this.quantity = quantity;
         this.createdAt = LocalDate.now();
     }
 
-    public Long getId() {
-        return id;
+    public Long getDenominationDetailId() {
+        return denominationDetailId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setDenominationDetailId(Long denominationDetailId) {
+        this.denominationDetailId = denominationDetailId;
     }
 
     public DenominationLabel getDenomination() {
@@ -51,6 +53,14 @@ public class Denomination {
         this.quantity = quantity;
     }
 
+    public EmployeeShift getEmployeeShift() {
+        return employeeShift;
+    }
+
+    public void setEmployeeShift(EmployeeShift employeeShift) {
+        this.employeeShift = employeeShift;
+    }
+
     public LocalDate getCreatedAt() {
         return createdAt;
     }
@@ -61,21 +71,22 @@ public class Denomination {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Denomination that)) return false;
-        return Objects.equals(id, that.id);
+        if (!(o instanceof DenominationDetail that)) return false;
+        return Objects.equals(denominationDetailId, that.denominationDetailId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(denominationDetailId);
     }
 
     @Override
     public String toString() {
-        return "Denomination{" +
-                "id=" + id +
+        return "DenominationDetail{" +
+                "denominationId=" + denominationDetailId +
                 ", denomination=" + denomination +
                 ", quantity=" + quantity +
+                ", employeeShift=" + employeeShift +
                 ", createdAt=" + createdAt +
                 '}';
     }

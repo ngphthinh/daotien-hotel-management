@@ -260,7 +260,7 @@ public class BookingPage extends javax.swing.JPanel {
 
             if (!booking.getCheckOutDate().isAfter(booking.getCheckInDate()) && !booking.getBookingType().equals(BookingType.OVERNIGHT)) {
                 CustomDialog.showMessage(null, "Ngày trả phòng phải sau ngày nhận phòng!",
-                        "Thông báo", CustomDialog.MessageType.ERROR);
+                        "Thông báo", CustomDialog.MessageType.ERROR, 420, 200);
             }
             // tinh toan tien dua vao booking type va so ngay o va loai phong
             booking.calcTotalPrice(room.get("roomType"));
@@ -283,11 +283,11 @@ public class BookingPage extends javax.swing.JPanel {
 
         if (orderService.createOrder(order, orderDetails) != null) {
             CustomDialog.showMessage(null, "Tạo đơn đặt phòng thành công!",
-                    "Thông báo", CustomDialog.MessageType.INFO);
+                    "Thông báo", CustomDialog.MessageType.INFO, 420, 200);
             clearForm();
         } else {
             CustomDialog.showMessage(null, "Tạo đơn đặt phòng thất bại!",
-                    "Thông báo", CustomDialog.MessageType.ERROR);
+                    "Thông báo", CustomDialog.MessageType.ERROR, 420, 200);
         }
 
 

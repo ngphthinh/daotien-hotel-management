@@ -208,7 +208,7 @@ public class CashPaymentModal extends JPanel {
         if (moneyGiven < totalToPay) {
             CustomDialog.showMessage(this,
                     "Khách đưa chưa đủ tiền!",
-                    "Thông báo", CustomDialog.MessageType.WARNING);
+                    "Thông báo", CustomDialog.MessageType.WARNING, 350, 150);
             return;
         }
 
@@ -221,8 +221,6 @@ public class CashPaymentModal extends JPanel {
                 "Hoàn tất", JOptionPane.INFORMATION_MESSAGE);
         GlassPanePopup.closePopupLast();
     }
-
-
 
 
     // ======================= GIAO DIỆN SWING ==========================

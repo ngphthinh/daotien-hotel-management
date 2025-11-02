@@ -4,9 +4,20 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.entity.DenominationDetail;
+import iuh.fit.se.group1.entity.EmployeeShift;
+import iuh.fit.se.group1.entity.ShiftClose;
+import iuh.fit.se.group1.enums.DenominationLabel;
+import iuh.fit.se.group1.repository.DenominationDetailRepository;
+import iuh.fit.se.group1.service.DenominationDetailService;
+import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.EmployeeShiftService;
+import iuh.fit.se.group1.service.ShiftCloseService;
 import iuh.fit.se.group1.ui.component.HeaderShift;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote;
 import iuh.fit.se.group1.ui.component.shift.InfoShift;
 import iuh.fit.se.group1.ui.component.shift.MinPanel;
@@ -15,323 +26,233 @@ import iuh.fit.se.group1.ui.component.shift.MoneyInTheSafe;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author THIS PC
  */
 public class CloseShift extends javax.swing.JPanel {
-
-
+    private static final Logger log = LoggerFactory.getLogger(CloseShift.class);
+    private EmployeeShiftService employeeShiftService;
+    private DenominationDetailService denominationDetailService;
+    private final ShiftCloseService shiftCloseService;
+    private EmployeeShift currentEmployeeShift;
+    private BigDecimal totalRevenue = BigDecimal.ZERO;
+    private static final DenominationLabel[] DENOMINATION_LABELS = {
+            DenominationLabel.VND_500000,
+            DenominationLabel.VND_200000,
+            DenominationLabel.VND_100000,
+            DenominationLabel.VND_50000,
+            DenominationLabel.VND_20000,
+            DenominationLabel.VND_10000,
+            DenominationLabel.VND_5000,
+            DenominationLabel.VND_2000,
+            DenominationLabel.VND_1000
+    };
+    private Runnable onCloseShiftSuccess;
     public CloseShift() {
+        this.employeeShiftService = new EmployeeShiftService();
+        this.denominationDetailService = new DenominationDetailService();
+        this.shiftCloseService = new ShiftCloseService();
         initComponents();
-        money1.getLblMoney().setText("500.000đ");
-        money2.getLblMoney().setText("200.000đ");
-        money3.getLblMoney().setText("100.000đ");
-        money4.getLblMoney().setText("50.000đ");
-        money5.getLblMoney().setText("20.000đ");
-        money6.getLblMoney().setText("10.000đ");
-        money7.getLblMoney().setText("5.000đ");
-        money8.getLblMoney().setText("2.000đ");
-        money9.getLblMoney().setText("1.000đ");
+        configureTextFields();
+        initIcons();
+        initMoneyLabels();
+        clearForm();
 
-        lblTitleMoneyOpenShift.setIcon(FontIcon.of(FontAwesomeSolid.MONEY_BILL_ALT, 20, Color.BLACK.BLACK));
+    }
+    private void configureTextFields() {
+        txtMoneyOpenShift.setEditable(false);
+        txtReality.setEditable(false);
+        txtSystem.setEditable(false);
+    }
+    private void initIcons() {
+        lblTitleMoneyOpenShift.setIcon(FontIcon.of(FontAwesomeSolid.MONEY_BILL_ALT, 20, Color.BLACK));
         lblTitleMoneyOfSafe.setIcon(FontIcon.of(FontAwesomeSolid.COINS, 17, Color.BLACK));
         lblCheckDifference.setIcon(FontIcon.of(FontAwesomeSolid.SHIELD_ALT, 17, Color.BLACK));
         lblNote.setIcon(FontIcon.of(FontAwesomeSolid.PEN, 17, Color.BLACK));
-        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.white));
-
-    }
-
-    public OpenDifferenceNote getAtTheEnd1() {
-        return atTheEnd1;
-    }
-
-    public void setAtTheEnd1(OpenDifferenceNote atTheEnd1) {
-        this.atTheEnd1 = atTheEnd1;
-    }
-
-    public OpenDifferenceNote getAtTheEnd2() {
-        return atTheEnd2;
-    }
-
-    public void setAtTheEnd2(OpenDifferenceNote atTheEnd2) {
-        this.atTheEnd2 = atTheEnd2;
-    }
-
-    public OpenDifferenceNote getAtTheEnd3() {
-        return atTheEnd3;
-    }
-
-    public void setAtTheEnd3(OpenDifferenceNote atTheEnd3) {
-        this.atTheEnd3 = atTheEnd3;
-    }
-
-    public Button getBtnClose() {
-        return btnClose;
-    }
-
-    public void setBtnClose(Button btnClose) {
-        this.btnClose = btnClose;
-    }
-
-    public HeaderShift getHeaderShift1() {
-        return headerShift1;
-    }
-
-    public void setHeaderShift1(HeaderShift headerShift1) {
-        this.headerShift1 = headerShift1;
-    }
-
-    public InfoShift getInfoShift1() {
-        return infoShift1;
-    }
-
-    public void setInfoShift1(InfoShift infoShift1) {
-        this.infoShift1 = infoShift1;
-    }
-
-    public JLabel getjLabel10() {
-        return lblPrice;
-    }
-
-    public void setjLabel10(JLabel jLabel10) {
-        this.lblPrice = jLabel10;
-    }
-
-    public JLabel getjLabel8() {
-        return lblTotalPrice;
-    }
-
-    public void setjLabel8(JLabel jLabel8) {
-        this.lblTotalPrice = jLabel8;
-    }
-
-    public JTextArea getjTextArea1() {
-        return jTextArea1;
-    }
-
-    public void setjTextArea1(JTextArea jTextArea1) {
-        this.jTextArea1 = jTextArea1;
-    }
-
-    public JLabel getLblCheckDifference() {
-        return lblCheckDifference;
-    }
-
-    public void setLblCheckDifference(JLabel lblCheckDifference) {
-        this.lblCheckDifference = lblCheckDifference;
-    }
-
-    public JLabel getLblMoneyDifference() {
-        return lblMoneyDifference;
-    }
-
-    public void setLblMoneyDifference(JLabel lblMoneyDifference) {
-        this.lblMoneyDifference = lblMoneyDifference;
-    }
-
-    public JLabel getLblNote() {
-        return lblNote;
-    }
-
-    public void setLblNote(JLabel lblNote) {
-        this.lblNote = lblNote;
-    }
-
-    public JLabel getLblReality() {
-        return lblReality;
-    }
-
-    public void setLblReality(JLabel lblReality) {
-        this.lblReality = lblReality;
-    }
-
-    public JLabel getLblSystem() {
-        return lblSystem;
-    }
-
-    public void setLblSystem(JLabel lblSystem) {
-        this.lblSystem = lblSystem;
-    }
-
-    public JLabel getLblTitleMoneyOfSafe() {
-        return lblTitleMoneyOfSafe;
-    }
-
-    public void setLblTitleMoneyOfSafe(JLabel lblTitleMoneyOfSafe) {
-        this.lblTitleMoneyOfSafe = lblTitleMoneyOfSafe;
-    }
-
-    public JLabel getLblTitleMoneyOpenShift() {
-        return lblTitleMoneyOpenShift;
-    }
-
-    public void setLblTitleMoneyOpenShift(JLabel lblTitleMoneyOpenShift) {
-        this.lblTitleMoneyOpenShift = lblTitleMoneyOpenShift;
-    }
-
-    public MinPanel getMinPanel1() {
-        return minPanel1;
-    }
-
-    public void setMinPanel1(MinPanel minPanel1) {
-        this.minPanel1 = minPanel1;
-    }
-
-    public MinPanel getMinPanel2() {
-        return minPanel2;
-    }
-
-    public void setMinPanel2(MinPanel minPanel2) {
-        this.minPanel2 = minPanel2;
-    }
-
-    public MinPanel getMinPanel3() {
-        return minPanel3;
-    }
-
-    public void setMinPanel3(MinPanel minPanel3) {
-        this.minPanel3 = minPanel3;
-    }
-
-    public MinPanel getMinPanel4() {
-        return minPanel4;
-    }
-
-    public void setMinPanel4(MinPanel minPanel4) {
-        this.minPanel4 = minPanel4;
-    }
-
-    public Money getMoney1() {
-        return money1;
-    }
-
-    public void setMoney1(Money money1) {
-        this.money1 = money1;
-    }
-
-    public Money getMoney2() {
-        return money2;
-    }
-
-    public void setMoney2(Money money2) {
-        this.money2 = money2;
-    }
-
-    public Money getMoney3() {
-        return money3;
-    }
-
-    public void setMoney3(Money money3) {
-        this.money3 = money3;
-    }
-
-    public Money getMoney4() {
-        return money4;
-    }
-
-    public void setMoney4(Money money4) {
-        this.money4 = money4;
-    }
-
-    public Money getMoney5() {
-        return money5;
-    }
-
-    public void setMoney5(Money money5) {
-        this.money5 = money5;
-    }
-
-    public Money getMoney6() {
-        return money6;
-    }
-
-    public void setMoney6(Money money6) {
-        this.money6 = money6;
-    }
-
-    public Money getMoney7() {
-        return money7;
-    }
-
-    public void setMoney7(Money money7) {
-        this.money7 = money7;
-    }
-
-    public Money getMoney8() {
-        return money8;
-    }
-
-    public void setMoney8(Money money8) {
-        this.money8 = money8;
-    }
-
-    public Money getMoney9() {
-        return money9;
-    }
-
-    public void setMoney9(Money money9) {
-        this.money9 = money9;
-    }
-
-    public MoneyInTheSafe getMoneyInTheSafe1() {
-        return moneyInTheSafe1;
-    }
-
-    public void setMoneyInTheSafe1(MoneyInTheSafe moneyInTheSafe1) {
-        this.moneyInTheSafe1 = moneyInTheSafe1;
-    }
-
-    public JScrollPane getScrNote() {
-        return scrNote;
-    }
-
-    public void setScrNote(JScrollPane scrNote) {
-        this.scrNote = scrNote;
-    }
-
-    public JLabel getTxtMoneyDifference() {
-        return txtMoneyDifference;
-    }
-
-    public void setTxtMoneyDifference(JLabel txtMoneyDifference) {
-        this.txtMoneyDifference = txtMoneyDifference;
-    }
-
-    public TextField getTxtMoneyOpenShift() {
-        return txtMoneyOpenShift;
-    }
-
-    public void setTxtMoneyOpenShift(TextField txtMoneyOpenShift) {
-        this.txtMoneyOpenShift = txtMoneyOpenShift;
-    }
-
-    public TextField getTxtReality() {
-        return txtReality;
-    }
-
-    public void setTxtReality(TextField txtReality) {
-        this.txtReality = txtReality;
-    }
-
-    public TextField getTxtSystem() {
-        return txtSystem;
-    }
-
-    public void setTxtSystem(TextField txtSystem) {
-        this.txtSystem = txtSystem;
-    }
-
-
-    @Override
-    protected void paintComponent(Graphics g) {
-
+        btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.WHITE));
+    }
+    private void initMoneyLabels() {
+        denominationDetailService = new DenominationDetailService();
+        List<Long> denominations = denominationDetailService.getAvailableDenominations();
+        Money[] moneyPanels = {money1, money2, money3, money4, money5, money6, money7, money8, money9};
+
+        for (int i = 0; i < Math.min(denominations.size(), moneyPanels.length); i++) {
+            long denom = denominations.get(i);
+            moneyPanels[i].getLblMoney().setText(formatDenomination(denom));
+        }
+    }
+    private String formatDenomination(long value) {
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+        return formatter.format(value) + "VND";
+    }
+    public void setCurrentEmployeeShift(EmployeeShift employeeShift) {
+        this.currentEmployeeShift = employeeShift;
+
+        if (employeeShift != null) {
+            try {
+                // 1. Load thông tin chi tiết ca làm việc
+                EmployeeShift detailedShift = employeeShiftService.getEmployeeShiftWithDetails(employeeShift.getEmployeeShiftId());
+
+                if (detailedShift != null) {
+                    // Hiển thị thông tin ca làm việc
+                    displayShiftInfo(detailedShift);
+                    txtMoneyOpenShift.setText("5.000.000 VND");
+                    // 3. Tính tổng doanh thu từ hóa đơn
+                    totalRevenue = employeeShiftService.getTotalRevenueForShift(employeeShift.getEmployeeShiftId());
+                    txtSystem.setText(formatCurrency(totalRevenue));
+                    setupAutoCalculation();
+                }
+
+            } catch (Exception e) {
+                log.error("Error loading shift data: ", e);
+                Message.showMessage("Lỗi", "Không thể tải thông tin ca làm việc: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Hiển thị thông tin ca làm việc lên UI
+     */
+    private void displayShiftInfo(EmployeeShift shift) {
+        if (shift.getEmployee() != null) {
+            infoShift1.setEmployeeName(shift.getEmployee().getFullName());
+            infoShift1.setEmployeeId(String.valueOf(shift.getEmployee().getEmployeeId()));
+        }
+
+        if (shift.getShift() != null) {
+            String shiftName = shift.getShift().getName();
+            String shiftTime = shift.getShift().getStartTime() + " - " + shift.getShift().getEndTime();
+            String shiftDate = shift.getShiftDate() != null
+                    ? shift.getShiftDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                    : "";
+            infoShift1.setShiftInfo(shiftName, shiftTime, shiftDate);
+        }
+    }
+
+
+    /**
+     * Thiết lập tính toán tự động khi nhập số tiền thực tế
+     */
+    private void setupAutoCalculation() {
+        txtReality.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                calculateDifference();
+            }
+        });
+        java.awt.event.KeyAdapter moneyKeyListener = new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                calculateTotalCashInDrawer();
+            }
+        };
+        for (Money moneyPanel : getMoneyPanels()) {
+            moneyPanel.getTxtQuantity().addKeyListener(moneyKeyListener);
+        }
+    }
+    private Money[] getMoneyPanels() {
+        return new Money[]{money1, money2, money3, money4, money5,
+                money6, money7, money8, money9};
+    }
+    /**
+     * Tính tổng tiền trong két dựa trên mệnh giá
+     */
+    private void calculateTotalCashInDrawer() {
+        try {
+            BigDecimal total = BigDecimal.ZERO;
+
+            total = total.add(calculateMoneyValue(money1, 500000));
+            total = total.add(calculateMoneyValue(money2, 200000));
+            total = total.add(calculateMoneyValue(money3, 100000));
+            total = total.add(calculateMoneyValue(money4, 50000));
+            total = total.add(calculateMoneyValue(money5, 20000));
+            total = total.add(calculateMoneyValue(money6, 10000));
+            total = total.add(calculateMoneyValue(money7, 5000));
+            total = total.add(calculateMoneyValue(money8, 2000));
+            total = total.add(calculateMoneyValue(money9, 1000));
+
+            lblPrice.setText(formatCurrency(total));
+            txtReality.setText(formatCurrency(total));
+
+            calculateDifference();
+
+        } catch (Exception e) {
+            log.error("Error calculating total cash: ", e);
+        }
+    }
+
+    /**
+     * Tính giá trị tiền của mỗi mệnh giá
+     */
+    private BigDecimal calculateMoneyValue(Money moneyPanel, long denomination) {
+        try {
+            String quantityText = moneyPanel.getTxtQuantity().getText();
+            if (quantityText != null && !quantityText.trim().isEmpty()) {
+                int quantity = Integer.parseInt(quantityText.trim());
+                return BigDecimal.valueOf(quantity * denomination);
+            }
+        } catch (NumberFormatException e) {
+            log.debug("Invalid quantity input: {}", e.getMessage());
+        }
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * Tính toán chênh lệch giữa thực tế và hệ thống
+     */
+    private void calculateDifference() {
+        try {
+            BigDecimal reality = parseCurrency(txtReality.getText());
+            BigDecimal openingCash = new BigDecimal("5000000");
+            BigDecimal difference = reality.subtract(totalRevenue.add(openingCash));
+
+            txtMoneyDifference.setText(formatCurrency(difference));
+            if (difference.compareTo(BigDecimal.ZERO) < 0) {
+                txtMoneyDifference.setForeground(new Color(255, 51, 0)); // Đỏ - thiếu tiền
+            } else if (difference.compareTo(BigDecimal.ZERO) > 0) {
+                txtMoneyDifference.setForeground(new Color(0, 153, 0)); // Xanh - thừa tiền
+            } else {
+                txtMoneyDifference.setForeground(Color.BLACK);
+            }
+
+        } catch (Exception e) {
+            log.error("Error calculating difference: ", e);
+        }
+    }
+
+    /**
+     * Format tiền tệ
+     */
+    private String formatCurrency(BigDecimal amount) {
+        if (amount == null) {
+            return "0 VND";
+        }
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+        return formatter.format(amount) + " VND";
+    }
+
+    /**
+     * Parse chuỗi tiền tệ thành BigDecimal
+     */
+    private BigDecimal parseCurrency(String text) {
+        if (text == null || text.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        String numberOnly = text.replaceAll("[^\\d]", "");
+        if (numberOnly.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return new BigDecimal(numberOnly);
     }
 
     /**
@@ -401,80 +322,81 @@ public class CloseShift extends javax.swing.JPanel {
         lblTotalPrice.setText("Tổng tiền:");
 
         lblPrice.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblPrice.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblPrice.setText("10000000 VND");
 
         javax.swing.GroupLayout minPanel4Layout = new javax.swing.GroupLayout(minPanel4);
         minPanel4.setLayout(minPanel4Layout);
         minPanel4Layout.setHorizontalGroup(
-                minPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(minPanel4Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTotalPrice)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(16, 16, 16))
+            minPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(minPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblTotalPrice)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16))
         );
         minPanel4Layout.setVerticalGroup(
-                minPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(minPanel4Layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addGroup(minPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblTotalPrice)
-                                        .addComponent(lblPrice))
-                                .addGap(0, 15, Short.MAX_VALUE))
+            minPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(minPanel4Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(minPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTotalPrice)
+                    .addComponent(lblPrice))
+                .addGap(0, 15, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout moneyInTheSafe1Layout = new javax.swing.GroupLayout(moneyInTheSafe1);
         moneyInTheSafe1.setLayout(moneyInTheSafe1Layout);
         moneyInTheSafe1Layout.setHorizontalGroup(
-                moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
-                                .addGroup(moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
-                                                .addGap(18, 18, 18)
-                                                .addComponent(lblTitleMoneyOfSafe)
-                                                .addGap(0, 0, Short.MAX_VALUE))
-                                        .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addGroup(moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(money1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
-                                                        .addComponent(money2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(money3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(money4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(money5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(money6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(money7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(money8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(money9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(minPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                .addContainerGap())
+            moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
+                .addGroup(moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(lblTitleMoneyOfSafe)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(money1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+                            .addComponent(money2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(money3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(money4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(money5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(money6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(money7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(money8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(money9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(minPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
         );
         moneyInTheSafe1Layout.setVerticalGroup(
-                moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTitleMoneyOfSafe)
-                                .addGap(17, 17, 17)
-                                .addComponent(money1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(13, 13, 13)
-                                .addComponent(money9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
-                                .addComponent(minPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            moneyInTheSafe1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(moneyInTheSafe1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblTitleMoneyOfSafe)
+                .addGap(17, 17, 17)
+                .addComponent(money1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addComponent(money9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addComponent(minPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         atTheEnd1.setBackground(new java.awt.Color(255, 255, 255));
@@ -485,24 +407,24 @@ public class CloseShift extends javax.swing.JPanel {
         javax.swing.GroupLayout atTheEnd1Layout = new javax.swing.GroupLayout(atTheEnd1);
         atTheEnd1.setLayout(atTheEnd1Layout);
         atTheEnd1Layout.setHorizontalGroup(
-                atTheEnd1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(atTheEnd1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(atTheEnd1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(atTheEnd1Layout.createSequentialGroup()
-                                                .addComponent(lblTitleMoneyOpenShift)
-                                                .addGap(0, 0, Short.MAX_VALUE))
-                                        .addComponent(txtMoneyOpenShift, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+            atTheEnd1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(atTheEnd1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(atTheEnd1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(atTheEnd1Layout.createSequentialGroup()
+                        .addComponent(lblTitleMoneyOpenShift)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(txtMoneyOpenShift, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         atTheEnd1Layout.setVerticalGroup(
-                atTheEnd1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(atTheEnd1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTitleMoneyOpenShift)
-                                .addGap(20, 20, 20)
-                                .addComponent(txtMoneyOpenShift, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(17, 17, 17))
+            atTheEnd1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(atTheEnd1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblTitleMoneyOpenShift)
+                .addGap(20, 20, 20)
+                .addComponent(txtMoneyOpenShift, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(17, 17, 17))
         );
 
         atTheEnd2.setBackground(new java.awt.Color(255, 255, 255));
@@ -520,22 +442,22 @@ public class CloseShift extends javax.swing.JPanel {
         javax.swing.GroupLayout minPanel1Layout = new javax.swing.GroupLayout(minPanel1);
         minPanel1.setLayout(minPanel1Layout);
         minPanel1Layout.setHorizontalGroup(
-                minPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(minPanel1Layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(lblSystem)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 123, Short.MAX_VALUE)
-                                .addComponent(txtSystem, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(15, 15, 15))
+            minPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(minPanel1Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(lblSystem)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                .addComponent(txtSystem, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
         );
         minPanel1Layout.setVerticalGroup(
-                minPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(minPanel1Layout.createSequentialGroup()
-                                .addGap(13, 13, 13)
-                                .addGroup(minPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblSystem)
-                                        .addComponent(txtSystem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(13, Short.MAX_VALUE))
+            minPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(minPanel1Layout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addGroup(minPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSystem)
+                    .addComponent(txtSystem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         minPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -553,22 +475,22 @@ public class CloseShift extends javax.swing.JPanel {
         javax.swing.GroupLayout minPanel2Layout = new javax.swing.GroupLayout(minPanel2);
         minPanel2.setLayout(minPanel2Layout);
         minPanel2Layout.setHorizontalGroup(
-                minPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, minPanel2Layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(lblReality)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
-                                .addComponent(txtReality, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(15, 15, 15))
+            minPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, minPanel2Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(lblReality)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)
+                .addComponent(txtReality, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
         );
         minPanel2Layout.setVerticalGroup(
-                minPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(minPanel2Layout.createSequentialGroup()
-                                .addGap(13, 13, 13)
-                                .addGroup(minPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblReality)
-                                        .addComponent(txtReality, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(13, Short.MAX_VALUE))
+            minPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(minPanel2Layout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addGroup(minPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblReality)
+                    .addComponent(txtReality, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         minPanel3.setBackground(new java.awt.Color(0, 0, 0));
@@ -584,22 +506,22 @@ public class CloseShift extends javax.swing.JPanel {
         javax.swing.GroupLayout minPanel3Layout = new javax.swing.GroupLayout(minPanel3);
         minPanel3.setLayout(minPanel3Layout);
         minPanel3Layout.setHorizontalGroup(
-                minPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(minPanel3Layout.createSequentialGroup()
-                                .addGap(14, 14, 14)
-                                .addComponent(lblMoneyDifference)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtMoneyDifference, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            minPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(minPanel3Layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(lblMoneyDifference)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtMoneyDifference, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         minPanel3Layout.setVerticalGroup(
-                minPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, minPanel3Layout.createSequentialGroup()
-                                .addContainerGap(15, Short.MAX_VALUE)
-                                .addGroup(minPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblMoneyDifference)
-                                        .addComponent(txtMoneyDifference, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(13, 13, 13))
+            minPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, minPanel3Layout.createSequentialGroup()
+                .addContainerGap(15, Short.MAX_VALUE)
+                .addGroup(minPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblMoneyDifference)
+                    .addComponent(txtMoneyDifference, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(13, 13, 13))
         );
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -608,41 +530,41 @@ public class CloseShift extends javax.swing.JPanel {
         javax.swing.GroupLayout atTheEnd2Layout = new javax.swing.GroupLayout(atTheEnd2);
         atTheEnd2.setLayout(atTheEnd2Layout);
         atTheEnd2Layout.setHorizontalGroup(
-                atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(atTheEnd2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblCheckDifference)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                        .addGroup(atTheEnd2Layout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(25, 25, 25)
-                                .addComponent(jLabel1)
-                                .addGap(18, 18, 18)
-                                .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(minPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
+            atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(atTheEnd2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblCheckDifference)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(atTheEnd2Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(minPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         atTheEnd2Layout.setVerticalGroup(
-                atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(atTheEnd2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblCheckDifference)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(atTheEnd2Layout.createSequentialGroup()
-                                                .addGroup(atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addGap(18, 18, 18))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd2Layout.createSequentialGroup()
-                                                .addComponent(jLabel1)
-                                                .addGap(37, 37, 37)))
-                                .addComponent(minPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(15, Short.MAX_VALUE))
+            atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(atTheEnd2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblCheckDifference)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(atTheEnd2Layout.createSequentialGroup()
+                        .addGroup(atTheEnd2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(minPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(minPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd2Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(37, 37, 37)))
+                .addComponent(minPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         atTheEnd3.setBackground(new java.awt.Color(255, 255, 255));
@@ -657,24 +579,24 @@ public class CloseShift extends javax.swing.JPanel {
         javax.swing.GroupLayout atTheEnd3Layout = new javax.swing.GroupLayout(atTheEnd3);
         atTheEnd3.setLayout(atTheEnd3Layout);
         atTheEnd3Layout.setHorizontalGroup(
-                atTheEnd3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(atTheEnd3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblNote)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd3Layout.createSequentialGroup()
-                                .addContainerGap(22, Short.MAX_VALUE)
-                                .addComponent(scrNote, javax.swing.GroupLayout.PREFERRED_SIZE, 710, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            atTheEnd3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(atTheEnd3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblNote)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, atTheEnd3Layout.createSequentialGroup()
+                .addContainerGap(22, Short.MAX_VALUE)
+                .addComponent(scrNote, javax.swing.GroupLayout.PREFERRED_SIZE, 710, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         atTheEnd3Layout.setVerticalGroup(
-                atTheEnd3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(atTheEnd3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblNote)
-                                .addGap(20, 20, 20)
-                                .addComponent(scrNote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(22, Short.MAX_VALUE))
+            atTheEnd3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(atTheEnd3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblNote)
+                .addGap(20, 20, 20)
+                .addComponent(scrNote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         btnClose.setBackground(new java.awt.Color(0, 0, 0));
@@ -690,41 +612,41 @@ public class CloseShift extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(headerShift1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(moneyInTheSafe1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                        .addComponent(atTheEnd3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(atTheEnd2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 738, Short.MAX_VALUE)
-                                                        .addComponent(atTheEnd1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                        .addComponent(infoShift1, javax.swing.GroupLayout.PREFERRED_SIZE, 1194, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(233, 233, 233))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(headerShift1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(moneyInTheSafe1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(atTheEnd3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(atTheEnd2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 738, Short.MAX_VALUE)
+                            .addComponent(atTheEnd1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(infoShift1, javax.swing.GroupLayout.PREFERRED_SIZE, 1194, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(233, 233, 233))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(headerShift1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(infoShift1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(atTheEnd1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(16, 16, 16)
-                                                .addComponent(atTheEnd2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(16, 16, 16)
-                                                .addComponent(atTheEnd3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(16, 16, 16)
-                                                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 0, Short.MAX_VALUE))
-                                        .addComponent(moneyInTheSafe1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(headerShift1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(infoShift1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(atTheEnd1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(atTheEnd2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(atTheEnd3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(moneyInTheSafe1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -732,11 +654,131 @@ public class CloseShift extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRealityActionPerformed
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnCloseActionPerformed
+    public Button getBtnClose() {
+        return btnClose;
+    }
 
+    public void setBtnClose(Button btnClose) {
+        this.btnClose = btnClose;
+    }
+    public void setOnCloseShiftSuccess(Runnable callback) {
+        this.onCloseShiftSuccess = callback;
+    }
+    public void saveData(){
+        if (currentEmployeeShift == null) {
+            Message.showMessage("Lỗi", "Không tìm thấy thông tin ca làm việc!");
+            return;
+        }
+        saveDenominationDetails();
+        // Xác nhận đóng ca
+        Message.showConfirm("Xác nhận đóng ca",
+                "Bạn có chắc chắn muốn đóng ca làm việc này?",
+                () -> {
+                    try {
+                        // 1. Tạo đối tượng ShiftClose
+                        ShiftClose shiftClose = new ShiftClose();
+                        shiftClose.setEmployeeShift(currentEmployeeShift);
+                        BigDecimal cashInDrawer = parseCurrency(txtReality.getText());
+                        shiftClose.setCashInDrawer(cashInDrawer);
+                        shiftClose.setTotalRevenue(totalRevenue);
+                        shiftClose.setNote(jTextArea1.getText());
+                        LocalDateTime now = LocalDateTime.now();
+                        shiftClose.setCreatedAt(now);
+                        ShiftCloseService shiftCloseService = new ShiftCloseService();
+                        ShiftClose savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
+                        String formattedTime = now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+                        String differenceText = formatCurrency(savedShiftClose.getDifference());
 
+                        String message = String.format(
+                                "<html>Đóng ca làm việc thành công!<br>" +
+                                        "Thời gian đóng ca: %s<br>" +
+                                        "Tổng doanh thu: %s<br>" +
+                                        "Tiền trong két: %s<br>" +
+                                        "Chênh lệch: %s<br>" +
+                                        "<span style='color:red; font-weight:bold;'>NHẤN OK HỆ THỐNG TỰ ĐĂNG XUẤT</span>" +
+                                        "</html>",
+                                formattedTime,
+                                formatCurrency(totalRevenue),
+                                formatCurrency(cashInDrawer),
+                                differenceText
+                        );
+                        CustomDialog.showMessage(null, message, "Đóng ca", CustomDialog.MessageType.SUCCESS, 500, 280);
+                        clearForm();
+                        if (onCloseShiftSuccess != null) {
+                            Timer timer = new Timer(0, e -> {
+                                onCloseShiftSuccess.run();
+                            });
+                            timer.setRepeats(false);
+                            timer.start();
+                        }
+                    } catch (Exception ex) {
+                        log.error("Error closing shift: ", ex);
+                        Message.showMessage("Lỗi", "Có lỗi xảy ra khi đóng ca: " + ex.getMessage());
+                    }
+                }
+        );
+
+    }
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+        saveData();
+    }                                        
+    private void saveDenominationDetails() {
+        List<DenominationDetail> details = new ArrayList<>();
+        Money[] moneyPanels = {money1, money2, money3, money4, money5, money6, money7, money8, money9};
+        DenominationLabel[] labels = {
+                DenominationLabel.VND_500000,
+                DenominationLabel.VND_200000,
+                DenominationLabel.VND_100000,
+                DenominationLabel.VND_50000,
+                DenominationLabel.VND_20000,
+                DenominationLabel.VND_10000,
+                DenominationLabel.VND_5000,
+                DenominationLabel.VND_2000,
+                DenominationLabel.VND_1000
+        };
+
+        for (int i = 0; i < moneyPanels.length; i++) {
+            try {
+                String qtyText = moneyPanels[i].getTxtQuantity().getText();
+                if (qtyText != null && !qtyText.trim().isEmpty()) {
+                    int quantity = Integer.parseInt(qtyText.trim());
+                    if (quantity > 0) {
+                        DenominationDetail detail = new DenominationDetail();
+                        detail.setDenomination(labels[i]);
+                        detail.setQuantity(quantity);
+                        detail.setEmployeeShift(currentEmployeeShift);
+                        detail.setCreatedAt(java.time.LocalDate.now());
+                        details.add(detail);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                log.warn("Invalid quantity for denomination {}", labels[i]);
+            }
+        }
+        if (!details.isEmpty()) {
+            denominationDetailService = new DenominationDetailService();
+            DenominationDetailRepository repo = new DenominationDetailRepository();
+            repo.saveBatch(details);
+            log.info("Saved {} denomination details", details.size());
+        }
+    }
+    private void clearForm() {
+        txtReality.setText("");
+        jTextArea1.setText("");
+        for (Money moneyPanel : getMoneyPanels()) {
+            moneyPanel.getTxtQuantity().setText("0");
+        }
+        lblPrice.setText("0 VND");
+        txtMoneyDifference.setText("0 VND");
+        txtReality.setText("5.000.000 VND");
+        txtSystem.setText("5.000.000 VND");
+    }
+    private int parseQuantity(String text) throws NumberFormatException {
+        if (text == null || text.trim().isEmpty()) {
+            return 0;
+        }
+        return Integer.parseInt(text.trim());
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd1;
     private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd2;

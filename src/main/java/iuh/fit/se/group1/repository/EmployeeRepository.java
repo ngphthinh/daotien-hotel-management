@@ -197,6 +197,7 @@ public void deleteById(Long aLong) {
         }
         return employees;
     }
+    
     @Override
     public Employee update(Employee entity) {
         String sql = "UPDATE Employee SET fullName = ?, phone = ?, email = ?, hireDate = ?, citizenId = ?, gender = ?, accountId = ?,avt=? WHERE employeeId = ?";
@@ -227,7 +228,57 @@ public void deleteById(Long aLong) {
             throw new RuntimeException(e);
         }
     }
+    public List<Employee> findAllByRoleId(String roleId) {
+        List<Employee> employees = new ArrayList<>();
+        String sql = """
+                SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
+                       e.accountId, a.username, a.password,
+                       r.roleId, r.roleName,e.avt
+                FROM Employee e
+                JOIN Account a ON e.accountId = a.accountId
+                JOIN Role r ON a.roleId = r.roleId
+                     where r.roleId=?
+                """;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, roleId);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    Employee employee = new Employee();
+                    employee.setEmployeeId(rs.getLong("employeeId"));
+                    employee.setFullName(rs.getString("fullName"));
+                    employee.setPhone(rs.getString("phone"));
+                    employee.setEmail(rs.getString("email"));
+                    employee.setHireDate(rs.getDate("hireDate").toLocalDate());
+                    employee.setCitizenId(rs.getString("citizenId"));
+                    employee.setGender(rs.getBoolean("gender"));
+                    String base64String = rs.getString("avt");
+                    if (base64String != null && !base64String.isEmpty()) {
+                        byte[] originalBytes = Base64.getDecoder().decode(base64String);
+                        employee.setAvt(originalBytes);
+                    }
+                    // Account
+                    Account account = new Account();
+                    account.setAccountId(rs.getLong("accountId"));
+                    account.setUsername(rs.getString("username"));
+                    account.setPassword(rs.getString("password"));
 
+                    // Role
+                    Role role = new Role();
+                    role.setRoleId(rs.getString("roleId"));
+                    role.setRoleName(rs.getString("roleName"));
+                    account.setRole(role);
+
+                    // Liên kết
+                    employee.setAccount(account);
+
+                    employees.add(employee);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return employees;
+    }
     public Employee findByCitizenId(String citizenId) {
         String sql = """
                 SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,

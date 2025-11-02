@@ -1,6 +1,11 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.entity.EmployeeShift;
+import iuh.fit.se.group1.service.EmployeeShiftService;
+import iuh.fit.se.group1.service.ShiftCloseService;
+import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
 
@@ -9,10 +14,13 @@ import raven.glasspanepopup.GlassPanePopup;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 public class MainLayout extends JPanel {
 
@@ -34,6 +42,8 @@ public class MainLayout extends JPanel {
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
     private SurchageManagement surchageManagement;
+    private CloseShift closeShift;
+    private Runnable logoutCallback;
 
     private float alpha = 1f;
     private SideBar sideBar;
@@ -42,7 +52,6 @@ public class MainLayout extends JPanel {
     public MainLayout() {
         init();
         setOpaque(false);
-        setAuth(true);
     }
 
     public Employee getCurrentEmployee() {
@@ -61,6 +70,10 @@ public class MainLayout extends JPanel {
         super.paint(grphcs);
     }
 
+    public void setLogoutCallback(Runnable callback) {
+        this.logoutCallback = callback;
+    }
+
     private void init() {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(Constants.WIDTH_FRAME, Constants.HEIGHT_FRAME));
@@ -74,8 +87,7 @@ public class MainLayout extends JPanel {
         pnlContent = new JPanel(new BorderLayout());
         pnlMain.add(pnlContent, BorderLayout.CENTER);
         add(pnlMain, BorderLayout.CENTER);
-
-
+        closeShift = new CloseShift();
         sideBar.getMenu1().setMenuEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
@@ -150,7 +162,37 @@ public class MainLayout extends JPanel {
                         setMainContent(paymentPage);
 
                     } else if (index == 3) {
-                        setMainContent(new CloseShift());
+                        if (currentEmployee == null) {
+                            Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
+                            return;
+                        }
+
+                        EmployeeShiftService employeeShiftService = new EmployeeShiftService();
+                        ShiftCloseService shiftCloseService = new ShiftCloseService();
+                        List<EmployeeShift> todayShifts = employeeShiftService.getShiftsByEmployeeAndDate(
+                                currentEmployee.getEmployeeId(),
+                                LocalDate.now()
+                        );
+
+                        EmployeeShift openShift = todayShifts.stream()
+                                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift).isEmpty())
+                                .findFirst()
+                                .orElse(null);
+
+                        if (openShift == null) {
+                            Message.showMessage("Thông báo",
+                                    "Bạn chưa mở ca làm việc hôm nay hoặc tất cả ca đã đóng!");
+                            return;
+                        }
+
+                        // ✅ KIỂM TRA CA CÓ ĐANG HOẠT ĐỘNG KHÔNG
+                        if (!employeeShiftService.isShiftActive(openShift)) {
+                            String shiftTime = openShift.getShift().getStartTime() + " - " +
+                                    openShift.getShift().getEndTime();
+                            Message.showMessage("Cảnh báo",
+                                    "Ca làm việc (" + shiftTime + ") chưa bắt đầu hoặc đã kết thúc!\n");
+                        }
+                        openCloseShiftPanel(openShift);
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
@@ -159,7 +201,7 @@ public class MainLayout extends JPanel {
         });
 
 
-        sideBar.getLblAvt().addMouseListener(new MouseListener() {
+        sideBar.getLblAvt().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Profile profilePage = new Profile();
@@ -169,23 +211,22 @@ public class MainLayout extends JPanel {
                 setMainContent(profilePage);
             }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
+        });
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
+    }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
+    private void openCloseShiftPanel(EmployeeShift openShift) {
+        CloseShift closeShiftPanel = new CloseShift();
+        closeShiftPanel.setCurrentEmployeeShift(openShift);
 
-            @Override
-            public void mouseExited(MouseEvent e) {
+        // Set callback để đăng xuất khi đóng ca thành công
+        closeShiftPanel.setOnCloseShiftSuccess(() -> {
+            if (logoutCallback != null) {
+                logoutCallback.run();
             }
         });
 
+        setMainContent(closeShiftPanel);
     }
 
     public void setMainContent(JPanel panel) {
@@ -197,6 +238,14 @@ public class MainLayout extends JPanel {
 
     public JButton getBtnSignOut() {
         return sideBar.getBtnSignOut();
+    }
+
+    public Button getBtnClose() {
+        return closeShift.getBtnClose();
+    }
+
+    public void saveData() {
+        closeShift.saveData();
     }
 
     public static void main(String args[]) {
@@ -240,9 +289,6 @@ public class MainLayout extends JPanel {
             paymentPage.setCurrentEmployee(currentEmployee);
             shiftManagement = new ShiftManagement();
             employeeManagement = new EmployeeManagement();
-            // if (shiftManagement.getShiftList() != null) {
-            //     employeeManagement.setShiftList(shiftManagement.getShiftList());
-            // }
             customerManagement = new CustomerManagement();
             amenityManagement = new AmenityManagement();
             promotionManagement = new PromotionManagement();
@@ -255,6 +301,8 @@ public class MainLayout extends JPanel {
             surchageManagement = new SurchageManagement();
             setMainContent(dashboard);
         } else {
+
+
             dashboardEmployee = new DashboardEmployee();
             bookingPage = new BookingPage();
             bookingPage.setCurrentEmployee(currentEmployee);
