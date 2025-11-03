@@ -37,7 +37,7 @@ public class Constants {
     public static Icon getIconOfManager(int index) {
         return switch (index) {
             case 99 -> FontIcon.of(FontAwesomeSolid.BARS, 16, Constants.COLOR_ICON_MENU);
-            case 0 -> FontIcon.of(FontAwesomeSolid.HORSE, 16, Constants.COLOR_ICON_MENU);
+            case 0 -> FontIcon.of(FontAwesomeSolid.CHART_AREA, 16, Constants.COLOR_ICON_MENU);
             case 1 -> FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 16, Constants.COLOR_ICON_MENU);
             case 2 -> FontIcon.of(FontAwesomeSolid.MONEY_BILL, 14, Constants.COLOR_ICON_MENU);
             case 3 -> FontIcon.of(FontAwesomeSolid.USER, 16, Constants.COLOR_ICON_MENU);

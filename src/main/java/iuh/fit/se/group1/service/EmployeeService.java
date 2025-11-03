@@ -23,6 +23,10 @@ public class EmployeeService {
         this.employeeRepository = new EmployeeRepository();
     }
 
+    public int count(){
+        return employeeRepository.count();
+    }
+
     public Employee createEmployee(Employee employee, String roleId) {
         Role role = roleService.getRoleById(roleId);
         if (role == null) {
@@ -74,6 +78,7 @@ public class EmployeeService {
 
 
     public Employee updateEmployee(Employee employee) {
+
         return employeeRepository.update(employee);
     }
 

@@ -64,7 +64,11 @@ public class CustomerManagement extends javax.swing.JPanel {
         loadTable(customerService.getAllCustomer());
     }
 
-    private void loadTable(List<Customer> customers) {
+    public void loadData(){
+        loadTable(customerService.getAllCustomer());
+    }
+
+    public void loadTable(List<Customer> customers) {
         DefaultTableModel modal = (DefaultTableModel) tblCustomer.getTbl().getModel();
         modal.setRowCount(0);
         for (Customer customer : customers) {

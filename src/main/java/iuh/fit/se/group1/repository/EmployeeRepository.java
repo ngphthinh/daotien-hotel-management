@@ -28,6 +28,8 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         connection = DatabaseUtil.getConnection();
     }
 
+
+
     @Override
     public Employee save(Employee entity) {
         String sql = "INSERT INTO Employee (fullName, phone,email,hireDate,citizenId,gender,accountId,avt,createdAt) VALUES (?, ?, ?,?,?,?,?,?,?)";
@@ -69,6 +71,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         }
 
     }
+
     @Override
     public Employee findById(Long id) {
         String sql = "SELECT * FROM Employee WHERE employeeId = ?";
@@ -107,46 +110,47 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return null;
     }
 
-@Override
-public void deleteById(Long aLong) {
-    String sqlGetAccountId = "SELECT accountId FROM Employee WHERE employeeId = ?";
-    String sqlDeleteEmployee = "DELETE FROM Employee WHERE employeeId = ?";
-    String sqlDeleteAccount = "DELETE FROM Account WHERE accountId = ?";
+    @Override
+    public void deleteById(Long aLong) {
+        String sqlGetAccountId = "SELECT accountId FROM Employee WHERE employeeId = ?";
+        String sqlDeleteEmployee = "DELETE FROM Employee WHERE employeeId = ?";
+        String sqlDeleteAccount = "DELETE FROM Account WHERE accountId = ?";
 
-    try {
-        connection.setAutoCommit(false);
-        Long accountId = null;
-        try (PreparedStatement psGetAccount = connection.prepareStatement(sqlGetAccountId)) {
-            psGetAccount.setLong(1, aLong);
-            try (ResultSet rs = psGetAccount.executeQuery()) {
-                if (rs.next()) {
-                    accountId = rs.getLong("accountId");
+        try {
+            connection.setAutoCommit(false);
+            Long accountId = null;
+            try (PreparedStatement psGetAccount = connection.prepareStatement(sqlGetAccountId)) {
+                psGetAccount.setLong(1, aLong);
+                try (ResultSet rs = psGetAccount.executeQuery()) {
+                    if (rs.next()) {
+                        accountId = rs.getLong("accountId");
+                    }
                 }
             }
-        }
-        try (PreparedStatement psDeleteEmployee = connection.prepareStatement(sqlDeleteEmployee)) {
-            psDeleteEmployee.setLong(1, aLong);
-            psDeleteEmployee.executeUpdate();
-        }
-        if (accountId != null && accountId > 0) {
-            try (PreparedStatement psDeleteAccount = connection.prepareStatement(sqlDeleteAccount)) {
-                psDeleteAccount.setLong(1, accountId);
-                psDeleteAccount.executeUpdate();
+            try (PreparedStatement psDeleteEmployee = connection.prepareStatement(sqlDeleteEmployee)) {
+                psDeleteEmployee.setLong(1, aLong);
+                psDeleteEmployee.executeUpdate();
             }
-        }
-        connection.commit();
-        connection.setAutoCommit(true);
-    } catch (SQLException e) {
-        try {
-            connection.rollback();
+            if (accountId != null && accountId > 0) {
+                try (PreparedStatement psDeleteAccount = connection.prepareStatement(sqlDeleteAccount)) {
+                    psDeleteAccount.setLong(1, accountId);
+                    psDeleteAccount.executeUpdate();
+                }
+            }
+            connection.commit();
             connection.setAutoCommit(true);
-        } catch (SQLException ex) {
-            log.error("Error rolling back transaction: ", ex);
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                log.error("Error rolling back transaction: ", ex);
+            }
+            log.error("Error deleting Employee and Account: ", e);
+            throw new RuntimeException(e);
         }
-        log.error("Error deleting Employee and Account: ", e);
-        throw new RuntimeException(e);
     }
-}
+
     @Override
     public List<Employee> findAll() {
         List<Employee> employees = new ArrayList<>();
@@ -197,37 +201,68 @@ public void deleteById(Long aLong) {
         }
         return employees;
     }
-    
+
     @Override
     public Employee update(Employee entity) {
-        String sql = "UPDATE Employee SET fullName = ?, phone = ?, email = ?, hireDate = ?, citizenId = ?, gender = ?, accountId = ?,avt=? WHERE employeeId = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String updateEmployeeSql = """
+                    UPDATE Employee
+                    SET fullName = ?, phone = ?, email = ?, hireDate = ?, citizenId = ?,
+                        gender = ?, accountId = ?, avt = ?
+                    WHERE employeeId = ?
+                """;
 
-            preparedStatement.setString(1, entity.getFullName());
-            preparedStatement.setString(2, entity.getPhone());
-            preparedStatement.setString(3, entity.getEmail());
-            preparedStatement.setDate(4, Date.valueOf(entity.getHireDate()));
-            preparedStatement.setString(5, entity.getCitizenId());
-            preparedStatement.setBoolean(6, entity.isGender());
-            preparedStatement.setLong(7, entity.getAccount().getAccountId());
-            if (entity.getAvt() != null && entity.getAvt().length > 0) {
-                String base64String = Base64.getEncoder().encodeToString(entity.getAvt());
-                preparedStatement.setString(8, base64String);
-            } else {
-                preparedStatement.setNull(8, java.sql.Types.NVARCHAR);
+        String updateRoleSql = """
+                    UPDATE Account
+                    SET roleId = ?
+                    WHERE accountId = ?
+                """;
+
+        try {
+            connection.setAutoCommit(false); // bắt đầu transaction
+
+            try (PreparedStatement psEmp = connection.prepareStatement(updateEmployeeSql);
+                 PreparedStatement psRole = connection.prepareStatement(updateRoleSql)) {
+
+                // ===== Update Employee =====
+                psEmp.setString(1, entity.getFullName());
+                psEmp.setString(2, entity.getPhone());
+                psEmp.setString(3, entity.getEmail());
+                psEmp.setDate(4, Date.valueOf(entity.getHireDate()));
+                psEmp.setString(5, entity.getCitizenId());
+                psEmp.setBoolean(6, entity.isGender());
+                psEmp.setLong(7, entity.getAccount().getAccountId());
+
+                if (entity.getAvt() != null && entity.getAvt().length > 0) {
+                    String base64String = Base64.getEncoder().encodeToString(entity.getAvt());
+                    psEmp.setString(8, base64String);
+                } else {
+                    psEmp.setNull(8, java.sql.Types.NVARCHAR);
+                }
+
+                psEmp.setLong(9, entity.getEmployeeId());
+                psEmp.executeUpdate();
+
+                // ===== Update Role =====
+                if (entity.getAccount() != null && entity.getAccount().getRole() != null) {
+                    psRole.setString(1, entity.getAccount().getRole().getRoleId());
+                    psRole.setLong(2, entity.getAccount().getAccountId());
+                    psRole.executeUpdate();
+                }
+
+                connection.commit(); // ✅ thành công
+                return entity;
+            } catch (SQLException e) {
+                connection.rollback(); // ❌ lỗi thì rollback
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
             }
-            preparedStatement.setLong(9, entity.getEmployeeId());
-
-            int affectedRows = preparedStatement.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Update failed, no rows affected.");
-            }
-
-            return entity;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error updating employee and role", e);
         }
     }
+
+
     public List<Employee> findAllByRoleId(String roleId) {
         List<Employee> employees = new ArrayList<>();
         String sql = """
@@ -279,6 +314,7 @@ public void deleteById(Long aLong) {
         }
         return employees;
     }
+
     public Employee findByCitizenId(String citizenId) {
         String sql = """
                 SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
@@ -389,5 +425,19 @@ public void deleteById(Long aLong) {
             throw new RuntimeException(e);
         }
         return employees;
+    }
+
+    public int count() {
+        String sql = "SELECT COUNT(*) AS total FROM Employee";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt("total");
+            }
+        } catch (SQLException e) {
+            log.error("Error counting Employees: ", e);
+            throw new RuntimeException(e);
+        }
+        return 0;
     }
 }
