@@ -230,3 +230,90 @@ VALUES
 (N'Đã hoàn thành',GETDATE()),
 (N'Đang xử lý',GETDATE()),
 (N'Đặt trước',GETDATE());
+
+
+INSERT INTO Promotion (promotionName, description, discountPercent, discountPrice, startDate, endDate)
+VALUES (N'Khuyến mãi Mùa Hè Rực Rỡ', N'Giảm 15% cho các đơn đặt phòng trong tháng 7', 15.00, 500000.00, '2025-07-01',
+        '2025-07-31'),
+       (N'Ưu đãi Quốc Khánh 2/9', N'Giảm 20% cho tất cả khách đặt phòng trong dịp lễ Quốc Khánh', 20.00, 0.00,
+        '2025-08-30', '2025-09-03'),
+       (N'Khuyến mãi Cuối Tuần Vui Vẻ', N'Giảm 10% cho các đơn đặt phòng vào thứ 6, 7 và chủ nhật', 10.00, 300000.00,
+        '2025-01-01', '2025-12-31'),
+       (N'Giảm giá Ngày Lễ Tình Nhân', N'Giảm 25% cho các cặp đôi đặt phòng vào ngày Valentine', 25.00, 400000.00,
+        '2025-02-10', '2025-02-15'),
+       (N'Ưu đãi Mùa Thu Lãng Mạn', N'Giảm 12% cho các đơn đặt phòng trong tháng 10', 12.00, 350000.00, '2025-10-01',
+        '2025-10-31'),
+       (N'Khuyến mãi Hè Cho Gia Đình', N'Giảm 200.000đ cho hóa đơn từ 1 triệu đồng trở lên', 0.00, 1000000.00,
+        '2025-06-01', '2025-08-31'),
+       (N'Giảm giá Ngày Quốc Tế Phụ Nữ', N'Giảm 30% cho tất cả đơn đặt phòng của khách nữ', 30.00, 0.00, '2025-03-06',
+        '2025-03-10'),
+       (N'Ưu đãi Sinh Viên', N'Giảm 15% cho khách hàng xuất trình thẻ sinh viên khi đặt phòng', 15.00, 200000.00,
+        '2025-01-01', '2025-12-31'),
+       (N'Khuyến mãi Mừng Đại Lễ 30/4', N'Giảm 20% hoặc 100.000đ cho hóa đơn từ 800.000đ trở lên', 20.00, 800000.00,
+        '2025-04-25', '2025-05-02'),
+       (N'Giảm giá Đặt Phòng Sớm', N'Giảm 10% cho khách đặt phòng trước ít nhất 7 ngày', 10.00, 0.00, '2025-01-01',
+        '2025-12-31');
+
+Insert into Room (roomNumber, roomTypeId, roomStatus)
+values ('101', 'SINgLE', 'AVAILABLE'),
+       ('102', 'SINgLE', 'AVAILABLE'),
+       ('103', 'SINgLE', 'AVAILABLE'),
+       ('104', 'SINgLE', 'AVAILABLE'),
+       ('105', 'SINgLE', 'AVAILABLE'),
+       ('106', 'SINgLE', 'AVAILABLE'),
+       ('107', 'SINgLE', 'AVAILABLE'),
+       ('108', 'SINgLE', 'AVAILABLE'),
+       ('109', 'SINgLE', 'AVAILABLE'),
+       ('110', 'SINgLE', 'AVAILABLE'),
+       ('111', 'SINgLE', 'AVAILABLE'),
+       ('112', 'SINgLE', 'AVAILABLE'),
+       ('113', 'SINgLE', 'AVAILABLE'),
+       ('114', 'SINgLE', 'AVAILABLE'),
+       ('115', 'SINgLE', 'AVAILABLE'),
+       ('116', 'SINgLE', 'AVAILABLE'),
+       ('117', 'SINgLE', 'AVAILABLE'),
+       ('118', 'SINgLE', 'AVAILABLE'),
+       ('119', 'SINgLE', 'AVAILABLE'),
+       ('120', 'SINgLE', 'AVAILABLE'),
+       ('201', 'DOUBLE', 'AVAILABLE'),
+       ('202', 'DOUBLE', 'AVAILABLE'),
+       ('203', 'DOUBLE', 'AVAILABLE'),
+       ('204', 'DOUBLE', 'AVAILABLE'),
+       ('205', 'DOUBLE', 'AVAILABLE'),
+       ('206', 'DOUBLE', 'AVAILABLE'),
+       ('207', 'DOUBLE', 'AVAILABLE'),
+       ('208', 'DOUBLE', 'AVAILABLE'),
+       ('209', 'DOUBLE', 'AVAILABLE'),
+       ('210', 'DOUBLE', 'AVAILABLE');
+
+-- dung tieng viet
+Insert into Amenity (nameAmenity, price) values
+                                             (N'Bữa sáng miễn phí', 50000.00),
+                                             (N'Hồ bơi ngoài trời',  80000.00),
+                                             (N'Spa và phòng tập gym',  100000.00),
+                                             (N'Dịch vụ đưa đón sân bay',  100000.00),
+                                             (N'Giặt là và ủi đồ', 50.000),
+                                             (N'Cho thuê xe đạp',  30.000),
+                                             (N'Phòng họp và hội nghị',  200.000),
+                                             (N'Dịch vụ ăn uống tại phòng',  200000.00),
+                                             (N'Khu vui chơi trẻ em',  20000.00);
+
+select * from Amenity
+
+INSERT INTO Customer (fullName, phone, email, citizenId, gender, dateOfBirth)
+VALUES
+    (N'Nguyễn Văn An', '0901234567', 'an.nguyen@example.com', '012345678901', 0, '1995-03-12'),
+    (N'Lê Thị Bích', '0912345678', 'bich.le@example.com', '023456789012', 1, '1998-07-24'),
+    (N'Trần Quốc Huy', '0938765432', 'huy.tran@example.com', '034567890123', 0, '1990-11-05'),
+    (N'Phạm Thu Trang', '0976543210', 'trang.pham@example.com', '045678901234', 1, '2000-01-16'),
+    (N'Đỗ Minh Khang', '0981122334', 'khang.do@example.com', '056789012345', 0, '1993-09-20'),
+    (N'Hoàng Mỹ Dung', '0965566778', 'dung.hoang@example.com', '067890123456', 1, '1997-12-30'),
+    (N'Vũ Đức Long', '0944455667', 'long.vu@example.com', '078901234567', 0, '1989-05-18'),
+    (N'Ngô Thị Hạnh', '0923344556', 'hanh.ngo@example.com', '089012345678', 1, '1996-02-10'),
+    (N'Bùi Anh Tuấn', '0911223344', 'tuan.bui@example.com', '090123456789', 0, '1992-10-25'),
+    (N'Phan Thảo Vy', '0909988776', 'vy.phan@example.com', '011223344556', 1, '2001-06-07');
+
+
+insert into Surcharge(name, price) values (N'Phụ thu ngày lễ', 50000.00),
+                                          (N'Trả phòng trễ', 30000.00),
+                                          (N'NDọn phòng thêm', 40000.00);

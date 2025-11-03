@@ -25,12 +25,8 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="lblTitle" alignment="1" max="32767" attributes="0"/>
-          <Component id="lblNameHotel" alignment="0" pref="336" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace pref="10" max="32767" attributes="0"/>
-              <Component id="lblLogo" min="-2" pref="141" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="96" max="-2" attributes="0"/>
-          </Group>
+          <Component id="lblNameHotel" alignment="0" pref="247" max="32767" attributes="0"/>
+          <Component id="lblLogo" alignment="1" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -50,6 +46,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lblLogo">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/images/logo64.png"/>
         </Property>
@@ -64,7 +61,7 @@
           <Font name="Segoe UI" size="20" style="1"/>
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="H&#x1ec7; th&#x1ed1;ng qu&#x1ea3;n l&#xed;"/>
+        <Property name="text" type="java.lang.String" value="H&#x1ec7; th&#x1ed1;ng qu&#x1ea3;n l&#xfd;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblNameHotel">

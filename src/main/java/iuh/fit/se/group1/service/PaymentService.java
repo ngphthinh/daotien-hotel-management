@@ -59,14 +59,13 @@ public class PaymentService {
 
         // Tạo chữ ký HMAC SHA256
         String signature = hmacSHA256(SECRET_KEY, rawHash);
-
         // Dựng request JSON
         JsonObject jsonRequest = new JsonObject();
         jsonRequest.addProperty("partnerCode", PARTNER_CODE);
         jsonRequest.addProperty("partnerName", "Dao Tien Hotel");
         jsonRequest.addProperty("storeId", "defaultStore");
         jsonRequest.addProperty("requestId", requestId);
-        jsonRequest.addProperty("amount", order.getTotalAmount());
+        jsonRequest.addProperty("amount", order.getTotalAmount().subtract(order.getDeposit()));
         jsonRequest.addProperty("orderId", orderId);
         jsonRequest.addProperty("orderInfo", orderInfo);
         jsonRequest.addProperty("redirectUrl", redirectUrl);

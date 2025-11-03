@@ -109,3 +109,9 @@ INFO: Order created successfully with order details
 Nov 01, 2025 12:43:34 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Order is missing required fields
 >>>>>>> 034ae500b3d3317bdc84049e39181ae182a258c4
+Nov 03, 2025 11:12:47 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Nov 03, 2025 11:35:46 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Nov 03, 2025 11:36:07 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
