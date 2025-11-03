@@ -95,16 +95,18 @@ public class MainLayout extends JPanel {
                     if (index == 0) {
                         setMainContent(dashboard);
                     } else if (index == 1) {
+                        bookingPage.loadData();
                         setMainContent(bookingPage);
                     } else if (index == 2) {
                         paymentPage.clearForm();
+                        paymentPage.loadData();
                         setMainContent(paymentPage);
-
                     } else if (index == 3 && subIndex == 1) {
                         setMainContent(shiftManagement);
                     } else if (index == 3 && subIndex == 2) {
                         setMainContent(employeeManagement);
                     } else if (index == 4) {
+                        customerManagement.loadData();
                         setMainContent(customerManagement);
                     } else if (index == 5) {
                         setMainContent(amenityManagement);
@@ -112,10 +114,10 @@ public class MainLayout extends JPanel {
                         setMainContent(promotionManagement);
                     } else if (index == 7) {
                         setMainContent(roomManagement);
+                        roomManagement.loadData();
                     } else if (index == 8) {
-                        setMainContent(orderManagement);
                         orderManagement.loadData();
-
+                        setMainContent(orderManagement);
                     } else if (index == 9) {
                         setMainContent(surchageManagement);
                     } else if (index == 10 && subIndex == 1) {

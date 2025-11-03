@@ -70,8 +70,13 @@ public class PaymentPage extends javax.swing.JPanel {
         surchargeDetailService = new SurchargeDetailService();
         surchargeService = new SurchargeService();
         promotionService = new PromotionService();
+        loadData();
+    }
+
+    public void loadData() {
         loadListBooking(orderService.getAllOrders());
         setTblSurcharge();
+        clearForm();
     }
 
     public void setCustomer(Customer customer) {
@@ -328,7 +333,7 @@ public class PaymentPage extends javax.swing.JPanel {
                 CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR,380,200);
             }
 
-            modal.getLblTotaPrice().setText("Tổng tiền cần thanh toán: " + order.getTotalAmount().longValue() + "VND");
+            modal.getLblTotaPrice().setText("Tổng tiền: " + order.getTotalAmount().longValue() + " VND");
             JFrame frame = new JFrame("Thanh toán MoMo QR");
             frame.setSize(300, 300);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -338,7 +343,7 @@ public class PaymentPage extends javax.swing.JPanel {
             pnlMain.setBackground(Color.WHITE);
             pnlMain.setLayout(new BorderLayout());
             JLabel lblImage = new JLabel("", new ImageIcon(paymentService.generateQRCodeImage(payUrl, 250, 250)), SwingConstants.CENTER);
-            JLabel lblPrice = new JLabel("Tổng tiền cần thanh toán: " + order.getTotalAmount().longValue() + "VND", SwingConstants.CENTER);
+            JLabel lblPrice = new JLabel("Tổng tiền: " + order.getTotalAmount().longValue() + "VND", SwingConstants.CENTER);
             lblPrice.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
             pnlMain.add(lblImage, BorderLayout.CENTER);
@@ -358,7 +363,7 @@ public class PaymentPage extends javax.swing.JPanel {
                     String responseCheck = paymentService.queryPayment(orderId);
                     String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
                     String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
-                    if (!"0".equals(responseCodeCheck)) {
+                    if ("0".equals(responseCodeCheck)) {
                         CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS,380,200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();

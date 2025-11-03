@@ -61,6 +61,14 @@ public class BookingPage extends javax.swing.JPanel {
         customerService = new CustomerService();
         roomService = new RoomService();
         bookingService = new BookingService();
+        loadData();
+    }
+
+    public void loadData() {
+        clearForm();
+
+        listAmenity1.loadData();
+
     }
 
     private void custom() {
@@ -193,8 +201,6 @@ public class BookingPage extends javax.swing.JPanel {
     }
 
     private String getBookingType(int idx) {
-        System.out.println(idx);
-        System.out.println(BookingType.fromIndex(idx).toString());
         return BookingType.fromIndex(idx).toString();
     }
 
@@ -631,6 +637,12 @@ public class BookingPage extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 
+    public void setCurrentEmployee(Employee currentEmployee) {
+        this.currentEmployee = currentEmployee;
+    }
+
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.booking.AddRoomPanel addRoomPanel1;
     private iuh.fit.se.group1.ui.component.HeaderBooking headerBooking1;
@@ -644,9 +656,5 @@ public class BookingPage extends javax.swing.JPanel {
     private javax.swing.JPanel pnlListAmenityMain;
     private javax.swing.JPanel pnlListRoom;
     private iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11 scrollPaneWin111;
-
-    public void setCurrentEmployee(Employee currentEmployee) {
-        this.currentEmployee = currentEmployee;
-    }
     // End of variables declaration//GEN-END:variables
 }

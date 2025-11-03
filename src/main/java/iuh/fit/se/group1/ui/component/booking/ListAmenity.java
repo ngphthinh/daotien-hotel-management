@@ -37,6 +37,16 @@ public class ListAmenity extends javax.swing.JPanel {
                 return false;
             }
         };
+        loadData();
+        table1.getTbl().setModel(model);
+        table1.setBackGroundScr(Color.white);
+        table1.getTbl().getTableHeader().setResizingAllowed(false);
+        table1.getTbl().getTableHeader().setReorderingAllowed(false);
+
+    }
+
+    public void loadData() {
+        DefaultTableModel model = (DefaultTableModel) table1.getTbl().getModel();
         amenityService.getAllAmenities().forEach(amenity ->
                 model.addRow(new Object[]{
                         amenity.getAmenityId(),
@@ -44,11 +54,6 @@ public class ListAmenity extends javax.swing.JPanel {
                         Constants.VND_FORMAT.format(amenity.getPrice())
                 })
         );
-        table1.getTbl().setModel(model);
-        table1.setBackGroundScr(Color.white);
-        table1.getTbl().getTableHeader().setResizingAllowed(false);
-        table1.getTbl().getTableHeader().setReorderingAllowed(false);
-
     }
 
     public void addDocumentListener(DocumentListener documentListener) {

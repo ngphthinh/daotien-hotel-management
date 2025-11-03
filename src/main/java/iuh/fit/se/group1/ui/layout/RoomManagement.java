@@ -61,6 +61,10 @@ public class RoomManagement extends javax.swing.JPanel {
         }
     }
 
+    public void loadData(){
+        loadTable(roomService.getAllRooms());
+    }
+
     private void initServices() {
         roomService = new RoomService();
         roomTypeService = new RoomTypeService();

@@ -250,4 +250,20 @@ public class RoomRepository implements Repository<Room, Long> {
 
     }
 
+    public void updateRoomStatusBatch(List<Long> roomsIdx, RoomStatus roomStatus) {
+        String sql = "UPDATE Room SET roomStatus = ? WHERE roomId = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            for (Long roomId : roomsIdx) {
+                preparedStatement.setString(1, roomStatus.name());
+                preparedStatement.setLong(2, roomId);
+                preparedStatement.addBatch();
+            }
+            int[] updateCounts = preparedStatement.executeBatch();
+            log.info("Updated room status for {} rooms to {}", updateCounts.length, roomStatus.name());
+        } catch (SQLException e) {
+            log.error("Error updating room statuses in batch: ", e);
+            throw new RuntimeException(e);
+        }
+    }
 }
