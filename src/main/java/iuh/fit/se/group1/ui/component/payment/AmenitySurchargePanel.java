@@ -19,6 +19,12 @@ public class AmenitySurchargePanel extends JPanel {
 
     public AmenitySurchargePanel() {
         initComponents();
+        initializeGlue();
+    }
+
+    private void initializeGlue() {
+        pnlAmenities.add(Box.createVerticalGlue());
+        pnlSurcharges.add(Box.createVerticalGlue());
     }
 
     private void initComponents() {
@@ -103,8 +109,10 @@ public class AmenitySurchargePanel extends JPanel {
     // ===== Thêm dịch vụ =====
     public void addAmenity(JComponent comp, BigDecimal price) {
         removeEmptyPanel(pnlAmenities);
-        pnlAmenities.add(comp);
-        pnlAmenities.add(Box.createVerticalStrut(6));
+        int position = pnlAmenities.getComponentCount() - 1;
+        if (position < 0) position = 0;
+        pnlAmenities.add(comp, position);
+        pnlAmenities.add(Box.createVerticalStrut(6), position + 1);
         adjustPanelSize(pnlAmenities);
         totalAmenity = totalAmenity.add(price);
         updateTotals();
@@ -113,8 +121,10 @@ public class AmenitySurchargePanel extends JPanel {
     // ===== Thêm phụ phí =====
     public void addSurcharge(JComponent comp, BigDecimal price) {
         removeEmptyPanel(pnlSurcharges);
-        pnlSurcharges.add(comp);
-        pnlSurcharges.add(Box.createVerticalStrut(6));
+        int position = pnlSurcharges.getComponentCount() - 1;
+        if (position < 0) position = 0;
+        pnlSurcharges.add(comp, position);
+        pnlSurcharges.add(Box.createVerticalStrut(6), position + 1);
         adjustPanelSize(pnlSurcharges);
         totalSurcharge = totalSurcharge.add(price);
         updateTotals();
@@ -128,9 +138,9 @@ public class AmenitySurchargePanel extends JPanel {
 
     // ===== Tự tăng chiều cao =====
     private void adjustPanelSize(JPanel panel) {
-        int count = panel.getComponentCount() / 2;
+        int count = (panel.getComponentCount() - 1) / 2;
         int baseHeight = 70;
-        int itemHeight = (count == 1) ? 0 : 30;
+        int itemHeight = (count <= 1) ? 0 : 30;
         int height = baseHeight + (count * itemHeight);
 
         panel.setPreferredSize(new Dimension(280, height));
@@ -141,8 +151,9 @@ public class AmenitySurchargePanel extends JPanel {
     }
 
     private void removeEmptyPanel(JPanel panel) {
-        if (panel.getComponentCount() == 1 && panel.getComponent(0) instanceof JPanel)
-            panel.removeAll();
+        if (panel.getComponentCount() == 2 && panel.getComponent(0) instanceof JPanel) {
+            panel.remove(0);
+        }
     }
 
     // ===== Reset lại =====
@@ -150,7 +161,9 @@ public class AmenitySurchargePanel extends JPanel {
         pnlAmenities.removeAll();
         pnlSurcharges.removeAll();
         pnlAmenities.add(createPanelEmpty("Chưa có dịch vụ nào"));
+        pnlAmenities.add(Box.createVerticalGlue());
         pnlSurcharges.add(createPanelEmpty("Chưa có phụ phí nào"));
+        pnlSurcharges.add(Box.createVerticalGlue());
         pnlAmenities.setPreferredSize(new Dimension(280, 70));
         pnlSurcharges.setPreferredSize(new Dimension(280, 70));
         totalAmenity = BigDecimal.ZERO;
