@@ -8,6 +8,7 @@ package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.repository.EmployeeShiftRepository;
+import iuh.fit.se.group1.repository.ShiftCloseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,9 +80,9 @@ public class EmployeeShiftService {
     /**
      * Lấy tổng doanh thu của ca làm việc
      */
-    public BigDecimal getTotalRevenueForShift(Long employeeShiftId) {
-        EmployeeShiftRepository repository = new EmployeeShiftRepository();
-        return repository.getTotalRevenueForShift(employeeShiftId);
+    public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
+        ShiftCloseRepository shiftCloseRepo = new ShiftCloseRepository();
+        return shiftCloseRepo.getTotalCashRevenueForShift(employeeShiftId);
     }
     public boolean isShiftActive(EmployeeShift shift) {
         try {

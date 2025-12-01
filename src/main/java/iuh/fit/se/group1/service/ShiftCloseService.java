@@ -75,4 +75,7 @@
             ShiftCloseRepository repository = new ShiftCloseRepository();
             return repository.findByEmployeeShift(employeeShift);
         }
+        public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
+            return repository.getTotalCashRevenueForShift(employeeShiftId);
+        }
     }

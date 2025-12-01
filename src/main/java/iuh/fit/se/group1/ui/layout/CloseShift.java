@@ -5,10 +5,12 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.DenominationDetail;
+import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.ShiftClose;
 import iuh.fit.se.group1.enums.DenominationLabel;
 import iuh.fit.se.group1.repository.DenominationDetailRepository;
+import iuh.fit.se.group1.repository.ShiftCloseRepository;
 import iuh.fit.se.group1.service.DenominationDetailService;
 import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.service.EmployeeShiftService;
@@ -18,6 +20,7 @@ import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
+import iuh.fit.se.group1.ui.component.modal.ConfirmInfoModal;
 import iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote;
 import iuh.fit.se.group1.ui.component.shift.InfoShift;
 import iuh.fit.se.group1.ui.component.shift.MinPanel;
@@ -37,6 +40,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import raven.glasspanepopup.GlassPanePopup;
 
 /**
  * @author THIS PC
@@ -48,6 +52,7 @@ public class CloseShift extends javax.swing.JPanel {
     private final ShiftCloseService shiftCloseService;
     private EmployeeShift currentEmployeeShift;
     private BigDecimal totalRevenue = BigDecimal.ZERO;
+    private ConfirmInfoModal confirmModal;
     private static final DenominationLabel[] DENOMINATION_LABELS = {
             DenominationLabel.VND_500000,
             DenominationLabel.VND_200000,
@@ -64,12 +69,104 @@ public class CloseShift extends javax.swing.JPanel {
         this.employeeShiftService = new EmployeeShiftService();
         this.denominationDetailService = new DenominationDetailService();
         this.shiftCloseService = new ShiftCloseService();
+        this.confirmModal = new ConfirmInfoModal();
         initComponents();
         configureTextFields();
         initIcons();
         initMoneyLabels();
         clearForm();
+        setupConfirmModal();
+    }
+    private void setupConfirmModal() {
+        // Xử lý khi nhấn nút Xác nhận
+        confirmModal.getBtnConfirm().addActionListener(e -> {
+            String username = confirmModal.getUsername();
+            String password = confirmModal.getPassword();
 
+            if (username.isEmpty() || password.isEmpty()) {
+                Message.showMessage("Lỗi", "Vui lòng nhập đầy đủ thông tin!");
+                return;
+            }
+
+            // Xác thực manager
+            ShiftCloseRepository repository = new ShiftCloseRepository();
+            Employee manager = repository.validateManager(username, password);
+
+            if (manager != null) {
+                // Xác thực thành công - Tiến hành đóng ca
+                GlassPanePopup.closePopupLast(); // Đóng modal
+                confirmModal.clearFields();
+                performCloseShift(manager.getEmployeeId()); // Gọi method đóng ca
+            } else {
+                Message.showMessage("Lỗi", "Sai tài khoản hoặc mật khẩu!\nHoặc tài khoản không phải Manager!");
+            }
+        });
+
+        // Xử lý khi nhấn nút Hủy
+        confirmModal.getBtnCancel().addActionListener(e -> {
+            GlassPanePopup.closePopupLast();
+            confirmModal.clearFields();
+        });
+    }
+    private void performCloseShift(Long managerId) {
+        Message.showConfirm("Xác nhận đóng ca",
+                "Bạn có chắc chắn muốn đóng ca làm việc này?",
+                () -> {
+                    try {
+                        // 1. Tạo đối tượng ShiftClose
+                        ShiftClose shiftClose = new ShiftClose();
+                        shiftClose.setEmployeeShift(currentEmployeeShift);
+
+                        BigDecimal cashInDrawer = parseCurrency(txtReality.getText());
+                        shiftClose.setCashInDrawer(cashInDrawer);
+                        shiftClose.setTotalRevenue(totalRevenue);
+                        shiftClose.setNote(jTextArea1.getText());
+                        shiftClose.setManagerId(managerId); // ✅ SET MANAGER ID
+
+                        LocalDateTime now = LocalDateTime.now();
+                        shiftClose.setCreatedAt(now);
+
+                        // 2. Lưu ShiftClose
+                        ShiftCloseService shiftCloseService = new ShiftCloseService();
+                        ShiftClose savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
+
+                        // 3. Hiển thị thông báo thành công
+                        String formattedTime = now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+                        String differenceText = formatCurrency(savedShiftClose.getDifference());
+
+                        String message = String.format(
+                                "<html>Đóng ca làm việc thành công!<br>" +
+                                        "Thời gian đóng ca: %s<br>" +
+                                        "Tổng doanh thu: %s<br>" +
+                                        "Tiền trong két: %s<br>" +
+                                        "Chênh lệch: %s<br>" +
+                                        "<span style='color:red; font-weight:bold;'>NHẤN OK HỆ THỐNG TỰ ĐĂNG XUẤT</span>" +
+                                        "</html>",
+                                formattedTime,
+                                formatCurrency(totalRevenue),
+                                formatCurrency(cashInDrawer),
+                                differenceText
+                        );
+
+                        CustomDialog.showMessage(null, message, "Đóng ca",
+                                CustomDialog.MessageType.SUCCESS, 500, 280);
+
+                        clearForm();
+
+                        // 4. Logout
+                        if (onCloseShiftSuccess != null) {
+                            Timer timer = new Timer(0, e -> {
+                                onCloseShiftSuccess.run();
+                            });
+                            timer.setRepeats(false);
+                            timer.start();
+                        }
+                    } catch (Exception ex) {
+                        log.error("Error closing shift: ", ex);
+                        Message.showMessage("Lỗi", "Có lỗi xảy ra khi đóng ca: " + ex.getMessage());
+                    }
+                }
+        );
     }
     private void configureTextFields() {
         txtMoneyOpenShift.setEditable(false);
@@ -102,26 +199,33 @@ public class CloseShift extends javax.swing.JPanel {
 
         if (employeeShift != null) {
             try {
-                // 1. Load thông tin chi tiết ca làm việc
-                EmployeeShift detailedShift = employeeShiftService.getEmployeeShiftWithDetails(employeeShift.getEmployeeShiftId());
+                EmployeeShift detailedShift = employeeShiftService.getEmployeeShiftWithDetails(
+                        employeeShift.getEmployeeShiftId()
+                );
 
                 if (detailedShift != null) {
-                    // Hiển thị thông tin ca làm việc
                     displayShiftInfo(detailedShift);
                     txtMoneyOpenShift.setText("5.000.000 VND");
+
+                    // 2. Thiết lập số lượng tiền mặc định
+                    setDefaultMoneyDistribution();
+
                     // 3. Tính tổng doanh thu từ hóa đơn
-                    totalRevenue = employeeShiftService.getTotalRevenueForShift(employeeShift.getEmployeeShiftId());
+                    totalRevenue = employeeShiftService.getTotalCashRevenueForShift(
+                            employeeShift.getEmployeeShiftId()
+                    );
                     txtSystem.setText(formatCurrency(totalRevenue));
+
                     setupAutoCalculation();
                 }
 
             } catch (Exception e) {
                 log.error("Error loading shift data: ", e);
-                Message.showMessage("Lỗi", "Không thể tải thông tin ca làm việc: " + e.getMessage());
+                Message.showMessage("Lỗi",
+                        "Không thể tải thông tin ca làm việc: " + e.getMessage());
             }
         }
     }
-
     /**
      * Hiển thị thông tin ca làm việc lên UI
      */
@@ -664,60 +768,16 @@ public class CloseShift extends javax.swing.JPanel {
     public void setOnCloseShiftSuccess(Runnable callback) {
         this.onCloseShiftSuccess = callback;
     }
-    public void saveData(){
+    public void saveData() {
         if (currentEmployeeShift == null) {
             Message.showMessage("Lỗi", "Không tìm thấy thông tin ca làm việc!");
             return;
         }
+
         saveDenominationDetails();
-        // Xác nhận đóng ca
-        Message.showConfirm("Xác nhận đóng ca",
-                "Bạn có chắc chắn muốn đóng ca làm việc này?",
-                () -> {
-                    try {
-                        // 1. Tạo đối tượng ShiftClose
-                        ShiftClose shiftClose = new ShiftClose();
-                        shiftClose.setEmployeeShift(currentEmployeeShift);
-                        BigDecimal cashInDrawer = parseCurrency(txtReality.getText());
-                        shiftClose.setCashInDrawer(cashInDrawer);
-                        shiftClose.setTotalRevenue(totalRevenue);
-                        shiftClose.setNote(jTextArea1.getText());
-                        LocalDateTime now = LocalDateTime.now();
-                        shiftClose.setCreatedAt(now);
-                        ShiftCloseService shiftCloseService = new ShiftCloseService();
-                        ShiftClose savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
-                        String formattedTime = now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
-                        String differenceText = formatCurrency(savedShiftClose.getDifference());
 
-                        String message = String.format(
-                                "<html>Đóng ca làm việc thành công!<br>" +
-                                        "Thời gian đóng ca: %s<br>" +
-                                        "Tổng doanh thu: %s<br>" +
-                                        "Tiền trong két: %s<br>" +
-                                        "Chênh lệch: %s<br>" +
-                                        "<span style='color:red; font-weight:bold;'>NHẤN OK HỆ THỐNG TỰ ĐĂNG XUẤT</span>" +
-                                        "</html>",
-                                formattedTime,
-                                formatCurrency(totalRevenue),
-                                formatCurrency(cashInDrawer),
-                                differenceText
-                        );
-                        CustomDialog.showMessage(null, message, "Đóng ca", CustomDialog.MessageType.SUCCESS, 500, 280);
-                        clearForm();
-                        if (onCloseShiftSuccess != null) {
-                            Timer timer = new Timer(0, e -> {
-                                onCloseShiftSuccess.run();
-                            });
-                            timer.setRepeats(false);
-                            timer.start();
-                        }
-                    } catch (Exception ex) {
-                        log.error("Error closing shift: ", ex);
-                        Message.showMessage("Lỗi", "Có lỗi xảy ra khi đóng ca: " + ex.getMessage());
-                    }
-                }
-        );
-
+        // ✅ HIỂN THỊ MODAL XÁC NHẬN
+        GlassPanePopup.showPopup(confirmModal);
     }
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
         saveData();
@@ -762,16 +822,39 @@ public class CloseShift extends javax.swing.JPanel {
             log.info("Saved {} denomination details", details.size());
         }
     }
+    private void setDefaultMoneyDistribution() {
+        // Mảng số lượng tương ứng với mỗi mệnh giá
+        int[] defaultQuantities = {
+                4,   // 500.000 x 4 = 2.000.000
+                5,   // 200.000 x 5 = 1.000.000
+                11,  // 100.000 x 11 = 1.100.000
+                9,   // 50.000 x 9 = 450.000
+                9,   // 20.000 x 9 = 180.000
+                20,  // 10.000 x 20 = 200.000
+                10,  // 5.000 x 10 = 50.000
+                5,  // 2.000 x 5 = 10.000
+                10   // 1.000 x 10 = 10.000
+        }; // Tổng giá trị: 5.000.000
+        Money[] moneyPanels = getMoneyPanels();
+
+        for (int i = 0; i < Math.min(moneyPanels.length, defaultQuantities.length); i++) {
+            moneyPanels[i].getTxtQuantity().setText(String.valueOf(defaultQuantities[i]));
+        }
+
+        // Tính toán và hiển thị tổng tiền
+        calculateTotalCashInDrawer();
+    }
     private void clearForm() {
         txtReality.setText("");
         jTextArea1.setText("");
-        for (Money moneyPanel : getMoneyPanels()) {
-            moneyPanel.getTxtQuantity().setText("0");
-        }
-        lblPrice.setText("0 VND");
+
+        // Reset về số lượng tiền mặc định thay vì 0
+        setDefaultMoneyDistribution();
+
         txtMoneyDifference.setText("0 VND");
-        txtReality.setText("5.000.000 VND");
-        txtSystem.setText("5.000.000 VND");
+        txtMoneyDifference.setForeground(Color.BLACK);
+        txtMoneyOpenShift.setText("5.000.000 VND");
+        txtSystem.setText("0 VND");
     }
     private int parseQuantity(String text) throws NumberFormatException {
         if (text == null || text.trim().isEmpty()) {
@@ -779,6 +862,7 @@ public class CloseShift extends javax.swing.JPanel {
         }
         return Integer.parseInt(text.trim());
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd1;
     private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd2;
