@@ -60,6 +60,8 @@ public class Login extends javax.swing.JFrame {
         this.emailSenderService = new EmailSenderService();
         initComponents();
         custom();
+        txtUser.setText("thinh1");
+        txtPass.setText("User@123");
 
     }
 
