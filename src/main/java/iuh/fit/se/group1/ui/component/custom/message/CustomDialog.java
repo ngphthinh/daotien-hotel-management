@@ -42,7 +42,7 @@ public class CustomDialog extends JDialog {
         JPanel center = new JPanel(new BorderLayout(10, 0));
         center.setOpaque(false);
         JLabel iconLabel = new JLabel(getIcon(type));
-        JLabel msgLabel = new JLabel("<html><body style='width:230px'>" + message + "</body></html>");
+        JLabel msgLabel = new JLabel("<html><body style='width:"+(width)+"px'>" + message + "</body></html>");
         msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         msgLabel.setForeground(new Color(40, 40, 40));
         center.add(iconLabel, BorderLayout.WEST);

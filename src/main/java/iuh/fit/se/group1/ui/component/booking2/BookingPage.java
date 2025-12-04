@@ -4,16 +4,48 @@
  */
 package iuh.fit.se.group1.ui.component.booking2;
 
-import javax.swing.*;
+import iuh.fit.se.group1.dto.RoomSelection;
+import iuh.fit.se.group1.entity.Amenity;
+import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.entity.Order;
+import iuh.fit.se.group1.entity.OrderDetail;
+import iuh.fit.se.group1.service.OrderService;
+import iuh.fit.se.group1.service.RoomService;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
- *
  * @author THIS PC
  */
 public class BookingPage extends javax.swing.JPanel {
 
-    private  MainFlow3 mainFlow3;
+
+    private List<RoomSelection> selectedRooms;
+
+    private Employee currentEmployee;
+    private OrderService orderService = new OrderService();
+    private RoomService roomService = new RoomService();
+    private MainFlow3 mainFlow3;
     private MainFlow2 mainFlow2;
+    private MainFlow4 mainFlow4;
+    private MainFlow5 mainFlow5;
+
+
+    private static final String[] bookingType = {"Theo giờ", "Theo ngày", "Qua đêm"};
+
+
+    public void setCurrentEmployee(Employee employee) {
+        this.currentEmployee = employee;
+    }
 
     /**
      * Creates new form BookingPage
@@ -23,20 +55,25 @@ public class BookingPage extends javax.swing.JPanel {
 
         mainFlow2 = new MainFlow2();
         mainFlow3 = new MainFlow3();
+        mainFlow4 = new MainFlow4();
+        mainFlow5 = new MainFlow5();
         header.getLblTile().setText("Đặt phòng khách sạn");
         header.getLblSubTitle().setText("");
-        
-        mainFlow1.getCbmBookingType().addActionListener(e ->{
-            if (mainFlow1.getCbmBookingType().getSelectedIndex()==0) {
-                mainFlow1.setVisiableTimeBooking(true);
-            }else {
-                mainFlow1.setVisiableTimeBooking(false);
-            }
-        });
+
+
+        mainFlow1.getCbmBookingType().addActionListener(e -> {
+                    mainFlow1.setVisiableTimeBooking(Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[0]));
+                    mainFlow1.resetInputDate();
+                }
+        );
 
         sequenceBooking.setActiveStep(0);
-        mainFlow1.getBtnNext().addActionListener(e-> {
+        mainFlow1.getBtnNext().addActionListener(e -> {
+            if (!validateInputStep1()) {
+                return;
+            }
             sequenceBooking.setActiveStep(1);
+            findRoom();
             scrollPaneWin111.setViewportView(mainFlow2);
         });
 
@@ -51,7 +88,6 @@ public class BookingPage extends javax.swing.JPanel {
         });
 
 
-
         mainFlow3.getBtnPrev().addActionListener(e -> {
             sequenceBooking.setActiveStep(1);
             scrollPaneWin111.setViewportView(mainFlow2);
@@ -59,47 +95,316 @@ public class BookingPage extends javax.swing.JPanel {
 
         mainFlow3.getBtnNext().addActionListener(e -> {
             sequenceBooking.setActiveStep(3);
-            scrollPaneWin111.setViewportView(new JPanel());
+            scrollPaneWin111.setViewportView(mainFlow4);
         });
 
-    }
+        mainFlow4.getBtnPrev().addActionListener(e -> {
+            sequenceBooking.setActiveStep(2);
+            scrollPaneWin111.setViewportView(mainFlow3);
+        });
 
-    
-       public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        // <editor-fold defaultstate="collapsed" desc=" Look and feel setting code
-        // (optional) ">
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the default
-         * look and feel.
-         * For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+        mainFlow4.getBtnNext().addActionListener(e -> {
+            if (!mainFlow4.validateInput()) {
+                return;
+            }
+            setupInfoStep5();
+            sequenceBooking.setActiveStep(4);
+            scrollPaneWin111.setViewportView(mainFlow5);
+
+        });
+
+        mainFlow5.getBtnPrev().addActionListener(e -> {
+            sequenceBooking.setActiveStep(3);
+            scrollPaneWin111.setViewportView(mainFlow4);
+        });
+
+        mainFlow5.getBtnComplete().addActionListener(e -> {
+            createOrder();
+        });
+
+
+        mainFlow1.getTxtCheckInDate().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[2])) {
+                    CalendarUI.showCalendar(mainFlow1.getTxtCheckInDate(), null, overNight, false);
+                } else if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[1])) {
+                    CalendarUI.showCalendar(mainFlow1.getTxtCheckInDate(), null, dailyCheckIn, false);
+                } else {
+                    CalendarUI.showCalendar(mainFlow1.getTxtCheckInDate(), null, hourly, true);
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace();
-        }
-        // </editor-fold>
+        });
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            JFrame frame = new JFrame();
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            BookingPage seq = new BookingPage();
-            frame.add(seq);
-            frame.pack();
-            frame.setVisible(true);
-            
+        mainFlow1.getTxtCheckOutDate().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[1])) {
+                    CalendarUI.showCalendar(mainFlow1.getTxtCheckOutDate(), null, dailyCheckOut, false);
+                }
+            }
+        });
+
+        mainFlow1.getCbmTime().addActionListener(e -> {
+            if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[0])) {
+                handleHourly("");
+            }
         });
     }
 
-    
+    private void createOrder() {
+        Order order = mainFlow5.buildOrder(currentEmployee, mainFlow4.getCustomer(), selectedRooms);
+
+        List<OrderDetail> orderDetails = mainFlow3.getSelectedAmenities().stream().map(e -> {
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setAmenity(new Amenity(e.getId()));
+            orderDetail.setQuantity(e.getQuantity());
+            orderDetail.setUnitPrice(BigDecimal.valueOf(e.getPrice()));
+            return orderDetail;
+        }).toList();
+
+        var orderSave = orderService.createOrder(order, orderDetails);
+
+        if (orderSave != null) {
+            CustomDialog.showMessage(
+                    null,
+                    "Tạo đơn đặt phòng thành công!",
+                    "Thành công",
+                    CustomDialog.MessageType.SUCCESS,
+                    400, 200
+            );
+            // Reset lại quy trình đặt phòng
+            sequenceBooking.setActiveStep(0);
+            resetAllInput();
+            scrollPaneWin111.setViewportView(mainFlow1);
+        } else {
+            CustomDialog.showMessage(
+                    null,
+                    "Tạo đơn đặt phòng thất bại. Vui lòng thử lại.",
+                    "Lỗi",
+                    CustomDialog.MessageType.ERROR,
+                    400, 200
+            );
+        }
+
+    }
+
+    private void resetAllInput() {
+//         reset 23
+        mainFlow1.resetInputDate();
+        mainFlow2.reset();
+        mainFlow3.reset();
+        mainFlow4.reset();
+//        mainFlow5.resetAllInput();
+    }
+
+    private void setupInfoStep5() {
+        mainFlow5.setupCustomer(mainFlow4.getCustomer());
+        mainFlow5.setAmenity(mainFlow3.getSelectedAmenities());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        // Parse ngày
+        LocalDateTime checkIn = LocalDateTime.parse(mainFlow1.getTxtCheckInDate().getText(), formatter);
+        LocalDateTime checkOut = LocalDateTime.parse(mainFlow1.getTxtCheckOutDate().getText(), formatter);
+
+
+        selectedRooms = mainFlow2.getSelectedRoom(roomService.getAvailableRooms(checkIn, checkOut));
+
+        mainFlow5.setInfoBooking(
+                mainFlow1.getTxtCheckInDate().getText(),
+                mainFlow1.getTxtCheckOutDate().getText(),
+                mainFlow1.getTxtNumberOfAdult().getText(),
+                mainFlow1.getTxtNumberOfChildren().getText(),
+                String.valueOf(mainFlow1.getCbmBookingType().getSelectedItem()),
+                selectedRooms,
+                mainFlow2.getLblTotalRoom().getText()
+        );
+
+    }
+
+
+    private void findRoom() {
+        String checkInStr = mainFlow1.getTxtCheckInDate().getText().trim();
+        String checkOutStr = mainFlow1.getTxtCheckOutDate().getText().trim();
+        String adultStr = mainFlow1.getTxtNumberOfAdult().getText().trim();
+        String childrenStr = mainFlow1.getTxtNumberOfChildren().getText().trim();
+        String timePlus = Objects.requireNonNull(mainFlow1.getCbmTime().getSelectedItem()).toString().split(" ")[0];
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        // Parse ngày
+        LocalDateTime checkIn = LocalDateTime.parse(checkInStr, formatter);
+        LocalDateTime checkOut = LocalDateTime.parse(checkOutStr, formatter);
+
+        int adults = Integer.parseInt(adultStr);
+        int children = 0;
+        if (!childrenStr.isEmpty()) {
+            children = Integer.parseInt(childrenStr);
+        }
+
+        // Tìm phòng trống
+        var availableRooms = roomService.countAvailableRooms(checkIn, checkOut);
+//        // Cập nhật danh sách phòng trống lên mainFlow2
+        mainFlow2.updateRoomList(
+                availableRooms,
+                adults,
+                children,
+                roomService,
+                mainFlow1.getCbmBookingType().getSelectedIndex(),
+                Integer.parseInt(timePlus)
+        );
+
+    }
+
+    private boolean validateInputStep1() {
+        try {
+            String checkInStr = mainFlow1.getTxtCheckInDate().getText().trim();
+            String checkOutStr = mainFlow1.getTxtCheckOutDate().getText().trim();
+            String adultStr = mainFlow1.getTxtNumberOfAdult().getText().trim();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            // Parse ngày
+            LocalDateTime checkIn = LocalDateTime.parse(checkInStr, formatter);
+            LocalDateTime checkOut = LocalDateTime.parse(checkOutStr, formatter);
+            LocalDateTime now = LocalDateTime.now();
+
+            // ─────────────────────────────────────────────
+            //            VALIDATION
+            // ─────────────────────────────────────────────
+
+            // 1. check-in phải >= hiện tại
+            if (checkIn.toLocalDate().isBefore(now.toLocalDate())) {
+                CustomDialog.showMessage(
+                        null,
+                        "Ngày nhận phòng phải lớn hơn hoặc bằng ngày hiện tại.",
+                        "Lỗi nhập liệu",
+                        CustomDialog.MessageType.ERROR,
+                        500, 200
+                );
+                return false;
+            }
+
+
+            // 2. check-out phải > check-in
+            if (!checkOut.isAfter(checkIn)) {
+                CustomDialog.showMessage(
+                        null,
+                        "Ngày trả phòng phải sau ngày nhận phòng.",
+                        "Lỗi nhập liệu",
+                        CustomDialog.MessageType.ERROR,
+                        400, 200
+                );
+                return false;
+            }
+
+            // 3. số người lớn phải > 0
+            int adults;
+            try {
+                adults = Integer.parseInt(adultStr);
+                if (adults <= 0) throw new NumberFormatException();
+            } catch (NumberFormatException ex) {
+                CustomDialog.showMessage(
+                        null,
+                        "Số người lớn phải là số nguyên dương.",
+                        "Lỗi nhập liệu",
+                        CustomDialog.MessageType.ERROR,
+                        400, 200
+                );
+                return false;
+            }
+
+        } catch (Exception e) {
+            CustomDialog.showMessage(
+                    null,
+                    "Ngày tháng không hợp lệ. Vui lòng kiểm tra lại.",
+                    "Lỗi nhập liệu",
+                    CustomDialog.MessageType.ERROR,
+                    400, 200
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private final Consumer<String> overNight = this::handleOverNight;
+    private final Consumer<String> dailyCheckIn = this::handleDailyCheckIn;
+    private final Consumer<String> dailyCheckOut = this::handleDailyCheckOut;
+    private final Consumer<String> hourly = this::handleHourly;
+
+    private void handleHourly(String s) {
+        String checkInDateFormCalendar = mainFlow1.getTxtCheckInDate().getText();
+        String[] parts = checkInDateFormCalendar.split(" ");
+
+        String checkInDate = parts[0];
+        String[] timeParts = parts[1].split(":");
+
+        int checkInHour = Integer.parseInt(timeParts[0]);
+        int checkInMinute = Integer.parseInt(timeParts[1]);
+
+        // Số giờ thuê
+        int timePlus = Integer.parseInt(mainFlow1.getCbmTime().getSelectedItem().toString().split(" ")[0]);
+
+        // Tính giờ check-out
+        int outHour = checkInHour + timePlus;
+
+        // Tăng ngày nếu vượt 24h
+        int addDay = 0;
+        if (outHour >= 24) {
+            addDay = outHour / 24;
+            outHour = outHour % 24;
+        }
+
+        // Convert ngày check-in từ dd/MM/yyyy sang LocalDate
+        LocalDate date = LocalDate.parse(checkInDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        // Cộng ngày
+        LocalDate outDate = date.plusDays(addDay);
+
+        // Format lại kết quả cuối
+        String finalOutDate = outDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                + " " + String.format("%02d:%02d", outHour, checkInMinute);
+
+        // Set vào UI
+        mainFlow1.getTxtCheckOutDate().setText(finalOutDate);
+    }
+
+
+    private void handleDailyCheckOut(String date) {
+        String checkOutDateFormCalender = mainFlow1.getTxtCheckOutDate().getText();
+
+        String hour = " 12:00";
+        // set giờ nhận phòng là 12:00
+        // dd/mm/yyyy hh:mm
+        String checkOutDate = checkOutDateFormCalender.split(" ")[0].concat(hour);
+        mainFlow1.getTxtCheckOutDate().setText(checkOutDate);
+    }
+
+    private void handleDailyCheckIn(String date) {
+        String checkInDateFormCalender = mainFlow1.getTxtCheckInDate().getText();
+
+        String hour = " 14:00";
+        // set giờ nhận phòng là 14:00
+        // dd/mm/yyyy hh:mm
+        String checkInDate = checkInDateFormCalender.split(" ")[0].concat(hour);
+        mainFlow1.getTxtCheckInDate().setText(checkInDate);
+    }
+
+    private void handleOverNight(String date) {
+        String checkInDateFormCalender = mainFlow1.getTxtCheckInDate().getText();
+
+        String checkInDate = checkInDateFormCalender.split(" ")[0].concat(" 20:00");
+        // dd/mm/yyyy hh:mm -> dd/mm/yyyy
+
+        // ngày checkout sau ngày checkin 1 ngày
+        LocalDate checkOut = LocalDate.parse(checkInDateFormCalender.split(" ")[0], DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1);
+
+        String checkOutDate = checkOut.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).concat(" 10:00");
+        mainFlow1.getTxtCheckInDate().setText(checkInDate);
+        mainFlow1.getTxtCheckOutDate().setText(checkOutDate);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -122,24 +427,24 @@ public class BookingPage extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(sequenceBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(sequenceBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(header, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sequenceBooking, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 1024, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(header, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(sequenceBooking, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 1024, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

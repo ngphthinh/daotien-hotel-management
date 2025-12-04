@@ -24,15 +24,23 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="btnPrev" min="-2" pref="133" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="btnNext" min="-2" pref="133" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="lbl" min="-2" pref="62" max="-2" attributes="0"/>
+                      <EmptySpace pref="480" max="32767" attributes="0"/>
+                      <Component id="lblTotalRoom" min="-2" pref="255" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jPanel1" max="32767" attributes="0"/>
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="btnPrev" min="-2" pref="133" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="btnNext" min="-2" pref="133" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="pnl1" max="32767" attributes="0"/>
+                      <Component id="scr" max="32767" attributes="0"/>
+                      <Component id="lblMessage" max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace pref="40" max="32767" attributes="0"/>
+              <EmptySpace pref="20" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -40,10 +48,17 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <Component id="pnl1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" min="-2" pref="132" max="-2" attributes="0"/>
-              <EmptySpace pref="132" max="32767" attributes="0"/>
+              <Component id="scr" min="-2" pref="132" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lbl" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
+                  <Component id="lblTotalRoom" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
+              <Component id="lblMessage" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="71" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnNext" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                   <Component id="btnPrev" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
@@ -54,7 +69,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JPanel" name="jPanel1">
+    <Container class="javax.swing.JPanel" name="pnl1">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="fe" green="d7" red="b9" type="rgb"/>
@@ -67,8 +82,8 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel1" min="-2" pref="486" max="-2" attributes="0"/>
-                      <Component id="jLabel2" min="-2" pref="720" max="-2" attributes="0"/>
+                      <Component id="lbl2" min="-2" pref="486" max="-2" attributes="0"/>
+                      <Component id="lbl1" min="-2" pref="720" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="48" max="32767" attributes="0"/>
               </Group>
@@ -78,16 +93,16 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbl2" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
-                  <Component id="jLabel2" pref="112" max="32767" attributes="0"/>
+                  <Component id="lbl1" pref="112" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel1">
+        <Component class="javax.swing.JLabel" name="lbl2">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="24" style="1"/>
@@ -98,7 +113,7 @@
             <Property name="text" type="java.lang.String" value="Ch&#x1ecd;n ph&#xf2;ng"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel2">
+        <Component class="javax.swing.JLabel" name="lbl1">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="14" style="0"/>
@@ -119,7 +134,7 @@
         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Ti&#x1ebf;p Theo"/>
+        <Property name="text" type="java.lang.String" value="TI&#x1ebe;P THEO"/>
         <Property name="borderRadius" type="int" value="5"/>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="14" style="1"/>
@@ -137,7 +152,7 @@
         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="a8" green="86" red="4d" type="rgb"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Quay l&#x1ea1;i"/>
+        <Property name="text" type="java.lang.String" value="QUAY L&#x1ea0;I"/>
         <Property name="borderRadius" type="int" value="5"/>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="14" style="1"/>
@@ -147,14 +162,14 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrevActionPerformed"/>
       </Events>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+    <Container class="javax.swing.JScrollPane" name="scr">
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="iuh.fit.se.group1.ui.component.booking2.CustomTable" name="customTable1">
+        <Component class="iuh.fit.se.group1.ui.component.booking2.CustomTable" name="tbl">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -166,5 +181,39 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="lblMessage">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="3"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="0" green="0" red="ff" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="S&#x1ed1; kh&#xe1;ch ch&#x1b0;a &#x111;&#x1b0;&#x1ee3;c x&#x1ebf;p"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbl">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="0" green="0" red="0" type="rgb"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="T&#x1ed5;ng ti&#x1ec1;n:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblTotalRoom">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="14" style="3"/>
+        </Property>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="0" green="0" red="ff" type="rgb"/>
+        </Property>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="text" type="java.lang.String" value="jLabel2"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

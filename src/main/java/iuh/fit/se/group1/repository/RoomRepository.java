@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -265,5 +266,60 @@ public class RoomRepository implements Repository<Room, Long> {
             log.error("Error updating room statuses in batch: ", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public List<Room> findAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut, RoomStatus roomStatus) {
+
+        String sql = """
+               
+                SELECT r.*
+                FROM Room r
+                   WHERE r.roomStatus = ?
+                  AND r.roomId NOT IN (
+                      SELECT b.roomId
+                      FROM Booking b
+                      WHERE (b.checkInDate < ? AND b.checkOutDate > ?)
+                         OR (b.checkInDate >= ? AND b.checkInDate < ?)
+                         OR (b.checkOutDate > ? AND b.checkOutDate <= ?)
+                  )
+                ORDER BY r.roomId ASC
+                """;
+
+        List<Room> rooms = new ArrayList<>();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, roomStatus.name());
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(checkOut));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(checkIn));
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(checkIn));
+            preparedStatement.setTimestamp(5, Timestamp.valueOf(checkOut));
+            preparedStatement.setTimestamp(6, Timestamp.valueOf(checkIn));
+            preparedStatement.setTimestamp(7, Timestamp.valueOf(checkOut));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Room room = new Room();
+                    room.setRoomId(resultSet.getLong("roomId"));
+                    room.setRoomNumber(resultSet.getString("roomNumber"));
+
+                    // Load full RoomType
+                    String typeId = resultSet.getString("roomTypeId");
+                    if (typeId != null) {
+                        room.setRoomType(roomTypeRepository.findById(typeId));
+                    }
+
+                    room.setCreateAt(resultSet.getDate("createdAt") != null
+                            ? resultSet.getDate("createdAt").toLocalDate()
+                            : null);
+                    room.setRoomStatus(RoomStatus.fromString(resultSet.getString("roomStatus")));
+                    rooms.add(room);
+                }
+            }
+            log.info("Found {} available rooms between {} and {}", rooms.size(), checkIn, checkOut);
+
+        } catch (SQLException e) {
+            log.error("Error finding available Rooms: ", e);
+            throw new RuntimeException(e);
+        }
+        return rooms;
     }
 }

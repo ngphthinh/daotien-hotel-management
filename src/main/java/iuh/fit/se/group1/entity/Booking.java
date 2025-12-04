@@ -13,11 +13,9 @@ public class Booking {
     private Long bookingId;
     private LocalDateTime checkInDate;
     private LocalDateTime checkOutDate;
-    private Employee employee;
+    private BookingType bookingType;
     private Order order;
     private Room room;
-    private BookingType bookingType;
-    private BigDecimal totalPrice;
     private LocalDate createdAt;
 
 
@@ -25,22 +23,11 @@ public class Booking {
         this.order = order;
     }
 
-    public Booking(Long bookingId, LocalDateTime checkInDate, LocalDateTime checkOutDate, Employee employee, Room room, BookingType bookingType, BigDecimal totalPrice, LocalDate createdAt) {
-        this.bookingId = bookingId;
-        this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
-        this.employee = employee;
-        this.room = room;
-        this.bookingType = bookingType;
-        this.totalPrice = totalPrice;
-        this.createdAt = createdAt;
-    }
 
-    public Booking(LocalDateTime checkInDate, LocalDateTime checkOutDate, Employee employee, Room room, BookingType bookingType, Order order) {
+    public Booking(LocalDateTime checkInDate, LocalDateTime checkOutDate,Room room, BookingType bookingType, Order order) {
         this.order = order;
         this.setCheckInDate(checkInDate);
         this.setCheckOutDate(checkOutDate);
-        this.setEmployee(employee);
         this.setRoom(room);
         this.setBookingType(bookingType);
         this.setCreatedAt(LocalDate.now());
@@ -64,11 +51,6 @@ public class Booking {
     }
 
     public void setCheckInDate(LocalDateTime checkInDate) {
-        if (bookingType != null && bookingType.equals(BookingType.DAILY)) {
-            this.checkInDate = checkInDate.withHour(14).withMinute(0).withSecond(0).withNano(0);
-        } else {
-            this.checkInDate = checkInDate;
-        }
         this.checkInDate = checkInDate;
     }
 
@@ -77,22 +59,9 @@ public class Booking {
     }
 
     public void setCheckOutDate(LocalDateTime checkOutDate) {
-        if (bookingType != null && bookingType.equals(BookingType.DAILY)) {
-            this.checkOutDate = checkOutDate.withHour(12).withMinute(0).withSecond(0).withNano(0);
-        } else if (bookingType != null && bookingType.equals(BookingType.OVERNIGHT)) {
-            this.checkOutDate = checkOutDate.withHour(8).withMinute(0).withSecond(0).withNano(0);
-        }else {
-            this.checkOutDate = checkOutDate;
-        }
+        this.checkOutDate = checkOutDate;
     }
 
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
 
     public Room getRoom() {
         return room;
@@ -110,14 +79,6 @@ public class Booking {
         this.bookingType = bookingType;
     }
 
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
 
     public LocalDate getCreatedAt() {
         return createdAt;
@@ -138,43 +99,6 @@ public class Booking {
         return Objects.hashCode(bookingId);
     }
 
-    public void calcTotalPrice(String roomTypeIndex) {
-        if (room == null || checkInDate == null || checkOutDate == null || bookingType == null) {
-            throw new IllegalStateException("Room, check-in date, check-out date, and booking type must be set before calculating total price.");
-        }
-
-        // Kiểm tra hợp lệ
-        if (!checkOutDate.isAfter(checkInDate) && !bookingType.equals(BookingType.OVERNIGHT)) {
-            throw new IllegalArgumentException("Check-out date must be after check-in date.");
-        }
-
-        BigDecimal totalPrice;
-
-        boolean isSingle = roomTypeIndex.equalsIgnoreCase("0");
-
-        switch (bookingType) {
-            case DAILY -> {
-                BigDecimal rate = isSingle ? BigDecimal.valueOf(300_000) : BigDecimal.valueOf(500_000);
-                long days = Math.max(1, java.time.Duration.between(checkInDate, checkOutDate).toDays());
-                totalPrice = rate.multiply(BigDecimal.valueOf(days));
-            }
-
-            case HOURLY -> {
-                BigDecimal baseRate = isSingle ? BigDecimal.valueOf(50_000) : BigDecimal.valueOf(80_000);
-                BigDecimal hourlyRate = isSingle ? BigDecimal.valueOf(20_000) : BigDecimal.valueOf(30_000);
-                long hours = java.time.Duration.between(checkInDate, checkOutDate).toHours();
-                if (hours < 1) hours = 1;
-                totalPrice = baseRate.add(hourlyRate.multiply(BigDecimal.valueOf(hours - 1)));
-            }
-
-            case OVERNIGHT -> {
-                totalPrice = isSingle ? BigDecimal.valueOf(250_000) : BigDecimal.valueOf(350_000);
-            }
-
-            default -> throw new IllegalArgumentException("Unknown booking type: " + bookingType);
-        }
-        this.totalPrice = totalPrice;
-    }
 
     public boolean isHoliday(LocalDate startDate, LocalDate endDate) {
         Set<String> FIXED_HOLIDAYS = Set.of(
@@ -208,31 +132,11 @@ public class Booking {
     }
 
 
-    public boolean isSurchargeCheckOut() {
-        switch (bookingType) {
-            case DAILY -> {
-                return LocalDateTime.now().isAfter(LocalDateTime.of(checkOutDate.toLocalDate(), LocalTime.of(12, 0)));
-            }
-            case HOURLY -> {
-                return LocalDateTime.now().isAfter(checkOutDate.plusMinutes(30));
-            }
-            case OVERNIGHT -> {
-                return isHoliday(checkInDate.toLocalDate(), checkOutDate.toLocalDate());
-            }
-            default -> throw new IllegalArgumentException("Unknown booking type: " + bookingType);
-        }
-    }
-
     @Override
     public String toString() {
         return "Booking{" +
                 "bookingId=" + bookingId +
-                ", checkInDate=" + checkInDate +
-                ", checkOutDate=" + checkOutDate +
-                ", employee=" + employee +
                 ", room=" + room +
-                ", bookingType=" + bookingType +
-                ", totalPrice=" + totalPrice +
                 ", createdAt=" + createdAt +
                 '}';
     }

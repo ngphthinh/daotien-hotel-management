@@ -89,7 +89,7 @@ public class CustomTable extends JTable {
     class AlternatingRowRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -121,8 +121,8 @@ public class CustomTable extends JTable {
         };
 
         private Object[][] data = {
-                { "Phòng đơn", "2 người", 500000, 4000000, 4, 4 },
-                { "Phòng đôi", "4 người", 800000, 10000000, 10, 3 }
+                {"Phòng đơn", "2 người", 500000, 4000000, 4, 4},
+                {"Phòng đôi", "4 người", 800000, 10000000, 10, 3}
         };
 
         @Override
@@ -150,9 +150,13 @@ public class CustomTable extends JTable {
             data[rowIndex][columnIndex] = value;
 
             // Auto-calculate total when quantity changes
-            if (columnIndex == 5) { // "Số Lượng" is column 5
-                int quantity = (Integer) value;
-                int price = (Integer) data[rowIndex][2]; // "Giá" is column 2
+            if (columnIndex == 5 || columnIndex == 4) { // "Số Lượng" is column 5
+                Number quantityNum = (Number) value;
+                Number priceNum = (Number) data[rowIndex][2];  // giá
+
+                int quantity = quantityNum.intValue();
+                int price = priceNum.intValue();
+
                 data[rowIndex][3] = price * quantity; // "Tổng" is column 3
                 fireTableCellUpdated(rowIndex, 3);
             }
@@ -182,7 +186,7 @@ public class CustomTable extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -254,7 +258,7 @@ public class CustomTable extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             if (value != null) {
                 quantityLabel.setText(value.toString());
@@ -310,32 +314,39 @@ public class CustomTable extends JTable {
             plusButton.setForeground(Color.BLACK);
             plusButton.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.BLACK));
 
-            minusButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    System.out.println("Minus clicked");
-                    if (currentValue > 0) {
-                        currentValue--;
-                        quantityLabel.setText(String.valueOf(currentValue));
-                        // Update the table model - column 5 is "Số Lượng"
-                        CustomTable.this.setValueAt(currentValue, currentRow, 5);
+            minusButton.addActionListener(e -> {
+                if (currentValue > 0) {
+                    currentValue--;
+                    quantityLabel.setText(String.valueOf(currentValue));
+
+                    // Update model
+                    CustomTable.this.setValueAt(currentValue, currentRow, 5);
+
+                    // 🔥 Gọi callback ra ngoài
+                    if (quantityChangeListener != null) {
+                        quantityChangeListener.onQuantityChange(currentRow, currentValue);
                     }
                 }
             });
 
-            plusButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Check available rooms - column 4 is "Còn trống"
-                    int available = (Integer) CustomTable.this.getValueAt(currentRow, 4);
-                    if (currentValue < available) {
-                        currentValue++;
-                        quantityLabel.setText(String.valueOf(currentValue));
-                        // Update the table model - column 5 is "Số Lượng"
-                        CustomTable.this.setValueAt(currentValue, currentRow, 5);
+            plusButton.addActionListener(e -> {
+                Number availableNum = (Number) CustomTable.this.getValueAt(currentRow, 4);
+                int available = availableNum.intValue();
+
+                if (currentValue < available) {
+                    currentValue++;
+                    quantityLabel.setText(String.valueOf(currentValue));
+
+                    // Update model
+                    CustomTable.this.setValueAt(currentValue, currentRow, 5);
+
+                    // 🔥 Gọi callback ra ngoài
+                    if (quantityChangeListener != null) {
+                        quantityChangeListener.onQuantityChange(currentRow, currentValue);
                     }
                 }
             });
+
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
@@ -350,14 +361,14 @@ public class CustomTable extends JTable {
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value,
-                boolean isSelected, int row, int column) {
+                                                     boolean isSelected, int row, int column) {
 
             currentRow = row;
             if (value != null) {
-                currentValue = (Integer) value;
+                Number valueNum = (Number) value;
+                currentValue = valueNum.intValue();
                 quantityLabel.setText(value.toString());
             }
-
             return panel;
         }
 
@@ -365,5 +376,11 @@ public class CustomTable extends JTable {
         public Object getCellEditorValue() {
             return currentValue;
         }
+    }
+
+    private QuantityChangeListener quantityChangeListener;
+
+    public void setQuantityChangeListener(QuantityChangeListener listener) {
+        this.quantityChangeListener = listener;
     }
 }

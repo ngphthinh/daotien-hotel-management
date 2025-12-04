@@ -189,9 +189,6 @@ public class PaymentPage extends javax.swing.JPanel {
                 setAmenityList(orderDetailService.getOrderDetailsByOrderId(order.getOrderId()));
 
 
-                BigDecimal totalRoomPrice = order.getBookings().stream()
-                        .map(Booking::getTotalPrice)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
 
                 BigDecimal totalAmenityPrice = orderDetailService.getOrderDetailsByOrderId(order.getOrderId()).stream()
@@ -202,7 +199,9 @@ public class PaymentPage extends javax.swing.JPanel {
                         .map(sd -> sd.getSurcharge().getPrice().multiply(BigDecimal.valueOf(sd.getQuantity())))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                BigDecimal totalAmount = totalRoomPrice.add(totalAmenityPrice).add(totalSurcharge);
+//                BigDecimal totalAmount =  totalRoomPrice.add(totalAmenityPrice).add(totalSurcharge);
+                log.info("Test sửa");
+                BigDecimal totalAmount = BigDecimal.ZERO;
 
 
                 Promotion promotion = setPromotion(totalAmount);
@@ -430,22 +429,25 @@ public class PaymentPage extends javax.swing.JPanel {
         defaultTableModel.setRowCount(0);
         System.out.println(bookings);
         int countHoliday = 0;
-        for (var b : bookings) {
-            String time = getDuration(b.getCheckInDate(), b.getCheckOutDate(), b.getBookingType());
-            totalPrice = totalPrice.add(b.getTotalPrice());
-            defaultTableModel.addRow(new Object[]{
-                    b.getRoom().getRoomNumber(),
-                    b.getRoom().getRoomType().getName(),
-                    getPriceRoom(b.getRoom().getRoomType().getRoomTypeId(), b.getBookingType().toString()),
-                    time,
-                    b.getTotalPrice()
-            });
+        log.info("Sửa");
 
-            if (b.isHoliday(b.getCheckInDate().toLocalDate(), b.getCheckOutDate().toLocalDate())) {
-                countHoliday++;
-            }
-
-        }
+        // TODO:
+//        for (var b : bookings) {
+//            String time = getDuration(b.getCheckInDate(), b.getCheckOutDate(), b.getBookingType());
+//            totalPrice = totalPrice.add(b.getTotalPrice());
+//            defaultTableModel.addRow(new Object[]{
+//                    b.getRoom().getRoomNumber(),
+//                    b.getRoom().getRoomType().getName(),
+//                    getPriceRoom(b.getRoom().getRoomType().getRoomTypeId(), b.getBookingType().toString()),
+//                    time,
+//                    b.getTotalPrice()
+//            });
+//
+//            if (b.isHoliday(b.getCheckInDate().toLocalDate(), b.getCheckOutDate().toLocalDate())) {
+//                countHoliday++;
+//            }
+//
+//        }
         BigDecimal total = BigDecimal.ZERO;
         // thêm phụ phí ngày lễ
         if (countHoliday != 0) {

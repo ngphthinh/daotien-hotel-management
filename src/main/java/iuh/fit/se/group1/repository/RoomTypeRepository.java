@@ -5,6 +5,7 @@ import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -74,6 +75,10 @@ public class RoomTypeRepository implements Repository<RoomType, String> {
                     RoomType roomType = new RoomType();
                     roomType.setRoomTypeId(resultSet.getString("roomTypeId"));
                     roomType.setName(resultSet.getString("name"));
+                    roomType.setHourlyRate(resultSet.getBigDecimal("hourlyRate"));
+                    roomType.setDailyRate(resultSet.getBigDecimal("dailyRate"));
+                    roomType.setOvernightRate(resultSet.getBigDecimal("overnightRate"));
+                    roomType.setAdditionalHourRate(resultSet.getBigDecimal("additionalHourRate"));
                     // Fix: Null-safe cho createdAt
                     Date createdAtDate = resultSet.getDate("createdAt");
                     roomType.setCreatedAt(createdAtDate != null ? createdAtDate.toLocalDate() : null);

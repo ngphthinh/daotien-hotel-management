@@ -8,30 +8,35 @@ import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import javax.swing.BorderFactory;
+import javax.swing.*;
 
 /**
  * @author THIS PC
  */
 public class MainFlow1 extends javax.swing.JPanel {
 
+
     /**
      * Creates new form MainFlow1
      */
     public MainFlow1() {
         initComponents();
-        jPanel1.setBorder(BorderFactory.createCompoundBorder(
+        pnl1.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(18),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)
         ));
         cbmBookingType.addItem("Theo giờ");
         cbmBookingType.addItem("Theo ngày");
         cbmBookingType.addItem("Qua đêm");
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i < 16; i++) {
             cbmTime.addItem(i + " giờ");
         }
         btnAdultDecrement.setText("");
@@ -46,14 +51,59 @@ public class MainFlow1 extends javax.swing.JPanel {
         btnChildIncrement.setIcon(FontIcon.of(FontAwesomeSolid.PLUS));
         btnAdultIncrement.setPreferredSize(new Dimension(30, 30));
         btnChildIncrement.setPreferredSize(new Dimension(30, 30));
-        jTextField1.setBorder(BorderFactory.createCompoundBorder(
+        txtCheckInDate.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.GRAY, 1),       // border ngoài
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)       // padding trong
         ));
-        jTextField2.setBorder(BorderFactory.createCompoundBorder(
+        txtCheckOutDate.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.GRAY, 1),       // border ngoài
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)       // padding trong
         ));
+
+        txtCheckInDate.setEditable(false);
+        txtCheckOutDate.setEditable(false);
+        resetInputDate();
+
+    }
+
+    public JTextField getTxtCheckInDate() {
+        return txtCheckInDate;
+    }
+
+    public void setTxtCheckInDate(JTextField txtCheckInDate) {
+        this.txtCheckInDate = txtCheckInDate;
+    }
+
+    public JTextField getTxtCheckOutDate() {
+        return txtCheckOutDate;
+    }
+
+    public void setTxtCheckOutDate(JTextField txtCheckOutDate) {
+        this.txtCheckOutDate = txtCheckOutDate;
+    }
+
+    public JTextField getTxtNumberOfAdult() {
+        return txtNumberOfAdult;
+    }
+
+    public void setTxtNumberOfAdult(JTextField txtNumberOfAdult) {
+        this.txtNumberOfAdult = txtNumberOfAdult;
+    }
+
+    public JTextField getTxtNumberOfChildren() {
+        return txtNumberOfChildren;
+    }
+
+    public void setTxtNumberOfChildren(JTextField txtNumberOfChildren) {
+        this.txtNumberOfChildren = txtNumberOfChildren;
+    }
+
+    public Combobox getCbmTime() {
+        return cbmTime;
+    }
+
+    public void setCbmTime(Combobox cbmTime) {
+        this.cbmTime = cbmTime;
     }
 
     public Button getBtnNext() {
@@ -82,6 +132,27 @@ public class MainFlow1 extends javax.swing.JPanel {
     }
 
 
+    public void resetInputDate() {
+        LocalDateTime now = LocalDateTime.now();
+        String format = "dd/MM/yyyy HH:mm";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        if (cbmBookingType.getSelectedIndex() == 2) {
+            now = now.withHour(20).withMinute(0);
+            txtCheckInDate.setText(now.format(formatter));
+            now = now.plusDays(1).withHour(10).withMinute(0);
+            txtCheckOutDate.setText(now.format(formatter));
+        }else if (cbmBookingType.getSelectedIndex() == 1) {
+            now = now.withHour(14).withMinute(0);
+            txtCheckInDate.setText(now.format(formatter));
+            txtCheckOutDate.setText(format);
+        }else if (cbmBookingType.getSelectedIndex() == 0) {
+            txtCheckInDate.setText(now.format(formatter));
+            now = now.plusHours(1);
+            txtCheckOutDate.setText(now.format(formatter));
+        }
+        cbmTime.setSelectedIndex(0);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -91,64 +162,64 @@ public class MainFlow1 extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        pnl1 = new javax.swing.JPanel();
+        lbl1 = new javax.swing.JLabel();
+        lbl2 = new javax.swing.JLabel();
+        lbl3 = new javax.swing.JLabel();
         cbmBookingType = new iuh.fit.se.group1.ui.component.custom.Combobox();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
+        lbl4 = new javax.swing.JLabel();
+        lbl5 = new javax.swing.JLabel();
+        txtCheckInDate = new javax.swing.JTextField();
+        txtCheckOutDate = new javax.swing.JTextField();
+        lbl6 = new javax.swing.JLabel();
         btnNext = new iuh.fit.se.group1.ui.component.custom.Button();
-        jLabel8 = new javax.swing.JLabel();
+        lbl7 = new javax.swing.JLabel();
         cbmTime = new iuh.fit.se.group1.ui.component.custom.Combobox();
         btnAdultDecrement = new iuh.fit.se.group1.ui.component.custom.Button();
-        jTextField3 = new javax.swing.JTextField();
+        txtNumberOfAdult = new javax.swing.JTextField();
         btnAdultIncrement = new iuh.fit.se.group1.ui.component.custom.Button();
-        jLabel9 = new javax.swing.JLabel();
+        lbl8 = new javax.swing.JLabel();
         btnChildDecrement = new iuh.fit.se.group1.ui.component.custom.Button();
-        jTextField4 = new javax.swing.JTextField();
+        txtNumberOfChildren = new javax.swing.JTextField();
         btnChildIncrement = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(new java.awt.Color(241, 241, 241));
 
-        jPanel1.setBackground(new java.awt.Color(185, 215, 254));
+        pnl1.setBackground(new java.awt.Color(185, 215, 254));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("Nhập thông tin yêu cầu");
+        lbl1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lbl1.setForeground(new java.awt.Color(0, 0, 0));
+        lbl1.setText("Nhập thông tin yêu cầu");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Vui lòng chọn đầy đủ thông tin để tìm phòng phù hợp");
+        lbl2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl2.setForeground(new java.awt.Color(0, 0, 0));
+        lbl2.setText("Vui lòng chọn đầy đủ thông tin để tìm phòng phù hợp");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnl1Layout = new javax.swing.GroupLayout(pnl1);
+        pnl1.setLayout(pnl1Layout);
+        pnl1Layout.setHorizontalGroup(
+            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl1Layout.createSequentialGroup()
                 .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 557, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl2, javax.swing.GroupLayout.PREFERRED_SIZE, 557, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(189, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        pnl1Layout.setVerticalGroup(
+            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl1Layout.createSequentialGroup()
                 .addGap(8, 8, 8)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addComponent(lbl2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("Hình thức thuê phòng:");
+        lbl3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl3.setForeground(new java.awt.Color(0, 0, 0));
+        lbl3.setText("Hình thức thuê phòng:");
 
         cbmBookingType.setBackground(new java.awt.Color(255, 255, 255));
         cbmBookingType.setForeground(new java.awt.Color(51, 51, 51));
@@ -158,35 +229,35 @@ public class MainFlow1 extends javax.swing.JPanel {
             }
         });
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("Thời gian trả phòng:");
+        lbl4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl4.setForeground(new java.awt.Color(0, 0, 0));
+        lbl4.setText("Thời gian trả phòng:");
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel5.setText("Thời gian nhận phòng:");
+        lbl5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl5.setForeground(new java.awt.Color(0, 0, 0));
+        lbl5.setText("Thời gian nhận phòng:");
 
-        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField1.setForeground(new java.awt.Color(51, 51, 51));
-        jTextField1.setText("dd/mm/yyyy :--:--:---");
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        txtCheckInDate.setBackground(new java.awt.Color(255, 255, 255));
+        txtCheckInDate.setForeground(new java.awt.Color(51, 51, 51));
+        txtCheckInDate.setText("dd/MM/yyyy hh:mm");
+        txtCheckInDate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtCheckInDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                txtCheckInDateActionPerformed(evt);
             }
         });
 
-        jTextField2.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField2.setForeground(new java.awt.Color(51, 51, 51));
-        jTextField2.setText("dd/mm/yyyy :--:--:---");
+        txtCheckOutDate.setBackground(new java.awt.Color(255, 255, 255));
+        txtCheckOutDate.setForeground(new java.awt.Color(51, 51, 51));
+        txtCheckOutDate.setText("dd/MM/yyyy hh:mm");
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel7.setText("Số người lớn");
+        lbl6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl6.setForeground(new java.awt.Color(0, 0, 0));
+        lbl6.setText("Số người lớn");
 
         btnNext.setBackground(new java.awt.Color(77, 134, 168));
         btnNext.setForeground(new java.awt.Color(255, 255, 255));
-        btnNext.setText("Tiếp theo");
+        btnNext.setText("TIẾP THEO");
         btnNext.setBorderRadius(5);
         btnNext.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnNext.addActionListener(new java.awt.event.ActionListener() {
@@ -195,9 +266,9 @@ public class MainFlow1 extends javax.swing.JPanel {
             }
         });
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("Thời gian thuê phòng:");
+        lbl7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl7.setForeground(new java.awt.Color(0, 0, 0));
+        lbl7.setText("Thời gian thuê phòng:");
 
         cbmTime.setBackground(new java.awt.Color(255, 255, 255));
         cbmTime.setForeground(new java.awt.Color(51, 51, 51));
@@ -212,10 +283,10 @@ public class MainFlow1 extends javax.swing.JPanel {
             }
         });
 
-        jTextField3.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField3.setText("0");
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtNumberOfAdult.setBackground(new java.awt.Color(255, 255, 255));
+        txtNumberOfAdult.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtNumberOfAdult.setText("0");
+        txtNumberOfAdult.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         btnAdultIncrement.setBackground(new java.awt.Color(255, 255, 255));
         btnAdultIncrement.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -227,9 +298,9 @@ public class MainFlow1 extends javax.swing.JPanel {
             }
         });
 
-        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel9.setText("Số trẻ em");
+        lbl8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl8.setForeground(new java.awt.Color(0, 0, 0));
+        lbl8.setText("Số trẻ em");
 
         btnChildDecrement.setBackground(new java.awt.Color(255, 255, 255));
         btnChildDecrement.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -241,10 +312,10 @@ public class MainFlow1 extends javax.swing.JPanel {
             }
         });
 
-        jTextField4.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField4.setText("0");
-        jTextField4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtNumberOfChildren.setBackground(new java.awt.Color(255, 255, 255));
+        txtNumberOfChildren.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtNumberOfChildren.setText("0");
+        txtNumberOfChildren.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         btnChildIncrement.setBackground(new java.awt.Color(255, 255, 255));
         btnChildIncrement.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -266,33 +337,33 @@ public class MainFlow1 extends javax.swing.JPanel {
                         .addContainerGap(42, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbl8, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(43, 43, 43)
                                 .addComponent(btnChildDecrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtNumberOfChildren, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnChildIncrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(lbl5, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lbl4, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lbl7, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lbl3, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lbl6, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(28, 28, 28)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtCheckOutDate, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtCheckInDate, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(cbmBookingType, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(cbmTime, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addGroup(layout.createSequentialGroup()
                                                 .addComponent(btnAdultDecrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(txtNumberOfAdult, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
                                                 .addComponent(btnAdultIncrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE))
@@ -302,41 +373,41 @@ public class MainFlow1 extends javax.swing.JPanel {
                                         .addGap(16, 16, 16))))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap(37, Short.MAX_VALUE)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(pnl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(0, 51, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(26, 26, 26)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbmBookingType, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(23, 23, 23)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtCheckInDate, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl7, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbmTime, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtCheckOutDate, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbl6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnAdultDecrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdultIncrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtNumberOfAdult, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbl8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnChildDecrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNumberOfChildren, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnChildIncrement, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14)
                 .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -348,32 +419,32 @@ public class MainFlow1 extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnNextActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void txtCheckInDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCheckInDateActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_txtCheckInDateActionPerformed
 
     private void btnAdultDecrementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdultDecrementActionPerformed
-        if (Integer.parseInt(jTextField3.getText()) > 0) {
-            int currentValue = Integer.parseInt(jTextField3.getText());
-            jTextField3.setText(String.valueOf(currentValue - 1));
+        if (Integer.parseInt(txtNumberOfAdult.getText()) > 0) {
+            int currentValue = Integer.parseInt(txtNumberOfAdult.getText());
+            txtNumberOfAdult.setText(String.valueOf(currentValue - 1));
         }
     }//GEN-LAST:event_btnAdultDecrementActionPerformed
 
     private void btnAdultIncrementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdultIncrementActionPerformed
-        int currentValue = Integer.parseInt(jTextField3.getText());
-        jTextField3.setText(String.valueOf(currentValue + 1));
+        int currentValue = Integer.parseInt(txtNumberOfAdult.getText());
+        txtNumberOfAdult.setText(String.valueOf(currentValue + 1));
     }//GEN-LAST:event_btnAdultIncrementActionPerformed
 
     private void btnChildDecrementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChildDecrementActionPerformed
-        if (Integer.parseInt(jTextField4.getText()) > 0) {
-            int currentValue = Integer.parseInt(jTextField4.getText());
-            jTextField4.setText(String.valueOf(currentValue - 1));
+        if (Integer.parseInt(txtNumberOfChildren.getText()) > 0) {
+            int currentValue = Integer.parseInt(txtNumberOfChildren.getText());
+            txtNumberOfChildren.setText(String.valueOf(currentValue - 1));
         }
     }//GEN-LAST:event_btnChildDecrementActionPerformed
 
     private void btnChildIncrementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChildIncrementActionPerformed
-        int currentValue = Integer.parseInt(jTextField4.getText());
-        jTextField4.setText(String.valueOf(currentValue + 1));
+        int currentValue = Integer.parseInt(txtNumberOfChildren.getText());
+        txtNumberOfChildren.setText(String.valueOf(currentValue + 1));
     }//GEN-LAST:event_btnChildIncrementActionPerformed
 
     private void cbmBookingTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbmBookingTypeActionPerformed
@@ -389,18 +460,18 @@ public class MainFlow1 extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.custom.Button btnNext;
     private iuh.fit.se.group1.ui.component.custom.Combobox cbmBookingType;
     private iuh.fit.se.group1.ui.component.custom.Combobox cbmTime;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JLabel lbl1;
+    private javax.swing.JLabel lbl2;
+    private javax.swing.JLabel lbl3;
+    private javax.swing.JLabel lbl4;
+    private javax.swing.JLabel lbl5;
+    private javax.swing.JLabel lbl6;
+    private javax.swing.JLabel lbl7;
+    private javax.swing.JLabel lbl8;
+    private javax.swing.JPanel pnl1;
+    private javax.swing.JTextField txtCheckInDate;
+    private javax.swing.JTextField txtCheckOutDate;
+    private javax.swing.JTextField txtNumberOfAdult;
+    private javax.swing.JTextField txtNumberOfChildren;
     // End of variables declaration//GEN-END:variables
 }

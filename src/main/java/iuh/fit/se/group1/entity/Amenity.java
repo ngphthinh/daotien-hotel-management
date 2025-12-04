@@ -38,7 +38,11 @@ public class Amenity {
 		this.price = price;
 	}
 
-	public Long getAmenityId() {
+    public Amenity(Long amenityId) {
+		this.amenityId = amenityId;
+    }
+
+    public Long getAmenityId() {
 		return amenityId;
 	}
 

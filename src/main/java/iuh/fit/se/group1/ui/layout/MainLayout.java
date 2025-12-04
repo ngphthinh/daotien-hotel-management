@@ -4,6 +4,7 @@ import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
+import iuh.fit.se.group1.ui.component.booking2.BookingPage;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
@@ -95,8 +96,7 @@ public class MainLayout extends JPanel {
                     if (index == 0) {
                         setMainContent(dashboard);
                     } else if (index == 1) {
-//                        bookingPage.loadData();
-                        setMainContent(new iuh.fit.se.group1.ui.component.booking2.BookingPage());
+                        setMainContent(bookingPage);
                     } else if (index == 2) {
                         paymentPage.clearForm();
                         paymentPage.loadData();
