@@ -52,6 +52,8 @@ public class MainLayout extends JPanel {
     public MainLayout() {
         init();
         setOpaque(false);
+        isAdmin = true;
+        setAuth(isAdmin);
     }
 
     public Employee getCurrentEmployee() {
@@ -95,13 +97,14 @@ public class MainLayout extends JPanel {
                     if (index == 0) {
                         setMainContent(dashboard);
                     } else if (index == 1) {
-//                        bookingPage.loadData();
-                        setMainContent(new iuh.fit.se.group1.ui.component.booking2.BookingPage());
+                        bookingPage.loadData();
+                        setMainContent(bookingPage);
                     } else if (index == 2) {
                         paymentPage.clearForm();
                         paymentPage.loadData();
                         setMainContent(paymentPage);
                     } else if (index == 3 && subIndex == 1) {
+                        shiftManagement.getShiftList().reloadEmployees();
                         setMainContent(shiftManagement);
                     } else if (index == 3 && subIndex == 2) {
                         setMainContent(employeeManagement);
@@ -186,8 +189,6 @@ public class MainLayout extends JPanel {
                                     "Bạn chưa mở ca làm việc hôm nay hoặc tất cả ca đã đóng!");
                             return;
                         }
-
-                        // ✅ KIỂM TRA CA CÓ ĐANG HOẠT ĐỘNG KHÔNG
                         if (!employeeShiftService.isShiftActive(openShift)) {
                             String shiftTime = openShift.getShift().getStartTime() + " - " +
                                     openShift.getShift().getEndTime();
@@ -281,7 +282,7 @@ public class MainLayout extends JPanel {
     }
 
     public void setAuth(boolean isAdmin) {
-        this.isAdmin = true;
+        this.isAdmin = isAdmin;
         sideBar.getMenu1().setAuth(isAdmin);
         if (isAdmin) {
             dashboard = new Dashboard();
