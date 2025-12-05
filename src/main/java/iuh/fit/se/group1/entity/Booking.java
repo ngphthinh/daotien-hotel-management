@@ -100,37 +100,6 @@ public class Booking {
     }
 
 
-    public boolean isHoliday(LocalDate startDate, LocalDate endDate) {
-        Set<String> FIXED_HOLIDAYS = Set.of(
-                "01-01", // Tết Dương lịch
-                "30-04", // Giải phóng miền Nam
-                "01-05", // Quốc tế Lao động
-                "02-09"  // Quốc khánh
-        );
-
-        LocalDate date = startDate;
-        while (!date.isAfter(endDate)) {
-            // Kiểm tra ngày dương lịch
-            String key = String.format("%02d-%02d", date.getDayOfMonth(), date.getMonthValue());
-            if (FIXED_HOLIDAYS.contains(key)) return true;
-
-            // Kiểm tra ngày âm lịch
-//            ChineseDate lunar = new ChineseDate(java.sql.Date.valueOf(date));
-//            int lunarDay = lunar.getDay();
-//            int lunarMonth = lunar.getMonth();
-//
-//            // Giỗ Tổ (10/3 AL)
-//            if (lunarMonth == 3 && lunarDay == 10) return true;
-//
-//            // Tết Nguyên Đán (29,30 tháng Chạp + 1–5 tháng Giêng)
-//            if ((lunarMonth == 12 && (lunarDay == 29 || lunarDay == 30)) ||
-//                    (lunarMonth == 1 && lunarDay <= 5)) return true;
-
-            date = date.plusDays(1);
-        }
-        return false;
-    }
-
 
     @Override
     public String toString() {

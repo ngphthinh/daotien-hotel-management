@@ -464,24 +464,7 @@ public class PaymentPage extends javax.swing.JPanel {
         infoPayment1.getLblPriceRoomValue().setText(Constants.VND_FORMAT.format(totalPrice));
     }
 
-    private String getPriceRoom(String roomTypeId, String bookingType) {
 
-        String fileName = "prices.properties";
-
-        if (roomTypeId.equals("SINGLE")) {
-            return switch (BookingType.valueOf(bookingType)) {
-                case DAILY -> PropertiesService.get(fileName, "/price.single.daily");
-                case HOURLY -> PropertiesService.get(fileName, "/price.single.hourly");
-                case OVERNIGHT -> PropertiesService.get(fileName, "/price.single.overnight");
-            };
-        } else {
-            return switch (BookingType.valueOf(bookingType)) {
-                case DAILY -> PropertiesService.get(fileName, "/price.double.daily");
-                case HOURLY -> PropertiesService.get(fileName, "/price.double.hourly");
-                case OVERNIGHT -> PropertiesService.get(fileName, "/price.double.overnight");
-            };
-        }
-    }
 
     private String getDuration(LocalDateTime checkInDate, LocalDateTime checkOutDate, BookingType bookingType) {
         switch (bookingType) {

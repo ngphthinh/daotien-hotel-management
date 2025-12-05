@@ -5,26 +5,33 @@
 package iuh.fit.se.group1.ui.component.booking2;
 
 import iuh.fit.se.group1.dto.AmenityDTO;
+import iuh.fit.se.group1.dto.OrderResult;
 import iuh.fit.se.group1.dto.RoomSelection;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
+import iuh.fit.se.group1.service.SurchargeDetailService;
+import iuh.fit.se.group1.service.SurchargeService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.util.Constants;
 
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * @author THIS PC
  */
 public class MainFlow5 extends javax.swing.JPanel {
+
+    private static final long SURCHARGE_HOLIDAY = 50_000;
 
     public Button getBtnPrev() {
         return btnPrev;
@@ -112,6 +119,8 @@ public class MainFlow5 extends javax.swing.JPanel {
         lblTotalPrice = new javax.swing.JLabel();
         btnComplete = new iuh.fit.se.group1.ui.component.custom.Button();
         btnPrev = new iuh.fit.se.group1.ui.component.custom.Button();
+        lblSurchargeHolidayName = new javax.swing.JLabel();
+        lblSurchargeHoliday = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -599,25 +608,38 @@ public class MainFlow5 extends javax.swing.JPanel {
             }
         });
 
+        lblSurchargeHolidayName.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblSurchargeHolidayName.setForeground(new java.awt.Color(255, 51, 51));
+        lblSurchargeHolidayName.setText("Phụ thu ngày lễ");
+
+        lblSurchargeHoliday.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        lblSurchargeHoliday.setForeground(new java.awt.Color(255, 0, 0));
+        lblSurchargeHoliday.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblSurchargeHoliday.setText("N/a");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(35, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(pnl5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnl1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnl2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnl3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnl4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnl6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnl7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addContainerGap(34, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblSurchargeHolidayName, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblSurchargeHoliday, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnl5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -634,13 +656,17 @@ public class MainFlow5 extends javax.swing.JPanel {
                 .addComponent(pnl5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(pnl6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(26, 26, 26)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSurchargeHolidayName)
+                    .addComponent(lblSurchargeHoliday))
+                .addGap(18, 18, 18)
                 .addComponent(pnl7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -687,7 +713,8 @@ public class MainFlow5 extends javax.swing.JPanel {
             String numberOfChildren,
             String bookingType,
             List<RoomSelection> selectedRoom,
-            String totalRoom
+            String totalRoom,
+            boolean isHoliday
     ) {
 
         lblCheckIn.setText(checkIn);
@@ -716,13 +743,23 @@ public class MainFlow5 extends javax.swing.JPanel {
         var deposit = Constants.parseVND(totalRoom) * 0.3;
         lblDeposit.setText(Constants.VND_FORMAT.format(deposit));
 
-        var totalPrice = Constants.parseVND(totalRoom) + Constants.parseVND(lblTotalAmenity.getText());
-        lblTotalPrice.setText(Constants.VND_FORMAT.format(totalPrice));
 
+        var holidayPrice = isHoliday ? SURCHARGE_HOLIDAY * selectedRoom.size() : 0;
+
+        var totalPrice = Constants.parseVND(totalRoom) + Constants.parseVND(lblTotalAmenity.getText());
+
+
+        lblSurchargeHoliday.setText(holidayPrice != 0 ? Constants.VND_FORMAT.format(holidayPrice) : "Không có");
+
+        lblTotalPrice.setText(Constants.VND_FORMAT.format(totalPrice + holidayPrice));
     }
 
 
-    public Order buildOrder(Employee currentEmployee, Customer customer, List<RoomSelection> selectedRooms) {
+    public OrderResult buildOrder(
+            Employee currentEmployee,
+            Customer customer,
+            List<RoomSelection> selectedRooms,
+            SurchargeService surchargeService) {
 
         Order order = new Order();
         order.setCustomer(customer);
@@ -766,9 +803,22 @@ public class MainFlow5 extends javax.swing.JPanel {
 
         order.setBookings(bookings);
 
-        return order;
+
+        if (lblSurchargeHoliday.getText().equals("N/a") || lblSurchargeHoliday.getText().equals("Không có")) {
+            return new OrderResult(order,null);
+        }
+
+        Surcharge surchargeHoliday = surchargeService.getSurchargeByName(lblSurchargeHolidayName.getText().trim());
+
+        SurchargeDetail surchargeDetail = new SurchargeDetail();
+        surchargeDetail.setSurcharge(surchargeHoliday);
+        surchargeDetail.setQuantity(selectedRooms.size());
+
+        return new OrderResult(order,surchargeDetail);
 
     }
+
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnComplete;
@@ -806,6 +856,8 @@ public class MainFlow5 extends javax.swing.JPanel {
     private javax.swing.JLabel lblNumberOfChildren;
     private javax.swing.JLabel lblPhone;
     private javax.swing.JLabel lblSingleRooms;
+    private javax.swing.JLabel lblSurchargeHoliday;
+    private javax.swing.JLabel lblSurchargeHolidayName;
     private javax.swing.JLabel lblTotalAmenity;
     private javax.swing.JLabel lblTotalPrice;
     private javax.swing.JLabel lblTotalRoom;

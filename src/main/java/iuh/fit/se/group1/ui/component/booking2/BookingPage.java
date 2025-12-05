@@ -5,12 +5,11 @@
 package iuh.fit.se.group1.ui.component.booking2;
 
 import iuh.fit.se.group1.dto.RoomSelection;
-import iuh.fit.se.group1.entity.Amenity;
-import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.entity.Order;
-import iuh.fit.se.group1.entity.OrderDetail;
+import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.service.OrderService;
 import iuh.fit.se.group1.service.RoomService;
+import iuh.fit.se.group1.service.SurchargeDetailService;
+import iuh.fit.se.group1.service.SurchargeService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 
 import java.awt.event.MouseAdapter;
@@ -21,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -28,9 +28,9 @@ import java.util.function.Consumer;
  */
 public class BookingPage extends javax.swing.JPanel {
 
-
+    private SurchargeDetailService  surchargeDetailService = new SurchargeDetailService();
     private List<RoomSelection> selectedRooms;
-
+    private SurchargeService surchargeService = new SurchargeService();
     private Employee currentEmployee;
     private OrderService orderService = new OrderService();
     private RoomService roomService = new RoomService();
@@ -153,7 +153,9 @@ public class BookingPage extends javax.swing.JPanel {
     }
 
     private void createOrder() {
-        Order order = mainFlow5.buildOrder(currentEmployee, mainFlow4.getCustomer(), selectedRooms);
+        var orderRs = mainFlow5.buildOrder(currentEmployee, mainFlow4.getCustomer(), selectedRooms, surchargeService);
+
+        Order order = orderRs.getOrder();
 
         List<OrderDetail> orderDetails = mainFlow3.getSelectedAmenities().stream().map(e -> {
             OrderDetail orderDetail = new OrderDetail();
@@ -164,6 +166,12 @@ public class BookingPage extends javax.swing.JPanel {
         }).toList();
 
         var orderSave = orderService.createOrder(order, orderDetails);
+
+        SurchargeDetail surchargeDetail = orderRs.getSurchargeDetail();
+
+        if (surchargeDetail != null) {
+            surchargeDetailService.save(surchargeDetail,orderSave.getOrderId());
+        }
 
         if (orderSave != null) {
             CustomDialog.showMessage(
@@ -217,9 +225,41 @@ public class BookingPage extends javax.swing.JPanel {
                 mainFlow1.getTxtNumberOfChildren().getText(),
                 String.valueOf(mainFlow1.getCbmBookingType().getSelectedItem()),
                 selectedRooms,
-                mainFlow2.getLblTotalRoom().getText()
+                mainFlow2.getLblTotalRoom().getText(),
+                isHoliday(checkIn.toLocalDate(), checkOut.toLocalDate())
         );
 
+    }
+
+    public boolean isHoliday(LocalDate startDate, LocalDate endDate) {
+        Set<String> FIXED_HOLIDAYS = Set.of(
+                "01-01", // Tết Dương lịch
+                "30-04", // Giải phóng miền Nam
+                "01-05", // Quốc tế Lao động
+                "02-09"  // Quốc khánh
+        );
+
+        LocalDate date = startDate;
+        while (!date.isAfter(endDate)) {
+            // Kiểm tra ngày dương lịch
+            String key = String.format("%02d-%02d", date.getDayOfMonth(), date.getMonthValue());
+            if (FIXED_HOLIDAYS.contains(key)) return true;
+
+            // Kiểm tra ngày âm lịch
+//            ChineseDate lunar = new ChineseDate(java.sql.Date.valueOf(date));
+//            int lunarDay = lunar.getDay();
+//            int lunarMonth = lunar.getMonth();
+//
+//            // Giỗ Tổ (10/3 AL)
+//            if (lunarMonth == 3 && lunarDay == 10) return true;
+//
+//            // Tết Nguyên Đán (29,30 tháng Chạp + 1–5 tháng Giêng)
+//            if ((lunarMonth == 12 && (lunarDay == 29 || lunarDay == 30)) ||
+//                    (lunarMonth == 1 && lunarDay <= 5)) return true;
+
+            date = date.plusDays(1);
+        }
+        return false;
     }
 
 
