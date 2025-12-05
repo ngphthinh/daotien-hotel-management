@@ -259,13 +259,14 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
     /**
      * Lấy tổng doanh thu của ca làm việc từ các hóa đơn
      */
-    public BigDecimal getTotalRevenueForShift(Long employeeShiftId) {
+    public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
         String sql = """
-        SELECT COALESCE(SUM(o.totalAmount), 0) AS totalRevenue
-        FROM Orders o
-        JOIN EmployeeShift es ON o.employeeId = es.employeeId
-        WHERE es.employeeShiftId = ?
-          AND CAST(o.createdAt AS DATE) = es.shiftDate
+        SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue
+        FROM Orders O
+        INNER JOIN Booking B ON O.orderId = B.orderId
+        WHERE B.employeeShiftId = ?
+        AND O.orderTypeId = 1
+        AND O.paymentType = 'CASH'
     """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -273,16 +274,15 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getBigDecimal("totalRevenue");
+                    return rs.getBigDecimal("totalCashRevenue");
                 }
+                return BigDecimal.ZERO;
             }
-            return BigDecimal.ZERO;
 
         } catch (SQLException e) {
-            log.error("Error getting total revenue for shift: ", e);
+            log.error("Error calculating total CASH revenue for shift: ", e);
             throw new RuntimeException(e);
         }
     }
-
 
 }

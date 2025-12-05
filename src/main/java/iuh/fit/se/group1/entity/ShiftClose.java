@@ -24,19 +24,23 @@ public class ShiftClose {
     private  BigDecimal cashInDrawer;
     private BigDecimal difference;
     private String note;
+    private Long managerId;
     private LocalDateTime createdAt;
 
     public ShiftClose() {
     }
 
-    public ShiftClose(Long shiftCloseId, EmployeeShift employeeShift, BigDecimal totalRevenue, BigDecimal cashInDrawer, BigDecimal difference, String note, LocalDateTime createdAt) {
+    public ShiftClose(Long shiftCloseId, EmployeeShift employeeShift, BigDecimal totalRevenue,
+                      BigDecimal cashInDrawer, BigDecimal difference, String note,
+                      Long managerId, LocalDateTime createdAt) {
         this.shiftCloseId = shiftCloseId;
         this.employeeShift = employeeShift;
         this.totalRevenue = totalRevenue;
         this.cashInDrawer = cashInDrawer;
         this.difference = difference;
         this.note = note;
-        this.createdAt = LocalDateTime.now();
+        this.managerId = managerId;
+        this.createdAt = createdAt;
     }
 
     public Long getShiftCloseId() {
@@ -87,6 +91,14 @@ public class ShiftClose {
         this.note = note;
     }
 
+    public Long getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -116,6 +128,7 @@ public class ShiftClose {
                 ", cashInDrawer=" + cashInDrawer +
                 ", difference=" + difference +
                 ", note='" + note + '\'' +
+                ", managerId=" + managerId +
                 ", createdAt=" + createdAt +
                 '}';
     }

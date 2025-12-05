@@ -75,7 +75,6 @@ public class ShiftManagement extends javax.swing.JPanel {
         employeeService = new EmployeeService();
         loadShiftsFromDatabase();
         setupDateChooser();
-
         setupShiftCardButtons();
         loadEmployeeShiftsByDate(LocalDate.now());
     }

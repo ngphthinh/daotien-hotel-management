@@ -5,10 +5,11 @@
  */
 package iuh.fit.se.group1.repository;
 
-
+import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.ShiftClose;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.util.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,6 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
     public ShiftCloseRepository() {
         connection = DatabaseUtil.getConnection();
     }
-    // Thay thế phương thức save trong ShiftCloseRepository.java
 
     @Override
     public ShiftClose save(ShiftClose entity) {
@@ -45,8 +45,8 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
             entity.setDifference(BigDecimal.ZERO);
         }
 
-        String sql = "INSERT INTO ShiftClose(employeeShiftId, totalRevenue, cashInDrawer, difference, note, createdAt) " +
-                "VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO ShiftClose(employeeShiftId, totalRevenue, cashInDrawer, " +
+                "difference, note, managerId, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?);";
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setLong(1, entity.getEmployeeShift().getEmployeeShiftId());
@@ -54,8 +54,9 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
             ps.setBigDecimal(3, entity.getCashInDrawer());
             ps.setBigDecimal(4, entity.getDifference());
             ps.setString(5, entity.getNote());
-            ps.setTimestamp(6, Timestamp.valueOf(entity.getCreatedAt() != null ? entity.getCreatedAt() : LocalDateTime.now()));
-
+            ps.setLong(6, entity.getManagerId());
+            ps.setTimestamp(7, Timestamp.valueOf(entity.getCreatedAt() != null ?
+                    entity.getCreatedAt() : LocalDateTime.now()));
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Insert failed, no rows affected.");
@@ -93,6 +94,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
                     sc.setCashInDrawer(rs.getBigDecimal("cashInDrawer") );
                     sc.setDifference(rs.getBigDecimal("difference"));
                     sc.setNote(rs.getString("note"));
+                    sc.setManagerId(rs.getLong("managerId"));
                     sc.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
 
                     return sc;
@@ -141,6 +143,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
                 sc.setCashInDrawer(rs.getBigDecimal("cashInDrawer") );
                 sc.setDifference(rs.getBigDecimal("difference") );
                 sc.setNote(rs.getString("note"));
+                sc.setManagerId(rs.getLong("managerId"));
                 sc.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
 
                 list.add(sc);
@@ -156,7 +159,8 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
 
     @Override
     public ShiftClose update(ShiftClose entity) {
-        String sql = "UPDATE ShiftClose SET employeeShiftId=?, totalRevenue=?, cashInDrawer=?, difference=?, note=? WHERE shiftCloseId=?;";
+        String sql = "UPDATE ShiftClose SET employeeShiftId=?, totalRevenue=?, cashInDrawer=?, " +
+                "difference=?, note=?, managerId=? WHERE shiftCloseId=?;";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setLong(1, entity.getEmployeeShift().getEmployeeShiftId());
@@ -164,7 +168,8 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
             ps.setBigDecimal(3,entity.getCashInDrawer());
             ps.setBigDecimal(4, entity.getDifference());
             ps.setString(5, entity.getNote());
-            ps.setLong(6, entity.getShiftCloseId());
+            ps.setLong(6, entity.getManagerId());
+            ps.setLong(7, entity.getShiftCloseId());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {
@@ -198,6 +203,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
                     sc.setCashInDrawer(rs.getBigDecimal("cashInDrawer") );
                     sc.setDifference(rs.getBigDecimal("difference") );
                     sc.setNote(rs.getString("note"));
+                    sc.setManagerId(rs.getLong("managerId"));
                     sc.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
 
                     list.add(sc);
@@ -208,6 +214,142 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
 
         } catch (SQLException e) {
             log.error("Error finding ShiftClose by EmployeeShift: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+    public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
+        String sql = """
+        SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue
+        FROM Orders O
+        INNER JOIN EmployeeShift ES ON O.employeeId = ES.employeeId
+        WHERE ES.employeeShiftId = ?
+        AND CAST(O.orderDate AS DATE) = ES.shiftDate
+        AND O.orderTypeId = 1
+        AND O.paymentType = 'CASH'
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, employeeShiftId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("totalCashRevenue");
+                }
+                return BigDecimal.ZERO;
+            }
+
+        } catch (SQLException e) {
+            log.error("Error calculating total CASH revenue for shift: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+    public Employee validateManager(String username, String password) {
+        // Query lấy thông tin manager và password hash
+        String sql = "SELECT e.*, a.password as hashedPassword " +
+                "FROM Employee e " +
+                "INNER JOIN Account a ON e.accountId = a.accountId " +
+                "WHERE a.username = ? AND a.roleId = 'MANAGER';";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String hashedPassword = rs.getString("hashedPassword");
+
+                    // ✅ DÙNG PasswordUtil.checkPassword() ĐỂ XÁC THỰC
+                    if (PasswordUtil.checkPassword(password, hashedPassword)) {
+                        // Password đúng - Tạo Employee object
+                        Employee manager = new Employee();
+                        manager.setEmployeeId(rs.getLong("employeeId"));
+                        manager.setFullName(rs.getString("fullName"));
+                        manager.setPhone(rs.getString("phone"));
+                        manager.setEmail(rs.getString("email"));
+
+                        // Set thêm các field khác nếu cần
+                        try {
+                            manager.setHireDate(rs.getDate("hireDate").toLocalDate());
+                        } catch (Exception e) {
+                            log.warn("hireDate is null or invalid");
+                        }
+
+                        try {
+                            manager.setCitizenId(rs.getString("citizenId"));
+                        } catch (Exception e) {
+                            log.warn("citizenId is null");
+                        }
+
+                        try {
+                            manager.setGender(rs.getBoolean("gender"));
+                        } catch (Exception e) {
+                            log.warn("gender is null");
+                        }
+
+                        log.info("Manager validated successfully: {}", username);
+                        return manager;
+
+                    } else {
+                        log.warn("Wrong password for username: {}", username);
+                        return null;
+                    }
+                } else {
+                    log.warn("Username not found or not a manager: {}", username);
+                    return null;
+                }
+            }
+
+        } catch (SQLException e) {
+            log.error("Error validating manager: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+    public Employee getManagerById(Long managerId) {
+        String sql = "SELECT e.* FROM Employee e " +
+                "INNER JOIN Account a ON e.accountId = a.accountId " +
+                "WHERE e.employeeId = ? AND a.roleId = 'MANAGER';";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, managerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Employee manager = new Employee();
+                    manager.setEmployeeId(rs.getLong("employeeId"));
+                    manager.setFullName(rs.getString("fullName"));
+                    manager.setPhone(rs.getString("phone"));
+                    manager.setEmail(rs.getString("email"));
+
+                    return manager;
+                }
+            }
+
+            return null;
+
+        } catch (SQLException e) {
+            log.error("Error getting manager by ID: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Lấy tên manager theo ID
+     */
+    public String getManagerNameById(Long managerId) {
+        String sql = "SELECT fullName FROM Employee WHERE employeeId = ?;";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, managerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("fullName");
+                }
+            }
+
+            return null;
+
+        } catch (SQLException e) {
+            log.error("Error getting manager name: ", e);
             throw new RuntimeException(e);
         }
     }
