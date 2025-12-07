@@ -29,4 +29,10 @@ public enum BookingType {
         }
         throw new IllegalArgumentException("No enum constant for index: " + idx);
     }
+    public static int toIndex(BookingType bookingType){
+        return bookingType.ordinal();
+    }
+    public String getDisplayName() {
+        return displayName;
+    }
 }

@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.repository.TransferRoomRepository.BookingDTO;
@@ -12,6 +13,8 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class RoomTransferUI extends JPanel {
     private JPanel mainPanel;
@@ -28,11 +31,12 @@ public class RoomTransferUI extends JPanel {
 
     private final TransferRoomService service;
 
-    private List<BookingDTO> bookings = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
+    
     private Map<String, Room> currentRoomsMap = new HashMap<>();
     private List<Room> selectedOldRooms = new ArrayList<>();
     private List<Room> selectedNewRooms = new ArrayList<>();
-    private BookingDTO currentBooking = null;
+    private Order currentBooking = null;
     private BookingType currentBookingType = null;
 
     public RoomTransferUI() {
@@ -423,18 +427,19 @@ public class RoomTransferUI extends JPanel {
     }
 
     private void loadBookingsFromDatabase() {
-        bookings = service.getAllBookings();
+        orders = service.getAllOrders();
         loadBookingsToTable();
     }
 
     private void loadBookingsToTable() {
         bookingsModel.setRowCount(0);
-        for (BookingDTO booking : bookings) {
+        for (Order order : orders) {
+            String room = order.getBookings().stream().map(e -> e.getRoom().getRoomNumber()).collect(Collectors.joining(", "));
             bookingsModel.addRow(new Object[] {
-                    booking.cccd,
-                    booking.guestName,
-                    booking.rooms,
-                    service.getBookingTypeDisplay(booking.bookingType)
+                    order.getCustomer().getCitizenId(),
+                    order.getCustomer().getFullName(),
+                    room,
+                    order.getBookings().get(0).getBookingType().getDisplayName()
             });
         }
     }
@@ -444,25 +449,26 @@ public class RoomTransferUI extends JPanel {
         if (row == -1)
             return;
 
-        currentBooking = bookings.get(row);
-        currentBookingType = currentBooking.bookingType;
+        currentBooking = orders.get(row);
+        currentBookingType = currentBooking.getBookings().get(0).getBookingType();
 
         String typeDisplay = service.getBookingTypeDisplay(currentBookingType);
         bookingTypeLabel.setText(String.format(
                 "%s (%s) - Loại thuê: %s",
-                currentBooking.guestName,
-                currentBooking.cccd,
+                currentBooking.getCustomer().getFullName(),
+                currentBooking.getCustomer().getCitizenId(),
                 typeDisplay));
         bookingTypeLabel.setForeground(new Color(5, 150, 105));
 
-        List<Room> rooms = service.getRoomsByOrderAndType(currentBooking.orderId, currentBookingType);
+        List<Room> rooms = service.getRoomsByOrderAndType(currentBooking.getOrderId(), currentBookingType);
 
         currentRoomsMap.clear();
         currentRoomsModel.setRowCount(0);
 
         for (Room room : rooms) {
             currentRoomsMap.put(room.getRoomNumber(), room);
-            long price = service.getRoomPriceByType(room, currentBookingType);
+            // Tính giá với duration
+            long price = service.getRoomPriceWithDuration(room, currentBookingType, currentBooking.getOrderId());
             currentRoomsModel.addRow(new Object[] {
                     room.getRoomNumber(),
                     room.getRoomType().getName(),
@@ -539,12 +545,12 @@ public class RoomTransferUI extends JPanel {
             return;
         }
 
-        // Tạo custom dialog với kích thước lớn hơn và style đẹp hơn
         Room selectedRoom = showRoomSelectionDialog(available);
 
         if (selectedRoom != null && !selectedNewRooms.contains(selectedRoom)) {
             selectedNewRooms.add(selectedRoom);
-            long price = service.getRoomPriceByType(selectedRoom, currentBookingType);
+            // Hiển thị giá với duration cho phòng mới
+            long price = service.getRoomPriceWithDuration(selectedRoom, currentBookingType, currentBooking.getOrderId());
             newRoomsModel.addRow(new Object[] {
                     selectedRoom.getRoomNumber(),
                     selectedRoom.getRoomType().getName(),
@@ -561,7 +567,6 @@ public class RoomTransferUI extends JPanel {
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout(10, 10));
 
-        // Header với hiệu ứng
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(52, 152, 219));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -570,7 +575,6 @@ public class RoomTransferUI extends JPanel {
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
 
-        // Tạo list với custom renderer
         DefaultListModel<Room> listModel = new DefaultListModel<>();
         available.forEach(listModel::addElement);
 
@@ -583,7 +587,6 @@ public class RoomTransferUI extends JPanel {
         JScrollPane scrollPane = new JScrollPane(roomList);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -603,7 +606,6 @@ public class RoomTransferUI extends JPanel {
         cancelButton.setFocusPainted(false);
         cancelButton.setBorderPainted(false);
 
-        // Hiệu ứng hover cho buttons
         addButtonHoverEffect(selectButton, new Color(46, 204, 113), new Color(39, 174, 96));
         addButtonHoverEffect(cancelButton, new Color(231, 76, 60), new Color(192, 57, 43));
 
@@ -623,7 +625,6 @@ public class RoomTransferUI extends JPanel {
 
         cancelButton.addActionListener(e -> dialog.dispose());
 
-        // Double click để chọn nhanh
         roomList.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -648,7 +649,6 @@ public class RoomTransferUI extends JPanel {
         return selectedRoom[0];
     }
 
-    // Custom cell renderer để làm đẹp list items
     private class RoomListCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -681,7 +681,6 @@ public class RoomTransferUI extends JPanel {
         }
     }
 
-    // Thêm hiệu ứng hover cho button
     private void addButtonHoverEffect(JButton button, Color normalColor, Color hoverColor) {
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -731,13 +730,15 @@ public class RoomTransferUI extends JPanel {
             }
         }
 
-        if (currentBookingType == null) {
+        if (currentBookingType == null || currentBooking == null) {
             totalSurchargeField.setText("0đ");
             totalSurchargeField.setForeground(new Color(107, 114, 128));
             return;
         }
 
-        long surcharge = service.calculateSurcharge(selectedOldRooms, selectedNewRooms, currentBookingType);
+        // Tính phụ phí với duration
+        long surcharge = service.calculateSurcharge(selectedOldRooms, selectedNewRooms, 
+                                                     currentBookingType, currentBooking.getOrderId());
 
         if (surcharge > 0) {
             totalSurchargeField.setText(String.format("+%,dđ", surcharge));
@@ -753,7 +754,7 @@ public class RoomTransferUI extends JPanel {
 
     private void searchBooking() {
         String keyword = searchField.getText().trim();
-        bookings = service.searchBookings(keyword);
+        orders = orders.stream().filter(e -> e.getCustomer().getCitizenId().equals(keyword)).toList();
         loadBookingsToTable();
     }
 
@@ -775,15 +776,9 @@ public class RoomTransferUI extends JPanel {
             return;
         }
 
-        long oldTotal = selectedOldRooms.stream()
-                .mapToLong(r -> service.getRoomPriceByType(r, currentBookingType))
-                .sum();
-
-        long newTotal = selectedNewRooms.stream()
-                .mapToLong(r -> service.getRoomPriceByType(r, currentBookingType))
-                .sum();
-
-        long surcharge = newTotal - oldTotal;
+        // Tính tổng giá với duration
+        long surcharge = service.calculateSurcharge(selectedOldRooms, selectedNewRooms, 
+                                                     currentBookingType, currentBooking.getOrderId());
 
         String oldRoomNumbers = selectedOldRooms.stream()
                 .map(Room::getRoomNumber)
@@ -795,20 +790,18 @@ public class RoomTransferUI extends JPanel {
                 .reduce((a, b) -> a + ", " + b)
                 .orElse("");
 
-        String colorCode = surcharge >= 0 ? "red" : "green";
-        String surchargeLabel = surcharge >= 0 ? "Phụ phí" : "Hoàn lại";
-
         String message = String.format(
-                "Xác nhận chuyển phòng từ phòng cũ (%d) sang phòng mới (%d) với tổng giá thay đổi từ %,dđ thành %,dđ.",
-                selectedOldRooms.size(),
-                selectedNewRooms.size(),
-                oldTotal,
-                newTotal);
+                "Xác nhận chuyển phòng từ %s sang %s với phụ phí %s%,dđ?",
+                oldRoomNumbers,
+                newRoomNumbers,
+                surcharge >= 0 ? "+" : "",
+                surcharge);
+                
         int confirm = JOptionPane.showConfirmDialog(this, message, "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
-            BookingType bookingType = currentBooking.bookingType;
+            BookingType bookingType = currentBooking.getBookings().get(0).getBookingType();
             TransferRoomService.TransferResult result = service.transferRooms(
-                    currentBooking.orderId,
+                    currentBooking.getOrderId(),
                     selectedOldRooms,
                     selectedNewRooms,
                     bookingType);

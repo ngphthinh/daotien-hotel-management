@@ -2,6 +2,7 @@ package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
@@ -359,4 +360,76 @@ public class OrderRepository implements Repository<Order, Long> {
             throw new RuntimeException(e);
         }
     }
+
+    public List<Order> findAllOrders() {
+    String sql = """
+            SELECT
+                O.orderId, O.orderDate, O.totalAmount, O.employeeId,
+                O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
+                B.bookingId, B.checkInDate, B.checkOutDate,
+                B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
+                OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
+            FROM Orders O
+            JOIN Booking B ON O.orderId = B.orderId
+            JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+            JOIN Room R ON B.roomId = R.roomId
+            WHERE O.orderTypeId != 1
+            """;
+
+    List<Order> orders = new ArrayList<>();
+
+    try (PreparedStatement ps = connection.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        Map<Long, Order> orderMap = new HashMap<>();
+
+        while (rs.next()) {
+            long orderId = rs.getLong("orderId");
+            Order order = orderMap.get(orderId);
+            if (order == null) {
+                order = new Order();
+                order.setOrderId(orderId);
+                order.setOrderDate(rs.getTimestamp("orderDate").toLocalDateTime());
+                order.setTotalAmount(rs.getBigDecimal("totalAmount"));
+                order.setDeposit(rs.getBigDecimal("deposit"));
+
+                long orderTypeId = rs.getLong("otId");
+                OrderType orderType = new OrderType();
+                orderType.setOrderTypeId(orderTypeId);
+                orderType.setName(rs.getString("otName"));
+                order.setOrderType(orderType);
+
+                long customerId = rs.getLong("customerId");
+                if (!rs.wasNull()) {
+                    Customer customer = customerRepository.findById(customerId);
+                    order.setCustomer(customer);
+                }
+
+                order.setBookings(new ArrayList<>());
+                orderMap.put(orderId, order);
+            }
+
+            // Ánh xạ Booking
+            Booking booking = new Booking();
+            booking.setBookingId(rs.getLong("bookingId"));
+            booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
+            booking.setOrder(order);
+
+            // Lấy Room
+            Room room = new Room();
+            room.setRoomId(rs.getLong("roomId"));
+            room.setRoomNumber(rs.getString("rRoomNumber"));
+            booking.setRoom(room);
+
+            order.getBookings().add(booking);
+        }
+
+        orders.addAll(orderMap.values());
+        return orders;
+
+    } catch (SQLException e) {
+        log.error("Error retrieving Orders with Bookings and OrderType: ", e);
+        throw new RuntimeException(e);
+    }
+}
 }

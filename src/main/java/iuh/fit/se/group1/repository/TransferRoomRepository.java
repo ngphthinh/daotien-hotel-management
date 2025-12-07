@@ -82,6 +82,8 @@ public class TransferRoomRepository {
         return bookings;
     }
 
+    
+
     public List<BookingDTO> searchBookingsByCitizenId(String citizenId) {
         List<BookingDTO> bookings = new ArrayList<>();
         String sql = """
@@ -447,7 +449,7 @@ public class TransferRoomRepository {
         }
 
         return null;
-    }
+    } 
 
     /**
      * Thêm surcharge vào order

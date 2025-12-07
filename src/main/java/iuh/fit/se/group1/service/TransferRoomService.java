@@ -1,29 +1,44 @@
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
+import iuh.fit.se.group1.repository.OrderRepository;
 import iuh.fit.se.group1.repository.TransferRoomRepository;
 import iuh.fit.se.group1.repository.TransferRoomRepository.BookingDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransferRoomService {
     private static final Logger log = LoggerFactory.getLogger(TransferRoomService.class);
     private final TransferRoomRepository repository;
+    private final OrderRepository orderRepository = new OrderRepository();
 
     public TransferRoomService() {
         this.repository = new TransferRoomRepository();
     }
+    
 
     /**
      * Lấy tất cả bookings đang hoạt động
      */
+    
+
     public List<BookingDTO> getAllBookings() {
         return repository.getAllBookings();
+    }
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAllOrders();
     }
 
     /**
@@ -58,25 +73,109 @@ public class TransferRoomService {
     }
 
     /**
-     * Tính phụ phí chuyển phòng
+     * Tính số lượng thời gian thuê theo loại booking
      */
-    public long calculateSurcharge(List<Room> oldRooms, List<Room> newRooms, BookingType bookingType) {
-        long oldTotal = calculateTotalPrice(oldRooms, bookingType);
-        long newTotal = calculateTotalPrice(newRooms, bookingType);
+    private long calculateBookingDuration(LocalDateTime checkIn, LocalDateTime checkOut, BookingType bookingType) {
+        switch (bookingType) {
+            case HOURLY:
+                // Tính số giờ, làm tròn lên
+                long hours = Duration.between(checkIn, checkOut).toHours();
+                long minutes = Duration.between(checkIn, checkOut).toMinutes() % 60;
+                return minutes > 0 ? hours + 1 : hours;
+                
+            case DAILY:
+                // Tính số ngày, làm tròn lên
+                long days = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
+                // Nếu có thời gian check-out sau check-in trong ngày, cộng thêm 1 ngày
+                if (checkOut.toLocalTime().isAfter(checkIn.toLocalTime())) {
+                    days++;
+                }
+                return Math.max(1, days);
+                
+            case OVERNIGHT:
+                // Tính số đêm
+                long nights = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
+                return Math.max(1, nights);
+                
+            default:
+                return 1;
+        }
+    }
+
+    /**
+     * Tính phụ phí chuyển phòng với thông tin booking
+     */
+    public long calculateSurcharge(List<Room> oldRooms, List<Room> newRooms, 
+                                   BookingType bookingType, long orderId) {
+        // Lấy thông tin booking để biết thời gian thuê
+        Booking bookingInfo = repository.getBookingByOrderIdAndType(
+            orderId, bookingType.name(), oldRooms.get(0).getRoomId());
+        
+        if (bookingInfo == null) {
+            log.error("Cannot find booking info for orderId={}, bookingType={}", orderId, bookingType);
+            return 0;
+        }
+        
+        // Tính số lượng thời gian thuê
+        long duration = calculateBookingDuration(
+            bookingInfo.getCheckInDate(), 
+            bookingInfo.getCheckOutDate(), 
+            bookingType);
+        
+        log.info("Booking duration: {} {} for bookingType={}", 
+            duration, bookingType.name(), bookingType);
+        
+        // Tính tổng giá với duration
+        long oldTotal = calculateTotalPrice(oldRooms, bookingType, (int)duration);
+        long newTotal = calculateTotalPrice(newRooms, bookingType, (int)duration);
+        
+        log.info("Old total: {}, New total: {}, Surcharge: {}", 
+            oldTotal, newTotal, newTotal - oldTotal);
+        
         return newTotal - oldTotal;
     }
 
     /**
-     * Tính tổng giá phòng theo loại thuê
+     * Tính tổng giá phòng theo loại thuê và duration
      */
-    private long calculateTotalPrice(List<Room> rooms, BookingType bookingType) {
-        return rooms.stream()
-                .mapToLong(room -> getRoomPriceByType(room, bookingType))
-                .sum();
+    private long calculateTotalPrice(java.util.List<Room> rooms, BookingType bookingType, int timePlus ) {
+        String SINGLE_ROOM_TYPE = "SINGLE";
+        String DOUBLE_ROOM_TYPE = "DOUBLE";
+
+        RoomService roomService = new RoomService();
+        RoomTypeService roomTypeService = new RoomTypeService();
+        int index = BookingType.toIndex(bookingType);
+        RoomType singleRoomType = roomTypeService.getRoomTypeById(SINGLE_ROOM_TYPE);
+        RoomType doubleRoomType = roomTypeService.getRoomTypeById(DOUBLE_ROOM_TYPE);
+
+        RoomDTO singleRoom = roomService.toRoomDTO(singleRoomType);
+        RoomDTO doubleRoom = roomService.toRoomDTO(doubleRoomType);
+
+        Long singleRooms = rooms.stream()
+                .filter(room -> room.getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
+                .count();
+
+        Long doubleRooms = rooms.stream()
+                .filter(room -> room.getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
+                .count();
+
+        Map<RoomDTO, Long> map = new LinkedHashMap<>();
+        map.put(singleRoom, singleRooms);
+        map.put(doubleRoom, doubleRooms);
+
+        long totalPrice = 0L;
+        for (Map.Entry<RoomDTO, Long> entry : map.entrySet()) {
+            RoomDTO roomDTO = entry.getKey();
+            Long quantity = entry.getValue();
+            totalPrice += getPriceFromBookingTypeAndRoomType(index, roomDTO, timePlus) * quantity;
+        }
+
+        return totalPrice;
     }
 
+
     /**
-     * Lấy giá phòng theo loại thuê
+     * Lấy giá phòng theo loại thuê (đơn giá)
      */
     public long getRoomPriceByType(Room room, BookingType bookingType) {
         RoomType roomType = room.getRoomType();
@@ -90,6 +189,37 @@ public class TransferRoomService {
         };
 
         return price != null ? price.longValue() : 0;
+    }
+public Long getPriceFromBookingTypeAndRoomType(int bookingType, RoomDTO roomDTO, int timePlus) {
+        if (bookingType == 0) { // Theo giờ
+            return roomDTO.getHourlyRate().longValueExact() + ((timePlus - 1) * roomDTO.getAdditionalHourRate().longValueExact());
+        } else if (bookingType == 1) { // Theo ngày
+            return roomDTO.getDailyRate().longValueExact() * timePlus;
+        } else if (bookingType == 2) { // qua đêm
+            return roomDTO.getOvernightRate().longValueExact();
+        }
+        return 0L;
+    }
+    /**
+     * Lấy giá phòng đã tính duration để hiển thị (cho UI)
+     */
+    public long getRoomPriceWithDuration(Room room, BookingType bookingType, long orderId) {
+        long basePrice = getRoomPriceByType(room, bookingType);
+        
+        // Lấy thông tin booking để tính duration
+        Booking bookingInfo = repository.getBookingByOrderIdAndType(
+            orderId, bookingType.name(), room.getRoomId());
+        
+        if (bookingInfo == null) {
+            return basePrice; // Fallback về giá gốc nếu không tìm thấy
+        }
+        
+        long duration = calculateBookingDuration(
+            bookingInfo.getCheckInDate(), 
+            bookingInfo.getCheckOutDate(), 
+            bookingType);
+        
+        return basePrice * duration;
     }
 
     /**
@@ -109,8 +239,8 @@ public class TransferRoomService {
             return result;
         }
 
-        // Tính phụ phí
-        long surcharge = calculateSurcharge(oldRooms, newRooms, bookingType);
+        // Tính phụ phí với duration
+        long surcharge = calculateSurcharge(oldRooms, newRooms, bookingType, orderId);
         result.surcharge = surcharge;
 
         // Lấy danh sách ID
