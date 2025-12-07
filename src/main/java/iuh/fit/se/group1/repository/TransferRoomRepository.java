@@ -39,7 +39,13 @@ public class TransferRoomRepository {
                     JOIN Room r ON b.roomId = r.roomId
                     JOIN OrderType ot ON o.orderTypeId = ot.orderTypeId
                     WHERE o.orderTypeId IN (2, 3)
-                    AND b.checkInDate <= GETDATE()
+                    AND (
+                        -- CASE 1: Đã check-in và chưa check-out (cho tất cả loại thuê)
+                        (b.checkInDate <= GETDATE() AND b.checkOutDate >= GETDATE())
+                        OR
+                        -- CASE 2: Booking trong ngày hôm nay nhưng chưa check-in
+                        (CAST(b.checkInDate AS DATE) = CAST(GETDATE() AS DATE) AND b.checkInDate > GETDATE())
+                    )
                     GROUP BY c.citizenId, c.fullName, b.bookingType, o.orderId
                     ORDER BY c.citizenId, b.bookingType
                 """;
@@ -48,28 +54,34 @@ public class TransferRoomRepository {
                 ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                BookingDTO dto = new BookingDTO();
-                dto.bookingId = rs.getLong("bookingId");
-                dto.bookingIdDisplay = String.format("%d", rs.getLong("bookingId"));
-                dto.guestName = rs.getString("fullName");
-                dto.cccd = rs.getString("citizenId");
-                dto.bookingType = BookingType.valueOf(rs.getString("bookingType"));
-                dto.rooms = rs.getString("rooms");
-                dto.orderId = rs.getLong("orderId");
-                dto.orderTypeName = rs.getString("orderTypeName");
-                bookings.add(dto);
+                try {
+                    BookingDTO dto = new BookingDTO();
+                    dto.bookingId = rs.getLong("bookingId");
+                    dto.bookingIdDisplay = String.format("%d", rs.getLong("bookingId"));
+                    dto.guestName = rs.getString("fullName");
+                    dto.cccd = rs.getString("citizenId");
+
+                    String bookingTypeStr = rs.getString("bookingType");
+                    log.info("Found booking with type: {}", bookingTypeStr);
+
+                    dto.bookingType = BookingType.valueOf(bookingTypeStr);
+                    dto.rooms = rs.getString("rooms");
+                    dto.orderId = rs.getLong("orderId");
+                    dto.orderTypeName = rs.getString("orderTypeName");
+                    bookings.add(dto);
+                } catch (IllegalArgumentException e) {
+                    log.error("Invalid booking type: {}", rs.getString("bookingType"), e);
+                }
             }
 
         } catch (SQLException e) {
             log.error("Error getting bookings", e);
         }
 
+        log.info("Total bookings found: {}", bookings.size());
         return bookings;
     }
 
-    /**
-     * Tìm kiếm booking theo CCCD - nhóm theo CCCD + bookingType
-     */
     public List<BookingDTO> searchBookingsByCitizenId(String citizenId) {
         List<BookingDTO> bookings = new ArrayList<>();
         String sql = """
@@ -87,7 +99,13 @@ public class TransferRoomRepository {
                     JOIN Room r ON b.roomId = r.roomId
                     JOIN OrderType ot ON o.orderTypeId = ot.orderTypeId
                     WHERE o.orderTypeId IN (2, 3)
-                    AND b.checkInDate <= GETDATE()
+                    AND (
+                        -- CASE 1: Đã check-in và chưa check-out (cho tất cả loại thuê)
+                        (b.checkInDate <= GETDATE() AND b.checkOutDate >= GETDATE())
+                        OR
+                        -- CASE 2: Booking trong ngày hôm nay nhưng chưa check-in
+                        (CAST(b.checkInDate AS DATE) = CAST(GETDATE() AS DATE) AND b.checkInDate > GETDATE())
+                    )
                     AND c.citizenId LIKE ?
                     GROUP BY c.citizenId, c.fullName, b.bookingType, o.orderId
                     ORDER BY c.citizenId, b.bookingType
@@ -99,16 +117,22 @@ public class TransferRoomRepository {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                BookingDTO dto = new BookingDTO();
-                dto.bookingId = rs.getLong("bookingId");
-                dto.bookingIdDisplay = String.format("%d", rs.getLong("bookingId"));
-                dto.guestName = rs.getString("fullName");
-                dto.cccd = rs.getString("citizenId");
-                dto.bookingType = BookingType.valueOf(rs.getString("bookingType"));
-                dto.rooms = rs.getString("rooms");
-                dto.orderId = rs.getLong("orderId");
-                dto.orderTypeName = rs.getString("orderTypeName");
-                bookings.add(dto);
+                try {
+                    BookingDTO dto = new BookingDTO();
+                    dto.bookingId = rs.getLong("bookingId");
+                    dto.bookingIdDisplay = String.format("%d", rs.getLong("bookingId"));
+                    dto.guestName = rs.getString("fullName");
+                    dto.cccd = rs.getString("citizenId");
+
+                    String bookingTypeStr = rs.getString("bookingType");
+                    dto.bookingType = BookingType.valueOf(bookingTypeStr);
+                    dto.rooms = rs.getString("rooms");
+                    dto.orderId = rs.getLong("orderId");
+                    dto.orderTypeName = rs.getString("orderTypeName");
+                    bookings.add(dto);
+                } catch (IllegalArgumentException e) {
+                    log.error("Invalid booking type: {}", rs.getString("bookingType"), e);
+                }
             }
 
         } catch (SQLException e) {
