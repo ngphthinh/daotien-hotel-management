@@ -154,7 +154,9 @@ public class MainLayout extends JPanel {
                                     "Không thể mở trang giới thiệu trong trình duyệt!",
                                     "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
-                    } else {
+                    } else if (index == 12){ 
+                            setMainContent(new RoomTransferUI());
+                    }else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 } else {

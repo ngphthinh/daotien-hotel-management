@@ -177,7 +177,6 @@
             <artifactId>poi</artifactId>
             <version>5.2.5</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
@@ -204,7 +203,14 @@
                     <release>17</release>
                 </configuration>
             </plugin>
-
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>exec-maven-plugin</artifactId>
+    <version>3.1.0</version>
+    <configuration>
+        <mainClass>RoomTransferUI</mainClass>
+    </configuration>
+</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

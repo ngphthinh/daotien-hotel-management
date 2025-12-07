@@ -123,3 +123,55 @@ Dec 04, 2025 11:24:41 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 Dec 05, 2025 10:32:02 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
+Dec 07, 2025 9:44:44 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:44 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:44 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:44 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:45 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:46 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:46 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:46 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:46 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:46 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:46 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:47 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:47 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:47 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:48 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:48 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:44:48 AM iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+Dec 07, 2025 9:47:20 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+Dec 07, 2025 10:01:05 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 07, 2025 12:07:36 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 07, 2025 12:10:40 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 07, 2025 12:13:17 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 07, 2025 12:15:56 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 07, 2025 12:19:23 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 07, 2025 2:00:55 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 07, 2025 2:02:00 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
