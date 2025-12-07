@@ -4,10 +4,10 @@ import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
-import iuh.fit.se.group1.ui.component.booking2.BookingPage;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
+import iuh.fit.se.group1.ui.component.paymentv2.PaymentPagev2;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
 
 import iuh.fit.se.group1.util.Constants;
@@ -17,7 +17,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ public class MainLayout extends JPanel {
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
-    private SurchageManagement surchageManagement;
+    private SurchargeManagement surchargeManagement;
     private CloseShift closeShift;
     private Runnable logoutCallback;
 
@@ -100,7 +99,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 2) {
                         paymentPage.clearForm();
                         paymentPage.loadData();
-                        setMainContent(paymentPage);
+                        setMainContent(new PaymentPagev2());
                     } else if (index == 3 && subIndex == 1) {
                         setMainContent(shiftManagement);
                     } else if (index == 3 && subIndex == 2) {
@@ -119,7 +118,7 @@ public class MainLayout extends JPanel {
                         orderManagement.loadData();
                         setMainContent(orderManagement);
                     } else if (index == 9) {
-                        setMainContent(surchageManagement);
+                        setMainContent(surchargeManagement);
                     } else if (index == 10 && subIndex == 1) {
                         setMainContent(revenueStatistics);
                     } else if (index == 10 && subIndex == 2) {
@@ -300,7 +299,7 @@ public class MainLayout extends JPanel {
             orderManagement.setPaymentPage(paymentPage);
             checkForVersionPanel = new CheckForVersionPanel();
             revenueStatistics = new RevenueStatistics();
-            surchageManagement = new SurchageManagement();
+            surchargeManagement = new SurchargeManagement();
             setMainContent(dashboard);
         } else {
 

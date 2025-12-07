@@ -29,4 +29,8 @@ public enum BookingType {
         }
         throw new IllegalArgumentException("No enum constant for index: " + idx);
     }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 }

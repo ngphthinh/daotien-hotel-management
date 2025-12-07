@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.entity;
 
 
+import iuh.fit.se.group1.enums.PaymentType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,6 +21,15 @@ public class Order {
     private LocalDate createdAt;
     private List<Booking> bookings;
 
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    private PaymentType paymentType;
     public Order() {
         bookings = new java.util.ArrayList<>();
     }

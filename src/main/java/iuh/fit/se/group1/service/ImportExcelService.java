@@ -219,10 +219,10 @@ public class ImportExcelService {
                 p.setPromotionName(tenKM);
 
                 try {
-                    p.setDiscountPrice(giaKMStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(giaKMStr));
+                    p.setMinOrderAmount(giaKMStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(giaKMStr));
                 } catch (NumberFormatException e) {
                     System.err.println("Lỗi định dạng giá tại dòng " + (i + 1) + ": " + giaKMStr);
-                    p.setDiscountPrice(BigDecimal.ZERO);
+                    p.setMinOrderAmount(BigDecimal.ZERO);
                 }
 
                 try {

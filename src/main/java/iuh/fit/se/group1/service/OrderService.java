@@ -80,7 +80,11 @@ public class OrderService {
         return orderRepository.findAllBookingDisplay();
     }
 
-    public void updateOrderStatusToPaid(Long aLong, PaymentType eWallet, BigDecimal totalAmount) {
-        orderRepository.updateOrderStatusToPaid(aLong, eWallet, totalAmount);
+    public void updateOrderStatusToPaid(Order order) {
+        orderRepository.updateOrderStatusToPaid(order);
+    }
+
+    public List<Order> getUnpaidOrders() {
+        return orderRepository.findAllByOrderUnPaid();
     }
 }

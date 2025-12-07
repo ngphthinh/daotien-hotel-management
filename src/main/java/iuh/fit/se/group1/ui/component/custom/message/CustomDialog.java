@@ -51,7 +51,7 @@ public class CustomDialog extends JDialog {
         // Buttons
         JPanel btnPanel = new JPanel();
         btnPanel.setOpaque(false);
-        JButton ok = createButton("OK", new Color(56, 142, 60), new Color(102, 187, 106));
+        JButton ok = createButton("Xác nhận", new Color(56, 142, 60), new Color(102, 187, 106));
         ok.addActionListener((ActionEvent e) -> {
             result = JOptionPane.OK_OPTION;
             dispose();
@@ -94,6 +94,113 @@ public class CustomDialog extends JDialog {
         btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
+    }
+    private String inputValue = null;
+
+    public String getInputValue() {
+        return inputValue;
+    }
+    public CustomDialog(Frame parent, String title, String message, MessageType type, boolean showCancel,
+                        int width, int height, boolean isInputDialog) {
+
+        super(parent, title, true);
+        setUndecorated(true);
+        setSize(width, height);
+        setLocationRelativeTo(parent);
+        setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 25, 25));
+
+        JPanel background = new JPanel(new BorderLayout(15, 15)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(new Color(255, 255, 255, 240));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                g2.dispose();
+            }
+        };
+        background.setBorder(BorderFactory.createEmptyBorder(25, 25, 20, 25));
+        background.setOpaque(false);
+
+        // CENTER
+        JPanel center = new JPanel(new BorderLayout(10, 10));
+        center.setOpaque(false);
+
+        JLabel iconLabel = new JLabel(getIcon(type));
+        JLabel msgLabel = new JLabel("<html><body style='width:" + (width - 100) + "px'>" + message + "</body></html>");
+        msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+
+        center.add(iconLabel, BorderLayout.WEST);
+        center.add(msgLabel, BorderLayout.CENTER);
+
+        JTextField inputField = null;
+
+        if (isInputDialog) {
+            inputField = new JTextField();
+            inputField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            inputField.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.GRAY, 1),
+                    BorderFactory.createEmptyBorder(5, 5, 5, 5)
+            ));
+            center.add(inputField, BorderLayout.SOUTH);
+        }
+
+        // BUTTONS
+        JPanel btnPanel = new JPanel();
+        btnPanel.setOpaque(false);
+
+        JButton ok = createButton("Xác nhận", new Color(56, 142, 60), new Color(102, 187, 106));
+        JTextField finalInputField = inputField;
+
+        inputField.addActionListener(e -> {
+            result = JOptionPane.OK_OPTION;
+            if (isInputDialog) {
+                inputValue = finalInputField.getText();
+            }
+            dispose();
+        });
+
+        ok.addActionListener(e -> {
+            result = JOptionPane.OK_OPTION;
+            if (isInputDialog) {
+                inputValue = finalInputField.getText();
+            }
+            dispose();
+        });
+        btnPanel.add(ok);
+
+        if (showCancel) {
+            JButton cancel = createButton("Hủy", new Color(211, 47, 47), new Color(239, 83, 80));
+            cancel.addActionListener(e -> {
+                result = JOptionPane.CANCEL_OPTION;
+                dispose();
+            });
+            btnPanel.add(cancel);
+        }
+
+        background.add(center, BorderLayout.CENTER);
+        background.add(btnPanel, BorderLayout.SOUTH);
+
+        add(background);
+    }
+    public static String showInput(Component parent, String message, String title, MessageType type,
+                                   int width, int height) {
+
+        Frame frame = JOptionPane.getFrameForComponent(parent);
+
+        CustomDialog dialog = new CustomDialog(
+                frame, title, message, type,
+                true,     // có nút Cancel
+                width, height,
+                true      // đây là input dialog
+        );
+
+        dialog.setVisible(true);
+
+        if (dialog.result == JOptionPane.OK_OPTION)
+            return dialog.getInputValue();  // trả về text user nhập
+
+        return null; // Cancel hoặc đóng dialog
     }
 
     private Icon getIcon(MessageType type) {

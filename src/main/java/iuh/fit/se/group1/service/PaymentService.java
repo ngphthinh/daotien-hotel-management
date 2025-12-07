@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -36,17 +37,21 @@ public class PaymentService {
     }
 
     public String createPayment(Order order) throws Exception {
+
         String orderId = "HD:" + order.getOrderId() + "_" + System.currentTimeMillis();
         String requestId = String.valueOf(System.currentTimeMillis());
         String orderInfo = "Thanh toán đơn hàng " + orderId;
         String redirectUrl = "https://momo.vn/return";
-        String ipnUrl = "https://webhook.site/unique-id"; // URL webhook nhận thông báo
+        String ipnUrl = "https://webhook.site/unique-id";
 
-        // Tạo chuỗi rawHash
+        BigDecimal amount = order.getTotalAmount()
+                .subtract(order.getDeposit())
+                .setScale(0, RoundingMode.HALF_UP);
+
         String rawHash = String.format(
                 "accessKey=%s&amount=%s&extraData=&ipnUrl=%s&orderId=%s&orderInfo=%s&partnerCode=%s&redirectUrl=%s&requestId=%s&requestType=captureWallet",
                 ACCESS_KEY,
-                order.getTotalAmount().setScale(0, RoundingMode.HALF_UP).toPlainString(), // đảm bảo không có .00
+                amount.toPlainString(),
                 ipnUrl,
                 orderId,
                 orderInfo,
@@ -55,17 +60,14 @@ public class PaymentService {
                 requestId
         );
 
-
-
-        // Tạo chữ ký HMAC SHA256
         String signature = hmacSHA256(SECRET_KEY, rawHash);
-        // Dựng request JSON
+
         JsonObject jsonRequest = new JsonObject();
         jsonRequest.addProperty("partnerCode", PARTNER_CODE);
         jsonRequest.addProperty("partnerName", "Dao Tien Hotel");
         jsonRequest.addProperty("storeId", "defaultStore");
         jsonRequest.addProperty("requestId", requestId);
-        jsonRequest.addProperty("amount", order.getTotalAmount().subtract(order.getDeposit()));
+        jsonRequest.addProperty("amount", amount);   // <── Dùng đúng amount
         jsonRequest.addProperty("orderId", orderId);
         jsonRequest.addProperty("orderInfo", orderInfo);
         jsonRequest.addProperty("redirectUrl", redirectUrl);
@@ -75,7 +77,7 @@ public class PaymentService {
         jsonRequest.addProperty("requestType", "captureWallet");
         jsonRequest.addProperty("signature", signature);
 
-        return sendPost(ENDPOINT_CREATE,gson.toJson(jsonRequest));
+        return sendPost(ENDPOINT_CREATE, gson.toJson(jsonRequest));
     }
 
     /** Tạo chữ ký HMAC-SHA256 */

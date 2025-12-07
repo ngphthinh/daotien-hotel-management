@@ -2,6 +2,7 @@ package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
@@ -76,9 +77,9 @@ public class OrderRepository implements Repository<Order, Long> {
                 SELECT
                     O.orderId, O.orderDate, O.totalAmount, O.employeeId,
                     O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
-                    B.bookingId, B.checkInDate, B.checkOutDate,
+                    B.bookingId, B.checkInDate, B.checkOutDate,B.bookingType,
                     B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
-                    OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, fullName, gender,phone, rt.name as rtName, rt.roomTypeId,
+                    OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt,email, fullName, gender,phone,dateOfBirth,citizenId, rt.name as rtName, rt.roomTypeId,
                     R.roomNumber AS rRoomNumber
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
@@ -109,6 +110,9 @@ public class OrderRepository implements Repository<Order, Long> {
                         customer.setFullName(rs.getString("fullName"));
                         customer.setGender(rs.getBoolean("gender"));
                         customer.setPhone(rs.getString("phone"));
+                        customer.setDateOfBirth(rs.getDate("dateOfBirth").toLocalDate());
+                        customer.setCitizenId(rs.getString("citizenId"));
+                        customer.setEmail(rs.getString("email"));
 
                         // 🔹 Map Order
                         order = new Order();
@@ -132,6 +136,9 @@ public class OrderRepository implements Repository<Order, Long> {
 
                     Booking booking = new Booking();
                     booking.setBookingId(rs.getLong("bookingId"));
+                    booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                    booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
+                    booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
                     booking.setRoom(room);
 
                     order.addBooking(booking); // ✅ thêm từng booking vào order
@@ -278,16 +285,13 @@ public class OrderRepository implements Repository<Order, Long> {
 
     public List<Order> findAllByOrderUnPaid() {
         String sql = """
-                SELECT
-                    O.orderId, O.orderDate, O.totalAmount, O.employeeId,
-                    O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
-                    B.bookingId, B.checkInDate, B.checkOutDate,
-                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
-                    OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
+               
+                SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount, C.phone, C.fullName, R.roomNumber
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
                 JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
                 JOIN Room R ON B.roomId = R.roomId
+                Join Customer C ON O.customerId = C.customerId
                 WHERE O.orderTypeId = 2
                 """;
 
@@ -304,19 +308,12 @@ public class OrderRepository implements Repository<Order, Long> {
                 if (order == null) {
                     order = new Order();
                     order.setOrderId(orderId);
-                    order.setOrderDate(rs.getTimestamp("orderDate").toLocalDateTime());
                     order.setTotalAmount(rs.getBigDecimal("totalAmount"));
-                    order.setDeposit(rs.getBigDecimal("deposit"));
 
-                    long orderTypeId = rs.getLong("otId");
-                    OrderType orderType = new OrderType();
-                    orderType.setOrderTypeId(orderTypeId);
-                    orderType.setName(rs.getString("otName"));
-                    order.setOrderType(orderType);
-
-                    long customerId = rs.getLong("customerId");
                     if (!rs.wasNull()) {
-                        Customer customer = customerRepository.findById(customerId);
+                        Customer customer = new Customer();
+                        customer.setFullName(rs.getString("fullName"));
+                        customer.setPhone(rs.getString("phone"));
                         order.setCustomer(customer);
                     }
 
@@ -326,15 +323,13 @@ public class OrderRepository implements Repository<Order, Long> {
 
                 // Ánh xạ Booking
                 Booking booking = new Booking();
-                booking.setBookingId(rs.getLong("bookingId"));
-                booking.setOrder(order);
+                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
 
                 // Lấy Room
                 Room room = new Room();
-                room.setRoomId(rs.getLong("roomId"));
-                room.setRoomNumber(rs.getString("rRoomNumber"));
+                room.setRoomNumber(rs.getString("roomNumber"));
                 booking.setRoom(room);
-
                 order.getBookings().add(booking);
             }
 
@@ -347,15 +342,20 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
-    public void updateOrderStatusToPaid(Long aLong, PaymentType eWallet, BigDecimal totalAmount) {
-        String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ? WHERE orderId = ?";
+    public void updateOrderStatusToPaid(Order order) {
+            String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ? WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setBigDecimal(1, totalAmount);
-            preparedStatement.setString(2, eWallet.name());
-            preparedStatement.setLong(3, aLong);
+            preparedStatement.setBigDecimal(1, order.getTotalAmount());
+            preparedStatement.setString(2, order.getPaymentType().name());
+            if (order.getPromotion() != null) {
+                preparedStatement.setLong(3, order.getPromotion().getPromotionId());
+            } else {
+                preparedStatement.setNull(3, java.sql.Types.BIGINT);
+            }
+            preparedStatement.setLong(4, order.getOrderId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            log.error("Error updating order status to paid for Order ID {}: ", aLong, e);
+            log.error("Error updating order status to paid for Order ID {}: ", order.getOrderId(), e);
             throw new RuntimeException(e);
         }
     }

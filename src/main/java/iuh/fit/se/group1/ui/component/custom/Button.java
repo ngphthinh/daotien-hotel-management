@@ -27,8 +27,36 @@ public class Button extends JButton{
         setContentAreaFilled(false);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
-    
-    
+
+
+    public static Button createSuccessButton(String title, Icon icon) {
+        Button btn = new Button(title);
+        btn.setFont(new Font("Dialog", Font.BOLD, 14));
+        btn.setIcon(icon);
+        btn.setBorderRadius(5);
+        btn.setBackground(new Color(40, 167, 69));
+        btn.setForeground(Color.WHITE);
+        return btn;
+    }
+
+    public static Button createDangerButton(String title){
+        Button btn = new Button(title);
+        btn.setFont(new Font("Dialog", Font.BOLD, 14));
+        btn.setBackground(new Color(220, 53, 69));
+        btn.setForeground(Color.WHITE);
+        return btn;
+    }
+
+    public static Button createWarningButton(String title, Icon icon) {
+        Button btn = new Button(title);
+        btn.setFont(new Font("Dialog", Font.BOLD, 14));
+        btn.setIcon(icon);
+        btn.setBorderRadius(5);
+        btn.setBackground(new Color(255, 193, 7));
+        btn.setForeground(Color.WHITE);
+        return btn;
+    }
+
 
     /**
      * Set border radius
