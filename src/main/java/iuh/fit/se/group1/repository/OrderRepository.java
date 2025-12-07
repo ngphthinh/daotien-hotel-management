@@ -359,4 +359,68 @@ public class OrderRepository implements Repository<Order, Long> {
             throw new RuntimeException(e);
         }
     }
+
+    public List<Order> findUnpaidOrdersByKeyword(String keyword) {
+        String sql = """
+            SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount, 
+                   C.phone, C.fullName, R.roomNumber
+            FROM Orders O
+            JOIN Booking B ON O.orderId = B.orderId
+            JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+            JOIN Room R ON B.roomId = R.roomId
+            JOIN Customer C ON O.customerId = C.customerId
+            WHERE O.orderTypeId = 2 
+              AND (C.fullName LIKE ? OR C.phone LIKE ? OR R.roomNumber LIKE ?)
+            """;
+
+        List<Order> orders = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + keyword + "%");
+            ps.setString(2, "%" + keyword + "%");
+            ps.setString(3, "%" + keyword + "%");
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                Map<Long, Order> orderMap = new HashMap<>();
+
+                while (rs.next()) {
+                    long orderId = rs.getLong("orderId");
+
+                    Order order = orderMap.get(orderId);
+                    if (order == null) {
+                        order = new Order();
+                        order.setOrderId(orderId);
+                        order.setTotalAmount(rs.getBigDecimal("totalAmount"));
+
+                        Customer customer = new Customer();
+                        customer.setFullName(rs.getString("fullName"));
+                        customer.setPhone(rs.getString("phone"));
+                        order.setCustomer(customer);
+
+                        order.setBookings(new ArrayList<>());
+                        orderMap.put(orderId, order);
+                    }
+
+                    Booking booking = new Booking();
+                    booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                    booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
+
+                    Room room = new Room();
+                    room.setRoomNumber(rs.getString("roomNumber"));
+                    booking.setRoom(room);
+
+                    order.getBookings().add(booking);
+                }
+
+                orders.addAll(orderMap.values());
+                return orders;
+            }
+
+        } catch (SQLException e) {
+            log.error("Error retrieving Orders with Bookings and OrderType: ", e);
+            throw new RuntimeException(e);
+        }
+    }
 }

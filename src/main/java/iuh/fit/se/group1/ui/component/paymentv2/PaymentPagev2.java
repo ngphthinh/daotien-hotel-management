@@ -12,6 +12,8 @@ import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.util.Constants;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
@@ -69,28 +71,59 @@ public class PaymentPagev2 extends javax.swing.JPanel {
             sequencePayment1.setActiveStep(0);
             scrollPaneWin111.setViewportView(jPanel1);
         });
+
+        search1.setText("");
+        search1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                findPendingOrders(search1.getText().trim());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                findPendingOrders(search1.getText().trim());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
+
+    }
+
+    private void findPendingOrders(String keyword) {
+        tbl.clearData();
+
+        for (Order order : orderService.getUnpaidOrdersByKeyword(keyword)) {
+            displayOrderOnTable(order);
+        }
+    }
+
+    private void displayOrderOnTable(Order order) {
+        String rooms = order.getBookings().stream()
+                .map(e ->e.getRoom().getRoomNumber())
+                .collect(Collectors.joining(", "));
+
+        String checkIn = order.getBookings().get(0).getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String checkOut = order.getBookings().get(0).getCheckOutDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        tbl.addRow(
+                order.getOrderId().toString(),
+                order.getCustomer().getFullName(),
+                rooms,
+                order.getTotalAmount().doubleValue(),
+                checkIn,
+                checkOut,
+                order.getCustomer().getPhone()
+        );
     }
 
     private void loadDataTable() {
         tbl.clearData();
 
         for (Order order : orderService.getUnpaidOrders()) {
-            String rooms = order.getBookings().stream()
-                    .map(e ->e.getRoom().getRoomNumber())
-                    .collect(Collectors.joining(", "));
-
-            String checkIn = order.getBookings().get(0).getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            String checkOut = order.getBookings().get(0).getCheckOutDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-            tbl.addRow(
-                    order.getOrderId().toString(),
-                    order.getCustomer().getFullName(),
-                    rooms,
-                    order.getTotalAmount().doubleValue(),
-                    checkIn,
-                    checkOut,
-                    order.getCustomer().getPhone()
-            );
+            displayOrderOnTable(order);
         }
     }
 

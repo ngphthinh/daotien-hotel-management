@@ -3,14 +3,19 @@ package iuh.fit.se.group1.ui.component.booking2;
 import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.dto.RoomSelection;
 import iuh.fit.se.group1.entity.Room;
+import iuh.fit.se.group1.entity.RoomType;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.service.RoomService;
+import iuh.fit.se.group1.service.RoomTypeService;
 import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -211,21 +216,23 @@ public class MainFlow2 extends javax.swing.JPanel {
     }
 
     public void setBtnPrev(Button btnPrev) {
+
         this.btnPrev = btnPrev;
     }
+    
 
     public Long getPriceFromBookingTypeAndRoomType(int bookingType, RoomDTO roomDTO, int timePlus) {
         if (bookingType == 0) { // Theo giờ
             return roomDTO.getHourlyRate().longValueExact() + ((timePlus - 1) * roomDTO.getAdditionalHourRate().longValueExact());
         } else if (bookingType == 1) { // Theo ngày
-            return roomDTO.getDailyRate().longValueExact();
+            return roomDTO.getDailyRate().longValueExact() * timePlus;
         } else if (bookingType == 2) { // qua đêm
             return roomDTO.getOvernightRate().longValueExact();
         }
         return 0L;
     }
 
-    public void updateRoomList(Map<RoomDTO, Long> availableRooms, int adults, int children, RoomService roomService, int bookingIndex, int timePlus) {
+    public boolean updateRoomList(Map<RoomDTO, Long> availableRooms, int adults, int children, RoomService roomService, int bookingIndex, int timePlus) {
         long singleQuantity = 0;
         long doubleQuantity = 0;
 
@@ -242,6 +249,10 @@ public class MainFlow2 extends javax.swing.JPanel {
 
         Map<String, Long> optimizeRoomAllocation = roomService.optimizeRoomAllocation((int) singleQuantity, (int) doubleQuantity, adults, children);
 
+        if (optimizeRoomAllocation.get("unaccommodatedGuests") > 0){
+            CustomDialog.showMessage(this, "Không đủ phòng để đáp ứng số lượng khách!","Không đủ phòng", CustomDialog.MessageType.ERROR,500,200);
+            return false;
+        }
 
         var model = (CustomTable.CustomTableModel) tbl.getModel();
         int row = 0;
@@ -326,6 +337,7 @@ public class MainFlow2 extends javax.swing.JPanel {
             lblMessage.setText(message);
             lblTotalRoom.setText(getTotalPriceRoom((Number) tbl.getValueAt(0, 3), (Number) tbl.getValueAt(1,3)));
         });
+        return true;
     }
 
     public String getTotalPriceRoom(Number priceSingle, Number priceDouble) {

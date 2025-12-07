@@ -48,11 +48,9 @@ public class RoomService {
     }
 
     public RoomDTO toRoomDTO(RoomType rt) {
-
         if (rt == null) {
             return null;
         }
-
         int capacity = rt.getRoomTypeId().equals(SINGLE_ROOM_TYPE) ? 2 : 4;
 
 
@@ -65,6 +63,7 @@ public class RoomService {
                 rt.getAdditionalHourRate()
         );
     }
+
 
 
 

@@ -5,7 +5,9 @@
 package iuh.fit.se.group1.ui.component.booking2;
 
 import iuh.fit.se.group1.entity.Customer;
+import iuh.fit.se.group1.service.CustomerService;
 import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 
 import javax.swing.*;
@@ -19,6 +21,13 @@ import java.time.format.ResolverStyle;
  * @author THIS PC
  */
 public class MainFlow4 extends javax.swing.JPanel {
+    public TextField getTxtDob() {
+        return txtDob;
+    }
+
+    public void setTxtDob(TextField txtDob) {
+        this.txtDob = txtDob;
+    }
 
     public Button getBtnNext() {
         return btnNext;
@@ -89,9 +98,9 @@ public class MainFlow4 extends javax.swing.JPanel {
             }
         }
 
-        // Validate số điện thoại VN hoặc quốc tế
-        // VN: 10 số, bắt đầu bằng 0 hoặc +84
-        String regexPhone = "^(0\\d{9}|\\+?\\d{10,15})$";
+        // Validate số điện thoại VN
+        // VN: 10 số, bắt đầu bằng 0
+        String regexPhone = "^0\\d{9}$";
         if (!phone.matches(regexPhone)) {
             showError("Số điện thoại không hợp lệ!", 500, 200);
             return false;
@@ -338,6 +347,21 @@ public class MainFlow4 extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtCitizenIdOrPassportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCitizenIdOrPassportActionPerformed
+        CustomerService customerService = new CustomerService();
+        String citizenId = txtCitizenIdOrPassport.getText().trim();
+        Customer existingCustomer = customerService.getCustomerByCitizenId(citizenId);
+        if (existingCustomer != null) {
+            txtFullName.setText(existingCustomer.getFullName());
+            txtEmail.setText(existingCustomer.getEmail());
+            txtPhone.setText(existingCustomer.getPhone());
+
+            DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dobStr = existingCustomer.getDateOfBirth().format(outputFormat);
+            txtDob.setText(dobStr);
+
+            rdoGender.setSelectedGender(existingCustomer.isGender());
+            return;
+        }
         txtFullName.requestFocus();
     }//GEN-LAST:event_txtCitizenIdOrPassportActionPerformed
 
@@ -356,12 +380,15 @@ public class MainFlow4 extends javax.swing.JPanel {
     }//GEN-LAST:event_txtPhoneActionPerformed
 
     private void txtDobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDobActionPerformed
+    }//GEN-LAST:event_txtDobActionPerformed
+
+    public boolean setupDob() {
         DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("ddMMyyyy");
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String dob = txtDob.getText().trim();
 
         if (!validateDate(dob)) {
-            return;
+            return false;
         }
 
         if (dob.contains("/")) {
@@ -373,8 +400,8 @@ public class MainFlow4 extends javax.swing.JPanel {
         String rs = date.format(outputFormat);
 
         txtDob.setText(rs);
-
-    }//GEN-LAST:event_txtDobActionPerformed
+        return true;
+    }
 
     public boolean validateDate(String date) {
 
@@ -385,12 +412,11 @@ public class MainFlow4 extends javax.swing.JPanel {
 
         date = date.trim();
 
-        // Chuẩn hóa: Nếu có dấu "/" → bỏ hết để thành ddMMyyyy
+        // Nếu có dấu "/", bỏ để thành ddMMyyyy
         if (date.contains("/")) {
             date = date.replace("/", "");
         }
 
-        // Kiểm tra đúng 8 ký tự số
         if (!date.matches("\\d{8}")) {
             showError("Định dạng ngày sinh không hợp lệ (ddMMyyyy hoặc dd/MM/yyyy)!", 550, 200);
             return false;
@@ -412,6 +438,12 @@ public class MainFlow4 extends javax.swing.JPanel {
                 return false;
             }
 
+            // ⭐️ Kiểm tra phải >= 18 tuổi
+            if (dob.isAfter(LocalDate.now().minusYears(18))) {
+                showError("Khách hàng phải từ 18 tuổi trở lên!", 500, 200);
+                return false;
+            }
+
         } catch (Exception e) {
             showError("Ngày sinh không hợp lệ!", 500, 200);
             return false;
@@ -419,19 +451,52 @@ public class MainFlow4 extends javax.swing.JPanel {
         return true;
     }
 
+
     public Customer getCustomer(){
+        String citizenIdOrPassport = txtCitizenIdOrPassport.getText().trim();
+        String fullName = txtFullName.getText().trim();
+        String email = txtEmail.getText().trim();
+        String phone = txtPhone.getText().trim();
+
+        CustomerService customerService = new CustomerService();
+
+        Customer customerSaveDB = customerService.getCustomerByCitizenId(citizenIdOrPassport);
+
+        if (customerSaveDB != null) {
+            boolean needUpdate = false;
+
+            if (!customerSaveDB.getEmail().equals(email)) {
+                customerSaveDB.setEmail(email);
+                needUpdate = true;
+            }
+
+            if (!customerSaveDB.getPhone().equals(phone)) {
+                customerSaveDB.setPhone(phone);
+                needUpdate = true;
+            }
+
+            if (needUpdate) {
+                return customerService.updateCustomer(customerSaveDB);
+            }
+            return customerSaveDB;
+        }
+
+        // Nếu chưa có trong DB → tạo mới
         Customer customer = new Customer();
-        customer.setCitizenId(txtCitizenIdOrPassport.getText().trim());
-        customer.setFullName(formatName( txtFullName.getText().trim()));
-        customer.setEmail(txtEmail.getText().trim());
-        customer.setPhone(txtPhone.getText().trim());
+        customer.setCitizenId(citizenIdOrPassport);
+        customer.setFullName(formatName(fullName));
+        customer.setEmail(email);
+        customer.setPhone(phone);
 
         DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dob = LocalDate.parse( txtDob.getText().trim(), inputFormat);
+        LocalDate dob = LocalDate.parse(txtDob.getText().trim(), inputFormat);
+
         customer.setDateOfBirth(dob);
         customer.setGender(rdoGender.getSelectedGender());
+
         return customer;
     }
+
 
     public void reset() {
         txtCitizenIdOrPassport.setText("");

@@ -792,6 +792,38 @@ public class PaymentMain extends javax.swing.JPanel {
     private void saveOrder() {
          saveSurchargesByOrderId(currentOrder.getOrderId());
         orderService.updateOrderStatusToPaid(currentOrder);
+        resetPanel();
+
+    }
+
+    private void resetPanel() {
+        lblTotalPrice.setText("");
+        lblTotalPricePayment.setText("");
+        lblDeposit.setText("");
+        lblPromotionName.setText("");
+        lblPromotion.setText("");
+        DefaultTableModel modelSurcharge = (DefaultTableModel) tblSurcharge.getModel();
+        modelSurcharge.setRowCount(0);
+        DefaultTableModel modelAmenity = (DefaultTableModel) tblAmenity.getModel();
+        modelAmenity.setRowCount(0);
+
+        lblFullName.setText("");
+        lblPhone.setText("");
+        lblEmail.setText("");
+        lblCitizenid.setText("");
+        lblDob.setText("");
+        lblGender.setText("");
+
+        lblCheckIn.setText("");
+        lblCheckOut.setText("");
+        lblTotalRoom.setText("");
+        currentOrder = null;
+        promotion = null;
+
+
+
+
+
     }
 
     private void saveSurchargesByOrderId(Long orderId) {
@@ -857,7 +889,7 @@ public class PaymentMain extends javax.swing.JPanel {
                     String responseCheck = paymentService.queryPayment(orderId);
                     String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
                     String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
-                    if (!"0".equals(responseCodeCheck)) {
+                    if ("0".equals(responseCodeCheck)) {
                         CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS,380,200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
