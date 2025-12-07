@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.repository.AmenityRepository;
 
@@ -25,13 +26,25 @@ public class AmenityService {
     }
 
 
-
     public Amenity updateAmenity(Amenity amenity) {
         return amenityRepository.update(amenity);
     }
 
     public List<Amenity> getAmenityByKeyword(String keyword) {
         return amenityRepository.findByAmenityNameOrId(keyword);
+    }
+
+
+    public AmenityDTO toAmenityDTO(Amenity amenity) {
+        if (amenity == null) {
+            return null;
+        }
+
+        return new AmenityDTO(
+                amenity.getAmenityId(),
+                amenity.getNameAmenity(),
+                amenity.getPrice().doubleValue(), 0
+        );
     }
 
 }

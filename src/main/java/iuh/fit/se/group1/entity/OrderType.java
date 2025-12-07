@@ -3,7 +3,8 @@ package iuh.fit.se.group1.entity;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class OrderType {
+public class
+OrderType {
     private Long orderTypeId;
     private String name;
     private LocalDate createdAt;

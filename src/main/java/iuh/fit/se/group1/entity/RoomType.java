@@ -1,11 +1,16 @@
 package iuh.fit.se.group1.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class RoomType {
     private String roomTypeId;
     private String name;
+    private BigDecimal hourlyRate;
+    private BigDecimal dailyRate;
+    private BigDecimal overnightRate;
+    private BigDecimal additionalHourRate;
     private LocalDate createdAt;
 
     public RoomType(String name) {
@@ -19,6 +24,48 @@ public class RoomType {
         this.roomTypeId = roomTypeId;
         this.name = name;
         this.createdAt = createdAt;
+    }
+
+    public RoomType(String roomTypeId, String name, BigDecimal hourlyRate, BigDecimal dailyRate, BigDecimal overnightRate, BigDecimal additionalHourRate, LocalDate createdAt) {
+        this.roomTypeId = roomTypeId;
+        this.name = name;
+        this.hourlyRate = hourlyRate;
+        this.dailyRate = dailyRate;
+        this.overnightRate = overnightRate;
+        this.additionalHourRate = additionalHourRate;
+        this.createdAt = createdAt;
+    }
+
+    public BigDecimal getHourlyRate() {
+        return hourlyRate;
+    }
+
+    public void setHourlyRate(BigDecimal hourlyRate) {
+        this.hourlyRate = hourlyRate;
+    }
+
+    public BigDecimal getDailyRate() {
+        return dailyRate;
+    }
+
+    public void setDailyRate(BigDecimal dailyRate) {
+        this.dailyRate = dailyRate;
+    }
+
+    public BigDecimal getOvernightRate() {
+        return overnightRate;
+    }
+
+    public void setOvernightRate(BigDecimal overnightRate) {
+        this.overnightRate = overnightRate;
+    }
+
+    public BigDecimal getAdditionalHourRate() {
+        return additionalHourRate;
+    }
+
+    public void setAdditionalHourRate(BigDecimal additionalHourRate) {
+        this.additionalHourRate = additionalHourRate;
     }
 
     public String getRoomTypeId() {

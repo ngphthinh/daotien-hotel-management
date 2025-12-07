@@ -67,11 +67,11 @@ protected JButton createArrowButton() {
 
             Color bg = comboBox.isPopupVisible() ? hoverBackground : background;
             g2.setColor(bg);
-            g2.fillRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 10, 10);
+            g2.fillRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 5, 5);
 
             // Border
             g2.setColor(comboBox.hasFocus() ? focusBorder : borderColor);
-            g2.drawRoundRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1, 10, 10);
+            g2.drawRoundRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1, 5, 5);
 
             g2.dispose();
         }

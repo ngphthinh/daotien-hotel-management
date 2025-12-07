@@ -2,7 +2,6 @@ package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
-import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
@@ -20,40 +19,39 @@ public class OrderRepository implements Repository<Order, Long> {
     private static final Logger log = LoggerFactory.getLogger(OrderRepository.class);
 
     private final CustomerRepository customerRepository;
-    private final BookingRepository bookingRepository;
     private final Connection connection;
 
     public OrderRepository() {
         this.customerRepository = new CustomerRepository();
-        this.bookingRepository = new BookingRepository();
         this.connection = DatabaseUtil.getConnection();
     }
 
     @Override
     public Order save(Order entity) {
-        String sql = "INSERT INTO Orders (orderDate, employeeId, orderTypeId, customerId, promotionId, deposit) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Orders (orderDate, totalAmount ,employeeId, orderTypeId, customerId, promotionId, deposit) VALUES (?, ?, ?, ?, ?, ?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setTimestamp(1, Timestamp.valueOf(entity.getOrderDate()));
-            preparedStatement.setLong(2, entity.getEmployee().getEmployeeId());
-            preparedStatement.setLong(3, entity.getOrderType().getOrderTypeId());
+            preparedStatement.setBigDecimal(2, entity.getTotalAmount()); // totalAmount ban đầu là 0
+            preparedStatement.setLong(3, entity.getEmployee().getEmployeeId());
+            preparedStatement.setLong(4, entity.getOrderType().getOrderTypeId());
 
             if (entity.getCustomer() != null) {
                 Customer existingCustomer = customerRepository.findByCitizenId(entity.getCustomer().getCitizenId());
                 if (existingCustomer == null) {
                     Customer customerSave = customerRepository.save(entity.getCustomer());
-                    preparedStatement.setLong(4, customerSave.getCustomerId());
+                    preparedStatement.setLong(5, customerSave.getCustomerId());
                 } else {
-                    preparedStatement.setLong(4, existingCustomer.getCustomerId());
+                    preparedStatement.setLong(5, existingCustomer.getCustomerId());
                 }
             }
 
             if (entity.getPromotion() != null) {
-                preparedStatement.setLong(5, entity.getPromotion().getPromotionId());
+                preparedStatement.setLong(6, entity.getPromotion().getPromotionId());
             } else {
-                preparedStatement.setNull(5, java.sql.Types.BIGINT);
+                preparedStatement.setNull(6, java.sql.Types.BIGINT);
             }
 
-            preparedStatement.setBigDecimal(6, entity.getDeposit());
+            preparedStatement.setBigDecimal(7, entity.getDeposit());
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Insert failed, no rows affected.");
@@ -63,15 +61,6 @@ public class OrderRepository implements Repository<Order, Long> {
                 if (generatedKeys.next()) {
                     entity.setOrderId(generatedKeys.getLong(1));
                 }
-            }
-
-
-            if (entity.getBookings() != null && !entity.getBookings().isEmpty()) {
-                List<Booking> bookingsSave = new ArrayList<>();
-                for (var booking : entity.getBookings()) {
-                    bookingsSave.add(bookingRepository.save(booking));
-                }
-                entity.setBookings(bookingsSave);
             }
 
             return entity;
@@ -87,8 +76,8 @@ public class OrderRepository implements Repository<Order, Long> {
                 SELECT
                     O.orderId, O.orderDate, O.totalAmount, O.employeeId,
                     O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
-                    B.bookingId, B.checkInDate, B.checkOutDate, B.employeeId AS bookingEmployeeId,
-                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.totalPrice, B.createdAt AS bookingCreatedAt,
+                    B.bookingId, B.checkInDate, B.checkOutDate,
+                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
                     OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, fullName, gender,phone, rt.name as rtName, rt.roomTypeId,
                     R.roomNumber AS rRoomNumber
                 FROM Orders O
@@ -143,10 +132,6 @@ public class OrderRepository implements Repository<Order, Long> {
 
                     Booking booking = new Booking();
                     booking.setBookingId(rs.getLong("bookingId"));
-                    booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
-                    booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
-                    booking.setBookingType(BookingType.valueOf(rs.getString("bookingType")));
-                    booking.setTotalPrice(rs.getBigDecimal("totalPrice"));
                     booking.setRoom(room);
 
                     order.addBooking(booking); // ✅ thêm từng booking vào order
@@ -172,8 +157,8 @@ public class OrderRepository implements Repository<Order, Long> {
                 SELECT
                     O.orderId, O.orderDate, O.totalAmount, O.employeeId,
                     O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
-                    B.bookingId, B.checkInDate, B.checkOutDate, B.employeeId AS bookingEmployeeId,
-                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.totalPrice, B.createdAt AS bookingCreatedAt,
+                    B.bookingId, B.checkInDate, B.checkOutDate,
+                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
                     OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
@@ -217,10 +202,6 @@ public class OrderRepository implements Repository<Order, Long> {
                 // Ánh xạ Booking
                 Booking booking = new Booking();
                 booking.setBookingId(rs.getLong("bookingId"));
-                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
-                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
-                booking.setBookingType(BookingType.valueOf(rs.getString("bookingType")));
-                booking.setTotalPrice(rs.getBigDecimal("totalPrice"));
                 booking.setOrder(order);
 
                 // Lấy Room
@@ -300,8 +281,8 @@ public class OrderRepository implements Repository<Order, Long> {
                 SELECT
                     O.orderId, O.orderDate, O.totalAmount, O.employeeId,
                     O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
-                    B.bookingId, B.checkInDate, B.checkOutDate, B.employeeId AS bookingEmployeeId,
-                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.totalPrice, B.createdAt AS bookingCreatedAt,
+                    B.bookingId, B.checkInDate, B.checkOutDate,
+                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
                     OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
@@ -346,10 +327,6 @@ public class OrderRepository implements Repository<Order, Long> {
                 // Ánh xạ Booking
                 Booking booking = new Booking();
                 booking.setBookingId(rs.getLong("bookingId"));
-                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
-                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
-                booking.setBookingType(BookingType.valueOf(rs.getString("bookingType")));
-                booking.setTotalPrice(rs.getBigDecimal("totalPrice"));
                 booking.setOrder(order);
 
                 // Lấy Room

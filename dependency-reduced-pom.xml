@@ -26,7 +26,7 @@
               <transformers>
                 <transformer />
                 <transformer>
-                  <mainClass>iuh.fit.se.group1.ui.layout.MainLayout</mainClass>
+                  <mainClass>iuh.fit.se.group1.Main</mainClass>
                 </transformer>
               </transformers>
               <filters>

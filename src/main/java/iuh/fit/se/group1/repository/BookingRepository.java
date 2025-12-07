@@ -1,7 +1,10 @@
 package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.entity.Booking;
+import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -10,6 +13,7 @@ import java.util.List;
 
 public class BookingRepository implements Repository<Booking, Long>{
 
+    private static final Logger log = LoggerFactory.getLogger(BookingRepository.class);
     private final Connection connection;
 
     public BookingRepository() {
@@ -38,20 +42,18 @@ public class BookingRepository implements Repository<Booking, Long>{
     @Override
     public Booking save(Booking entity) {
         String sql = """
-            INSERT INTO Booking(checkInDate, checkOutDate, employeeId, orderId, roomId, bookingType, totalPrice, createdAt)
-            values (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Booking(checkInDate, checkOutDate, orderId, roomId, bookingType, createdAt)
+            values (?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setTimestamp(1, Timestamp.valueOf(entity.getCheckInDate()));
             preparedStatement.setTimestamp(2, Timestamp.valueOf(entity.getCheckOutDate()));
-            preparedStatement.setLong(3, entity.getEmployee().getEmployeeId());
-            preparedStatement.setLong(4, entity.getOrder().getOrderId());
-            preparedStatement.setLong(5, entity.getRoom().getRoomId());
-            preparedStatement.setString(6, entity.getBookingType().toString());
-            preparedStatement.setBigDecimal(7, entity.getTotalPrice());
+            preparedStatement.setLong(3, entity.getOrder().getOrderId());
+            preparedStatement.setLong(4, entity.getRoom().getRoomId());
+            preparedStatement.setString(5, entity.getBookingType().toString());
             entity.setCreatedAt(LocalDate.now());
-            preparedStatement.setDate(8, java.sql.Date.valueOf(entity.getCreatedAt()));
+            preparedStatement.setDate(6, java.sql.Date.valueOf(entity.getCreatedAt()));
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -88,5 +90,12 @@ public class BookingRepository implements Repository<Booking, Long>{
     @Override
     public Booking update(Booking entity) {
         return null;
+    }
+
+    public void saveAllBookingsForOrder(Order savedOrder, List<Booking> bookings) {
+        for (Booking booking : bookings) {
+            booking.setOrder(savedOrder);
+            this.save(booking);
+        }
     }
 }
