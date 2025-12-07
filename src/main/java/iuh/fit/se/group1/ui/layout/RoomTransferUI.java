@@ -170,7 +170,7 @@ public class RoomTransferUI extends JPanel {
                 new LineBorder(new Color(251, 191, 36), 2, true),
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)));
 
-        bookingTypeLabel = new JLabel("Chưa chọn booking - Vui lòng chọn booking để bắt đầu");
+        bookingTypeLabel = new JLabel("Chưa chọn phòng - Vui lòng chọn phòng để bắt đầu");
         bookingTypeLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
         bookingTypeLabel.setForeground(new Color(146, 64, 14));
         bookingTypePanel.add(bookingTypeLabel);
@@ -479,7 +479,7 @@ public class RoomTransferUI extends JPanel {
     private void selectOldRooms() {
         if (currentBooking == null) {
             CustomDialog.showMessage(this,
-                    "Vui lòng chọn booking trước!",
+                    "Vui lòng chọn phòng trước!",
                     "Thông báo",
                     CustomDialog.MessageType.WARNING, 400, 200);
             return;
@@ -514,7 +514,7 @@ public class RoomTransferUI extends JPanel {
     private void showAvailableRooms(String roomTypeId) {
         if (currentBooking == null) {
             CustomDialog.showMessage(this,
-                    "Vui lòng chọn booking!",
+                    "Vui lòng chọn phòng đã đặt!",
                     "Lỗi",
                     CustomDialog.MessageType.ERROR, 380, 180);
             return;
@@ -858,7 +858,7 @@ public class RoomTransferUI extends JPanel {
         currentBookingType = null;
         currentRoomsMap.clear();
 
-        bookingTypeLabel.setText("Chưa chọn booking - Vui lòng chọn booking để bắt đầu");
+        bookingTypeLabel.setText("Chưa chọn phòng đã đặt - Vui lòng chọn để bắt đầu");
         bookingTypeLabel.setForeground(new Color(146, 64, 14));
 
         updateSummary();
