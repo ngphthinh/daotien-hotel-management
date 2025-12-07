@@ -819,6 +819,29 @@ public class MainFlow5 extends javax.swing.JPanel {
     }
 
 
+    public void reset() {
+        lblCheckIn.setText("");
+        lblCheckOut.setText("");
+        lblNumberOfAdult.setText("");
+        lblNumberOfChildren.setText("");
+        lblSingleRooms.setText("");
+        lblDoubleRooms.setText("");
+        lblBookingType.setText("");
+        lblTotalRoom.setText("");
+        lblTotalAmenity.setText("");
+        lblFullName.setText("");
+        lblPhone.setText("");
+        lblEmail.setText("");
+        lblCitizenid.setText("");
+        lblDob.setText("");
+        lblGender.setText("");
+        lblSurchargeHoliday.setText("");
+        lblDeposit.setText("");
+        lblTotalPrice.setText("");
+
+        DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+        model.setRowCount(0);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnComplete;

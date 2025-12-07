@@ -2,14 +2,25 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package iuh.fit.se.group1.ui.component.booking2;
+package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.dto.RoomSelection;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.service.OrderService;
 import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.service.SurchargeService;
+import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
+import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow2;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow2;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow3;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow3;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow4;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow4;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow5;
+import iuh.fit.se.group1.ui.component.booking2.MainFlow5;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 
 import java.awt.event.MouseAdapter;
@@ -19,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -38,6 +50,8 @@ public class BookingPage extends javax.swing.JPanel {
     private MainFlow2 mainFlow2;
     private MainFlow4 mainFlow4;
     private MainFlow5 mainFlow5;
+
+
 
 
     private static final String[] bookingType = {"Theo giờ", "Theo ngày", "Qua đêm"};
@@ -72,8 +86,10 @@ public class BookingPage extends javax.swing.JPanel {
             if (!validateInputStep1()) {
                 return;
             }
+            if (!findRoom()) {
+                return;
+            }
             sequenceBooking.setActiveStep(1);
-            findRoom();
             scrollPaneWin111.setViewportView(mainFlow2);
         });
 
@@ -106,11 +122,29 @@ public class BookingPage extends javax.swing.JPanel {
         mainFlow4.getBtnNext().addActionListener(e -> {
             if (!mainFlow4.validateInput()) {
                 return;
+            }else
+            if (!mainFlow4.setupDob()){
+                return;
             }
             setupInfoStep5();
             sequenceBooking.setActiveStep(4);
             scrollPaneWin111.setViewportView(mainFlow5);
 
+        });
+
+        mainFlow4.getTxtDob().addActionListener(l->{
+
+            if (!mainFlow4.validateInput()) {
+                return;
+            }else
+
+            if (!mainFlow4.setupDob()){
+                return;
+            }
+
+            setupInfoStep5();
+            sequenceBooking.setActiveStep(4);
+            scrollPaneWin111.setViewportView(mainFlow5);
         });
 
         mainFlow5.getBtnPrev().addActionListener(e -> {
@@ -153,6 +187,9 @@ public class BookingPage extends javax.swing.JPanel {
     }
 
     private void createOrder() {
+
+
+
         var orderRs = mainFlow5.buildOrder(currentEmployee, mainFlow4.getCustomer(), selectedRooms, surchargeService);
 
         Order order = orderRs.getOrder();
@@ -203,6 +240,7 @@ public class BookingPage extends javax.swing.JPanel {
         mainFlow2.reset();
         mainFlow3.reset();
         mainFlow4.reset();
+        mainFlow5.reset();
 //        mainFlow5.resetAllInput();
     }
 
@@ -263,7 +301,7 @@ public class BookingPage extends javax.swing.JPanel {
     }
 
 
-    private void findRoom() {
+    private boolean findRoom() {
         String checkInStr = mainFlow1.getTxtCheckInDate().getText().trim();
         String checkOutStr = mainFlow1.getTxtCheckOutDate().getText().trim();
         String adultStr = mainFlow1.getTxtNumberOfAdult().getText().trim();
@@ -284,7 +322,7 @@ public class BookingPage extends javax.swing.JPanel {
         // Tìm phòng trống
         var availableRooms = roomService.countAvailableRooms(checkIn, checkOut);
 //        // Cập nhật danh sách phòng trống lên mainFlow2
-        mainFlow2.updateRoomList(
+      return  mainFlow2.updateRoomList(
                 availableRooms,
                 adults,
                 children,
@@ -467,24 +505,24 @@ public class BookingPage extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(sequenceBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(sequenceBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(header, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(sequenceBooking, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 1024, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(header, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(sequenceBooking, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

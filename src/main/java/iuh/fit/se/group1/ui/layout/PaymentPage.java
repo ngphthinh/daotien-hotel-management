@@ -270,38 +270,38 @@ public class PaymentPage extends javax.swing.JPanel {
     }
 
     private void handlePaymentCash(Order order) {
-        var modal = new CashPaymentModal(order.getTotalAmount().subtract(order.getDeposit()).longValue());
-        GlassPanePopup.showPopup(modal);
-
-        modal.getBtnComplete().addActionListener(e -> {
-            if (modal.getMoneyGiven() < order.getTotalAmount().longValue()) {
-                CustomDialog.showMessage(null,
-                        "Khách đưa chưa đủ tiền!",
-                        "Thông báo", CustomDialog.MessageType.WARNING, 300,200);
-                return;
-            }
-            long change = modal.getMoneyGiven() - order.getTotalAmount().longValue();
-            CustomDialog.showMessage(null,
-                    "Thanh toán thành công! Tiền thừa: " + Constants.VND_FORMAT.format(change),
-                    "Thông báo", CustomDialog.MessageType.SUCCESS, 300,200);
-            saveOrder();
-            GlassPanePopup.closePopupAll();
-        });
+//        var modal = new CashPaymentModal(order.getTotalAmount().subtract(order.getDeposit()).longValue());
+//        GlassPanePopup.showPopup(modal);
+//
+//        modal.getBtnComplete().addActionListener(e -> {
+//            if (modal.getMoneyGiven() < order.getTotalAmount().longValue()) {
+//                CustomDialog.showMessage(null,
+//                        "Khách đưa chưa đủ tiền!",
+//                        "Thông báo", CustomDialog.MessageType.WARNING, 300,200);
+//                return;
+//            }
+//            long change = modal.getMoneyGiven() - order.getTotalAmount().longValue();
+//            CustomDialog.showMessage(null,
+//                    "Thanh toán thành công! Tiền thừa: " + Constants.VND_FORMAT.format(change),
+//                    "Thông báo", CustomDialog.MessageType.SUCCESS, 300,200);
+//            saveOrder();
+//            GlassPanePopup.closePopupAll();
+//        });
 
     }
 
     private void saveOrder() {
-        // update trang thái
-        orderService.updateOrderStatusToPaid(order.getOrderId(), PaymentType.CASH, order.getTotalAmount());
-
-
-        surcharges.forEach((k, v) -> {
-            SurchargeDetail sd = new SurchargeDetail(k, v);
-            surchargeDetailService.save(sd, order.getOrderId());
-        });
-
-        // Clear form
-        clearForm();
+//        // update trang thái
+//        orderService.updateOrderStatusToPaid(order.getOrderId(), PaymentType.CASH, order.getTotalAmount());
+//
+//
+//        surcharges.forEach((k, v) -> {
+//            SurchargeDetail sd = new SurchargeDetail(k, v);
+//            surchargeDetailService.save(sd, order.getOrderId());
+//        });
+//
+//        // Clear form
+//        clearForm();
     }
 
     private Promotion setPromotion(BigDecimal totalAmount) {
@@ -320,65 +320,7 @@ public class PaymentPage extends javax.swing.JPanel {
 
 
     private void handlePaymentTransfer(Order order) {
-        try {
-            String response = paymentService.createPayment(order);
-            String payUrl = paymentService.extractJsonValue(response, "payUrl");
-            String orderId = paymentService.extractJsonValue(response, "orderId");
-            String priceFinal = order.getTotalAmount().subtract(order.getDeposit()).toString();
-            var modal = new TransferPaymentModal();
-            if (payUrl != null && !payUrl.isEmpty()) {
-                modal.getLblQrCode().setIcon(new ImageIcon(paymentService.generateQRCodeImage(payUrl, 200, 200)));
-            } else {
-                CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR,380,200);
-            }
 
-            modal.getLblTotaPrice().setText("Tổng tiền: " + order.getTotalAmount().longValue() + " VND");
-            JFrame frame = new JFrame("Thanh toán MoMo QR");
-            frame.setSize(300, 300);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setLayout(new BorderLayout());
-            frame.setBackground(Color.WHITE);
-            JPanel pnlMain = new JPanel();
-            pnlMain.setBackground(Color.WHITE);
-            pnlMain.setLayout(new BorderLayout());
-            JLabel lblImage = new JLabel("", new ImageIcon(paymentService.generateQRCodeImage(payUrl, 250, 250)), SwingConstants.CENTER);
-            JLabel lblPrice = new JLabel("Tổng tiền: " + order.getTotalAmount().longValue() + "VND", SwingConstants.CENTER);
-            lblPrice.setFont(new Font("Segoe UI", Font.BOLD, 16));
-
-            pnlMain.add(lblImage, BorderLayout.CENTER);
-            pnlMain.add(lblPrice, BorderLayout.SOUTH);
-            frame.add(pnlMain, BorderLayout.CENTER);
-            frame.setVisible(true);
-
-            GlassPanePopup.showPopup(modal);
-
-            modal.getBtnCheck().addActionListener(e ->
-            {
-                try {
-                    if (orderId == null) {
-                        JOptionPane.showMessageDialog(null, "Chưa có đơn hàng nào!");
-                        return;
-                    }
-                    String responseCheck = paymentService.queryPayment(orderId);
-                    String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
-                    String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
-                    if ("0".equals(responseCodeCheck)) {
-                        CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS,380,200);
-                        GlassPanePopup.closePopupAll();
-                        frame.dispose();
-                        saveOrder();
-                    } else {
-                        CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING,380,200);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Lỗi: " + ex.getMessage());
-                }
-            });
-
-        } catch (Exception e) {
-            CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố, vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR,380,200);
-        }
     }
 
     public void clearForm() {

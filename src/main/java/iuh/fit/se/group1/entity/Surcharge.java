@@ -30,6 +30,10 @@ public class Surcharge {
     public Surcharge() {
     }
 
+    public Surcharge(long surchargeId) {
+        this.surchargeId = surchargeId;
+    }
+
     public long getSurchargeId() {
         return surchargeId;
     }

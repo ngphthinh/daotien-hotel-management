@@ -224,12 +224,12 @@ public class ImportExcelService {
                 promotion.setPromotionName(promotionName);
 
                 try {
-                    promotion.setDiscountPrice(discountPriceStr.isEmpty()
+                    promotion.setMinOrderAmount(discountPriceStr.isEmpty()
                             ? BigDecimal.ZERO
                             : new BigDecimal(discountPriceStr));
                 } catch (NumberFormatException e) {
                     System.err.println("Invalid price at row " + (rowIndex + 1) + ": " + discountPriceStr);
-                    promotion.setDiscountPrice(BigDecimal.ZERO);
+                    promotion.setMinOrderAmount(BigDecimal.ZERO);
                 }
 
                 try {

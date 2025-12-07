@@ -290,11 +290,10 @@ public class RoomRepository implements Repository<Room, Long> {
                   AND r.roomId NOT IN (
                       SELECT b.roomId
                       FROM Booking b
-                      WHERE (b.checkInDate < ? AND b.checkOutDate > ?)
-                         OR (b.checkInDate >= ? AND b.checkInDate < ?)
-                         OR (b.checkOutDate > ? AND b.checkOutDate <= ?)
+                      WHERE b.checkInDate < ?   
+                        AND b.checkOutDate > ?  
                   )
-                ORDER BY r.roomId ASC
+                ORDER BY r.roomId ASC;
                 """;
 
         List<Room> rooms = new ArrayList<>();
@@ -302,10 +301,6 @@ public class RoomRepository implements Repository<Room, Long> {
             preparedStatement.setString(1, roomStatus.name());
             preparedStatement.setTimestamp(2, Timestamp.valueOf(checkOut));
             preparedStatement.setTimestamp(3, Timestamp.valueOf(checkIn));
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(checkIn));
-            preparedStatement.setTimestamp(5, Timestamp.valueOf(checkOut));
-            preparedStatement.setTimestamp(6, Timestamp.valueOf(checkIn));
-            preparedStatement.setTimestamp(7, Timestamp.valueOf(checkOut));
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {

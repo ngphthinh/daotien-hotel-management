@@ -190,29 +190,25 @@ public class CalendarUI extends JDialog {
         panel.setBackground(WHITE);
         panel.setBorder(new EmptyBorder(10, 15, 15, 15));
 
-        // Time panel - only show if showTimeSelector is true
-        if (showTimeSelector) {
-            JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-            timePanel.setBackground(WHITE);
+        // Time panel
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        timePanel.setBackground(WHITE);
 
-            JLabel timeLabel = new JLabel("Thời gian:");
-            timeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            timeLabel.setForeground(SECONDARY_COLOR);
+        JLabel timeLabel = new JLabel("Thời gian:");
+        timeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        timeLabel.setForeground(SECONDARY_COLOR);
 
-            JLabel hourLabel = new JLabel("Giờ:");
-            hourLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JLabel hourLabel = new JLabel("Giờ:");
+        hourLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
-            JLabel minuteLabel = new JLabel("Phút:");
-            minuteLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JLabel minuteLabel = new JLabel("Phút:");
+        minuteLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
-            timePanel.add(timeLabel);
-            timePanel.add(hourLabel);
-            timePanel.add(hourSpinner);
-            timePanel.add(minuteLabel);
-            timePanel.add(minuteSpinner);
-            
-            panel.add(timePanel, BorderLayout.CENTER);
-        }
+        timePanel.add(timeLabel);
+        timePanel.add(hourLabel);
+        timePanel.add(hourSpinner);
+        timePanel.add(minuteLabel);
+        timePanel.add(minuteSpinner);
 
         // Action buttons
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));

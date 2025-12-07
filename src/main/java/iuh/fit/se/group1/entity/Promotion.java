@@ -9,7 +9,7 @@ public class Promotion {
     private String promotionName;
     private String description;
     private Float discountPercent;
-    private BigDecimal discountPrice;
+    private BigDecimal minOrderAmount;
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalDate createdAt;
@@ -46,12 +46,12 @@ public class Promotion {
         this.discountPercent = discountPercent;
     }
 
-    public BigDecimal getDiscountPrice() {
-        return discountPrice;
+    public BigDecimal getMinOrderAmount() {
+        return minOrderAmount;
     }
 
-    public void setDiscountPrice(BigDecimal discountPrice) {
-        this.discountPrice = discountPrice;
+    public void setMinOrderAmount(BigDecimal minOrderAmount) {
+        this.minOrderAmount = minOrderAmount;
     }
 
     public LocalDate getStartDate() {
@@ -78,22 +78,22 @@ public class Promotion {
         this.createdAt = createdAt;
     }
 
-    public Promotion(Long promotionId, String promotionName, String description,Float discountPercent, BigDecimal discountPrice, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
+    public Promotion(Long promotionId, String promotionName, String description, Float discountPercent, BigDecimal minOrderAmount, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
         this.promotionId = promotionId;
         this.promotionName = promotionName;
         this.description = description;
         this.discountPercent = discountPercent;
-        this.discountPrice = discountPrice;
+        this.minOrderAmount = minOrderAmount;
         this.startDate = startDate;
         this.endDate = endDate;
         this.createdAt = createdAt;
     }
 
-    public Promotion(String promotionName, String description,Float discountPercent, BigDecimal discountPrice, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
+    public Promotion(String promotionName, String description, Float discountPercent, BigDecimal minOrderAmount, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
         this.promotionName = promotionName;
         this.description = description;
         this.discountPercent = discountPercent;
-        this.discountPrice = discountPrice;
+        this.minOrderAmount = minOrderAmount;
         this.startDate = startDate;
         this.endDate = endDate;
         this.createdAt = createdAt;
@@ -109,7 +109,7 @@ public class Promotion {
                 ", promotionName='" + promotionName + '\'' +
                 ", description='" + description + '\'' +
                 ", discountPercent=" + discountPercent +
-                ", discountPrice=" + discountPrice +
+                ", minOrderAmount=" + minOrderAmount +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", createdAt=" + createdAt +
