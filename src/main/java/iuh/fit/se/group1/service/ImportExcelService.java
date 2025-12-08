@@ -384,88 +384,74 @@ public List<Employee> importEmployeesFromExcel(File file) {
 }
 
 private RoomTypeService roomTypeService = new RoomTypeService();
-
 public List<Room> importRoomsFromExcel(File file) {
     List<Room> rooms = new ArrayList<>();
-
     try (FileInputStream fis = new FileInputStream(file);
          Workbook workbook = new XSSFWorkbook(fis)) {
 
         Sheet sheet = workbook.getSheetAt(0);
         if (sheet == null) return rooms;
 
-        // Bỏ qua header
+        // Bỏ qua header (dòng 0)
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String roomNumber   = getCellValueRoom(row.getCell(1));  // Số phòng
-            String roomTypeName = getCellValueRoom(row.getCell(2));  // Loại phòng
-            String roomStatusStr= getCellValueRoom(row.getCell(3));  // Trạng thái
+            String roomNumber = getCellValueRoom(row.getCell(1)); // Số phòng
+            String roomTypeName = getCellValueRoom(row.getCell(2)); // Loại phòng
+            String roomStatusStr = getCellValueRoom(row.getCell(3)); // Trạng thái
 
+            if (roomNumber.isEmpty() || roomTypeName.isEmpty() || roomStatusStr.isEmpty()) {
+                System.err.println("⚠️ Dòng " + (i + 1) + " thiếu thông tin, bỏ qua.");
+                continue;
+            }
 
-            
-
-            // Chuẩn hóa tên loại phòng
+            // Chuẩn hóa tên RoomType
             roomTypeName = java.text.Normalizer.normalize(roomTypeName, java.text.Normalizer.Form.NFC).trim();
 
-            // Map room type
+            // Map Loại phòng sang RoomType ID
             String roomTypeId = switch (roomTypeName) {
                 case "Phòng đơn" -> "SINGLE";
                 case "Phòng đôi" -> "DOUBLE";
                 default -> "SINGLE";
             };
 
-            // Lấy hoặc tạo room type
+            // Lấy hoặc tạo RoomType
             RoomType roomType = roomTypeService.getRoomTypeById(roomTypeId);
             if (roomType == null) {
                 roomType = new RoomType();
                 roomType.setRoomTypeId(roomTypeId);
                 roomType.setName(roomTypeName);
                 roomType = roomTypeService.createRoomType(roomType);
-                System.out.println("ℹ️ Tạo RoomType mới: " + roomTypeName);
+                System.out.println("ℹ️ Tạo RoomType mới: " + roomTypeName + " (ID=" + roomTypeId + ")");
             }
 
             Room room = new Room();
             room.setRoomNumber(roomNumber);
             room.setRoomType(roomType);
 
-            // Mapping trạng thái phòng tiếng Việt → Enum
-            RoomStatus status;
-            String st = roomStatusStr.trim().toUpperCase();
-
-            switch (st) {
-                case "CÓ SẴN", "AVAILABLE" -> status = RoomStatus.AVAILABLE;
-                case "ĐANG SỬ DỤNG", "OCCUPIED" -> status = RoomStatus.OCCUPIED;
-                case "BẢO TRÌ", "OUT_OF_ORDER" -> status = RoomStatus.OUT_OF_ORDER;
-                default -> {
-                    System.err.println("⚠️ Trạng thái không hợp lệ dòng " + (i + 1) + ": " + roomStatusStr);
-                    status = RoomStatus.AVAILABLE;
-                }
+            // Map trạng thái phòng
+            roomStatusStr = roomStatusStr.trim().toUpperCase();
+            try {
+                room.setRoomStatus(RoomStatus.valueOf(roomStatusStr));
+            } catch (IllegalArgumentException e) {
+                System.err.println("⚠️ Trạng thái phòng không hợp lệ ở dòng " + (i + 1) + ": " + roomStatusStr + " -> đặt AVAILABLE");
+                room.setRoomStatus(RoomStatus.AVAILABLE);
             }
-            room.setRoomStatus(status);
 
-            // Giá phòng
-           
-
-            // Ngày tạo phòng
-            room.setCreatedAt(LocalDate.now());
-
-            // Lưu phòng
+            // Tạo phòng
             Room savedRoom = roomService.createRoom(room);
             if (savedRoom != null) {
                 rooms.add(savedRoom);
-                System.out.println("✅ Thêm phòng: " + roomNumber + " - " + roomTypeName + " - " + status);
+                System.out.println("✅ Thêm phòng: " + roomNumber + " - " + roomTypeName + " - " + room.getRoomStatus());
             }
         }
 
     } catch (Exception e) {
         e.printStackTrace();
     }
-
     return rooms;
 }
-
 
 private String getCellValueRoom(Cell cell) {
     if (cell == null) return "";

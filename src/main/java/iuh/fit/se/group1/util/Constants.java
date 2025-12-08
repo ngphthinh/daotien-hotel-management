@@ -11,12 +11,8 @@ import java.awt.*;
 
 import java.text.DecimalFormat;
 
-
-
-
 import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
-
 
 public class Constants {
     public static final Color FOREGROUND_COLOR_MENU = new Color(77, 134, 168);
@@ -66,7 +62,8 @@ public class Constants {
     }
 
     public static double parseVND(String formatted) {
-        if (formatted == null || formatted.isEmpty()) return 0.0;
+        if (formatted == null || formatted.isEmpty())
+            return 0.0;
         try {
             // Loại bỏ ký tự không phải số hoặc dấu . , trước khi parse
             String cleaned = formatted.replaceAll("[^\\d,\\.]", "");
@@ -81,5 +78,4 @@ public class Constants {
             }
         }
     }
-
 }

@@ -8,6 +8,7 @@ import iuh.fit.se.group1.entity.OrderType;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.enums.RoomStatus;
+import iuh.fit.se.group1.repository.BookingRepository;
 import iuh.fit.se.group1.repository.OrderRepository;
 import iuh.fit.se.group1.repository.RoomRepository;
 
@@ -18,6 +19,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private OrderDetailService orderDetailsService;
     private RoomRepository roomRepository;
+    private BookingRepository bookingRepository = new BookingRepository();
 
     public OrderService() {
         this.orderDetailsService = new OrderDetailService();
@@ -36,6 +38,7 @@ public class OrderService {
             return null;
         }
 
+        // nếu 2 là đặt phòng thì cập nhật trạng thái phòng thành đang sử dụng
         if (order.getOrderType().getOrderTypeId() == 2) {
             List<Long> roomsIdx = order.getBookings().stream()
                     .map(booking -> booking.getRoom().getRoomId())
@@ -50,27 +53,15 @@ public class OrderService {
             return null;
         }
 
+        // save booking
+        bookingRepository.saveAllBookingsForOrder(savedOrder, order.getBookings());
+
+
         if (orderDetailsService.saveOrderDetailsForOrder(savedOrder, orderDetails)) {
-
-
-//            BigDecimal totalAmountOrderDetail = orderDetails.stream()
-//                    .map(detail -> detail.getUnitPrice().multiply(BigDecimal.valueOf(detail.getQuantity())))
-//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-
-//            savedOrder.setTotalAmount(totalAmountOrderDetail);
-//            updateTotalAmount(savedOrder, totalAmountOrderDetail);
-
             AppLogger.info("Order created successfully with order details");
             return savedOrder;
         }
         return null;
-    }
-
-    private void updateTotalAmount(Order order, BigDecimal totalAmountOrderDetail) {
-        BigDecimal totalAmount = order.getTotalAmountBooking().add(totalAmountOrderDetail);
-        order.setTotalAmount(totalAmount);
-        orderRepository.updateTotalAmount(order.getOrderId(), totalAmount);
     }
 
     public List<Order> getAllOrders() {

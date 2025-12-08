@@ -4,10 +4,14 @@
  */
 package iuh.fit.se.group1.ui.component.booking2;
 
+import iuh.fit.se.group1.dto.AmenityDTO;
+import iuh.fit.se.group1.service.AmenityService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -15,13 +19,48 @@ import java.awt.*;
  */
 public class MainFlow3 extends javax.swing.JPanel {
 
+    private AmenityService amenityService = new AmenityService();
     /**
      * Creates new form MainFlow3
      */
     public MainFlow3() {
         initComponents();
 
+        var model =(CustomTable2.CustomTable2Model) tbl.getModel();
+        model.clear();
+        amenityService.getAllAmenities().forEach(amenity ->
+            model.addRow(new Object[]{
+                    false,
+                    amenityService.toAmenityDTO(amenity),
+                    amenity.getPrice(),
+                    0
+            })
+        );
+
+        tbl.setQuantityChangeListener((r, newQuantity) -> {
+            if (newQuantity > 0) {
+                model.setValueAt(true, r, 0);
+            }
+            if (newQuantity == 0) {
+                model.setValueAt(false, r, 0);
+            }
+        });
     }
+
+    public List<AmenityDTO> getSelectedAmenities() {
+        List<AmenityDTO> selectedAmenities = new ArrayList<>();
+        var model = (CustomTable2.CustomTable2Model) tbl.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Boolean isSelected = (Boolean) model.getValueAt(i, 0);
+            if (isSelected != null && isSelected) {
+                AmenityDTO amenityDTO = (AmenityDTO) model.getValueAt(i, 1);
+                amenityDTO.setQuantity(model.getValueAt(i, 3) != null ? (Integer) model.getValueAt(i, 3) : 0);
+                selectedAmenities.add(amenityDTO);
+            }
+        }
+        return selectedAmenities;
+    }
+
 
     public Button getBtnNext() {
         return btnNext;
@@ -50,61 +89,60 @@ public class MainFlow3 extends javax.swing.JPanel {
 
         btnNext = new iuh.fit.se.group1.ui.component.custom.Button();
         btnPrev = new iuh.fit.se.group1.ui.component.custom.Button();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        customTable21 = new iuh.fit.se.group1.ui.component.booking2.CustomTable2();
+        pnl1 = new javax.swing.JPanel();
+        lbl1 = new javax.swing.JLabel();
+        lbl2 = new javax.swing.JLabel();
+        scr = new javax.swing.JScrollPane();
+        tbl = new iuh.fit.se.group1.ui.component.booking2.CustomTable2();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(new java.awt.Color(255, 255, 255));
 
         btnNext.setBackground(new java.awt.Color(77, 134, 168));
         btnNext.setForeground(new java.awt.Color(255, 255, 255));
-        btnNext.setText("Tiếp theo");
+        btnNext.setText("TIẾP THEO");
         btnNext.setBorderRadius(5);
         btnNext.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         btnPrev.setBackground(new java.awt.Color(227, 227, 227));
         btnPrev.setForeground(new java.awt.Color(77, 134, 168));
-        btnPrev.setText("Quay lại");
+        btnPrev.setText("QUAY LẠI");
         btnPrev.setBorderRadius(5);
         btnPrev.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        jPanel1.setBackground(new java.awt.Color(185, 215, 254));
+        pnl1.setBackground(new java.awt.Color(185, 215, 254));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel1.setText("Dịch vụ đi kèm");
+        lbl1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lbl1.setForeground(new java.awt.Color(0, 0, 0));
+        lbl1.setText("Dịch vụ đi kèm");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("Chọn thêm dịch vụ để nâng cao trải nghiệm");
+        lbl2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbl2.setForeground(new java.awt.Color(0, 0, 0));
+        lbl2.setText("Chọn thêm dịch vụ để nâng cao trải nghiệm");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnl1Layout = new javax.swing.GroupLayout(pnl1);
+        pnl1.setLayout(pnl1Layout);
+        pnl1Layout.setHorizontalGroup(
+            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl1Layout.createSequentialGroup()
                 .addGap(30, 30, 30)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 741, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl2, javax.swing.GroupLayout.PREFERRED_SIZE, 741, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        pnl1Layout.setVerticalGroup(
+            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl1Layout.createSequentialGroup()
                 .addGap(8, 8, 8)
-                .addComponent(jLabel1)
+                .addComponent(lbl1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addComponent(lbl2)
                 .addContainerGap(39, Short.MAX_VALUE))
         );
 
-        customTable21.setBackground(new java.awt.Color(255, 255, 255));
-        customTable21.setForeground(new java.awt.Color(255, 255, 255));
-        jScrollPane1.setViewportView(customTable21);
+        tbl.setForeground(new java.awt.Color(255, 255, 255));
+        scr.setViewportView(tbl);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -113,8 +151,8 @@ public class MainFlow3 extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scr, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnl1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -124,10 +162,10 @@ public class MainFlow3 extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(42, 42, 42)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25)
+                .addComponent(pnl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(scr, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -137,13 +175,21 @@ public class MainFlow3 extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 
+    public void reset() {
+        var model =(CustomTable2.CustomTable2Model) tbl.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            model.setValueAt(false, i, 0);
+            model.setValueAt(0, i, 3);
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnNext;
     private iuh.fit.se.group1.ui.component.custom.Button btnPrev;
-    private iuh.fit.se.group1.ui.component.booking2.CustomTable2 customTable21;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbl1;
+    private javax.swing.JLabel lbl2;
+    private javax.swing.JPanel pnl1;
+    private javax.swing.JScrollPane scr;
+    private iuh.fit.se.group1.ui.component.booking2.CustomTable2 tbl;
     // End of variables declaration//GEN-END:variables
 }

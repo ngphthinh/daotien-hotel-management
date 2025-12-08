@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -58,7 +59,7 @@ public class CustomTable2 extends JTable {
     private void setupColumnRenderers() {
         // Checkbox column (Chọn)
         getColumn("Chọn").setCellRenderer(new CheckboxRenderer());
-        
+
         // Text column (Tên dịch vụ)
         getColumn("Tên dịch vụ").setCellRenderer(new TextRenderer());
 
@@ -89,7 +90,8 @@ public class CustomTable2 extends JTable {
         private int specialColumn = -1;
         private Color specialColor = new Color(255, 248, 220); // vàng nhạt
 
-        public AlternatingRowRenderer() { }
+        public AlternatingRowRenderer() {
+        }
 
         public AlternatingRowRenderer(int specialColumn, Color specialColor) {
             this.specialColumn = specialColumn;
@@ -98,7 +100,7 @@ public class CustomTable2 extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+                boolean isSelected, boolean hasFocus, int row, int column) {
 
             Component c = super.getTableCellRendererComponent(
                     table, value, isSelected, hasFocus, row, column);
@@ -135,31 +137,27 @@ public class CustomTable2 extends JTable {
         }
     }
 
-
     /**
      * Custom table model for service booking
      */
     class CustomTable2Model extends AbstractTableModel {
+
         private final String[] columnNames = {
                 "Chọn", "Tên dịch vụ", "Giá", "Số lượng"
         };
 
-        private final Object[][] data = {
-                { false, "Dịch vụ chăn màn", 100000, 1 },
-                { false, "Đón khách tại sân bay", 500000, 1 },
-                { false, "Dịch vụ chăn màn", 100000, 1 },
-                { false, "Đón khách tại sân bay", 500000, 1 },
-                { false, "Dịch vụ chăn màn", 100000, 1 },
-                { false, "Đón khách tại sân bay", 500000, 1 },
-                { false, "Dịch vụ chăn màn", 100000, 1 },
-                { false, "Đón khách tại sân bay", 500000, 1 },
-                { false, "Dịch vụ chăn màn", 100000, 1 },
-                { false, "Đón khách tại sân bay", 500000, 1 }
-        };
+        private final java.util.List<Object[]> data = new ArrayList<>();
+
+        public CustomTable2Model() {
+            // Nếu muốn giữ danh sách mặc định có thể thêm ở đây
+            data.add(new Object[]{false, "Dịch vụ chăn màn", 100000, 1});
+            data.add(new Object[]{false, "Đón khách tại sân bay", 500000, 1});
+            // ...
+        }
 
         @Override
         public int getRowCount() {
-            return data.length;
+            return data.size();
         }
 
         @Override
@@ -174,29 +172,84 @@ public class CustomTable2 extends JTable {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return data[rowIndex][columnIndex];
+            return data.get(rowIndex)[columnIndex];
         }
 
         @Override
         public void setValueAt(Object value, int rowIndex, int columnIndex) {
-            data[rowIndex][columnIndex] = value;
+
+            // Xử lý cột checkbox
+            if (columnIndex == 0) {
+                boolean selected = (boolean) value;
+                data.get(rowIndex)[0] = selected;
+
+                // Checkbox ON → đặt SL = 1 (chỉ khi đang là 0)
+                if (selected) {
+                    int currentQty = (int) data.get(rowIndex)[3];
+                    if (currentQty == 0) {   // chỉ set lại nếu = 0
+                        data.get(rowIndex)[3] = 1;
+                        fireTableCellUpdated(rowIndex, 3);
+                    }
+                } else {
+                    // Checkbox OFF → đặt SL = 0
+                    data.get(rowIndex)[3] = 0;
+                    fireTableCellUpdated(rowIndex, 3);
+                }
+
+                fireTableCellUpdated(rowIndex, 0);
+                return;
+            }
+
+            // Xử lý cột số lượng
+            if (columnIndex == 3) {
+                int qty = Integer.parseInt(value.toString());
+
+                data.get(rowIndex)[3] = qty;
+
+                // Nếu nhập số lượng > 0 thì auto tick checkbox
+                if (qty > 0) {
+                    data.get(rowIndex)[0] = true;
+                    fireTableCellUpdated(rowIndex, 0);
+                }
+
+                fireTableCellUpdated(rowIndex, 3);
+                return;
+            }
+
+            // Cột còn lại
+            data.get(rowIndex)[columnIndex] = value;
             fireTableCellUpdated(rowIndex, columnIndex);
         }
 
+
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 0 || columnIndex == 3; // "Chọn" and "Số lượng" columns are editable
+            return columnIndex == 0 || columnIndex == 3;
         }
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 0) {
-                return Boolean.class; // Checkbox column
-            }
-            return String.class;
+            if (columnIndex == 0) return Boolean.class;
+            return Object.class;
+        }
+
+        // ✅ Thêm dòng
+        public void addRow(Object[] row) {
+            data.add(row);
+            fireTableRowsInserted(data.size() - 1, data.size() - 1);
+        }
+
+        // ✅ Xóa tất cả dòng
+        public void clear() {
+            data.clear();
+            fireTableDataChanged();
         }
     }
+    private QuantityChangeListener quantityChangeListener;
 
+    public void setQuantityChangeListener(QuantityChangeListener listener) {
+        this.quantityChangeListener = listener;
+    }
     /**
      * Currency formatter renderer
      */
@@ -304,19 +357,29 @@ public class CustomTable2 extends JTable {
         public QuantityEditor() {
             comp = new QuantityComponent();
 
+            comp.plusBtn.addActionListener(e -> {
+                currentValue++;
+                comp.quantityLabel.setText(String.valueOf(currentValue));
+                fireEditingStopped();
+
+                if (quantityChangeListener != null) {
+                    quantityChangeListener.onQuantityChange(editingRow, currentValue);
+                }
+            });
+
+
             comp.minusBtn.addActionListener(e -> {
                 if (currentValue > 0) {
                     currentValue--;
                     comp.quantityLabel.setText(String.valueOf(currentValue));
                     fireEditingStopped();
+
+                    if (quantityChangeListener != null) {
+                        quantityChangeListener.onQuantityChange(editingRow, currentValue);
+                    }
                 }
             });
 
-            comp.plusBtn.addActionListener(e -> {
-                currentValue++;
-                comp.quantityLabel.setText(String.valueOf(currentValue));
-                fireEditingStopped();
-            });
         }
 
         @Override
@@ -327,6 +390,7 @@ public class CustomTable2 extends JTable {
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
                 int column) {
+            editingRow = row;
             currentValue = value != null ? (Integer) value : 0;
             comp.quantityLabel.setText(String.valueOf(currentValue));
 
@@ -335,7 +399,7 @@ public class CustomTable2 extends JTable {
             return comp;
         }
     }
-
+    private int editingRow;
     class QuantityComponent extends JPanel {
 
         public JButton minusBtn;

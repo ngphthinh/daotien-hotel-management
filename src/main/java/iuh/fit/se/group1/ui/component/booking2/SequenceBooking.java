@@ -243,45 +243,13 @@ public class SequenceBooking extends javax.swing.JPanel {
             circles[i].setActive(false);
         }
 
-        // Active phần tử đúng
-        labels[step].setForeground(activeColor);
-        circles[step].setActive(true);
-    }
 
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        // <editor-fold defaultstate="collapsed" desc=" Look and feel setting code
-        // (optional) ">
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the default
-         * look and feel.
-         * For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace();
+
+        for (int i = 0; i <= step; i++) {
+            labels[i].setForeground(activeColor);
+            circles[i].setActive(true);
         }
-        // </editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            JFrame frame = new JFrame();
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            SequenceBooking seq = new SequenceBooking();
-            frame.add(seq);
-            frame.pack();
-            frame.setVisible(true);
-            seq.setActiveStep(3);
-        });
     }
-
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
