@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class RoomRepository implements Repository<Room, Long> {
 
     private static final Logger log = LoggerFactory.getLogger(RoomRepository.class);
@@ -29,10 +28,10 @@ public class RoomRepository implements Repository<Room, Long> {
     @Override
     public Room save(Room room) {
         String sql = "INSERT INTO Room (roomNumber, roomTypeId, createdAt, roomStatus) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            conn.setAutoCommit(true);
+            connection.setAutoCommit(true);
 
             ps.setString(1, room.getRoomNumber());
 
@@ -302,19 +301,7 @@ public List<Room> findAll() {
             throw new RuntimeException(e);
         }
     }
-    /**
-     * Close the connection when repository is no longer needed
-     */
-    public void close() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                log.info("Database connection closed");
-            }
-        } catch (SQLException e) {
-            log.error("Error closing database connection: ", e);
-        }
-    }
+
 
     public List<Room> findAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut, RoomStatus roomStatus) {
 

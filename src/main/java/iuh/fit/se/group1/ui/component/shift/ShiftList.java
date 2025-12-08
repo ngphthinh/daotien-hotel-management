@@ -4,13 +4,11 @@
  */
 package iuh.fit.se.group1.ui.component.shift;
 
-
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
@@ -69,6 +67,7 @@ public class ShiftList extends JPanel {
     public void reloadEmployees() {
         loadEmployeesFromDatabase();
     }
+
     public void addNewEmployee(Employee employee) {
         try {
             String name = employee.getFullName();
@@ -82,8 +81,9 @@ public class ShiftList extends JPanel {
                 } else {
                     // Ảnh mặc định
                     URL defaultImg = getClass().getResource("/images/meomeo.jpg");
-                    if (defaultImg != null)
+                    if (defaultImg != null) {
                         image = ImageIO.read(defaultImg);
+                    }
                 }
             } catch (Exception ex) {
                 log.error("Error loading image for employee {}", name, ex);
@@ -91,7 +91,7 @@ public class ShiftList extends JPanel {
 
             ShiftProfile shiftProfile = new ShiftProfile();
             shiftProfile.getLblName().setText(name);
-            shiftProfile.getLblCode().setText(code);
+            shiftProfile.updateEmployeeCodeLabel(code);
             shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
             shiftProfile.setMaximumSize(new Dimension(303, 72));
             shiftProfile.setMinimumSize(new Dimension(0, 72));
@@ -126,92 +126,95 @@ public class ShiftList extends JPanel {
             log.error("Error adding new employee to shift list: ", ex);
         }
     }
+
     private void loadEmployeesFromDatabase() {
-    try {
-        EmployeeRepository employeeRepository = new EmployeeRepository();
-        List<Employee> employees = employeeRepository.findAllByRoleId(Role.RECEPTIONIST.toString());
+        try {
+            EmployeeRepository employeeRepository = new EmployeeRepository();
+            List<Employee> employees = employeeRepository.findAllByRoleId(Role.RECEPTIONIST.toString());
 
-        pnlEmployees.removeAll();
-        pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
-        for (Employee e : employees) {
-            String name = e.getFullName();
-            String code = String.valueOf(e.getEmployeeId());
+            pnlEmployees.removeAll();
+            pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
+            for (Employee e : employees) {
+                String name = e.getFullName();
+                String code = String.valueOf(e.getEmployeeId());
 
-            // Nếu có ảnh base64 trong DB
-            BufferedImage image = null;
-            try {
-                if (e.getAvt() != null && e.getAvt().length > 0) {
-                    image = ImageIO.read(new ByteArrayInputStream(e.getAvt()));
-                } else {
-                    URL defaultImg = getClass().getResource("/images/meomeo.jpg");
-                    if (defaultImg != null)
-                        image = ImageIO.read(defaultImg);
+                // Nếu có ảnh base64 trong DB
+                BufferedImage image = null;
+                try {
+                    if (e.getAvt() != null && e.getAvt().length > 0) {
+                        image = ImageIO.read(new ByteArrayInputStream(e.getAvt()));
+                    } else {
+                        URL defaultImg = getClass().getResource("/images/meomeo.jpg");
+                        if (defaultImg != null) {
+                            image = ImageIO.read(defaultImg);
+                        }
+                    }
+                } catch (Exception ex) {
+                    log.error("Error loading image for employee {}", name, ex);
                 }
-            } catch (Exception ex) {
-                log.error("Error loading image for employee {}", name, ex);
+                ShiftProfile shiftProfile = new ShiftProfile();
+                shiftProfile.getLblName().setText(name);
+                shiftProfile.updateEmployeeCodeLabel(code);
+                shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
+                shiftProfile.setMaximumSize(new Dimension(303, 72));
+                shiftProfile.setMinimumSize(new Dimension(0, 72));
+
+                if (image != null) {
+                    BufferedImage resized = Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
+                    shiftProfile.getAvatarLabel().setImage(resized);
+                }
+
+                pnlEmployees.add(shiftProfile);
+                JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+                separator.setAlignmentX(Component.LEFT_ALIGNMENT);
+                separator.setMaximumSize(new Dimension(303, 1));
+                separator.setForeground(new Color(180, 180, 180));
+                separator.setBackground(new Color(180, 180, 180));
+                separator.setOpaque(true);
+                pnlEmployees.add(separator);
+
+                shiftProfile.addMouseListener(shiftProfile);
             }
-            ShiftProfile shiftProfile = new ShiftProfile();
-            shiftProfile.getLblName().setText(name);
-            shiftProfile.getLblCode().setText( code);
-            shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
-            shiftProfile.setMaximumSize(new Dimension(303, 72));
-            shiftProfile.setMinimumSize(new Dimension(0, 72));
 
-            if (image != null) {
-                BufferedImage resized = Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
-                shiftProfile.getAvatarLabel().setImage(resized);
-            }
-
-            pnlEmployees.add(shiftProfile);
-            JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-            separator.setAlignmentX(Component.LEFT_ALIGNMENT);
-            separator.setMaximumSize(new Dimension(303, 1));
-            separator.setForeground(new Color(180, 180, 180));
-            separator.setBackground(new Color(180, 180, 180));
-            separator.setOpaque(true);
-            pnlEmployees.add(separator);
-
-            shiftProfile.addMouseListener(shiftProfile);
+            pnlEmployees.revalidate();
+            pnlEmployees.repaint();
+            SwingUtilities.invokeLater(() -> {
+                scrollPaneWin111.getVerticalScrollBar().setValue(0);
+            });
+        } catch (Exception ex) {
+            log.error("Error loading employees: ", ex);
         }
-
-        pnlEmployees.revalidate();
-        pnlEmployees.repaint();
-        SwingUtilities.invokeLater(() -> {
-            scrollPaneWin111.getVerticalScrollBar().setValue(0);
-        });
-    } catch (Exception ex) {
-        log.error("Error loading employees: ", ex);
     }
-}
 
     @Override
     protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
+        super.paintComponent(g);
 
-    Graphics2D g2 = (Graphics2D) g.create();
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    int w = getWidth();
-    int h = getHeight();
-    int arc = 5;
-    int shadow = 6;
+        int w = getWidth();
+        int h = getHeight();
+        int arc = 5;
+        int shadow = 6;
 
-    // 🎨 Bóng mờ phía sau
-    for (int i = shadow; i > 0; i--) {
-        float alpha = 0.05f * (shadow - i + 1);
-        g2.setColor(new Color(0, 0, 0, (int) (alpha * 255)));
-        g2.fillRoundRect(i, i, w - i * 2, h - i * 2, arc, arc);
+        // 🎨 Bóng mờ phía sau
+        for (int i = shadow; i > 0; i--) {
+            float alpha = 0.05f * (shadow - i + 1);
+            g2.setColor(new Color(0, 0, 0, (int) (alpha * 255)));
+            g2.fillRoundRect(i, i, w - i * 2, h - i * 2, arc, arc);
+        }
+
+        // 🎨 Nền trắng
+        g2.setColor(Color.WHITE);
+        g2.fillRoundRect(0, 0, w - shadow, h - shadow, arc, arc);
+
+        g2.dispose();
     }
 
-    // 🎨 Nền trắng
-    g2.setColor(Color.WHITE);
-    g2.fillRoundRect(0, 0, w - shadow, h - shadow, arc, arc);
-
-    g2.dispose();
-}
-public List<ShiftProfile> getSelectedEmployees() {
+    public List<ShiftProfile> getSelectedEmployees() {
         List<ShiftProfile> selectedList = new ArrayList<>();
-        
+
         for (Component c : pnlEmployees.getComponents()) {
             if (c instanceof ShiftProfile) {
                 ShiftProfile profile = (ShiftProfile) c;
@@ -220,7 +223,7 @@ public List<ShiftProfile> getSelectedEmployees() {
                 }
             }
         }
-        
+
         return selectedList;
     }
 
@@ -235,7 +238,6 @@ public List<ShiftProfile> getSelectedEmployees() {
             }
         }
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -282,19 +284,19 @@ public List<ShiftProfile> getSelectedEmployees() {
     private void addEmployees(String employeeName, String code, String imagePath) {
         ShiftProfile shiftProfile = new ShiftProfile();
         shiftProfile.getLblName().setText(employeeName);
-        shiftProfile.getLblCode().setText(code);
+        shiftProfile.updateEmployeeCodeLabel(code);
         // todo:
-         try {
-        // Nếu ảnh nằm trong thư mục resources (ví dụ: /images/avttest.jpg)
+        try {
+            // Nếu ảnh nằm trong thư mục resources (ví dụ: /images/avttest.jpg)
             URL url = getClass().getResource(imagePath);
             if (url != null) {
                 BufferedImage original = ImageIO.read(url);
-        // Resize mượt
+                // Resize mượt
                 BufferedImage avatar = Scalr.resize(original, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
                 shiftProfile.getAvatarLabel().setImage(avatar); // ✅ Gán ảnh vào AvatarLabel
                 log.info("Loaded image from resources: {}", imagePath);
             } else {
-               log.error("Image not found at path: {}", imagePath);
+                log.error("Image not found at path: {}", imagePath);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -310,7 +312,7 @@ public List<ShiftProfile> getSelectedEmployees() {
         int componentCount = pnlEmployees.getComponentCount();
 
         // Tính tổng chiều cao: mỗi 2 component là 1 profile + 1 line
-        int pairCount = componentCount / 2; 
+        int pairCount = componentCount / 2;
         int contentHeight = pairCount * (profileHeight + lineHeight);
 
         // Nếu cuối cùng không có line (thêm nhân viên cuối), có thể +80

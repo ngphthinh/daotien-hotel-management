@@ -11,6 +11,7 @@ public class RoomTypeService {
         this.roomTypeRepository = new RoomTypeRepository();
     }
 
+
     public RoomType createRoomType(RoomType roomType) {
         return roomTypeRepository.save(roomType);
     }

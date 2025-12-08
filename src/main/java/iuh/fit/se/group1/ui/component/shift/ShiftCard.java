@@ -32,6 +32,22 @@ public class ShiftCard extends javax.swing.JPanel {
         pnlInforEmployee1.setVisible(true);
         pnlInforEmployee2.setVisible(true);
         btnAdd.setVisible(true);
+        String code1 = lblCode1.getText();
+        if (!code1.startsWith("Mã nhân viên:")) {
+            lblCode1.setText("Mã nhân viên: " + code1);
+        }
+
+        String code2 = lblCode2.getText();
+        if (!code2.startsWith("Mã nhân viên:")) {
+            lblCode2.setText("Mã nhân viên: " + code2);
+        }
+    }
+    public void updateEmployeeCode1(String code) {
+    lblCode1.setText("Mã nhân viên: " + code);
+    }
+
+    public void updateEmployeeCode2(String code) {
+        lblCode2.setText("Mã nhân viên: " + code);
     }
     private void styleCard() {
         // Làm trong suốt để tự vẽ nền

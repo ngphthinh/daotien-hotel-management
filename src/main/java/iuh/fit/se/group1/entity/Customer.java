@@ -16,6 +16,17 @@ public class Customer {
     public Customer() {
     }
 
+	/**
+	 *
+	 * @param customerId
+	 * @param fullName
+	 * @param phone
+	 * @param email
+	 * @param citizenId
+	 * @param gender
+	 * @param dateOfBirth
+	 * @param createdAt
+	 */
 	public Customer(Long customerId, String fullName, String phone, String email, String citizenId, boolean gender,
 			LocalDate dateOfBirth,  LocalDate createdAt) {
 		this.customerId = customerId;

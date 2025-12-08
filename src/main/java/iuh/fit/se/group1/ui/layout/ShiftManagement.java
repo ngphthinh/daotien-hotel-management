@@ -200,12 +200,12 @@ public class ShiftManagement extends javax.swing.JPanel {
 
                         if (j == 0) {
                             card.getLblName1().setText(employeeName);
-                            card.getLblCode1().setText(employeeCode);
+                            card.updateEmployeeCode1(employeeCode);
                             card.getAvatarLabel1().setImage(image);
                             card.getPnlInforEmployee1().setVisible(true);
                         } else {
                             card.getLblName2().setText(employeeName);
-                            card.getLblCode2().setText(employeeCode);
+                            card.updateEmployeeCode2(employeeCode);
                             card.getAvatarLabel2().setImage(image);
                             card.getPnlInforEmployee2().setVisible(true);
                         }
@@ -295,6 +295,8 @@ public class ShiftManagement extends javax.swing.JPanel {
         ShiftProfile profile2 = selectedProfiles.get(1);
         String name1 = profile1.getLblName().getText();
         String name2 = profile2.getLblName().getText();
+        String code1 = profile1.getLblCode().getText().replace("Mã nhân viên: ", "");
+        String code2 = profile2.getLblCode().getText().replace("Mã nhân viên: ", "");
         String shiftName = shiftCard.getLblShiftName().getText();
 
         try {
@@ -358,7 +360,7 @@ public class ShiftManagement extends javax.swing.JPanel {
                     // Lưu nhân viên 1 vào EmployeeShift
                     EmployeeShift employeeShift1 = new EmployeeShift();
                     Employee emp1 = new Employee();
-                    emp1.setEmployeeId(Long.parseLong(profile1.getLblCode().getText()));
+                    emp1.setEmployeeId(Long.parseLong(code1));
                     employeeShift1.setEmployee(emp1);
                     employeeShift1.setShift(shift);
                     employeeShift1.setShiftDate(shiftDate);
@@ -368,7 +370,7 @@ public class ShiftManagement extends javax.swing.JPanel {
                     // Lưu nhân viên 2 vào EmployeeShift
                     EmployeeShift employeeShift2 = new EmployeeShift();
                     Employee emp2 = new Employee();
-                    emp2.setEmployeeId(Long.parseLong(profile2.getLblCode().getText()));
+                    emp2.setEmployeeId(Long.parseLong(code2));
                     employeeShift2.setEmployee(emp2);
                     employeeShift2.setShift(shift);
                     employeeShift2.setShiftDate(shiftDate);
@@ -377,11 +379,11 @@ public class ShiftManagement extends javax.swing.JPanel {
 
                     // Cập nhật UI
                     shiftCard.getLblName1().setText(name1);
-                    shiftCard.getLblCode1().setText(profile1.getLblCode().getText());
+                    shiftCard.updateEmployeeCode1(code1);
                     shiftCard.getAvatarLabel1().setImage(profile1.getAvatarLabel().getImage());
 
                     shiftCard.getLblName2().setText(name2);
-                    shiftCard.getLblCode2().setText(profile2.getLblCode().getText());
+                    shiftCard.updateEmployeeCode2(code2);
                     shiftCard.getAvatarLabel2().setImage(profile2.getAvatarLabel().getImage());
 
                     shiftCard.getPnlInforEmployee1().setVisible(true);

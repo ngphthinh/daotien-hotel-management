@@ -33,4 +33,16 @@ public class SurchargeDetailService {
     public List<SurchargeDetail> getSurchargeDetailsByOrderId(Long orderId) {
         return surchargeDetailRepository.findSurchargeDetailsByOrderId(orderId);
     }
+
+    public void saveWithOrderId(Long orderId, List<SurchargeDetail> surchargesToSave) {
+            for (SurchargeDetail surchargeDetail : surchargesToSave) {
+                if (!surchargeDetailRepository.existsBySurchargeIdAndOrderId(surchargeDetail.getSurcharge().getSurchargeId(), orderId)) {
+                    surchargeDetailRepository.save(surchargeDetail, orderId);
+                } else {
+                    AppLogger.info("SurchargeDetail with Surcharge ID " + surchargeDetail.getSurcharge().getSurchargeId() +
+                            " already exists for Order ID " + orderId);
+                }
+            }
+
+    }
 }

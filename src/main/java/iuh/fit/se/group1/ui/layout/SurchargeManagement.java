@@ -33,15 +33,15 @@ import iuh.fit.se.group1.service.ExportExcelService;
  *
  * @author Windows
  */
-public class SurchageManagement extends javax.swing.JPanel {
+public class SurchargeManagement extends javax.swing.JPanel {
 
     /**
      * Creates new form SurchageManagement
      */
-    private static final Logger log = LoggerFactory.getLogger(SurchageManagement.class);
+    private static final Logger log = LoggerFactory.getLogger(SurchargeManagement.class);
     private final SurchargeService surchargeService;
 
-    public SurchageManagement() {
+    public SurchargeManagement() {
         initComponents();
         custom();
         surchargeService = new SurchargeService(); 
@@ -90,15 +90,7 @@ public class SurchageManagement extends javax.swing.JPanel {
         });
 
         btnExport.setText("Xuất Excel");
-        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 12)); 
-        btnExport.addActionListener(e -> {
-            ExportExcelService.exportTableToExcel(
-                    this,
-                    tblSurchage.getTbl(),
-                    "Danh sách phụ phí",
-                    "DanhSachPhuPhi"
-            );
-        });
+        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
         btnImport.setText("Nhập excel");
         btnImport.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N

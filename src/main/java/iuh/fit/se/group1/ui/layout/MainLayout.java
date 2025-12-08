@@ -4,10 +4,10 @@ import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
-import iuh.fit.se.group1.ui.component.booking2.BookingPage;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
+import iuh.fit.se.group1.ui.component.paymentv2.PaymentPagev2;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
 
 import iuh.fit.se.group1.util.Constants;
@@ -17,7 +17,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ public class MainLayout extends JPanel {
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
-    private SurchageManagement surchageManagement;
+    private SurchargeManagement surchargeManagement;
     private CloseShift closeShift;
     private Runnable logoutCallback;
 
@@ -53,8 +52,6 @@ public class MainLayout extends JPanel {
     public MainLayout() {
         init();
         setOpaque(false);
-        isAdmin = true;
-        setAuth(isAdmin);
     }
 
     public Employee getCurrentEmployee() {
@@ -102,7 +99,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 2) {
                         paymentPage.clearForm();
                         paymentPage.loadData();
-                        setMainContent(paymentPage);
+                        setMainContent(new PaymentPagev2());
                     } else if (index == 3 && subIndex == 1) {
                         shiftManagement.getShiftList().reloadEmployees();
                         setMainContent(shiftManagement);
@@ -122,7 +119,7 @@ public class MainLayout extends JPanel {
                         orderManagement.loadData();
                         setMainContent(orderManagement);
                     } else if (index == 9) {
-                        setMainContent(surchageManagement);
+                        setMainContent(surchargeManagement);
                     } else if (index == 10 && subIndex == 1) {
                         setMainContent(revenueStatistics);
                     } else if (index == 10 && subIndex == 2) {
@@ -154,7 +151,9 @@ public class MainLayout extends JPanel {
                                     "Không thể mở trang giới thiệu trong trình duyệt!",
                                     "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
-                    } else {
+                    } else if (index == 12){ 
+                            setMainContent(new RoomTransferUI());
+                    }else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 } else {
@@ -164,39 +163,169 @@ public class MainLayout extends JPanel {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
                         paymentPage.clearForm();
-                        setMainContent(paymentPage);
+                        setMainContent(new PaymentPagev2());
 
                     } else if (index == 3) {
                         if (currentEmployee == null) {
                             Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
                             return;
                         }
-
                         EmployeeShiftService employeeShiftService = new EmployeeShiftService();
                         ShiftCloseService shiftCloseService = new ShiftCloseService();
+
+                        //  THỜI GIAN DƯ SAU KHI KẾT THÚC CA (10 phút)
+                        final int BUFFER_MINUTES = 10;
+
+                        // LẤY TẤT CẢ CA TRONG NGÀY HÔM NAY
                         List<EmployeeShift> todayShifts = employeeShiftService.getShiftsByEmployeeAndDate(
                                 currentEmployee.getEmployeeId(),
                                 LocalDate.now()
                         );
 
-                        EmployeeShift openShift = todayShifts.stream()
-                                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift).isEmpty())
-                                .findFirst()
-                                .orElse(null);
-
-                        if (openShift == null) {
+                        if (todayShifts.isEmpty()) {
                             Message.showMessage("Thông báo",
-                                    "Bạn chưa mở ca làm việc hôm nay hoặc tất cả ca đã đóng!");
+                                    "Bạn chưa có ca làm việc nào trong ngày hôm nay!");
                             return;
                         }
-                        if (!employeeShiftService.isShiftActive(openShift)) {
-                            String shiftTime = openShift.getShift().getStartTime() + " - " +
-                                    openShift.getShift().getEndTime();
-                            Message.showMessage("Cảnh báo",
-                                    "Ca làm việc (" + shiftTime + ") chưa bắt đầu hoặc đã kết thúc!\n");
+
+                        //  LỌC RA CÁC CA CHƯA ĐÓNG
+                        List<EmployeeShift> openShifts = todayShifts.stream()
+                                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift).isEmpty())
+                                .sorted((s1, s2) -> {
+                                    // Parse string time để sắp xếp
+                                    java.time.LocalTime t1 = java.time.LocalTime.parse(s1.getShift().getStartTime());
+                                    java.time.LocalTime t2 = java.time.LocalTime.parse(s2.getShift().getStartTime());
+                                    return t1.compareTo(t2);
+                                })
+                                .collect(java.util.stream.Collectors.toList());
+
+                        if (openShifts.isEmpty()) {
+                            Message.showMessage("Thông báo",
+                                    "Tất cả ca làm việc hôm nay đã được đóng!");
+                            return;
                         }
-                        openCloseShiftPanel(openShift);
-                    } else {
+
+                        java.time.LocalTime currentTime = java.time.LocalTime.now();
+
+                        // TÌM CA CÓ THỂ ĐÓNG (ĐANG MỞ HOẶC VỪA KẾT THÚC TRONG VÒNG 10 PHÚT)
+                        EmployeeShift shiftToClose = null;
+
+                        for (EmployeeShift shift : openShifts) {
+                            try {
+                                // PARSE STRING SANG LOCALTIME
+                                java.time.LocalTime startTime = java.time.LocalTime.parse(shift.getShift().getStartTime());
+                                java.time.LocalTime endTime = java.time.LocalTime.parse(shift.getShift().getEndTime());
+                                java.time.LocalTime endTimeWithBuffer = endTime.plusMinutes(BUFFER_MINUTES);
+
+                                // KIỂM TRA XEM CA NÀY CÓ ĐANG TRONG THỜI GIAN CHO PHÉP ĐÓNG KHÔNG
+                                boolean isAfterStart = currentTime.isAfter(startTime) || currentTime.equals(startTime);
+                                boolean isBeforeBufferEnd = currentTime.isBefore(endTimeWithBuffer) || currentTime.equals(endTimeWithBuffer);
+
+                                if (isAfterStart && isBeforeBufferEnd) {
+                                    shiftToClose = shift;
+                                    break;
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Lỗi parse time cho ca: " + shift.getShift().getName() + " - " + e.getMessage());
+                            }
+                        }
+
+                        if (shiftToClose != null) {
+                            // Kiểm tra xem có ca cũ hơn chưa đóng không
+                            EmployeeShift oldestOpenShift = openShifts.get(0);
+                            boolean hasOlderUnclosedShift = !oldestOpenShift.getEmployeeShiftId()
+                                    .equals(shiftToClose.getEmployeeShiftId());
+
+                            if (hasOlderUnclosedShift) {
+                                // CÓ CA CŨ HƠN CHƯA ĐÓNG → CẢNH BÁO
+                                String oldShiftName = oldestOpenShift.getShift().getName();
+                                String oldShiftTime = oldestOpenShift.getShift().getStartTime() + " - " +
+                                        oldestOpenShift.getShift().getEndTime();
+                                String currentShiftName = shiftToClose.getShift().getName();
+                                String currentShiftTime = shiftToClose.getShift().getStartTime() + " - " +
+                                        shiftToClose.getShift().getEndTime();
+
+                                int choice = JOptionPane.showOptionDialog(
+                                        null,
+                                        "<html><b style='color:red;'>CẢNH BÁO: Bạn có ca cũ chưa đóng!</b><br><br>" +
+                                                "Ca chưa đóng: <b>" + oldShiftName + "</b> (" + oldShiftTime + ")<br>" +
+                                                "Ca hiện tại: <b>" + currentShiftName + "</b> (" + currentShiftTime + ")<br><br>" +
+                                                "Bạn muốn đóng ca nào?</html>",
+                                        "Cảnh báo",
+                                        JOptionPane.YES_NO_CANCEL_OPTION,
+                                        JOptionPane.WARNING_MESSAGE,
+                                        null,
+                                        new Object[]{"Đóng ca cũ", "Đóng ca hiện tại", "Hủy"},
+                                        "Đóng ca cũ"
+                                );
+
+                                if (choice == JOptionPane.YES_OPTION) {
+                                    openCloseShiftPanel(oldestOpenShift);
+                                } else if (choice == JOptionPane.NO_OPTION) {
+                                    openCloseShiftPanel(shiftToClose);
+                                }
+                                // Cancel → không làm gì
+
+                            } else {
+                                // KHÔNG CÓ CA CŨ CHƯA ĐÓNG → ĐÓNG CA HIỆN TẠI
+                                try {
+                                    java.time.LocalTime endTime = java.time.LocalTime.parse(shiftToClose.getShift().getEndTime());
+                                    boolean isInBufferTime = currentTime.isAfter(endTime);
+
+                                    if (isInBufferTime) {
+                                        long minutesRemaining = java.time.Duration.between(currentTime,
+                                                endTime.plusMinutes(BUFFER_MINUTES)).toMinutes();
+                                        System.out.println("Đang trong thời gian buffer. Còn " + minutesRemaining + " phút để đóng ca.");
+                                    }
+                                } catch (Exception e) {
+                                    System.err.println("Lỗi tính buffer time: " + e.getMessage());
+                                }
+
+                                openCloseShiftPanel(shiftToClose);
+                            }
+
+                        } else {
+
+                            // Kiểm tra xem có ca cũ quá hạn chưa đóng không
+                            EmployeeShift oldestOpenShift = openShifts.get(0);
+
+                            try {
+                                java.time.LocalTime oldestEndTime = java.time.LocalTime.parse(
+                                        oldestOpenShift.getShift().getEndTime()
+                                );
+                                java.time.LocalTime oldestEndTimeWithBuffer = oldestEndTime.plusMinutes(BUFFER_MINUTES);
+
+                                if (currentTime.isAfter(oldestEndTimeWithBuffer)) {
+                                    //  CÓ CA QUÁ HẠN BUFFER TIME
+                                    String oldShiftName = oldestOpenShift.getShift().getName();
+                                    String oldShiftTime = oldestOpenShift.getShift().getStartTime() + " - " +
+                                            oldestOpenShift.getShift().getEndTime();
+
+                                    Message.showMessage("Cảnh báo",
+                                            "<html><b style='color:red;'>Ca làm việc đã quá hạn đóng ca!</b><br><br>" +
+                                                    "Ca: <b>" + oldShiftName + "</b> (" + oldShiftTime + ")<br>" +
+                                                    "Thời gian cho phép đóng ca: đến " + oldestEndTimeWithBuffer.toString() + "<br><br>" +
+                                                    "Vui lòng liên hệ quản lý để xử lý.</html>");
+                                } else {
+                                    //  CHƯA ĐẾN GIỜ LÀM CA
+                                    EmployeeShift nextShift = openShifts.get(0);
+                                    String nextShiftName = nextShift.getShift().getName();
+                                    String nextShiftTime = nextShift.getShift().getStartTime() + " - " +
+                                            nextShift.getShift().getEndTime();
+
+                                    Message.showMessage("Thông báo",
+                                            "<html>Chưa có ca làm việc nào có thể đóng!<br><br>" +
+                                                    "Ca tiếp theo: <b>" + nextShiftName + "</b> (" + nextShiftTime + ")<br>" +
+                                                    "Vui lòng quay lại trong giờ làm việc.</html>");
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Lỗi parse time: " + e.getMessage());
+                                Message.showMessage("Lỗi", "Không thể xử lý thời gian ca làm việc!");
+                            }
+                        }
+                    }
+                    else {
+                        System.out.println("hihi");
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
@@ -301,11 +430,9 @@ public class MainLayout extends JPanel {
             orderManagement.setPaymentPage(paymentPage);
             checkForVersionPanel = new CheckForVersionPanel();
             revenueStatistics = new RevenueStatistics();
-            surchageManagement = new SurchageManagement();
+            surchargeManagement = new SurchargeManagement();
             setMainContent(dashboard);
         } else {
-
-
             dashboardEmployee = new DashboardEmployee();
             bookingPage = new BookingPage();
             bookingPage.setCurrentEmployee(currentEmployee);

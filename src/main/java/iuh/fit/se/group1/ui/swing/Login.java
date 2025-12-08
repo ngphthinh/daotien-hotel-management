@@ -60,7 +60,7 @@ public class Login extends javax.swing.JFrame {
         this.emailSenderService = new EmailSenderService();
         initComponents();
         custom();
-        txtUser.setText("thinh1");
+        txtUser.setText("admin1");
         txtPass.setText("User@123");
 
     }
@@ -400,6 +400,8 @@ public class Login extends javax.swing.JFrame {
             }
         }
     }
+
+
     private void btnForgotPassActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnForgotPassActionPerformed
         var modal = new VerifyIdentityModal();
         var sendCodeModal = new SendResetCodeModal();

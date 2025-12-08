@@ -28,12 +28,12 @@ public class PromotionRepository implements Repository<Promotion, Long>{
 
     @Override
     public Promotion save(Promotion entity) {
-        String sql= "Insert into Promotion(promotionName,description,discountPercent,discountPrice,startDate,endDate,createdAt) values (?,?,?,?,?,?,?);";
+        String sql= "Insert into Promotion(promotionName,description,discountPercent,minOrderAmount,startDate,endDate,createdAt) values (?,?,?,?,?,?,?);";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getPromotionName());
             preparedStatement.setString(2, entity.getDescription());
             preparedStatement.setFloat(3, entity.getDiscountPercent());
-            preparedStatement.setBigDecimal(4, entity.getDiscountPrice());
+            preparedStatement.setBigDecimal(4, entity.getMinOrderAmount());
             preparedStatement.setDate(5, Date.valueOf(entity.getStartDate()));
             preparedStatement.setDate(6, Date.valueOf(entity.getEndDate()));
             if (entity.getCreatedAt() == null) {
@@ -68,7 +68,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
                     entity.setPromotionName(rs.getString(2));
                     entity.setDescription(rs.getString(3));
                     entity.setDiscountPercent(rs.getFloat(4));
-                    entity.setDiscountPrice(rs.getBigDecimal(5));
+                    entity.setMinOrderAmount(rs.getBigDecimal(5));
                     entity.setStartDate(rs.getDate(6).toLocalDate());
                     entity.setEndDate(rs.getDate(7).toLocalDate());
                     entity.setCreatedAt(rs.getDate(8).toLocalDate());
@@ -105,7 +105,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
                 entity.setPromotionName(rs.getString("promotionName"));
                 entity.setDescription(rs.getString("description"));
                 entity.setDiscountPercent(rs.getFloat("discountPercent"));
-                entity.setDiscountPrice(rs.getBigDecimal("discountPrice"));
+                entity.setMinOrderAmount(rs.getBigDecimal("minOrderAmount"));
                 entity.setStartDate(rs.getDate("startDate").toLocalDate());
                 entity.setEndDate(rs.getDate("endDate").toLocalDate());
                 entity.setCreatedAt(rs.getDate("createdAt").toLocalDate());
@@ -121,12 +121,12 @@ public class PromotionRepository implements Repository<Promotion, Long>{
 
     @Override
     public Promotion update(Promotion entity) {
-        String sql = "Update Promotion set promotionName=?,description=?,discountPercent=?,discountPrice=?,startDate=?,endDate=? where promotionId=?;";
+        String sql = "Update Promotion set promotionName=?,description=?,discountPercent=?,minOrderAmount=?,startDate=?,endDate=? where promotionId=?;";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getPromotionName());
             preparedStatement.setString(2, entity.getDescription());
             preparedStatement.setFloat(3, entity.getDiscountPercent());
-            preparedStatement.setBigDecimal(4, entity.getDiscountPrice());
+            preparedStatement.setBigDecimal(4, entity.getMinOrderAmount());
             preparedStatement.setDate(5, Date.valueOf(entity.getStartDate()));
             preparedStatement.setDate(6, Date.valueOf(entity.getEndDate()));
             preparedStatement.setLong(7, entity.getPromotionId());
@@ -159,7 +159,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
                     promotion.setPromotionName(resultSet.getString("promotionName"));
                     promotion.setDescription(resultSet.getString("description"));
                     promotion.setDiscountPercent(resultSet.getFloat("discountPercent"));
-                    promotion.setDiscountPrice(resultSet.getBigDecimal("discountPrice"));
+                    promotion.setMinOrderAmount(resultSet.getBigDecimal("minOrderAmount"));
                     promotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
                     promotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
                     promotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
@@ -182,7 +182,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
                     promotion.setPromotionName(resultSet.getString("promotionName"));
                     promotion.setDescription(resultSet.getString("description"));
                     promotion.setDiscountPercent(resultSet.getFloat("discountPercent"));
-                    promotion.setDiscountPrice(resultSet.getBigDecimal("discountPrice"));
+                    promotion.setMinOrderAmount(resultSet.getBigDecimal("minOrderAmount"));
                     promotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
                     promotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
                     promotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
@@ -205,7 +205,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
                     promotion.setPromotionName(resultSet.getString("promotionName"));
                     promotion.setDescription(resultSet.getString("description"));
                     promotion.setDiscountPercent(resultSet.getFloat("discountPercent"));
-                    promotion.setDiscountPrice(resultSet.getBigDecimal("discountPrice"));
+                    promotion.setMinOrderAmount(resultSet.getBigDecimal("minOrderAmount"));
                     promotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
                     promotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
                     promotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
@@ -230,7 +230,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
                     promotion.setPromotionName(resultSet.getString("promotionName"));
                     promotion.setDescription(resultSet.getString("description"));
                     promotion.setDiscountPercent(resultSet.getFloat("discountPercent"));
-                    promotion.setDiscountPrice(resultSet.getBigDecimal("discountPrice"));
+                    promotion.setMinOrderAmount(resultSet.getBigDecimal("minOrderAmount"));
                     promotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
                     promotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
                     promotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
@@ -241,5 +241,39 @@ public class PromotionRepository implements Repository<Promotion, Long>{
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+
+    public Promotion findActivePromotion(BigDecimal totalAmount) {
+        String sql = """
+                SELECT * FROM Promotion
+                WHERE endDate > GETDATE() AND minOrderAmount <= ?
+                """;
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setBigDecimal(1, totalAmount);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                Promotion bestPromotion = null;
+                float maxDiscountPercent = 0.0f;
+                while (resultSet.next()) {
+                    float discountPercent = resultSet.getFloat("discountPercent");
+                    if (discountPercent > maxDiscountPercent) {
+                        maxDiscountPercent = discountPercent;
+                        bestPromotion = new Promotion();
+                        bestPromotion.setPromotionId(resultSet.getLong("promotionId"));
+                        bestPromotion.setPromotionName(resultSet.getString("promotionName"));
+                        bestPromotion.setDescription(resultSet.getString("description"));
+                        bestPromotion.setDiscountPercent(discountPercent);
+                        bestPromotion.setMinOrderAmount(resultSet.getBigDecimal("minOrderAmount"));
+                        bestPromotion.setStartDate(resultSet.getDate("startDate").toLocalDate());
+                        bestPromotion.setEndDate(resultSet.getDate("endDate").toLocalDate());
+                        bestPromotion.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    }
+                }
+                return bestPromotion;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

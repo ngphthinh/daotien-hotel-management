@@ -4,47 +4,28 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.entity.DenominationDetail;
-import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.entity.EmployeeShift;
-import iuh.fit.se.group1.entity.ShiftClose;
+import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.DenominationLabel;
-import iuh.fit.se.group1.repository.DenominationDetailRepository;
-import iuh.fit.se.group1.repository.ShiftCloseRepository;
-import iuh.fit.se.group1.service.DenominationDetailService;
-import iuh.fit.se.group1.service.EmployeeService;
-import iuh.fit.se.group1.service.EmployeeShiftService;
-import iuh.fit.se.group1.service.ShiftCloseService;
-import iuh.fit.se.group1.ui.component.HeaderShift;
+import iuh.fit.se.group1.repository.*;
+import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
-import iuh.fit.se.group1.ui.component.custom.TextField;
-import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
-import iuh.fit.se.group1.ui.component.custom.message.Message;
+import iuh.fit.se.group1.ui.component.custom.message.*;
 import iuh.fit.se.group1.ui.component.modal.ConfirmInfoModal;
-import iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote;
-import iuh.fit.se.group1.ui.component.shift.InfoShift;
-import iuh.fit.se.group1.ui.component.shift.MinPanel;
 import iuh.fit.se.group1.ui.component.shift.Money;
-import iuh.fit.se.group1.ui.component.shift.MoneyInTheSafe;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.*;
-
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
-/**
- * @author THIS PC
- */
+import javax.swing.*;
+import java.awt.Color;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
 public class CloseShift extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(CloseShift.class);
     private EmployeeShiftService employeeShiftService;
@@ -53,18 +34,13 @@ public class CloseShift extends javax.swing.JPanel {
     private EmployeeShift currentEmployeeShift;
     private BigDecimal totalRevenue = BigDecimal.ZERO;
     private ConfirmInfoModal confirmModal;
-    private static final DenominationLabel[] DENOMINATION_LABELS = {
-            DenominationLabel.VND_500000,
-            DenominationLabel.VND_200000,
-            DenominationLabel.VND_100000,
-            DenominationLabel.VND_50000,
-            DenominationLabel.VND_20000,
-            DenominationLabel.VND_10000,
-            DenominationLabel.VND_5000,
-            DenominationLabel.VND_2000,
-            DenominationLabel.VND_1000
-    };
+
+    // THÊM: Timer tự động refresh
+    private Timer autoRefreshTimer;
+    private BigDecimal openingCash = new BigDecimal("5000000");
+
     private Runnable onCloseShiftSuccess;
+
     public CloseShift() {
         this.employeeShiftService = new EmployeeShiftService();
         this.denominationDetailService = new DenominationDetailService();
@@ -76,34 +52,118 @@ public class CloseShift extends javax.swing.JPanel {
         initMoneyLabels();
         clearForm();
         setupConfirmModal();
+
+        //KHỞI ĐỘNG TIMER TỰ ĐỘNG
+        setupAutoRefresh();
+    }
+
+    /**
+     *  THIẾT LẬP TIMER TỰ ĐỘNG CẬP NHẬT MỖI 3 GIÂY
+     */
+    private void setupAutoRefresh() {
+        autoRefreshTimer = new Timer(3000, e -> {
+            if (currentEmployeeShift != null) {
+                refreshRevenueData();
+            }
+        });
+        autoRefreshTimer.start();
+        log.info("Auto-refresh timer started (3 seconds interval)");
+    }
+
+    /**
+     *  CẬP NHẬT LẠI DOANH THU VÀ TÍNH CHÊNH LỆCH TỰ ĐỘNG
+     */
+    private void refreshRevenueData() {
+        try {
+            // Lấy lại tổng doanh thu mới nhất từ database
+            BigDecimal newRevenue = employeeShiftService.getTotalCashRevenueForShift(
+                    currentEmployeeShift.getEmployeeShiftId()
+            );
+
+            // Chỉ cập nhật nếu có thay đổi
+            if (!newRevenue.equals(totalRevenue)) {
+                log.info("Revenue changed: {} -> {}",
+                        formatCurrency(totalRevenue),
+                        formatCurrency(newRevenue));
+
+                totalRevenue = newRevenue;
+                txtSystem.setText(formatCurrency(totalRevenue));
+
+                // TỰ ĐỘNG TÍNH LẠI CHÊNH LỆCH NGAY
+                calculateDifference();
+            }
+
+        } catch (Exception e) {
+            log.error("Error refreshing revenue data: ", e);
+        }
+    }
+
+    /**
+     * DỪNG TIMER KHI PANEL BỊ XÓA
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        if (autoRefreshTimer != null && autoRefreshTimer.isRunning()) {
+            autoRefreshTimer.stop();
+            log.info("Auto-refresh timer stopped");
+        }
     }
     private void setupConfirmModal() {
-        // Xử lý khi nhấn nút Xác nhận
         confirmModal.getBtnConfirm().addActionListener(e -> {
-            String username = confirmModal.getUsername();
-            String password = confirmModal.getPassword();
+            System.out.println("=== BUTTON CONFIRM CLICKED ===");
 
-            if (username.isEmpty() || password.isEmpty()) {
-                Message.showMessage("Lỗi", "Vui lòng nhập đầy đủ thông tin!");
+            // ✅ KIỂM TRA NẾU ĐANG XỬ LÝ THÌ BỎ QUA
+            if (confirmModal.isProcessing()) {
+                System.out.println(">>> ALREADY PROCESSING - IGNORED");
                 return;
             }
 
-            // Xác thực manager
-            ShiftCloseRepository repository = new ShiftCloseRepository();
-            Employee manager = repository.validateManager(username, password);
+            // ✅ ĐẶT CỜ ĐANG XỬ LÝ
+            confirmModal.setProcessing(true);
 
-            if (manager != null) {
-                // Xác thực thành công - Tiến hành đóng ca
-                GlassPanePopup.closePopupLast(); // Đóng modal
-                confirmModal.clearFields();
-                performCloseShift(manager.getEmployeeId()); // Gọi method đóng ca
-            } else {
-                Message.showMessage("Lỗi", "Sai tài khoản hoặc mật khẩu!\nHoặc tài khoản không phải Manager!");
+            try {
+                // Lấy giá trị
+                String username = confirmModal.getUsername();
+                String password = confirmModal.getPassword();
+
+                System.out.println("Username result: '" + username + "' (isEmpty: " + username.isEmpty() + ")");
+                System.out.println("Password result length: " + password.length() + " (isEmpty: " + password.isEmpty() + ")");
+
+                if (username.isEmpty() || password.isEmpty()) {
+                    System.out.println(">>> VALIDATION FAILED - Showing error message");
+                    Message.showMessage("Lỗi", "Vui lòng nhập đầy đủ thông tin!");
+                    SwingUtilities.invokeLater(() -> confirmModal.clearFields());
+                    return;
+                }
+
+                System.out.println(">>> VALIDATION PASSED - Checking credentials");
+
+                ShiftCloseRepository repository = new ShiftCloseRepository();
+                Employee manager = repository.validateManager(username, password);
+
+                if (manager != null) {
+                    System.out.println(">>> MANAGER VALIDATED - Closing shift");
+                    GlassPanePopup.closePopupLast();
+                    confirmModal.clearFields();
+                    performCloseShift(manager.getEmployeeId());
+                } else {
+                    System.out.println(">>> INVALID CREDENTIALS");
+                    Message.showMessage("Lỗi", "Sai tài khoản hoặc mật khẩu!\nHoặc tài khoản không phải Manager!");
+                    SwingUtilities.invokeLater(() -> confirmModal.clearFields());
+                }
+            } finally {
+                // ✅ RESET CỜ SAU KHI XỬ LÝ XONG (delay 500ms để tránh click liên tiếp)
+                Timer resetTimer = new Timer(500, evt -> {
+                    confirmModal.setProcessing(false);
+                });
+                resetTimer.setRepeats(false);
+                resetTimer.start();
             }
         });
 
-        // Xử lý khi nhấn nút Hủy
         confirmModal.getBtnCancel().addActionListener(e -> {
+            System.out.println("=== BUTTON CANCEL CLICKED ===");
             GlassPanePopup.closePopupLast();
             confirmModal.clearFields();
         });
@@ -113,7 +173,11 @@ public class CloseShift extends javax.swing.JPanel {
                 "Bạn có chắc chắn muốn đóng ca làm việc này?",
                 () -> {
                     try {
-                        // 1. Tạo đối tượng ShiftClose
+                        // Dừng timer trước khi đóng ca
+                        if (autoRefreshTimer != null) {
+                            autoRefreshTimer.stop();
+                        }
+
                         ShiftClose shiftClose = new ShiftClose();
                         shiftClose.setEmployeeShift(currentEmployeeShift);
 
@@ -121,16 +185,13 @@ public class CloseShift extends javax.swing.JPanel {
                         shiftClose.setCashInDrawer(cashInDrawer);
                         shiftClose.setTotalRevenue(totalRevenue);
                         shiftClose.setNote(jTextArea1.getText());
-                        shiftClose.setManagerId(managerId); // ✅ SET MANAGER ID
+                        shiftClose.setManagerId(managerId);
 
                         LocalDateTime now = LocalDateTime.now();
                         shiftClose.setCreatedAt(now);
 
-                        // 2. Lưu ShiftClose
-                        ShiftCloseService shiftCloseService = new ShiftCloseService();
                         ShiftClose savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
 
-                        // 3. Hiển thị thông báo thành công
                         String formattedTime = now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
                         String differenceText = formatCurrency(savedShiftClose.getDifference());
 
@@ -153,7 +214,6 @@ public class CloseShift extends javax.swing.JPanel {
 
                         clearForm();
 
-                        // 4. Logout
                         if (onCloseShiftSuccess != null) {
                             Timer timer = new Timer(0, e -> {
                                 onCloseShiftSuccess.run();
@@ -168,11 +228,13 @@ public class CloseShift extends javax.swing.JPanel {
                 }
         );
     }
+
     private void configureTextFields() {
         txtMoneyOpenShift.setEditable(false);
         txtReality.setEditable(false);
         txtSystem.setEditable(false);
     }
+
     private void initIcons() {
         lblTitleMoneyOpenShift.setIcon(FontIcon.of(FontAwesomeSolid.MONEY_BILL_ALT, 20, Color.BLACK));
         lblTitleMoneyOfSafe.setIcon(FontIcon.of(FontAwesomeSolid.COINS, 17, Color.BLACK));
@@ -180,6 +242,7 @@ public class CloseShift extends javax.swing.JPanel {
         lblNote.setIcon(FontIcon.of(FontAwesomeSolid.PEN, 17, Color.BLACK));
         btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.WHITE));
     }
+
     private void initMoneyLabels() {
         denominationDetailService = new DenominationDetailService();
         List<Long> denominations = denominationDetailService.getAvailableDenominations();
@@ -190,10 +253,12 @@ public class CloseShift extends javax.swing.JPanel {
             moneyPanels[i].getLblMoney().setText(formatDenomination(denom));
         }
     }
+
     private String formatDenomination(long value) {
         java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
         return formatter.format(value) + "VND";
     }
+
     public void setCurrentEmployeeShift(EmployeeShift employeeShift) {
         this.currentEmployeeShift = employeeShift;
 
@@ -205,18 +270,23 @@ public class CloseShift extends javax.swing.JPanel {
 
                 if (detailedShift != null) {
                     displayShiftInfo(detailedShift);
-                    txtMoneyOpenShift.setText("5.000.000 VND");
 
-                    // 2. Thiết lập số lượng tiền mặc định
+                    // Hiển thị tiền mở ca
+                    txtMoneyOpenShift.setText(formatCurrency(openingCash));
+
+                    // Thiết lập số lượng tiền mặc định
                     setDefaultMoneyDistribution();
 
-                    // 3. Tính tổng doanh thu từ hóa đơn
+                    //LẤY DOANH THU BAN ĐẦU
                     totalRevenue = employeeShiftService.getTotalCashRevenueForShift(
                             employeeShift.getEmployeeShiftId()
                     );
                     txtSystem.setText(formatCurrency(totalRevenue));
 
                     setupAutoCalculation();
+
+                    // TÍNH NGAY KHI VỪA LOAD
+                    calculateDifference();
                 }
 
             } catch (Exception e) {
@@ -226,9 +296,7 @@ public class CloseShift extends javax.swing.JPanel {
             }
         }
     }
-    /**
-     * Hiển thị thông tin ca làm việc lên UI
-     */
+
     private void displayShiftInfo(EmployeeShift shift) {
         if (shift.getEmployee() != null) {
             infoShift1.setEmployeeName(shift.getEmployee().getFullName());
@@ -245,32 +313,29 @@ public class CloseShift extends javax.swing.JPanel {
         }
     }
 
-
-    /**
-     * Thiết lập tính toán tự động khi nhập số tiền thực tế
-     */
     private void setupAutoCalculation() {
         txtReality.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 calculateDifference();
             }
         });
+
         java.awt.event.KeyAdapter moneyKeyListener = new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 calculateTotalCashInDrawer();
             }
         };
+
         for (Money moneyPanel : getMoneyPanels()) {
             moneyPanel.getTxtQuantity().addKeyListener(moneyKeyListener);
         }
     }
+
     private Money[] getMoneyPanels() {
         return new Money[]{money1, money2, money3, money4, money5,
                 money6, money7, money8, money9};
     }
-    /**
-     * Tính tổng tiền trong két dựa trên mệnh giá
-     */
+
     private void calculateTotalCashInDrawer() {
         try {
             BigDecimal total = BigDecimal.ZERO;
@@ -295,9 +360,6 @@ public class CloseShift extends javax.swing.JPanel {
         }
     }
 
-    /**
-     * Tính giá trị tiền của mỗi mệnh giá
-     */
     private BigDecimal calculateMoneyValue(Money moneyPanel, long denomination) {
         try {
             String quantityText = moneyPanel.getTxtQuantity().getText();
@@ -312,21 +374,24 @@ public class CloseShift extends javax.swing.JPanel {
     }
 
     /**
-     * Tính toán chênh lệch giữa thực tế và hệ thống
+     * ✅ TÍNH CHÊNH LỆCH - SỬ DỤNG totalRevenue TỪ BIẾN (ĐÃ ĐƯỢC AUTO-REFRESH)
      */
     private void calculateDifference() {
         try {
             BigDecimal reality = parseCurrency(txtReality.getText());
-            BigDecimal openingCash = new BigDecimal("5000000");
+
+            // Công thức: Chênh lệch = Tiền thực tế - (Doanh thu + Tiền mở ca)
             BigDecimal difference = reality.subtract(totalRevenue.add(openingCash));
 
             txtMoneyDifference.setText(formatCurrency(difference));
+
+            // Đổi màu theo kết quả
             if (difference.compareTo(BigDecimal.ZERO) < 0) {
-                txtMoneyDifference.setForeground(new Color(255, 51, 0)); // Đỏ - thiếu tiền
+                txtMoneyDifference.setForeground(new Color(255, 51, 0)); // Đỏ - thiếu
             } else if (difference.compareTo(BigDecimal.ZERO) > 0) {
-                txtMoneyDifference.setForeground(new Color(0, 153, 0)); // Xanh - thừa tiền
+                txtMoneyDifference.setForeground(new Color(0, 153, 0)); // Xanh - thừa
             } else {
-                txtMoneyDifference.setForeground(Color.BLACK);
+                txtMoneyDifference.setForeground(Color.WHITE); // Trắng - khớp
             }
 
         } catch (Exception e) {
@@ -334,9 +399,6 @@ public class CloseShift extends javax.swing.JPanel {
         }
     }
 
-    /**
-     * Format tiền tệ
-     */
     private String formatCurrency(BigDecimal amount) {
         if (amount == null) {
             return "0 VND";
@@ -345,9 +407,6 @@ public class CloseShift extends javax.swing.JPanel {
         return formatter.format(amount) + " VND";
     }
 
-    /**
-     * Parse chuỗi tiền tệ thành BigDecimal
-     */
     private BigDecimal parseCurrency(String text) {
         if (text == null || text.isEmpty()) {
             return BigDecimal.ZERO;
@@ -357,6 +416,105 @@ public class CloseShift extends javax.swing.JPanel {
             return BigDecimal.ZERO;
         }
         return new BigDecimal(numberOnly);
+    }
+
+    public Button getBtnClose() {
+        return btnClose;
+    }
+
+    public void setBtnClose(Button btnClose) {
+        this.btnClose = btnClose;
+    }
+
+    public void setOnCloseShiftSuccess(Runnable callback) {
+        this.onCloseShiftSuccess = callback;
+    }
+
+    public void saveData() {
+        if (currentEmployeeShift == null) {
+            Message.showMessage("Lỗi", "Không tìm thấy thông tin ca làm việc!");
+            return;
+        }
+
+        saveDenominationDetails();
+        GlassPanePopup.showPopup(confirmModal);
+    }
+
+    private void saveDenominationDetails() {
+        List<DenominationDetail> details = new ArrayList<>();
+        Money[] moneyPanels = {money1, money2, money3, money4, money5, money6, money7, money8, money9};
+        DenominationLabel[] labels = {
+                DenominationLabel.VND_500000,
+                DenominationLabel.VND_200000,
+                DenominationLabel.VND_100000,
+                DenominationLabel.VND_50000,
+                DenominationLabel.VND_20000,
+                DenominationLabel.VND_10000,
+                DenominationLabel.VND_5000,
+                DenominationLabel.VND_2000,
+                DenominationLabel.VND_1000
+        };
+
+        for (int i = 0; i < moneyPanels.length; i++) {
+            try {
+                String qtyText = moneyPanels[i].getTxtQuantity().getText();
+                if (qtyText != null && !qtyText.trim().isEmpty()) {
+                    int quantity = Integer.parseInt(qtyText.trim());
+                    if (quantity > 0) {
+                        DenominationDetail detail = new DenominationDetail();
+                        detail.setDenomination(labels[i]);
+                        detail.setQuantity(quantity);
+                        detail.setEmployeeShift(currentEmployeeShift);
+                        detail.setCreatedAt(java.time.LocalDate.now());
+                        details.add(detail);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                log.warn("Invalid quantity for denomination {}", labels[i]);
+            }
+        }
+
+        if (!details.isEmpty()) {
+            DenominationDetailRepository repo = new DenominationDetailRepository();
+            repo.saveBatch(details);
+            log.info("Saved {} denomination details", details.size());
+        }
+    }
+
+    private void setDefaultMoneyDistribution() {
+        int[] defaultQuantities = {
+                4,   // 500.000 x 4 = 2.000.000
+                5,   // 200.000 x 5 = 1.000.000
+                11,  // 100.000 x 11 = 1.100.000
+                9,   // 50.000 x 9 = 450.000
+                9,   // 20.000 x 9 = 180.000
+                20,  // 10.000 x 20 = 200.000
+                10,  // 5.000 x 10 = 50.000
+                5,   // 2.000 x 5 = 10.000
+                10   // 1.000 x 10 = 10.000
+        };
+
+        Money[] moneyPanels = getMoneyPanels();
+
+        for (int i = 0; i < Math.min(moneyPanels.length, defaultQuantities.length); i++) {
+            moneyPanels[i].getTxtQuantity().setText(String.valueOf(defaultQuantities[i]));
+        }
+
+        calculateTotalCashInDrawer();
+    }
+
+    private void clearForm() {
+        txtReality.setText("");
+        jTextArea1.setText("");
+
+        setDefaultMoneyDistribution();
+
+        txtMoneyDifference.setText("0 VND");
+        txtMoneyDifference.setForeground(Color.WHITE);
+        txtMoneyOpenShift.setText(formatCurrency(openingCash));
+        txtSystem.setText("0 VND");
+
+        totalRevenue = BigDecimal.ZERO;
     }
 
     /**
@@ -757,111 +915,10 @@ public class CloseShift extends javax.swing.JPanel {
     private void txtRealityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRealityActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRealityActionPerformed
-
-    public Button getBtnClose() {
-        return btnClose;
-    }
-
-    public void setBtnClose(Button btnClose) {
-        this.btnClose = btnClose;
-    }
-    public void setOnCloseShiftSuccess(Runnable callback) {
-        this.onCloseShiftSuccess = callback;
-    }
-    public void saveData() {
-        if (currentEmployeeShift == null) {
-            Message.showMessage("Lỗi", "Không tìm thấy thông tin ca làm việc!");
-            return;
-        }
-
-        saveDenominationDetails();
-
-        // ✅ HIỂN THỊ MODAL XÁC NHẬN
-        GlassPanePopup.showPopup(confirmModal);
-    }
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
         saveData();
-    }                                        
-    private void saveDenominationDetails() {
-        List<DenominationDetail> details = new ArrayList<>();
-        Money[] moneyPanels = {money1, money2, money3, money4, money5, money6, money7, money8, money9};
-        DenominationLabel[] labels = {
-                DenominationLabel.VND_500000,
-                DenominationLabel.VND_200000,
-                DenominationLabel.VND_100000,
-                DenominationLabel.VND_50000,
-                DenominationLabel.VND_20000,
-                DenominationLabel.VND_10000,
-                DenominationLabel.VND_5000,
-                DenominationLabel.VND_2000,
-                DenominationLabel.VND_1000
-        };
-
-        for (int i = 0; i < moneyPanels.length; i++) {
-            try {
-                String qtyText = moneyPanels[i].getTxtQuantity().getText();
-                if (qtyText != null && !qtyText.trim().isEmpty()) {
-                    int quantity = Integer.parseInt(qtyText.trim());
-                    if (quantity > 0) {
-                        DenominationDetail detail = new DenominationDetail();
-                        detail.setDenomination(labels[i]);
-                        detail.setQuantity(quantity);
-                        detail.setEmployeeShift(currentEmployeeShift);
-                        detail.setCreatedAt(java.time.LocalDate.now());
-                        details.add(detail);
-                    }
-                }
-            } catch (NumberFormatException e) {
-                log.warn("Invalid quantity for denomination {}", labels[i]);
-            }
-        }
-        if (!details.isEmpty()) {
-            denominationDetailService = new DenominationDetailService();
-            DenominationDetailRepository repo = new DenominationDetailRepository();
-            repo.saveBatch(details);
-            log.info("Saved {} denomination details", details.size());
-        }
     }
-    private void setDefaultMoneyDistribution() {
-        // Mảng số lượng tương ứng với mỗi mệnh giá
-        int[] defaultQuantities = {
-                4,   // 500.000 x 4 = 2.000.000
-                5,   // 200.000 x 5 = 1.000.000
-                11,  // 100.000 x 11 = 1.100.000
-                9,   // 50.000 x 9 = 450.000
-                9,   // 20.000 x 9 = 180.000
-                20,  // 10.000 x 20 = 200.000
-                10,  // 5.000 x 10 = 50.000
-                5,  // 2.000 x 5 = 10.000
-                10   // 1.000 x 10 = 10.000
-        }; // Tổng giá trị: 5.000.000
-        Money[] moneyPanels = getMoneyPanels();
 
-        for (int i = 0; i < Math.min(moneyPanels.length, defaultQuantities.length); i++) {
-            moneyPanels[i].getTxtQuantity().setText(String.valueOf(defaultQuantities[i]));
-        }
-
-        // Tính toán và hiển thị tổng tiền
-        calculateTotalCashInDrawer();
-    }
-    private void clearForm() {
-        txtReality.setText("");
-        jTextArea1.setText("");
-
-        // Reset về số lượng tiền mặc định thay vì 0
-        setDefaultMoneyDistribution();
-
-        txtMoneyDifference.setText("0 VND");
-        txtMoneyDifference.setForeground(Color.BLACK);
-        txtMoneyOpenShift.setText("5.000.000 VND");
-        txtSystem.setText("0 VND");
-    }
-    private int parseQuantity(String text) throws NumberFormatException {
-        if (text == null || text.trim().isEmpty()) {
-            return 0;
-        }
-        return Integer.parseInt(text.trim());
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.shift.OpenDifferenceNote atTheEnd1;

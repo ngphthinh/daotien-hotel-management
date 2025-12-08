@@ -60,11 +60,18 @@ public class ShiftProfile extends javax.swing.JPanel implements MouseListener{
         initComponents();
         setPreferredSize(new Dimension(290, getPreferredSize().height));
         rdoSelect.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 24));
-         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-         rdoSelect.addActionListener(e -> {
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        String currentCode = lblCode.getText();
+        if (!currentCode.startsWith("Mã nhân viên:")) {
+            lblCode.setText("Mã nhân viên: " + currentCode);
+        }
+        rdoSelect.addActionListener(e -> {
             isSelect = rdoSelect.isSelected();
             updateBackground();
         });
+    }
+    public void updateEmployeeCodeLabel(String code) {
+        lblCode.setText("Mã nhân viên: " + code);
     }
 
     public AvatarLabel getAvatarLabel() {
