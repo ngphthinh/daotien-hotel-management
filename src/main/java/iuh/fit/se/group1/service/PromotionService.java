@@ -39,4 +39,9 @@ public class PromotionService {
     public Promotion getPromotionDiscountPercentMax(){
         return promotionRepository.findAllWithDiscountPercentMax();
     }
+
+    public Promotion getActivePromotion(BigDecimal totalAmount) {
+        return promotionRepository.findActivePromotion(totalAmount);
+    }
+
 }

@@ -70,4 +70,16 @@ public class RoomDTO {
     public void setAdditionalHourRate(BigDecimal additionalHourRate) {
         this.additionalHourRate = additionalHourRate;
     }
+
+    @Override
+    public String toString() {
+        return "RoomDTO{" +
+                "roomType='" + roomType + '\'' +
+                ", capacity=" + capacity +
+                ", hourlyRate=" + hourlyRate +
+                ", dailyRate=" + dailyRate +
+                ", overnightRate=" + overnightRate +
+                ", additionalHourRate=" + additionalHourRate +
+                '}';
+    }
 }

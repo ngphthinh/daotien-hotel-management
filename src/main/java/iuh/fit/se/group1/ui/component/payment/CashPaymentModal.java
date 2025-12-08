@@ -16,8 +16,8 @@ public class CashPaymentModal extends JPanel {
 
     // ====== Biến logic ======
     private final DecimalFormat df = new DecimalFormat("#,### VNĐ");
-    private long totalToPay = 1_250_000; // 💵 ví dụ
-    private long moneyGiven = 0;
+    private double totalToPay = 1_250_000; // 💵 ví dụ
+    private double moneyGiven = 0;
 
     // ====== Biến giao diện ======
     private iuh.fit.se.group1.ui.component.custom.Button btnComplete;
@@ -26,7 +26,7 @@ public class CashPaymentModal extends JPanel {
     private JPanel pnlMoney;
     private iuh.fit.se.group1.ui.component.custom.TextField txtMoneyChange, txtMoneyGive;
 
-    public CashPaymentModal(long totalToPay) {
+    public CashPaymentModal(double totalToPay) {
         this.totalToPay = totalToPay;
         initComponents();
         setupUI();
@@ -55,7 +55,7 @@ public class CashPaymentModal extends JPanel {
         return shortDf.format(money);
     }
 
-    public String formatMoney(long value) {
+    public String formatMoney(double value) {
         return df.format(value);
     }
 
@@ -110,11 +110,11 @@ public class CashPaymentModal extends JPanel {
         return btn;
     }
 
-    private void selectSuggestedMoney(long value) {
+    private void selectSuggestedMoney(double value) {
         moneyGiven = value;
         txtMoneyGive.setText(df.format(moneyGiven));
 
-        long change = moneyGiven - totalToPay;
+        double change = moneyGiven - totalToPay;
         txtMoneyChange.setText(change >= 0 ? df.format(change) : "0 VNĐ");
     }
 
@@ -123,7 +123,7 @@ public class CashPaymentModal extends JPanel {
         return df;
     }
 
-    public long getTotalToPay() {
+    public double getTotalToPay() {
         return totalToPay;
     }
 
@@ -131,7 +131,7 @@ public class CashPaymentModal extends JPanel {
         this.totalToPay = totalToPay;
     }
 
-    public long getMoneyGiven() {
+    public double getMoneyGiven() {
         return moneyGiven;
     }
 
@@ -212,7 +212,7 @@ public class CashPaymentModal extends JPanel {
             return;
         }
 
-        long change = moneyGiven - totalToPay;
+        double change = moneyGiven - totalToPay;
         JOptionPane.showMessageDialog(this,
                 "✅ Thanh toán hoàn tất!\n"
                         + "Tổng tiền: " + formatMoney(totalToPay) + "\n"

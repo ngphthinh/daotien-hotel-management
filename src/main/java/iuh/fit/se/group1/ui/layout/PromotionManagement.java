@@ -66,7 +66,7 @@ public class PromotionManagement extends javax.swing.JPanel {
             model.addRow(new Object[]{
                 promotion.getPromotionId(),
                 promotion.getPromotionName(),
-                Constants.VND_FORMAT.format(promotion.getDiscountPrice()),
+                Constants.VND_FORMAT.format(promotion.getMinOrderAmount()),
                 promotion.getDiscountPercent() + "%",
                 promotion.getStartDate().format(Constants.DATE_FORMATTER),
                 promotion.getEndDate().format(Constants.DATE_FORMATTER),
@@ -172,7 +172,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                         Promotion promotion = new Promotion();
                         promotion.setPromotionId(id);
                         promotion.setPromotionName(result.name);
-                        promotion.setDiscountPrice(result.discountPrice);
+                        promotion.setMinOrderAmount(result.discountPrice);
                         promotion.setDiscountPercent(result.discountPercent);
                         promotion.setDescription(result.description);
                         promotion.setStartDate(result.startDate);
@@ -182,10 +182,10 @@ public class PromotionManagement extends javax.swing.JPanel {
 
                         model.setValueAt(entitySave.getPromotionName(), row, 1);
 
-                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getDiscountPrice()), row, 2);
+                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getMinOrderAmount()), row, 2);
                         model.setValueAt(entitySave.getDiscountPercent() + " %", row, 3);
 
-                        model.setValueAt(entitySave.getDiscountPrice(), row, 2);
+                        model.setValueAt(entitySave.getMinOrderAmount(), row, 2);
                         model.setValueAt(entitySave.getDiscountPercent(), row, 3);
 
                         model.setValueAt(entitySave.getStartDate().format(Constants.DATE_FORMATTER), row, 4);
@@ -374,7 +374,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         if (result.valid) {
             Promotion promotion = new Promotion();
             promotion.setPromotionName(result.name);
-            promotion.setDiscountPrice(result.discountPrice);
+            promotion.setMinOrderAmount(result.discountPrice);
             promotion.setDiscountPercent(result.discountPercent);
             promotion.setDescription(result.description);
             promotion.setStartDate(result.startDate);
@@ -387,14 +387,14 @@ public class PromotionManagement extends javax.swing.JPanel {
             model.addRow(new Object[]{
                 entitySave.getPromotionId(), // Cột 0
                 entitySave.getPromotionName(), // Cột 1
-                Constants.VND_FORMAT.format(promotion.getDiscountPrice()), // Cột 2
+                Constants.VND_FORMAT.format(promotion.getPromotionName()), // Cột 2
                 entitySave.getDiscountPercent() + " %", // Cột 3
                 entitySave.getStartDate().format(Constants.DATE_FORMATTER), // Cột 4
                 entitySave.getEndDate().format(Constants.DATE_FORMATTER), // Cột 5
                 entitySave.getCreatedAt().format(Constants.DATE_FORMATTER), // Cột 6
                 entitySave.getPromotionId(), // Cột 0
                 entitySave.getPromotionName(), // Cột 1
-                entitySave.getDiscountPrice(), // Cột 2
+                entitySave.getMinOrderAmount(), // Cột 2
                 entitySave.getDiscountPercent(), // Cột 3
                 entitySave.getStartDate().format(Constants.DATE_FORMATTER), // Cột 4
                 entitySave.getEndDate().format(Constants.DATE_FORMATTER), // Cột 5

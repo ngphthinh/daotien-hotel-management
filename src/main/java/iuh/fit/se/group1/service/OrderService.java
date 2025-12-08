@@ -80,7 +80,17 @@ public class OrderService {
         return orderRepository.findAllBookingDisplay();
     }
 
-    public void updateOrderStatusToPaid(Long aLong, PaymentType eWallet, BigDecimal totalAmount) {
-        orderRepository.updateOrderStatusToPaid(aLong, eWallet, totalAmount);
+    public void updateOrderStatusToPaid(Order order) {
+        orderRepository.updateOrderStatusToPaid(order);
+        List<Long> roomIds = order.getBookings().stream().map(e -> e.getRoom().getRoomId()).toList();
+        roomRepository.updateRoomStatusBatch(roomIds, RoomStatus.AVAILABLE);
+    }
+
+    public List<Order> getUnpaidOrders() {
+        return orderRepository.findAllByOrderUnPaid();
+    }
+
+    public List<Order> getUnpaidOrdersByKeyword(String keyword) {
+        return orderRepository.findUnpaidOrdersByKeyword(keyword);
     }
 }
