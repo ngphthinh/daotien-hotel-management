@@ -282,7 +282,7 @@ public class MainLayout extends JPanel {
     }
 
     public void setAuth(boolean isAdmin) {
-        this.isAdmin = true;
+        this.isAdmin = isAdmin;
         sideBar.getMenu1().setAuth(isAdmin);
         if (isAdmin) {
             dashboard = new Dashboard();
