@@ -232,8 +232,6 @@ public class TransferRoomService {
 
         RoomDTO roomDTO = roomService.toRoomDTO(room.getRoomType());
 
-
-
         int bookingTypeIndex = BookingType.toIndex(bookingType);
         return calculatePriceByTypeAndDuration(bookingTypeIndex, roomDTO, (int) duration);
     }
@@ -403,5 +401,30 @@ public class TransferRoomService {
     public static class ValidationResult {
         public boolean valid;
         public String message;
+    }
+
+    public long calculateNewRoomPriceWithBookingDuration(Room newRoom, BookingType bookingType,
+            long orderId, Room referenceOldRoom) {
+
+        // Lấy thông tin booking từ phòng cũ để biết duration
+        Booking bookingInfo = repository.getBookingByOrderIdAndType(
+                orderId, bookingType.name(), referenceOldRoom.getRoomId());
+
+        if (bookingInfo == null) {
+            // Fallback về giá cơ bản nếu không tìm thấy booking
+            return getRoomPriceByType(newRoom, bookingType);
+        }
+
+        // Tính duration từ booking
+        long duration = calculateBookingDuration(
+                bookingInfo.getCheckInDate(),
+                bookingInfo.getCheckOutDate(),
+                bookingType);
+
+        // Tính giá cho phòng mới với duration này
+        RoomDTO newRoomDTO = roomService.toRoomDTO(newRoom.getRoomType());
+        int bookingTypeIndex = BookingType.toIndex(bookingType);
+
+        return calculatePriceByTypeAndDuration(bookingTypeIndex, newRoomDTO, (int) duration);
     }
 }
