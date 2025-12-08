@@ -495,4 +495,99 @@ public class OrderRepository implements Repository<Order, Long> {
         throw new RuntimeException(e);
     }
 }
+
+    public List<Order> findOrdersUnPendingByKeyWord(String keyword) {
+        String sql = """
+        SELECT
+            O.orderId, O.orderDate, O.totalAmount, O.deposit, 
+            O.orderTypeId, O.customerId, 
+            B.bookingId, B.checkInDate, B.checkOutDate,
+            B.orderId AS bookingOrderId, B.roomId, B.bookingType,
+            OT.orderTypeId AS otId, OT.name AS otName,
+            R.roomNumber AS rRoomNumber,
+            C.fullName AS cFullName, C.phone AS cPhone, C.citizenId AS cCitizenId
+            
+        FROM Orders O
+        JOIN Booking B ON O.orderId = B.orderId
+        JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+        JOIN Room R ON B.roomId = R.roomId
+        JOIN Customer C ON O.customerId = C.customerId
+        
+        WHERE O.orderTypeId != 1
+          AND (C.fullName LIKE ? 
+            OR C.phone LIKE ? 
+            OR R.roomNumber LIKE ? 
+            OR C.citizenId LIKE ?)
+        """;
+
+        List<Order> orders = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            // Set parameters
+            String like = "%" + keyword + "%";
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            ps.setString(4, like);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                Map<Long, Order> orderMap = new HashMap<>();
+
+                while (rs.next()) {
+                    long orderId = rs.getLong("orderId");
+
+                    // Nếu Order chưa tồn tại trong map -> tạo mới
+                    Order order = orderMap.get(orderId);
+                    if (order == null) {
+                        order = new Order();
+                        order.setOrderId(orderId);
+                        order.setOrderDate(rs.getTimestamp("orderDate").toLocalDateTime());
+                        order.setTotalAmount(rs.getBigDecimal("totalAmount"));
+                        order.setDeposit(rs.getBigDecimal("deposit"));
+
+                        // OrderType
+                        OrderType ot = new OrderType();
+                        ot.setOrderTypeId(rs.getLong("otId"));
+                        ot.setName(rs.getString("otName"));
+                        order.setOrderType(ot);
+
+                        // Customer
+                        long customerId = rs.getLong("customerId");
+                        if (!rs.wasNull()) {
+                            Customer customer = customerRepository.findById(customerId);
+                            order.setCustomer(customer);
+                        }
+
+                        order.setBookings(new ArrayList<>());
+                        orderMap.put(orderId, order);
+                    }
+
+                    // Booking
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getLong("bookingId"));
+
+                    booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
+                    booking.setOrder(order);
+
+                    // Room
+                    Room room = new Room();
+                    room.setRoomId(rs.getLong("roomId"));
+                    room.setRoomNumber(rs.getString("rRoomNumber"));
+                    booking.setRoom(room);
+
+                    order.getBookings().add(booking);
+                }
+
+                orders.addAll(orderMap.values());
+                return orders;
+            }
+
+        } catch (SQLException e) {
+            log.error("Error retrieving Orders: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
 }

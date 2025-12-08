@@ -52,8 +52,6 @@ public class MainLayout extends JPanel {
     public MainLayout() {
         init();
         setOpaque(false);
-        isAdmin = true;
-        setAuth(isAdmin);
     }
 
     public Employee getCurrentEmployee() {
@@ -165,7 +163,7 @@ public class MainLayout extends JPanel {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
                         paymentPage.clearForm();
-                        setMainContent(paymentPage);
+                        setMainContent(new PaymentPagev2());
 
                     } else if (index == 3) {
                         if (currentEmployee == null) {
@@ -198,6 +196,7 @@ public class MainLayout extends JPanel {
                         }
                         openCloseShiftPanel(openShift);
                     } else {
+                        System.out.println("hihi");
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
@@ -283,7 +282,7 @@ public class MainLayout extends JPanel {
     }
 
     public void setAuth(boolean isAdmin) {
-        this.isAdmin = true;
+        this.isAdmin = isAdmin;
         sideBar.getMenu1().setAuth(isAdmin);
         if (isAdmin) {
             dashboard = new Dashboard();
@@ -305,8 +304,6 @@ public class MainLayout extends JPanel {
             surchargeManagement = new SurchargeManagement();
             setMainContent(dashboard);
         } else {
-
-
             dashboardEmployee = new DashboardEmployee();
             bookingPage = new BookingPage();
             bookingPage.setCurrentEmployee(currentEmployee);

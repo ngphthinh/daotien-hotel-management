@@ -465,6 +465,13 @@ public class MainFlow4 extends javax.swing.JPanel {
         if (customerSaveDB != null) {
             boolean needUpdate = false;
 
+            txtFullName.setText(customerSaveDB.getFullName());
+            txtEmail.setText(customerSaveDB.getEmail());
+            txtPhone.setText(customerSaveDB.getPhone());
+            DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dobStr = customerSaveDB.getDateOfBirth().format(outputFormat);
+            txtDob.setText(dobStr);
+
             if (!customerSaveDB.getEmail().equals(email)) {
                 customerSaveDB.setEmail(email);
                 needUpdate = true;

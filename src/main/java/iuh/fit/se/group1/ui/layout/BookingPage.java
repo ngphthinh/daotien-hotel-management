@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -306,12 +307,23 @@ public class BookingPage extends javax.swing.JPanel {
         String checkOutStr = mainFlow1.getTxtCheckOutDate().getText().trim();
         String adultStr = mainFlow1.getTxtNumberOfAdult().getText().trim();
         String childrenStr = mainFlow1.getTxtNumberOfChildren().getText().trim();
-        String timePlus = Objects.requireNonNull(mainFlow1.getCbmTime().getSelectedItem()).toString().split(" ")[0];
+
+
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
         // Parse ngày
         LocalDateTime checkIn = LocalDateTime.parse(checkInStr, formatter);
         LocalDateTime checkOut = LocalDateTime.parse(checkOutStr, formatter);
+
+
+        String timePlus = "0";
+        if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[0])) {
+            timePlus = Objects.requireNonNull(mainFlow1.getCbmTime().getSelectedItem()).toString().split(" ")[0];
+        }else if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[1]) ){
+            long daysBetween = ChronoUnit.DAYS.between(checkIn, checkOut) + 1;
+            timePlus = String.valueOf(daysBetween);
+        }
 
         int adults = Integer.parseInt(adultStr);
         int children = 0;

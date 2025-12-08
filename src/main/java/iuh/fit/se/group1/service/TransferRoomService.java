@@ -13,25 +13,29 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransferRoomService {
     private static final Logger log = LoggerFactory.getLogger(TransferRoomService.class);
+    private static final String SINGLE_ROOM_TYPE = "SINGLE";
+    private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
+
     private final TransferRoomRepository repository;
-    private final OrderRepository orderRepository = new OrderRepository();
+    private final OrderRepository orderRepository;
+    private final RoomService roomService;
+    private final RoomTypeService roomTypeService;
 
     public TransferRoomService() {
         this.repository = new TransferRoomRepository();
+        this.orderRepository = new OrderRepository();
+        this.roomService = new RoomService();
+        this.roomTypeService = new RoomTypeService();
     }
-    
 
     /**
      * Lấy tất cả bookings đang hoạt động
      */
-    
 
     public List<BookingDTO> getAllBookings() {
         return repository.getAllBookings();
@@ -82,21 +86,25 @@ public class TransferRoomService {
                 long hours = Duration.between(checkIn, checkOut).toHours();
                 long minutes = Duration.between(checkIn, checkOut).toMinutes() % 60;
                 return minutes > 0 ? hours + 1 : hours;
-                
+
             case DAILY:
-                // Tính số ngày, làm tròn lên
+                // Tính số ngày thuê: mốc 12h trưa
+                // Check-out trước 12h -> không tính ngày đó
+                // Check-out từ 12h trở đi -> tính ngày đó
+                // VD: 08/12 14:00 -> 12/12 12:00 = 4 ngày (8,9,10,11)
+                // 08/12 14:00 -> 12/12 14:00 = 5 ngày (8,9,10,11,12)
                 long days = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
-                // Nếu có thời gian check-out sau check-in trong ngày, cộng thêm 1 ngày
-                if (checkOut.toLocalTime().isAfter(checkIn.toLocalTime())) {
+
+                // Nếu check-out từ 12h trở đi, cộng thêm 1 ngày
+                if (checkOut.getHour() >= 12) {
                     days++;
                 }
+
                 return Math.max(1, days);
-                
+
             case OVERNIGHT:
-                // Tính số đêm
-                long nights = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
-                return Math.max(1, nights);
-                
+                return 1;
+
             default:
                 return 1;
         }
@@ -105,82 +113,81 @@ public class TransferRoomService {
     /**
      * Tính phụ phí chuyển phòng với thông tin booking
      */
-    public long calculateSurcharge(List<Room> oldRooms, List<Room> newRooms, 
-                                   BookingType bookingType, long orderId) {
+    public long calculateSurcharge(List<Room> oldRooms, List<Room> newRooms,
+            BookingType bookingType, long orderId) {
+        // Validate input lists
+        if (oldRooms == null || oldRooms.isEmpty() || newRooms == null || newRooms.isEmpty()) {
+            log.warn("Empty room lists provided for surcharge calculation");
+            return 0;
+        }
+
         // Lấy thông tin booking để biết thời gian thuê
         Booking bookingInfo = repository.getBookingByOrderIdAndType(
-            orderId, bookingType.name(), oldRooms.get(0).getRoomId());
-        
+                orderId, bookingType.name(), oldRooms.get(0).getRoomId());
+
         if (bookingInfo == null) {
             log.error("Cannot find booking info for orderId={}, bookingType={}", orderId, bookingType);
             return 0;
         }
-        
+
         // Tính số lượng thời gian thuê
         long duration = calculateBookingDuration(
-            bookingInfo.getCheckInDate(), 
-            bookingInfo.getCheckOutDate(), 
-            bookingType);
-        
-        log.info("Booking duration: {} {} for bookingType={}", 
-            duration, bookingType.name(), bookingType);
-        
+                bookingInfo.getCheckInDate(),
+                bookingInfo.getCheckOutDate(),
+                bookingType);
+
+        log.info("Booking duration: {} {} for bookingType={}",
+                duration, bookingType.getDisplayName(), bookingType);
+
         // Tính tổng giá với duration
-        long oldTotal = calculateTotalPrice(oldRooms, bookingType, (int)duration);
-        long newTotal = calculateTotalPrice(newRooms, bookingType, (int)duration);
-        
-        log.info("Old total: {}, New total: {}, Surcharge: {}", 
-            oldTotal, newTotal, newTotal - oldTotal);
-        
+        long oldTotal = calculateTotalPrice(oldRooms, bookingType, (int) duration);
+        long newTotal = calculateTotalPrice(newRooms, bookingType, (int) duration);
+
+        log.info("Old total: {}, New total: {}, Surcharge: {}",
+                oldTotal, newTotal, newTotal - oldTotal);
+
         return newTotal - oldTotal;
     }
 
     /**
      * Tính tổng giá phòng theo loại thuê và duration
      */
-    private long calculateTotalPrice(java.util.List<Room> rooms, BookingType bookingType, int timePlus ) {
-        String SINGLE_ROOM_TYPE = "SINGLE";
-        String DOUBLE_ROOM_TYPE = "DOUBLE";
+    private long calculateTotalPrice(List<Room> rooms, BookingType bookingType, int duration) {
+        int bookingTypeIndex = BookingType.toIndex(bookingType);
 
-        RoomService roomService = new RoomService();
-        RoomTypeService roomTypeService = new RoomTypeService();
-        int index = BookingType.toIndex(bookingType);
         RoomType singleRoomType = roomTypeService.getRoomTypeById(SINGLE_ROOM_TYPE);
         RoomType doubleRoomType = roomTypeService.getRoomTypeById(DOUBLE_ROOM_TYPE);
 
-        RoomDTO singleRoom = roomService.toRoomDTO(singleRoomType);
-        RoomDTO doubleRoom = roomService.toRoomDTO(doubleRoomType);
+        RoomDTO singleRoomDTO = roomService.toRoomDTO(singleRoomType);
+        RoomDTO doubleRoomDTO = roomService.toRoomDTO(doubleRoomType);
 
-        Long singleRooms = rooms.stream()
-                .filter(room -> room.getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
+        long singleCount = rooms.stream()
+                .filter(room -> SINGLE_ROOM_TYPE.equals(room.getRoomType().getRoomTypeId()))
                 .count();
 
-        Long doubleRooms = rooms.stream()
-                .filter(room -> room.getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
+        long doubleCount = rooms.stream()
+                .filter(room -> DOUBLE_ROOM_TYPE.equals(room.getRoomType().getRoomTypeId()))
                 .count();
-
-        Map<RoomDTO, Long> map = new LinkedHashMap<>();
-        map.put(singleRoom, singleRooms);
-        map.put(doubleRoom, doubleRooms);
 
         long totalPrice = 0L;
-        for (Map.Entry<RoomDTO, Long> entry : map.entrySet()) {
-            RoomDTO roomDTO = entry.getKey();
-            Long quantity = entry.getValue();
-            totalPrice += getPriceFromBookingTypeAndRoomType(index, roomDTO, timePlus) * quantity;
+        if (singleCount > 0) {
+            totalPrice += calculatePriceByTypeAndDuration(bookingTypeIndex, singleRoomDTO, duration) * singleCount;
+        }
+        if (doubleCount > 0) {
+            totalPrice += calculatePriceByTypeAndDuration(bookingTypeIndex, doubleRoomDTO, duration) * doubleCount;
         }
 
         return totalPrice;
     }
 
-
     /**
-     * Lấy giá phòng theo loại thuê (đơn giá)
+     * Lấy giá phòng theo loại thuê (đơn giá cơ bản)
      */
     public long getRoomPriceByType(Room room, BookingType bookingType) {
         RoomType roomType = room.getRoomType();
-        if (roomType == null)
+        if (roomType == null) {
             return 0;
+        }
 
         BigDecimal price = switch (bookingType) {
             case HOURLY -> roomType.getHourlyRate();
@@ -190,36 +197,45 @@ public class TransferRoomService {
 
         return price != null ? price.longValue() : 0;
     }
-public Long getPriceFromBookingTypeAndRoomType(int bookingType, RoomDTO roomDTO, int timePlus) {
-        if (bookingType == 0) { // Theo giờ
-            return roomDTO.getHourlyRate().longValueExact() + ((timePlus - 1) * roomDTO.getAdditionalHourRate().longValueExact());
-        } else if (bookingType == 1) { // Theo ngày
-            return roomDTO.getDailyRate().longValueExact() * timePlus;
-        } else if (bookingType == 2) { // qua đêm
-            return roomDTO.getOvernightRate().longValueExact();
-        }
-        return 0L;
+
+    private long calculatePriceByTypeAndDuration(int bookingTypeIndex, RoomDTO roomDTO, int duration) {
+
+        System.out.println(roomDTO + ", duration: " + duration + ", bookingTypeIndex: " + bookingTypeIndex);
+
+        return switch (bookingTypeIndex) {
+            case 0 -> // Theo giờ: giá giờ đầu + giá giờ thêm × (số giờ - 1)
+                roomDTO.getHourlyRate().longValueExact()
+                        + ((duration - 1) * roomDTO.getAdditionalHourRate().longValueExact());
+            case 1 -> // Theo ngày: giá theo ngày × số ngày
+                roomDTO.getDailyRate().longValueExact() * duration;
+            case 2 -> // Qua đêm: giá cố định
+                roomDTO.getOvernightRate().longValueExact();
+            default -> 0L;
+        };
     }
+
     /**
      * Lấy giá phòng đã tính duration để hiển thị (cho UI)
      */
     public long getRoomPriceWithDuration(Room room, BookingType bookingType, long orderId) {
-        long basePrice = getRoomPriceByType(room, bookingType);
-        
-        // Lấy thông tin booking để tính duration
         Booking bookingInfo = repository.getBookingByOrderIdAndType(
-            orderId, bookingType.name(), room.getRoomId());
-        
+                orderId, bookingType.name(), room.getRoomId());
+
         if (bookingInfo == null) {
-            return basePrice; // Fallback về giá gốc nếu không tìm thấy
+            return getRoomPriceByType(room, bookingType);
         }
-        
+
         long duration = calculateBookingDuration(
-            bookingInfo.getCheckInDate(), 
-            bookingInfo.getCheckOutDate(), 
-            bookingType);
-        
-        return basePrice * duration;
+                bookingInfo.getCheckInDate(),
+                bookingInfo.getCheckOutDate(),
+                bookingType);
+
+        RoomDTO roomDTO = roomService.toRoomDTO(room.getRoomType());
+
+
+
+        int bookingTypeIndex = BookingType.toIndex(bookingType);
+        return calculatePriceByTypeAndDuration(bookingTypeIndex, roomDTO, (int) duration);
     }
 
     /**
@@ -303,18 +319,18 @@ public Long getPriceFromBookingTypeAndRoomType(int bookingType, RoomDTO roomDTO,
 
         // Đếm số phòng đơn và đôi trong phòng cũ
         long oldSingleCount = oldRooms.stream()
-                .filter(r -> "SINGLE".equals(r.getRoomType().getRoomTypeId()))
+                .filter(r -> SINGLE_ROOM_TYPE.equals(r.getRoomType().getRoomTypeId()))
                 .count();
         long oldDoubleCount = oldRooms.stream()
-                .filter(r -> "DOUBLE".equals(r.getRoomType().getRoomTypeId()))
+                .filter(r -> DOUBLE_ROOM_TYPE.equals(r.getRoomType().getRoomTypeId()))
                 .count();
 
         // Đếm số phòng đơn và đôi trong phòng mới
         long newSingleCount = newRooms.stream()
-                .filter(r -> "SINGLE".equals(r.getRoomType().getRoomTypeId()))
+                .filter(r -> SINGLE_ROOM_TYPE.equals(r.getRoomType().getRoomTypeId()))
                 .count();
         long newDoubleCount = newRooms.stream()
-                .filter(r -> "DOUBLE".equals(r.getRoomType().getRoomTypeId()))
+                .filter(r -> DOUBLE_ROOM_TYPE.equals(r.getRoomType().getRoomTypeId()))
                 .count();
 
         // TRƯỜNG HỢP 1: 1 đôi → 2 đơn
@@ -373,15 +389,8 @@ public Long getPriceFromBookingTypeAndRoomType(int bookingType, RoomDTO roomDTO,
         return result;
     }
 
-    /**
-     * Format loại booking cho hiển thị
-     */
-    public String getBookingTypeDisplay(BookingType bookingType) {
-        return switch (bookingType) {
-            case HOURLY -> "Theo giờ";
-            case DAILY -> "Theo ngày";
-            case OVERNIGHT -> "Qua đêm";
-        };
+    public List<Order> findOrdersUnPendingByKeyWord(String keyword) {
+        return orderRepository.findOrdersUnPendingByKeyWord(keyword);
     }
 
     // Result classes
