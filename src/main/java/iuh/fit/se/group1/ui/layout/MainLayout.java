@@ -95,7 +95,7 @@ public class MainLayout extends JPanel {
                     if (index == 0) {
                         setMainContent(dashboard);
                     } else if (index == 1) {
-                        setMainContent(bookingPage);
+                    setMainContent(bookingPage);
                     } else if (index == 2) {
                         paymentPage.clearForm();
                         paymentPage.loadData();
