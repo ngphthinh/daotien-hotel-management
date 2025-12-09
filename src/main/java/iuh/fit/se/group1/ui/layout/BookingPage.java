@@ -165,7 +165,7 @@ public class BookingPage extends javax.swing.JPanel {
                     CalendarUI.showCalendar(mainFlow1.getTxtCheckInDate(), null, overNight, false);
                 } else if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[1])) {
                     CalendarUI.showCalendar(mainFlow1.getTxtCheckInDate(), null, dailyCheckIn, false);
-                } else {
+                } else if (Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[0])) {
                     CalendarUI.showCalendar(mainFlow1.getTxtCheckInDate(), null, hourly, true);
                 }
             }
@@ -189,8 +189,6 @@ public class BookingPage extends javax.swing.JPanel {
 
     private void createOrder() {
 
-
-
         var orderRs = mainFlow5.buildOrder(currentEmployee, mainFlow4.getCustomer(), selectedRooms, surchargeService);
 
         Order order = orderRs.getOrder();
@@ -207,11 +205,10 @@ public class BookingPage extends javax.swing.JPanel {
 
         SurchargeDetail surchargeDetail = orderRs.getSurchargeDetail();
 
-        if (surchargeDetail != null) {
-            surchargeDetailService.save(surchargeDetail,orderSave.getOrderId());
-        }
-
         if (orderSave != null) {
+            if (surchargeDetail != null) {
+                surchargeDetailService.save(surchargeDetail,orderSave.getOrderId());
+            }
             CustomDialog.showMessage(
                     null,
                     "Tạo đơn đặt phòng thành công!",
