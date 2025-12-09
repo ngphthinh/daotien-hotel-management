@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class TransferRoomRepository {
      * Lấy tất cả bookings - nhóm theo CCCD + bookingType (mỗi CCCD có thể có nhiều
      * dòng nếu khác loại thuê)
      */
+    
     public List<BookingDTO> getAllBookings() {
         List<BookingDTO> bookings = new ArrayList<>();
         String sql = """
@@ -81,7 +83,7 @@ public class TransferRoomRepository {
         log.info("Total bookings found: {}", bookings.size());
         return bookings;
     }
-
+    
     
 
     public List<BookingDTO> searchBookingsByCitizenId(String citizenId) {
@@ -484,4 +486,221 @@ public class TransferRoomRepository {
         public long orderId;
         public String orderTypeName;
     }
+
+    /**
+     * Implement cancelRoomBooking method to cancel room bookings
+     * Xóa booking và cập nhật trạng thái phòng về AVAILABLE
+     */
+    public boolean cancelRoomBooking(Long orderId, Long roomId, String bookingType) {
+        try {
+            connection.setAutoCommit(false);
+
+            // 1. Check booking tồn tại và chưa check-in
+            String checkBookingSql = """
+                SELECT checkInDate
+                FROM Booking
+                WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                """;
+
+            Timestamp checkInTimestamp = null;
+
+            try (PreparedStatement stmt = connection.prepareStatement(checkBookingSql)) {
+                stmt.setLong(1, orderId);
+                stmt.setString(2, bookingType);
+                stmt.setLong(3, roomId);
+
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    checkInTimestamp = rs.getTimestamp("checkInDate");
+                } else {
+                    connection.rollback();
+                    log.warn("Booking not found for orderId: {}, roomId: {}", orderId, roomId);
+                    return false;
+                }
+            }
+
+            // Nếu đã check-in → không cho hủy
+            if (checkInTimestamp != null &&
+                    checkInTimestamp.before(Timestamp.from(java.time.Instant.now()))) {
+                connection.rollback();
+                log.warn("Cannot cancel room booking: already checked in.");
+                return false;
+            }
+
+            // 2. Xóa booking
+            String deleteBookingSql = """
+                DELETE FROM Booking
+                WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                """;
+
+            try (PreparedStatement stmt = connection.prepareStatement(deleteBookingSql)) {
+                stmt.setLong(1, orderId);
+                stmt.setString(2, bookingType);
+                stmt.setLong(3, roomId);
+                stmt.executeUpdate();
+            }
+
+            // 3. Update room status → AVAILABLE
+            String updateRoomSql = "UPDATE Room SET roomStatus = 'AVAILABLE' WHERE roomId = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(updateRoomSql)) {
+                stmt.setLong(1, roomId);
+                stmt.executeUpdate();
+            }
+
+            connection.commit();
+            log.info("Cancelled booking for orderId {}, roomId {}", orderId, roomId);
+            return true;
+
+        } catch (SQLException e) {
+            log.error("Error canceling room booking", e);
+            try { connection.rollback(); } catch (Exception ignored) {}
+            return false;
+        } finally {
+            try { connection.setAutoCommit(true); } catch (Exception ignored) {}
+        }
+    }
+
+    /**
+     *
+     * Gia hạn ngày check-out cho booking
+     */
+public boolean extendRoomBooking(Long orderId, List<Long> roomIds,
+                                 int extendValue, String bookingType) {
+    try {
+        connection.setAutoCommit(false);
+
+        // Validate booking type
+        if ("OVERNIGHT".equals(bookingType)) {
+            log.warn("Cannot extend OVERNIGHT booking type");
+            connection.rollback();
+            return false;
+        }
+
+        // Lấy thông tin booking hiện tại
+        String getBookingSql = """
+                SELECT checkInDate, checkOutDate
+                FROM Booking
+                WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                """;
+
+        LocalDateTime currentCheckOut = null;
+
+        try (PreparedStatement stmt = connection.prepareStatement(getBookingSql)) {
+            stmt.setLong(1, orderId);
+            stmt.setString(2, bookingType);
+            stmt.setLong(3, roomIds.get(0)); // Lấy từ phòng đầu tiên
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Timestamp checkOutTimestamp = rs.getTimestamp("checkOutDate");
+                if (checkOutTimestamp != null) {
+                    currentCheckOut = checkOutTimestamp.toLocalDateTime();
+                }
+            } else {
+                connection.rollback();
+                log.warn("Booking not found for orderId: {}", orderId);
+                return false;
+            }
+        }
+
+        if (currentCheckOut == null) {
+            connection.rollback();
+            return false;
+        }
+
+        // Tính checkout date mới dựa trên booking type
+        LocalDateTime newCheckOut;
+        if ("HOURLY".equals(bookingType)) {
+            // Gia hạn theo giờ
+            newCheckOut = currentCheckOut.plusHours(extendValue);
+            log.info("Extending HOURLY booking by {} hours. Current: {}, New: {}",
+                    extendValue, currentCheckOut, newCheckOut);
+        } else if ("DAILY".equals(bookingType)) {
+            // Gia hạn theo ngày
+            newCheckOut = currentCheckOut.plusDays(extendValue);
+            log.info("Extending DAILY booking by {} days. Current: {}, New: {}",
+                    extendValue, currentCheckOut, newCheckOut);
+        } else {
+            connection.rollback();
+            log.warn("Invalid booking type for extension: {}", bookingType);
+            return false;
+        }
+
+        // Cập nhật checkout date cho tất cả phòng
+        String updateSql = """
+                UPDATE Booking
+                SET checkOutDate = ?
+                WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(updateSql)) {
+            for (Long roomId : roomIds) {
+                stmt.setTimestamp(1, Timestamp.valueOf(newCheckOut));
+                stmt.setLong(2, orderId);
+                stmt.setString(3, bookingType);
+                stmt.setLong(4, roomId);
+
+                int updated = stmt.executeUpdate();
+                if (updated == 0) {
+                    log.warn("No booking updated for roomId: {}", roomId);
+                }
+            }
+        }
+
+        connection.commit();
+        log.info("Successfully extended {} bookings for order {}", roomIds.size(), orderId);
+        return true;
+
+    } catch (SQLException e) {
+        log.error("Error extending room booking", e);
+        try {
+            connection.rollback();
+        } catch (SQLException ex) {
+            log.error("Error rolling back transaction", ex);
+        }
+        return false;
+    } finally {
+        try {
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            log.error("Error resetting auto-commit", e);
+        }
+    }
+}
+    public boolean addRoomAmountToOrder(long orderId, long amount) {
+        String sql = """
+            UPDATE Orders
+            SET totalAmount = totalAmount + ?
+            WHERE orderId = ?
+            """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, amount);
+            stmt.setLong(2, orderId);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            log.error("Error adding room amount to order", e);
+            return false;
+        }
+    }
+    public boolean subtractAmountFromOrder(long orderId, long amount) {
+        String sql = """
+        UPDATE Orders
+        SET totalAmount = totalAmount - ?
+        WHERE orderId = ?
+    """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, amount);
+            stmt.setLong(2, orderId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.error("Error subtracting amount from order", e);
+            return false;
+        }
+    }
+
 }

@@ -41,10 +41,11 @@ public class Constants {
             case 5 -> FontIcon.of(FontAwesomeSolid.GIFT, 16, Constants.COLOR_ICON_MENU);
             case 6 -> FontIcon.of(FontAwesomeSolid.GIFTS, 16, Constants.COLOR_ICON_MENU);
             case 7 -> FontIcon.of(FontAwesomeSolid.BED, 16, Constants.COLOR_ICON_MENU);
-            case 8 -> FontIcon.of(FontAwesomeSolid.FILE_INVOICE_DOLLAR, 16, Constants.COLOR_ICON_MENU);
-            case 9 -> FontIcon.of(FontAwesomeSolid.MONEY_CHECK, 16, Constants.COLOR_ICON_MENU);
-            case 10 -> FontIcon.of(FontAwesomeSolid.CHART_LINE, 16, Constants.COLOR_ICON_MENU);
-            case 11 -> FontIcon.of(FontAwesomeSolid.QUESTION_CIRCLE, 16, Constants.COLOR_ICON_MENU);
+            case 8 -> FontIcon.of(FontAwesomeSolid.TOOLS, 16, Constants.COLOR_ICON_MENU);
+            case 9 -> FontIcon.of(FontAwesomeSolid.FILE_INVOICE_DOLLAR, 16, Constants.COLOR_ICON_MENU);
+            case 10 -> FontIcon.of(FontAwesomeSolid.MONEY_CHECK, 16, Constants.COLOR_ICON_MENU);
+            case 11 -> FontIcon.of(FontAwesomeSolid.CHART_LINE, 16, Constants.COLOR_ICON_MENU);
+            case 12 -> FontIcon.of(FontAwesomeSolid.QUESTION_CIRCLE, 16, Constants.COLOR_ICON_MENU);
             default -> null;
         };
     }
@@ -55,8 +56,9 @@ public class Constants {
             case 0 -> FontIcon.of(FontAwesomeSolid.HOME, 16, Constants.COLOR_ICON_MENU);
             case 1 -> FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 16, Constants.COLOR_ICON_MENU);
             case 2 -> FontIcon.of(FontAwesomeSolid.MONEY_BILL, 14, Constants.COLOR_ICON_MENU);
-            case 3 -> FontIcon.of(FontAwesomeSolid.LOCK_OPEN, 16, Constants.COLOR_ICON_MENU);
-            case 4 -> FontIcon.of(FontAwesomeSolid.QUESTION_CIRCLE, 16, Constants.COLOR_ICON_MENU);
+            case 3 -> FontIcon.of(FontAwesomeSolid.TOOLS, 14, Constants.COLOR_ICON_MENU);
+            case 4 -> FontIcon.of(FontAwesomeSolid.LOCK_OPEN, 16, Constants.COLOR_ICON_MENU);
+            case 5 -> FontIcon.of(FontAwesomeSolid.QUESTION_CIRCLE, 16, Constants.COLOR_ICON_MENU);
             default -> null;
         };
     }

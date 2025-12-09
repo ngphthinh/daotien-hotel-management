@@ -33,17 +33,19 @@ public class Menu extends JComponent {
             {"Quản lý dịch vụ"},
             {"Quản lý khuyến mãi"},
             {"Quản lý phòng"},
+            {"Tiện ích phòng"},
             {"Quản lý hóa đơn"},
             {"Quản lý phụ phí"},
             {"Quản lý thống kê", "Thống kê doanh thu",  "Thống kê theo xu hướng","Thống kê chi tiết",},
-            {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản","Về chúng tôi"},
-            {"Chuyển phòng"}
+            {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản","Về chúng tôi"}
+
     };
 
     private final String[][] menuItemsEmployee = new String[][]{
             {"Dashboard"},
             {"Đặt phòng"},
             {"Thanh toán"},
+            {"Tiện ích phòng"},
             {"Đóng ca"},
             {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản"}
     };

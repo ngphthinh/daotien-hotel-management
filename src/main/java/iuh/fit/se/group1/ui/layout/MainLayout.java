@@ -38,6 +38,7 @@ public class MainLayout extends JPanel {
     private AmenityManagement amenityManagement;
     private PromotionManagement promotionManagement;
     private RoomManagement roomManagement;
+    private RoomTransferUI roomTransferUI;
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
@@ -116,25 +117,29 @@ public class MainLayout extends JPanel {
                         setMainContent(roomManagement);
                         roomManagement.loadData();
                     } else if (index == 8) {
-                        orderManagement.loadData();
+                        roomTransferUI.loadData();
+                        setMainContent(roomTransferUI);
+                    }else if (index == 9) {
+
                         setMainContent(orderManagement);
-                    } else if (index == 9) {
+                        orderManagement.loadData();
+                    } else if(index==10){
                         setMainContent(surchargeManagement);
-                    } else if (index == 10 && subIndex == 1) {
+                    } else if (index == 11 && subIndex == 1) {
                         setMainContent(revenueStatistics);
-                    } else if (index == 10 && subIndex == 2) {
-                        setMainContent(new BookingTrend());
-                    } else if (index == 10 && subIndex == 3) {
-                        setMainContent(new StatisticsDetail());
                     } else if (index == 11 && subIndex == 2) {
-                        setMainContent(new Regulation());
+                        setMainContent(new BookingTrend());
                     } else if (index == 11 && subIndex == 3) {
+                        setMainContent(new StatisticsDetail());
+                    } else if (index == 12 && subIndex == 2) {
+                        setMainContent(new Regulation());
+                    } else if (index == 12 && subIndex == 3) {
                         var modal = new CheckForVersionPanel();
                         GlassPanePopup.showPopup(modal);
                         modal.getBtnClose().addActionListener(e
                                 -> GlassPanePopup.closePopupLast()
                         );
-                    } else if (index == 11 && subIndex == 4) {
+                    } else if (index == 12 && subIndex == 4) {
                         try {
                             File htmlFile = new File("src/main/resources/static/about.html");
 
@@ -151,9 +156,7 @@ public class MainLayout extends JPanel {
                                     "Không thể mở trang giới thiệu trong trình duyệt!",
                                     "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
-                    } else if (index == 12){ 
-                            setMainContent(new RoomTransferUI());
-                    }else {
+                    } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 } else {
@@ -165,7 +168,9 @@ public class MainLayout extends JPanel {
                         paymentPage.clearForm();
                         setMainContent(new PaymentPagev2());
 
-                    } else if (index == 3) {
+                    } else if (index == 3){
+                        setMainContent(new RoomTransferUI());
+                    } else if (index == 4) {
                         if (currentEmployee == null) {
                             Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
                             return;
@@ -425,6 +430,7 @@ public class MainLayout extends JPanel {
             amenityManagement = new AmenityManagement();
             promotionManagement = new PromotionManagement();
             roomManagement = new RoomManagement();
+            roomTransferUI= new RoomTransferUI();
             orderManagement = new OrderManagement();
             orderManagement.setParent(this);
             orderManagement.setPaymentPage(paymentPage);

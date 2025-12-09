@@ -35,7 +35,7 @@ public class CloseShift extends javax.swing.JPanel {
     private BigDecimal totalRevenue = BigDecimal.ZERO;
     private ConfirmInfoModal confirmModal;
 
-    // THÊM: Timer tự động refresh
+    // Timer
     private Timer autoRefreshTimer;
     private BigDecimal openingCash = new BigDecimal("5000000");
 
@@ -52,8 +52,6 @@ public class CloseShift extends javax.swing.JPanel {
         initMoneyLabels();
         clearForm();
         setupConfirmModal();
-
-        //KHỞI ĐỘNG TIMER TỰ ĐỘNG
         setupAutoRefresh();
     }
 
@@ -79,8 +77,6 @@ public class CloseShift extends javax.swing.JPanel {
             BigDecimal newRevenue = employeeShiftService.getTotalCashRevenueForShift(
                     currentEmployeeShift.getEmployeeShiftId()
             );
-
-            // Chỉ cập nhật nếu có thay đổi
             if (!newRevenue.equals(totalRevenue)) {
                 log.info("Revenue changed: {} -> {}",
                         formatCurrency(totalRevenue),
@@ -88,8 +84,6 @@ public class CloseShift extends javax.swing.JPanel {
 
                 totalRevenue = newRevenue;
                 txtSystem.setText(formatCurrency(totalRevenue));
-
-                // TỰ ĐỘNG TÍNH LẠI CHÊNH LỆCH NGAY
                 calculateDifference();
             }
 
@@ -111,19 +105,12 @@ public class CloseShift extends javax.swing.JPanel {
     }
     private void setupConfirmModal() {
         confirmModal.getBtnConfirm().addActionListener(e -> {
-            System.out.println("=== BUTTON CONFIRM CLICKED ===");
-
-            // ✅ KIỂM TRA NẾU ĐANG XỬ LÝ THÌ BỎ QUA
             if (confirmModal.isProcessing()) {
-                System.out.println(">>> ALREADY PROCESSING - IGNORED");
                 return;
             }
-
-            // ✅ ĐẶT CỜ ĐANG XỬ LÝ
             confirmModal.setProcessing(true);
 
             try {
-                // Lấy giá trị
                 String username = confirmModal.getUsername();
                 String password = confirmModal.getPassword();
 
@@ -131,29 +118,23 @@ public class CloseShift extends javax.swing.JPanel {
                 System.out.println("Password result length: " + password.length() + " (isEmpty: " + password.isEmpty() + ")");
 
                 if (username.isEmpty() || password.isEmpty()) {
-                    System.out.println(">>> VALIDATION FAILED - Showing error message");
                     Message.showMessage("Lỗi", "Vui lòng nhập đầy đủ thông tin!");
                     SwingUtilities.invokeLater(() -> confirmModal.clearFields());
                     return;
                 }
 
-                System.out.println(">>> VALIDATION PASSED - Checking credentials");
-
                 ShiftCloseRepository repository = new ShiftCloseRepository();
                 Employee manager = repository.validateManager(username, password);
 
                 if (manager != null) {
-                    System.out.println(">>> MANAGER VALIDATED - Closing shift");
                     GlassPanePopup.closePopupLast();
                     confirmModal.clearFields();
                     performCloseShift(manager.getEmployeeId());
                 } else {
-                    System.out.println(">>> INVALID CREDENTIALS");
                     Message.showMessage("Lỗi", "Sai tài khoản hoặc mật khẩu!\nHoặc tài khoản không phải Manager!");
                     SwingUtilities.invokeLater(() -> confirmModal.clearFields());
                 }
             } finally {
-                // ✅ RESET CỜ SAU KHI XỬ LÝ XONG (delay 500ms để tránh click liên tiếp)
                 Timer resetTimer = new Timer(500, evt -> {
                     confirmModal.setProcessing(false);
                 });
@@ -163,7 +144,6 @@ public class CloseShift extends javax.swing.JPanel {
         });
 
         confirmModal.getBtnCancel().addActionListener(e -> {
-            System.out.println("=== BUTTON CANCEL CLICKED ===");
             GlassPanePopup.closePopupLast();
             confirmModal.clearFields();
         });
@@ -270,22 +250,14 @@ public class CloseShift extends javax.swing.JPanel {
 
                 if (detailedShift != null) {
                     displayShiftInfo(detailedShift);
-
-                    // Hiển thị tiền mở ca
                     txtMoneyOpenShift.setText(formatCurrency(openingCash));
-
-                    // Thiết lập số lượng tiền mặc định
                     setDefaultMoneyDistribution();
-
-                    //LẤY DOANH THU BAN ĐẦU
                     totalRevenue = employeeShiftService.getTotalCashRevenueForShift(
                             employeeShift.getEmployeeShiftId()
                     );
                     txtSystem.setText(formatCurrency(totalRevenue));
 
                     setupAutoCalculation();
-
-                    // TÍNH NGAY KHI VỪA LOAD
                     calculateDifference();
                 }
 
@@ -374,7 +346,7 @@ public class CloseShift extends javax.swing.JPanel {
     }
 
     /**
-     * ✅ TÍNH CHÊNH LỆCH
+     * TÍNH CHÊNH LỆCH
      */
     private void calculateDifference() {
         try {
@@ -384,8 +356,6 @@ public class CloseShift extends javax.swing.JPanel {
             BigDecimal difference = reality.subtract(totalRevenue.add(openingCash));
 
             txtMoneyDifference.setText(formatCurrency(difference));
-
-            // Đổi màu theo kết quả
             if (difference.compareTo(BigDecimal.ZERO) < 0) {
                 txtMoneyDifference.setForeground(new Color(255, 51, 0)); // Đỏ - thiếu
             } else if (difference.compareTo(BigDecimal.ZERO) > 0) {
