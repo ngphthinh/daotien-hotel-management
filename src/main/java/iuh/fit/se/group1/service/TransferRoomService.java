@@ -75,7 +75,7 @@ public class TransferRoomService {
     public List<Room> getAvailableRoomsByType(String roomTypeId) {
         return repository.getAvailableRoomsByType(roomTypeId);
     }
-
+    
     /**
      * Tính số lượng thời gian thuê theo loại booking
      */
@@ -404,4 +404,81 @@ public class TransferRoomService {
         public boolean valid;
         public String message;
     }
+
+public boolean cancelRoomBooking(Long orderId, String roomNumber, BookingType bookingType) {
+    try {
+        log.info("Canceling room booking - OrderId: {}, RoomNumber: {}, BookingType: {}", 
+                orderId, roomNumber, bookingType);
+        
+        // Gọi repository để hủy booking
+        boolean success = repository.cancelRoomBooking(orderId, roomNumber, bookingType.name());
+        
+        if (success) {
+            log.info("Successfully cancelled room booking");
+        } else {
+            log.warn("Failed to cancel room booking");
+        }
+        
+        return success;
+    } catch (Exception e) {
+        log.error("Error canceling room booking: {}", e.getMessage(), e);
+        return false;
+    }
+}
+
+public boolean extendRoomBooking(Long orderId, List<Room> rooms, int days, BookingType bookingType) {
+    try {
+        log.info("Extending room booking - OrderId: {}, Rooms: {}, Days: {}, BookingType: {}", 
+                orderId, rooms.size(), days, bookingType);
+        
+        if (rooms == null || rooms.isEmpty()) {
+            log.warn("No rooms provided for extension");
+            return false;
+        }
+        
+        if (days <= 0) {
+            log.warn("Invalid number of days: {}", days);
+            return false;
+        }
+        
+        // Lấy danh sách room IDs
+        List<Long> roomIds = rooms.stream()
+                .map(Room::getRoomId)
+                .collect(Collectors.toList());
+        
+        // Gọi repository để gia hạn
+        boolean success = repository.extendRoomBooking(orderId, roomIds, days, bookingType.name());
+        
+        if (success) {
+            log.info("Successfully extended room booking");
+            
+            // Tính thêm tiền cho số ngày gia hạn
+            long additionalCharge = calculateExtensionCharge(rooms, days, bookingType);
+            
+            if (additionalCharge > 0) {
+                // Cập nhật tổng tiền vào order
+                repository.addSurchargeToOrder(orderId, additionalCharge);
+                log.info("Added extension charge: {}", additionalCharge);
+            }
+        } else {
+            log.warn("Failed to extend room booking");
+        }
+        
+        return success;
+    } catch (Exception e) {
+        log.error("Error extending room booking: {}", e.getMessage(), e);
+        return false;
+    }
+}
+
+/**
+ * Tính tiền phụ thu cho việc gia hạn
+ */
+private long calculateExtensionCharge(List<Room> rooms, int days, BookingType bookingType) {
+    if (bookingType != BookingType.DAILY) {
+        return 0; // Chỉ tính phí gia hạn cho thuê theo ngày
+    }
+    
+    return calculateTotalPrice(rooms, bookingType, days);
+}
 }

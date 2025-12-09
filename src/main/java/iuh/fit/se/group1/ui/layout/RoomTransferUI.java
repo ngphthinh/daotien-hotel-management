@@ -217,23 +217,10 @@ public class RoomTransferUI extends JPanel {
         currentRoomsModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return column == 3; // Chỉ cho phép click vào cột "Hủy phòng"
             }
         };
-        currentRoomsTable = new JTable(currentRoomsModel) {
-            @Override
-            public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
-                // Không cho phép chọn cột "Hủy phòng"
-                if (columnIndex == 3) {
-                    return;
-                }
-                if (isRowSelected(rowIndex)) {
-                    getSelectionModel().removeSelectionInterval(rowIndex, rowIndex);
-                } else {
-                    getSelectionModel().addSelectionInterval(rowIndex, rowIndex);
-                }
-            }
-        };
+        currentRoomsTable = new JTable(currentRoomsModel);
 
         styleTable(currentRoomsTable);
         currentRoomsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -244,9 +231,24 @@ public class RoomTransferUI extends JPanel {
         currentRoomsTable.getColumnModel().getColumn(2).setPreferredWidth(100);
         currentRoomsTable.getColumnModel().getColumn(3).setPreferredWidth(80);
 
-        // Thêm renderer và editor cho cột "Hủy phòng"
-        currentRoomsTable.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer());
-        currentRoomsTable.getColumnModel().getColumn(3).setCellEditor(new ButtonEditor(new JCheckBox()));
+        // Thêm renderer cho cột "Hủy phòng"
+        currentRoomsTable.getColumnModel().getColumn(3).setCellRenderer(new TableCellRenderer() {
+            private final JButton button = new JButton("Hủy");
+            
+            {
+                button.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                button.setForeground(Color.WHITE);
+                button.setBackground(new Color(239, 68, 68));
+                button.setFocusPainted(false);
+                button.setBorderPainted(false);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                return button;
+            }
+        });
 
         // Thêm mouse listener để xử lý click
         currentRoomsTable.addMouseListener(new MouseAdapter() {
@@ -269,14 +271,219 @@ public class RoomTransferUI extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
 
         JButton selectBtn = createStyledButton("Chọn phòng cần đổi", new Color(59, 130, 246), 180, 35);
+        JButton extendBtn = createStyledButton("Gia hạn phòng", new Color(16, 185, 129), 140, 35);
+        
         selectBtn.addActionListener(e -> selectOldRooms());
+        extendBtn.addActionListener(e -> extendRoomBooking());
+        
         buttonPanel.add(selectBtn);
+        buttonPanel.add(extendBtn);
 
         panel.add(label, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private void extendRoomBooking() {
+        if (currentBooking == null) {
+            CustomDialog.showMessage(this,
+                    "Vui lòng chọn thông tin khách hàng!",
+                    "Thông báo",
+                    CustomDialog.MessageType.WARNING, 400, 200);
+            return;
+        }
+
+        int[] rows = currentRoomsTable.getSelectedRows();
+        if (rows.length == 0) {
+            CustomDialog.showMessage(this,
+                    "Vui lòng chọn phòng cần gia hạn!",
+                    "Thông báo",
+                    CustomDialog.MessageType.WARNING, 400, 200);
+            return;
+        }
+
+        // Lấy danh sách phòng được chọn
+        List<Room> roomsToExtend = new ArrayList<>();
+        for (int row : rows) {
+            String roomNum = currentRoomsModel.getValueAt(row, 0).toString();
+            Room room = currentRoomsMap.get(roomNum);
+            if (room != null) {
+                roomsToExtend.add(room);
+            }
+        }
+
+        if (roomsToExtend.isEmpty()) {
+            return;
+        }
+
+        // Hiển thị dialog nhập số ngày gia hạn
+        showExtendDialog(roomsToExtend);
+    }
+
+    private void showExtendDialog(List<Room> rooms) {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        JDialog dialog = new JDialog(parentFrame, "Gia Hạn Phòng", true);
+        dialog.setSize(500, 400);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new BorderLayout(10, 10));
+
+        // Header
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(16, 185, 129));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JLabel titleLabel = new JLabel("GIA HẠN PHÒNG");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel);
+
+        // Content
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        contentPanel.setBackground(Color.WHITE);
+
+        // Thông tin khách hàng
+        JLabel customerLabel = new JLabel(String.format(
+            "<html><b>Khách hàng:</b> %s<br><b>CCCD:</b> %s</html>",
+            currentBooking.getCustomer().getFullName(),
+            currentBooking.getCustomer().getCitizenId()
+        ));
+        customerLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        customerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Danh sách phòng
+        String roomList = rooms.stream()
+            .map(Room::getRoomNumber)
+            .collect(Collectors.joining(", "));
+        JLabel roomsLabel = new JLabel(String.format(
+            "<html><b>Phòng:</b> %s (%d phòng)</html>",
+            roomList, rooms.size()
+        ));
+        roomsLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        roomsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Loại thuê
+        JLabel typeLabel = new JLabel(String.format(
+            "<html><b>Loại thuê:</b> %s</html>",
+            currentBookingType.getDisplayName()
+        ));
+        typeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Input số ngày
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        inputPanel.setBackground(Color.WHITE);
+        inputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JLabel daysLabel = new JLabel("Số ngày gia hạn:");
+        daysLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        
+        SpinnerModel spinnerModel = new SpinnerNumberModel(1, 1, 365, 1);
+        JSpinner daysSpinner = new JSpinner(spinnerModel);
+        daysSpinner.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        ((JSpinner.DefaultEditor) daysSpinner.getEditor()).getTextField().setColumns(5);
+        
+        inputPanel.add(daysLabel);
+        inputPanel.add(daysSpinner);
+
+        // Thêm các component
+        contentPanel.add(customerLabel);
+        contentPanel.add(Box.createVerticalStrut(15));
+        contentPanel.add(roomsLabel);
+        contentPanel.add(Box.createVerticalStrut(10));
+        contentPanel.add(typeLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+        contentPanel.add(inputPanel);
+
+        // Button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        buttonPanel.setBackground(Color.WHITE);
+
+        JButton confirmButton = new JButton("Xác nhận");
+        confirmButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        confirmButton.setPreferredSize(new Dimension(150, 40));
+        confirmButton.setBackground(new Color(16, 185, 129));
+        confirmButton.setForeground(Color.WHITE);
+        confirmButton.setFocusPainted(false);
+        confirmButton.setBorderPainted(false);
+
+        JButton cancelButton = new JButton("Hủy");
+        cancelButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        cancelButton.setPreferredSize(new Dimension(150, 40));
+        cancelButton.setBackground(new Color(156, 163, 175));
+        cancelButton.setForeground(Color.WHITE);
+        cancelButton.setFocusPainted(false);
+        cancelButton.setBorderPainted(false);
+
+        addButtonHoverEffect(confirmButton, new Color(16, 185, 129), new Color(5, 150, 105));
+        addButtonHoverEffect(cancelButton, new Color(156, 163, 175), new Color(107, 114, 128));
+
+        confirmButton.addActionListener(e -> {
+            int days = (Integer) daysSpinner.getValue();
+            performExtendBooking(rooms, days);
+            dialog.dispose();
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(cancelButton);
+
+        dialog.add(headerPanel, BorderLayout.NORTH);
+        dialog.add(contentPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
+    }
+
+    private void performExtendBooking(List<Room> rooms, int days) {
+        try {
+            // Gọi service để gia hạn booking
+            boolean success = service.extendRoomBooking(
+                currentBooking.getOrderId(),
+                rooms,
+                days,
+                currentBookingType
+            );
+
+            if (success) {
+                String roomList = rooms.stream()
+                    .map(Room::getRoomNumber)
+                    .collect(Collectors.joining(", "));
+
+                CustomDialog.showMessage(this,
+                    String.format(
+                        "<b>GIA HẠN PHÒNG THÀNH CÔNG!</b><br><br>" +
+                        "Phòng: <b>%s</b><br>" +
+                        "Số ngày gia hạn: <b>%d ngày</b><br>" +
+                        "Khách hàng: <b>%s</b>",
+                        roomList,
+                        days,
+                        currentBooking.getCustomer().getFullName()
+                    ),
+                    "Thành công",
+                    CustomDialog.MessageType.SUCCESS,
+                    450,
+                    280);
+
+                // Reload data
+                loadSelectedBooking();
+            } else {
+                CustomDialog.showMessage(this,
+                    "Không thể gia hạn phòng! Vui lòng thử lại.",
+                    "Lỗi",
+                    CustomDialog.MessageType.ERROR, 400, 200);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            CustomDialog.showMessage(this,
+                "Lỗi khi gia hạn phòng: " + ex.getMessage(),
+                "Lỗi",
+                CustomDialog.MessageType.ERROR, 450, 220);
+        }
     }
 
     // Button Renderer cho cột "Hủy phòng"
@@ -343,30 +550,34 @@ public class RoomTransferUI extends JPanel {
             return;
         }
 
+        // Debug
+        System.out.println("Hủy phòng: " + roomNumber);
+        System.out.println("Order ID: " + currentBooking.getOrderId());
+        System.out.println("Booking Type: " + currentBookingType);
+
         // Kiểm tra xem booking có phải là "Theo ngày" không
         if (currentBookingType != BookingType.DAILY) {
             CustomDialog.showMessage(this,
                     "Chỉ có thể hủy phòng cho đặt phòng theo ngày!",
                     "Thông báo",
-                    CustomDialog.MessageType.WARNING, 400, 200);
+                    CustomDialog.MessageType.WARNING, 400, 400);
             return;
         }
 
-        // Kiểm tra thời gian - chỉ cho phép hủy nếu thời gian ở trước thời điểm hiện tại
-        // Giả sử Order có phương thức getCheckInDate() hoặc getBookingDate()
-        // LocalDateTime bookingTime = currentBooking.getCheckInDate(); // hoặc getBookingDate()
-        // if (bookingTime.isAfter(LocalDateTime.now())) {
-        //     CustomDialog.showMessage(this,
-        //             "Chỉ có thể hủy phòng có thời gian ở trước thời điểm hiện tại!",
-        //             "Thông báo",
-        //             CustomDialog.MessageType.WARNING, 400, 200);
-        //     return;
-        // }
+        long roomPrice = service.getRoomPriceWithDuration(roomToCancel, currentBookingType, 
+                currentBooking.getOrderId());
 
         String message = String.format(
-                "Xác nhận hủy đặt phòng %s trong hóa đơn %s?",
+                "<html><div style='text-align: center;'>" +
+                "<b>Xác nhận hủy đặt phòng?</b><br><br>" +
+                "Phòng: <b>%s</b><br>" +
+                "Hóa đơn: <b>%s</b><br>" +
+                "Giá phòng: <b>%,dđ</b><br><br>" +
+                "<i>Phòng sẽ được chuyển về trạng thái trống</i>" +
+                "</div></html>",
                 roomNumber,
-                currentBooking.getOrderId());
+                currentBooking.getOrderId(),
+                roomPrice);
 
         int confirm = JOptionPane.showConfirmDialog(
                 this,
@@ -376,24 +587,51 @@ public class RoomTransferUI extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            // Xóa phòng khỏi table
-            currentRoomsModel.removeRow(row);
-            currentRoomsMap.remove(roomNumber);
-            
-            // Xóa khỏi danh sách selected nếu có
-            selectedOldRooms.removeIf(r -> r.getRoomNumber().equals(roomNumber));
-            
-            updateSummary();
+            try {
+                // Gọi service để xóa booking khỏi database
+                boolean success = service.cancelRoomBooking(
+                        currentBooking.getOrderId(), 
+                        roomToCancel.getRoomNumber(),
+                        currentBookingType);
 
-            CustomDialog.showMessage(this,
-                    String.format("Đã hủy phòng %s thành công!", roomNumber),
-                    "Thành công",
-                    CustomDialog.MessageType.SUCCESS, 400, 200);
+                if (success) {
+                    // Xóa phòng khỏi table UI
+                    currentRoomsModel.removeRow(row);
+                    currentRoomsMap.remove(roomNumber);
+                    
+                    // Xóa khỏi danh sách selected nếu có
+                    selectedOldRooms.removeIf(r -> r.getRoomNumber().equals(roomNumber));
+                    
+                    updateSummary();
 
-            // Nếu không còn phòng nào, reset form
-            if (currentRoomsModel.getRowCount() == 0) {
-                resetForm();
-                loadBookingsFromDatabase();
+                    CustomDialog.showMessage(this,
+                            String.format(
+                                "<b>HỦY PHÒNG THÀNH CÔNG!</b><br><br>" +
+                                "Phòng <b>%s</b> đã được hủy<br>" +
+                                "Phòng hiện đang trống và có thể đặt lại<br>" +
+                                "Số tiền hoàn: <b>%,dđ</b>",
+                                roomNumber,
+                                roomPrice),
+                            "Thành công",
+                            CustomDialog.MessageType.SUCCESS, 450, 250);
+
+                    // Nếu không còn phòng nào, reset form và reload data
+                    if (currentRoomsModel.getRowCount() == 0) {
+                        resetForm();
+                        loadBookingsFromDatabase();
+                    }
+                } else {
+                    CustomDialog.showMessage(this,
+                            "Không thể hủy phòng! Vui lòng thử lại.",
+                            "Lỗi",
+                            CustomDialog.MessageType.ERROR, 400, 200);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                CustomDialog.showMessage(this,
+                        "Lỗi khi hủy phòng: " + ex.getMessage(),
+                        "Lỗi",
+                        CustomDialog.MessageType.ERROR, 450, 220);
             }
         }
     }
@@ -638,7 +876,7 @@ public class RoomTransferUI extends JPanel {
     private void selectOldRooms() {
         if (currentBooking == null) {
             CustomDialog.showMessage(this,
-                    "Vui lòng chọn phòng trước!",
+                    "Vui lòng chọn thông tin khách hàng!",
                     "Thông báo",
                     CustomDialog.MessageType.WARNING, 400, 200);
             return;
@@ -910,6 +1148,8 @@ public class RoomTransferUI extends JPanel {
         orders = service.findOrdersUnPendingByKeyWord(keyword);
         loadBookingsToTable();
     }
+
+    
 
     private void performTransfer() {
         if (currentBooking == null) {
