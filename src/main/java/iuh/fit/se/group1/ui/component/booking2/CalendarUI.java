@@ -230,7 +230,13 @@ public class CalendarUI extends JDialog {
         actionPanel.add(cancelButton);
         actionPanel.add(confirmButton);
 
-        panel.add(actionPanel, showTimeSelector ? BorderLayout.SOUTH : BorderLayout.CENTER);
+        // Add timePanel nếu showTimeSelector = true
+        if (showTimeSelector) {
+            panel.add(timePanel, BorderLayout.CENTER);
+            panel.add(actionPanel, BorderLayout.SOUTH);
+        } else {
+            panel.add(actionPanel, BorderLayout.CENTER);
+        }
 
         return panel;
     }
