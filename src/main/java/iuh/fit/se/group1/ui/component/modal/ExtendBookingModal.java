@@ -7,7 +7,7 @@ package iuh.fit.se.group1.ui.component.modal;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.service.TransferRoomService;
+import iuh.fit.se.group1.service.RoomToolsService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import raven.glasspanepopup.GlassPanePopup;
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 
 public class ExtendBookingModal extends JPanel {
-    private final TransferRoomService service;
+    private final RoomToolsService service;
     private final Order currentBooking;
     private final List<Room> roomsToExtend;
     private final BookingType bookingType;
@@ -42,7 +42,7 @@ public class ExtendBookingModal extends JPanel {
 
     public ExtendBookingModal(Order currentBooking, List<Room> roomsToExtend,
                               BookingType bookingType, Runnable onSuccess, Runnable onCancel) {
-        this.service = new TransferRoomService();
+        this.service = new RoomToolsService();
         this.currentBooking = currentBooking;
         this.roomsToExtend = roomsToExtend;
         this.bookingType = bookingType;
