@@ -493,7 +493,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 saveData(modal);
-                GlassPanePopup.closePopupAll();
             }
 
         });
@@ -504,7 +503,8 @@ public class CustomerManagement extends javax.swing.JPanel {
     private void saveData(InfoCustomerModal modal) {
         Valid rs = getValid(modal);
         if (!rs.valid) {
-            Message.showMessage("Loi", "Kiem tra lai thong tin");
+            Message.showMessage("Lỗi", "Kiểm tra lại thông tin");
+            return;
         }
         try {
             Customer customer = new Customer();
@@ -518,7 +518,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             Customer customerSave = customerService.createCustomer(customer);
 
             if (customerSave == null) {
-                Message.showMessage("Loi", "Khong the tao nhan vien");
+                Message.showMessage("Lỗi", "Không thể thêm khách hàng!");
                 return;
             }
 
@@ -532,6 +532,9 @@ public class CustomerManagement extends javax.swing.JPanel {
                     customerSave.getEmail(),
                     customerSave.getCitizenId(),
                     customerSave.getPhone(),});
+            Message.showMessage("Thành công", "Đã thêm khách hàng thành công!");
+            GlassPanePopup.closePopupAll();
+
         } catch (Exception e) {
 
             Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
@@ -571,11 +574,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ (10 chữ số, bắt đầu bằng 0)!");
             isValid = false;
         }
-
-        if (email.isEmpty()) {
-            modal.getLblErrolEmail().setText("Vui lòng nhập email!");
-            isValid = false;
-        } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             modal.getLblErrolEmail().setText("Email không hợp lệ!");
             isValid = false;
         }
