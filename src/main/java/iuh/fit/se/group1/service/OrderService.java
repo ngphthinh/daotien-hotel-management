@@ -13,6 +13,7 @@ import iuh.fit.se.group1.repository.OrderRepository;
 import iuh.fit.se.group1.repository.RoomRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public class OrderService {
@@ -92,5 +93,9 @@ public class OrderService {
 
     public List<Order> getUnpaidOrdersByKeyword(String keyword) {
         return orderRepository.findUnpaidOrdersByKeyword(keyword);
+    }
+
+    public BigDecimal getTotalRevenueBetweenDates(LocalDate from, LocalDate to) {
+        return orderRepository.calculateTotalRevenueBetweenDates(from, to);
     }
 }

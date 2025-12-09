@@ -20,6 +20,11 @@ public class Order {
     private BigDecimal deposit;
     private LocalDate createdAt;
     private List<Booking> bookings;
+    private LocalDate paymentDate;
+
+    public LocalDate getPaymentDate() {
+        return paymentDate;
+    }
 
     public PaymentType getPaymentType() {
         return paymentType;
@@ -157,5 +162,9 @@ public class Order {
     @Override
     public int hashCode() {
         return Objects.hashCode(orderId);
+    }
+
+    public void setPaymentDate(LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
     }
 }

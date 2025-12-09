@@ -12,16 +12,15 @@ import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import iuh.fit.se.group1.util.Constants;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -30,6 +29,15 @@ import javax.swing.table.TableColumn;
  * @author Windows
  */
 public class OrderManagement extends javax.swing.JPanel {
+
+    public static void main(String[] args) {
+        Frame frame = new Frame();
+        OrderManagement orderManagement = new OrderManagement();
+        frame.add(orderManagement);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        frame.setVisible(true);
+    }
 
     private final OrderService orderService;
     private MainLayout parent;
@@ -42,7 +50,7 @@ public class OrderManagement extends javax.swing.JPanel {
         initComponents();
         custom();
         orderService = new OrderService();
-        loadData(orderService.getAllOrders());
+        loadData();
     }
 
     public void loadData(List<Order> orders) {
@@ -66,19 +74,41 @@ public class OrderManagement extends javax.swing.JPanel {
         model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
 
         for (Order order : orderService.getAllOrders()) {
+
+            String rooms = order.getBookings().stream()
+                    .map(booking -> booking.getRoom().getRoomNumber())
+                            .collect(Collectors.joining(", "));
+
+            String checkIn = null;
+            String checkOut = null;
+            try {
+                checkIn = order.getBookings().get(0).getCheckInDate().format(Constants.DATE_FORMATTER);
+
+                checkOut = order.getBookings().get(0).getCheckOutDate().format(Constants.DATE_FORMATTER);
+            } catch (Exception e) {
+                order.getBookings().forEach(booking -> {
+                    System.out.println(booking.getBookingId());
+                });
+                throw new RuntimeException(e);
+            }
+
+
             model.addRow(new Object[]{
                     order.getOrderId(),
-                    Constants.DATE_FORMATTER.format(order.getOrderDate()),
-                    order.getTotalAmount(),
+                    order.getCustomer().getFullName(),
+                    order.getCustomer().getCitizenId(),
+                    Constants.VND_FORMAT.format(order.getTotalAmount()),
                     order.getOrderType().getName(),
-                    order.getCustomer().getFullName()
+                    rooms ,
+                    checkIn,
+                    checkOut
             });
         }
     }
 
 
     private void custom() {
-        String cols[] = {"Mã hóa đơn", "Ngày tạo", "Tổng tiền", "Loại hóa đơn", "Tên khách hàng", "Chức năng"};
+        String cols[] = {"Mã", "Tên khách hàng", "CCCD/Passport", "Tổng tiền", "Trạng thái", "Số phòng","Ngày nhận","Ngày trả", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 5);
         tblOrder.getTbl().setModel(model);
         TableActionEvent event = new TableActionEvent() {
@@ -98,22 +128,22 @@ public class OrderManagement extends javax.swing.JPanel {
 
             @Override
             public void onView(int row) {
-                Long id = Long.valueOf(tblOrder.getTbl().getValueAt(row, 0).toString());
-                Customer customer = orderService.getAllOrders()
-                        .stream()
-                        .filter(e -> e.getOrderId().equals(id))
-                        .findFirst().get()
-                        .getCustomer();
-                paymentPage.setCustomer(customer);
-                parent.setMainContent(paymentPage);
+//                Long id = Long.valueOf(tblOrder.getTbl().getValueAt(row, 0).toString());
+//                Customer customer = orderService.getAllOrders()
+//                        .stream()
+//                        .filter(e -> e.getOrderId().equals(id))
+//                        .findFirst().get()
+//                        .getCustomer();
+//                paymentPage.setCustomer(customer);
+//                parent.setMainContent(paymentPage);
             }
         };
 
         var header = tblOrder.getTbl().getTableHeader();
 
-        Combobox<String> cmbType = new Combobox<>(new String[]{"Đã thanh toán", "Chưa thanh toán", "Đặt cọc"});
+        Combobox<String> cmbType = new Combobox<>(new String[]{"Đã hoàn thành", "Đang xử lí", "Đặt trước"});
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
-        TableColumn column = tblOrder.getTbl().getColumnModel().getColumn(3);
+        TableColumn column = tblOrder.getTbl().getColumnModel().getColumn(4);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -124,7 +154,7 @@ public class OrderManagement extends javax.swing.JPanel {
             Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
 
             if (comp instanceof JLabel lbl) {
-                lbl.setText("Loại hóa đơn                                                \u25BC");
+                lbl.setText("Loại hóa đơn      \u25BC");
                 lbl.setHorizontalTextPosition(SwingConstants.LEFT);
                 lbl.setHorizontalAlignment(SwingConstants.LEFT);
                 lbl.setIconTextGap(5);
@@ -143,7 +173,7 @@ public class OrderManagement extends javax.swing.JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int col = tblOrder.getTbl().columnAtPoint(e.getPoint());
-                if (col == 3) {
+                if (col == 4) {
                     Rectangle rect = header.getHeaderRect(col);
 
                     cmbType.setBounds(rect);
@@ -162,27 +192,59 @@ public class OrderManagement extends javax.swing.JPanel {
             }
         });
 
-        tblOrder.setTableActionColumn(tblOrder.getTbl(), 5, event, true);
-        tblOrder.getTbl().getColumnModel().getColumn(0).setPreferredWidth(150);  // chiều rộng mong muốn
-        tblOrder.getTbl().getColumnModel().getColumn(1).setPreferredWidth(150);
+        tblOrder.setTableActionColumn(tblOrder.getTbl(), 8, event, true);
+        tblOrder.getTbl().getColumnModel().getColumn(0).setPreferredWidth(70);  // chiều rộng mong muốn
+        tblOrder.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
         tblOrder.getTbl().getColumnModel().getColumn(2).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(3).setPreferredWidth(300);
-        tblOrder.getTbl().getColumnModel().getColumn(4).setPreferredWidth(250);
+        tblOrder.getTbl().getColumnModel().getColumn(3).setPreferredWidth(150);
+        tblOrder.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
         tblOrder.getTbl().getColumnModel().getColumn(5).setPreferredWidth(150);
+        tblOrder.getTbl().getColumnModel().getColumn(6).setPreferredWidth(150);
+        tblOrder.getTbl().getColumnModel().getColumn(7).setPreferredWidth(150);
+        tblOrder.getTbl().getColumnModel().getColumn(8).setPreferredWidth(150);
 
         tblOrder.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 int col = tblOrder.getTbl().columnAtPoint(e.getPoint());
 
-                if (col == 5) {
+                if (col == 8) {
                     tblOrder.getTbl().setCursor(Cursor.getDefaultCursor().getPredefinedCursor(Cursor.HAND_CURSOR));
                 } else {
                     tblOrder.getTbl().setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
+        setupOrderTableColumnAlignment(tblOrder.getTbl());
     }
+
+    public void setupOrderTableColumnAlignment(JTable tblOrder) {
+
+        DefaultTableCellRenderer left = new DefaultTableCellRenderer();
+        left.setHorizontalAlignment(SwingConstants.LEFT);
+
+        DefaultTableCellRenderer center = new DefaultTableCellRenderer();
+        center.setHorizontalAlignment(SwingConstants.CENTER);
+
+        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+        right.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        // Căn trái mặc định toàn bộ
+        for (int i = 0; i < tblOrder.getColumnCount() -1 ; i++) {
+            tblOrder.getColumnModel().getColumn(i).setCellRenderer(left);
+        }
+
+
+        tblOrder.getColumnModel().getColumn(0).setCellRenderer(center);
+        tblOrder.getColumnModel().getColumn(4).setCellRenderer(center);
+
+        // Cột căn phải (index: 3, 5, 6, 7)
+        tblOrder.getColumnModel().getColumn(3).setCellRenderer(right);
+        tblOrder.getColumnModel().getColumn(5).setCellRenderer(right);
+        tblOrder.getColumnModel().getColumn(6).setCellRenderer(right);
+        tblOrder.getColumnModel().getColumn(7).setCellRenderer(right);
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

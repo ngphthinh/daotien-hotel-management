@@ -4,17 +4,66 @@
  */
 package iuh.fit.se.group1.ui.component.chart;
 
+import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
+import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.TextField;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 /**
  *
  * @author THIS PC
  */
 public class HeaderChart extends javax.swing.JPanel {
 
+    public TextField getTxtFromDate() {
+        return txtFromDate;
+    }
+
+    public void setTxtFromDate(TextField txtFromDate) {
+        this.txtFromDate = txtFromDate;
+    }
+
+    public TextField getTxtToDate() {
+        return txtToDate;
+    }
+
+    public void setTxtToDate(TextField txtToDate) {
+        this.txtToDate = txtToDate;
+    }
+
     /**
      * Creates new form HeaderChart
      */
     public HeaderChart() {
         initComponents();
+        txtFromDate.setEditable(false);
+        txtToDate.setEditable(false);
+        txtFromDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        txtToDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+        txtFromDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CalendarUI.showCalendar(txtFromDate, null, null, false);
+            }
+        });
+
+        txtToDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CalendarUI.showCalendar(txtToDate, null, null, false);
+            }
+        });
+    }
+
+    public Button getBtnView() {
+        return btnView;
+    }
+
+    public void setBtnView(Button btnView) {
+        this.btnView = btnView;
     }
 
     /**
@@ -28,9 +77,9 @@ public class HeaderChart extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        button1 = new iuh.fit.se.group1.ui.component.custom.Button();
-        textField1 = new iuh.fit.se.group1.ui.component.custom.TextField();
-        textField2 = new iuh.fit.se.group1.ui.component.custom.TextField();
+        btnView = new iuh.fit.se.group1.ui.component.custom.Button();
+        txtFromDate = new iuh.fit.se.group1.ui.component.custom.TextField();
+        txtToDate = new iuh.fit.se.group1.ui.component.custom.TextField();
         jLabel3 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(108, 165, 200));
@@ -40,27 +89,27 @@ public class HeaderChart extends javax.swing.JPanel {
         jLabel1.setText("Quản lí thống kê");
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel2.setText("Doanh thu");
+        jLabel2.setText(">Doanh thu");
 
-        button1.setBackground(new java.awt.Color(255, 108, 3));
-        button1.setForeground(new java.awt.Color(255, 255, 255));
-        button1.setText("Xem");
-        button1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnView.setBackground(new java.awt.Color(255, 108, 3));
+        btnView.setForeground(new java.awt.Color(255, 255, 255));
+        btnView.setText("Xem");
+        btnView.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        textField1.setEditable(false);
-        textField1.setBackground(new java.awt.Color(108, 165, 200));
-        textField1.setForeground(new java.awt.Color(255, 255, 255));
-        textField1.setText("textField1");
-        textField1.setBorderColor(java.awt.Color.white);
-        textField1.setBorderRadius(5);
-        textField1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        txtFromDate.setEditable(false);
+        txtFromDate.setBackground(new java.awt.Color(108, 165, 200));
+        txtFromDate.setForeground(new java.awt.Color(255, 255, 255));
+        txtFromDate.setText("textField1");
+        txtFromDate.setBorderColor(java.awt.Color.white);
+        txtFromDate.setBorderRadius(5);
+        txtFromDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
-        textField2.setBackground(new java.awt.Color(108, 165, 200));
-        textField2.setForeground(new java.awt.Color(255, 255, 255));
-        textField2.setText("textField1");
-        textField2.setBorderColor(java.awt.Color.white);
-        textField2.setBorderRadius(5);
-        textField2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        txtToDate.setBackground(new java.awt.Color(108, 165, 200));
+        txtToDate.setForeground(new java.awt.Color(255, 255, 255));
+        txtToDate.setText("textField1");
+        txtToDate.setBorderColor(java.awt.Color.white);
+        txtToDate.setBorderRadius(5);
+        txtToDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
         jLabel3.setText("đến");
 
@@ -74,13 +123,13 @@ public class HeaderChart extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-                .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(25, 25, 25))
         );
         layout.setVerticalGroup(
@@ -88,20 +137,20 @@ public class HeaderChart extends javax.swing.JPanel {
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
                 .addComponent(jLabel2)
-                .addComponent(button1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(jLabel3))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button button1;
+    private iuh.fit.se.group1.ui.component.custom.Button btnView;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField1;
-    private iuh.fit.se.group1.ui.component.custom.TextField textField2;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtFromDate;
+    private iuh.fit.se.group1.ui.component.custom.TextField txtToDate;
     // End of variables declaration//GEN-END:variables
 }
