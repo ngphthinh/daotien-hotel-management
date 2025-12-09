@@ -233,4 +233,8 @@ public class RoomService {
     public List<Room> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
         return roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
     }
+
+    public Room getRoomByRoomId(Long roomId) {
+        return roomRepository.findById(roomId);
+    }
 }

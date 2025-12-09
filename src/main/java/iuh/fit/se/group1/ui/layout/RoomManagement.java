@@ -3,7 +3,9 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.service.*;
+import iuh.fit.se.group1.service.RoomService;
+import iuh.fit.se.group1.service.RoomTypeService;
+import iuh.fit.se.group1.service.PropertiesService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
@@ -12,10 +14,13 @@ import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Properties;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -26,9 +31,16 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
+import iuh.fit.se.group1.service.ExportExcelService;
+import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 
 public class RoomManagement extends javax.swing.JPanel {
@@ -59,10 +71,6 @@ public class RoomManagement extends javax.swing.JPanel {
 
             e.printStackTrace();
         }
-    }
-
-    public void loadData(){
-        loadTable(roomService.getAllRooms());
     }
 
     private void initServices() {
@@ -179,7 +187,7 @@ public class RoomManagement extends javax.swing.JPanel {
                 }
 
                 savePricesToFile();
-
+                System.out.println("Saved prices ");
                 JOptionPane.showMessageDialog(this, "Cập nhật và lưu giá thành công!");
 
                 // Khóa lại các field
@@ -195,41 +203,56 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void savePricesToFile() {
-        String filePath = "prices.properties";
-        Properties props = PropertiesService.loadProperties(filePath);
+        RoomType singleType = new RoomType();
+        singleType.setHourlyRate(new BigDecimal(txtSingleFirstHour.getText().trim()));
+        singleType.setDailyRate(new BigDecimal(txtSingleDay.getText().trim()));
+        singleType.setOvernightRate(new BigDecimal(txtSingleNight.getText().trim()));
+        singleType.setAdditionalHourRate(new BigDecimal(txtSingleHour.getText().trim()));
+        singleType.setRoomTypeId("SINGLE");
 
-        props.setProperty("/price.single.hourly", txtSingleHour.getText());
-        props.setProperty("/price.single.overnight", txtSingleNight.getText());
-        props.setProperty("/price.single.daily", txtSingleDay.getText());
-        props.setProperty("/price.single.firsthour", txtSingleFirstHour.getText());
+        RoomType doubleType = new RoomType();
+        doubleType.setHourlyRate(new BigDecimal(txtDoubleFirstHour.getText().trim()));
+        doubleType.setDailyRate(new BigDecimal(txtDoubleDay.getText().trim()));
+        doubleType.setOvernightRate(new BigDecimal(txtDoubleNight.getText().trim()));
+        doubleType.setAdditionalHourRate(new BigDecimal(txtDoubleHour.getText().trim()));
+        doubleType.setRoomTypeId("DOUBLE"); 
 
-        props.setProperty("/price.double.hourly", txtDoubleHour.getText());
-        props.setProperty("/price.double.overnight", txtDoubleNight.getText());
-        props.setProperty("/price.double.daily", txtDoubleDay.getText());
-        props.setProperty("/price.double.firsthour", txtDoubleFirstHour.getText());
+        roomTypeService.updateRoomType(singleType);
+        roomTypeService.updateRoomType(doubleType);
 
-        PropertiesService.saveProperties(filePath, props);
     }
-
     private void loadPricesFromFile() {
-        String filePath = "prices.properties";
+        var roomType = roomTypeService.getAllRoomTypes();
+        RoomType singleType = roomType.stream()
+                .filter(rt -> rt.getRoomTypeId().equals("SINGLE"))
+                .findFirst()
+                .orElse(null);
+        RoomType doubleType = roomType.stream()
+                .filter(rt -> rt.getRoomTypeId().equals("DOUBLE"))
+                .findFirst()
+                .orElse(null);
+        if (singleType == null || doubleType == null) {
+            throw new IllegalStateException("Không tìm thấy loại phòng SINGLE hoặc DOUBLE trong CSDL!");
+        }
+        txtSingleDay.setText(singleType.getDailyRate().toString());
+        txtDoubleDay.setText(doubleType.getDailyRate().toString());
 
-        txtSingleHour.setText(PropertiesService.get(filePath, "/price.single.hourly"));
-        txtSingleNight.setText(PropertiesService.get(filePath, "/price.single.overnight"));
-        txtSingleDay.setText(PropertiesService.get(filePath, "/price.single.daily"));
-        txtSingleFirstHour.setText(PropertiesService.get(filePath, "/price.single.firsthour"));
+        txtDoubleFirstHour.setText(doubleType.getHourlyRate().toString());
+        txtSingleFirstHour.setText(singleType.getHourlyRate().toString());
 
-        txtDoubleHour.setText(PropertiesService.get(filePath, "/price.double.hourly"));
-        txtDoubleNight.setText(PropertiesService.get(filePath, "/price.double.overnight"));
-        txtDoubleDay.setText(PropertiesService.get(filePath, "/price.double.daily"));
-        txtDoubleFirstHour.setText(PropertiesService.get(filePath, "/price.double.firsthour"));
+        txtSingleNight.setText(singleType.getOvernightRate().toString());
+        txtDoubleNight.setText(doubleType.getOvernightRate().toString());   
+
+        txtSingleHour.setText(singleType.getAdditionalHourRate().toString());
+        txtDoubleHour.setText(doubleType.getAdditionalHourRate().toString());
+
     }
 
     private void loadTable(List<Room> rooms) {
         DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
         model.setRowCount(0);
         for (Room room : rooms) {
-            model.addRow(new Object[]{
+            model.addRow(new Object[] {
                     room.getRoomId(),
                     room.getRoomNumber(),
                     room.getRoomType() != null ? room.getRoomType().getName() : "N/A",
@@ -241,7 +264,7 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void setupTableModel() {
-        String[] cols = {"Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng"};
+        String[] cols = { "Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng" };
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -355,7 +378,7 @@ public class RoomManagement extends javax.swing.JPanel {
         }
 
         Combobox<String> cmbType = new Combobox<>(typeItems);
-        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Tất cả", "AVAILABLE", "OCCUPIED", "MAINTENANCE"});
+        Combobox<String> cmbStatus = new Combobox<>(new String[] { "Tất cả", "AVAILABLE", "OCCUPIED", "MAINTENANCE" });
 
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
@@ -376,6 +399,8 @@ public class RoomManagement extends javax.swing.JPanel {
             return panel;
         });
 
+
+
         TableColumn colStatus = tblRoom.getTbl().getColumnModel().getColumn(3);
         colStatus.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
             JPanel panel = new JPanel(new BorderLayout());
@@ -392,6 +417,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
             return panel;
         });
+
 
         cmbType.addActionListener(ev -> {
             currentTypeFilter = (String) cmbType.getSelectedItem();
@@ -418,15 +444,15 @@ public class RoomManagement extends javax.swing.JPanel {
                 JTableHeader header = tblRoom.getTbl().getTableHeader();
                 Rectangle headerRect = header.getHeaderRect(columnIndex);
 
-                int x = headerRect.x;
-                int y = headerRect.y + headerRect.height;
-
                 JPopupMenu popup = new JPopupMenu();
                 popup.setLayout(new BorderLayout());
                 popup.add(cmb, BorderLayout.CENTER);
-                popup.setPreferredSize(new Dimension(headerRect.width, 200));
 
-                popup.show(header, x, y);
+                popup.setPreferredSize(new Dimension(headerRect.width, 60)); 
+                popup.setBackground(Color.WHITE);
+                cmb.setBackground(Color.WHITE);
+
+                popup.show(header, headerRect.x, headerRect.height);
 
                 cmb.addActionListener(e -> popup.setVisible(false));
             }
@@ -669,7 +695,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
         btnUpdatePrice.setText("Cập nhật giá");
         btnUpdatePrice.setFont(new java.awt.Font("Segoe UI", 1, 14));
-
+       
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -727,10 +753,10 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void exportTableToExcel(RoomManagement roomManagement, JTable tbl, String string, String string2,
-                                    boolean b) {
+            boolean b) {
         throw new UnsupportedOperationException("Unimplemented method 'exportTableToExcel'");
     }
-
+    // CHẮC CHẮN ĐẢM BẢO NHU CẦU TỐI ĐA THEO HỆ HÀNG HÓA TỔNG SỐ ĐIỀU TRA TÊN THANH LÝ HÀNG HÓA NỘI ĐỊA NÓI CHUNG VÀ KHU VỰC NÓI RIÊNG, ĐẢM BẢO TÍNH SẴN DÙNG VÀ NHIỀU YẾU TỐ KHÁC
     private void btnAddRoomActionPerformed(java.awt.event.ActionEvent evt) {
         RoomManagementModal modal = new RoomManagementModal();
         modal.closeModel(ae -> GlassPanePopup.closePopupLast());
@@ -753,8 +779,14 @@ public class RoomManagement extends javax.swing.JPanel {
             }
         });
         GlassPanePopup.showPopup(modal);
+
     }
 
+    
+    public void loadData() {
+        // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method 'loadData'");
+    }
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("Import Excel clicked");
     }
@@ -766,5 +798,4 @@ public class RoomManagement extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom;
     private javax.swing.JLabel lblTitle;
     private iuh.fit.se.group1.ui.component.table.Table tblRoom;
-
 }

@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class RoomRepository implements Repository<Room, Long> {
 
     private static final Logger log = LoggerFactory.getLogger(RoomRepository.class);
@@ -29,10 +28,10 @@ public class RoomRepository implements Repository<Room, Long> {
     @Override
     public Room save(Room room) {
         String sql = "INSERT INTO Room (roomNumber, roomTypeId, createdAt, roomStatus) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            conn.setAutoCommit(true);
+            connection.setAutoCommit(true);
 
             ps.setString(1, room.getRoomNumber());
 
@@ -138,39 +137,74 @@ public class RoomRepository implements Repository<Room, Long> {
         }
     }
 
-    @Override
-    public List<Room> findAll() {
-        List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT * FROM Room ORDER BY roomId";
+   @Override
+public List<Room> findAll() {
+    List<Room> rooms = new ArrayList<>();
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+    String sql = """
+        SELECT
+            r.roomId,
+            r.roomNumber,
+            r.createdAt AS roomCreatedAt,
+            r.roomStatus,
+            r.roomTypeId,
 
-            while (resultSet.next()) {
-                Room room = new Room();
-                room.setRoomId(resultSet.getLong("roomId"));
-                room.setRoomNumber(resultSet.getString("roomNumber"));
+            rt.name AS roomTypeName,
+            rt.hourlyRate,
+            rt.dailyRate,
+            rt.overnightRate,
+            rt.additionalHourRate,
+            rt.createdAt AS roomTypeCreatedAt
+        FROM Room r
+        JOIN RoomType rt ON r.roomTypeId = rt.roomTypeId
+        ORDER BY r.roomId
+        """;
 
-                // Load full RoomType
-                String typeId = resultSet.getString("roomTypeId");
-                if (typeId != null) {
-                    room.setRoomType(roomTypeRepository.findById(typeId));
-                }
+    try (PreparedStatement ps = connection.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
 
-                room.setCreateAt(resultSet.getDate("createdAt") != null ? resultSet.getDate("createdAt").toLocalDate() : null);
-                room.setRoomStatus(RoomStatus.fromString(resultSet.getString("roomStatus")));
-                rooms.add(room);
-            }
-            log.info("Found {} rooms in total", rooms.size());  // Log để debug
+        while (rs.next()) {
+            Room room = new Room();
 
-        } catch (SQLException e) {
-            log.error("Error finding all Rooms: ", e);
-            throw new RuntimeException(e);
+            // ===== ROOM =====
+            room.setRoomId(rs.getLong("roomId"));
+
+            // ✅ FIX LỖI COMPILER Ở ĐÂY
+            room.setRoomNumber(String.valueOf(rs.getInt("roomNumber")));
+
+            room.setRoomStatus(RoomStatus.valueOf(rs.getString("roomStatus")));
+
+            Date roomCreatedAt = rs.getDate("roomCreatedAt");
+            room.setCreateAt(roomCreatedAt != null ? roomCreatedAt.toLocalDate() : null);
+
+            // ===== ROOM TYPE =====
+            RoomType roomType = new RoomType();
+            roomType.setRoomTypeId(rs.getString("roomTypeId"));
+            roomType.setName(rs.getString("roomTypeName"));
+            roomType.setHourlyRate(rs.getBigDecimal("hourlyRate"));
+            roomType.setDailyRate(rs.getBigDecimal("dailyRate"));
+            roomType.setOvernightRate(rs.getBigDecimal("overnightRate"));
+            roomType.setAdditionalHourRate(rs.getBigDecimal("additionalHourRate"));
+
+            Date rtCreatedAt = rs.getDate("roomTypeCreatedAt");
+            roomType.setCreatedAt(
+                rtCreatedAt != null ? rtCreatedAt.toLocalDate() : null
+            );
+
+            room.setRoomType(roomType);
+
+            rooms.add(room);
         }
 
-        return rooms;
+        log.info("Found {} rooms with RoomType", rooms.size());
+
+    } catch (SQLException e) {
+        log.error("Error loading rooms with RoomType", e);
+        throw new RuntimeException(e);
     }
 
+    return rooms;
+}
 
     public List<Room> findByRoomNumberOrId(String keyword) {
         List<Room> rooms = new ArrayList<>();
@@ -267,19 +301,7 @@ public class RoomRepository implements Repository<Room, Long> {
             throw new RuntimeException(e);
         }
     }
-    /**
-     * Close the connection when repository is no longer needed
-     */
-    public void close() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                log.info("Database connection closed");
-            }
-        } catch (SQLException e) {
-            log.error("Error closing database connection: ", e);
-        }
-    }
+
 
     public List<Room> findAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut, RoomStatus roomStatus) {
 

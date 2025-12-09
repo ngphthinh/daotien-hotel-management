@@ -51,6 +51,13 @@ public class InfoShift extends javax.swing.JPanel {
         txtEmployee = new iuh.fit.se.group1.ui.component.custom.TextField();
         lblShift = new javax.swing.JLabel();
         txtShift = new iuh.fit.se.group1.ui.component.custom.TextField();
+        pnlNotify = new javax.swing.JPanel();
+        lblMiss = new javax.swing.JLabel();
+        lblExcess = new javax.swing.JLabel();
+        pnlPrice = new javax.swing.JPanel();
+        lblCalculatePrice = new javax.swing.JLabel();
+        lblTotalPrice = new javax.swing.JLabel();
+        lblNote = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -75,6 +82,79 @@ public class InfoShift extends javax.swing.JPanel {
             }
         });
 
+        pnlNotify.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblMiss.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMiss.setForeground(new java.awt.Color(255, 51, 0));
+        lblMiss.setText("MÀU ĐỎ LÀ SỐ TIỀN THIẾU");
+
+        lblExcess.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblExcess.setForeground(new java.awt.Color(0, 153, 0));
+        lblExcess.setText("MÀU XANH LÀ SỐ TIỀN THỪA");
+
+        pnlPrice.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout pnlPriceLayout = new javax.swing.GroupLayout(pnlPrice);
+        pnlPrice.setLayout(pnlPriceLayout);
+        pnlPriceLayout.setHorizontalGroup(
+            pnlPriceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 304, Short.MAX_VALUE)
+        );
+        pnlPriceLayout.setVerticalGroup(
+            pnlPriceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 48, Short.MAX_VALUE)
+        );
+
+        lblCalculatePrice.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblCalculatePrice.setText("CÁCH TÍNH TIỀN :");
+
+        lblTotalPrice.setBackground(new java.awt.Color(255, 255, 255));
+        lblTotalPrice.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTotalPrice.setText("THỰC TẾ = ĐÓNG CA + HỆ THỐNG");
+
+        lblNote.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblNote.setForeground(new java.awt.Color(102, 102, 102));
+        lblNote.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblNote.setText("CHÚ THÍCH:");
+
+        javax.swing.GroupLayout pnlNotifyLayout = new javax.swing.GroupLayout(pnlNotify);
+        pnlNotify.setLayout(pnlNotifyLayout);
+        pnlNotifyLayout.setHorizontalGroup(
+            pnlNotifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlNotifyLayout.createSequentialGroup()
+                .addComponent(lblNote, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlNotifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCalculatePrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(pnlNotifyLayout.createSequentialGroup()
+                        .addGroup(pnlNotifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblMiss, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblExcess, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(pnlNotifyLayout.createSequentialGroup()
+                                .addComponent(lblTotalPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnlPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        pnlNotifyLayout.setVerticalGroup(
+            pnlNotifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlNotifyLayout.createSequentialGroup()
+                .addGroup(pnlNotifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblMiss, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pnlNotifyLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblNote, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(0, 0, 0)
+                .addComponent(lblExcess, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(lblCalculatePrice)
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(pnlNotifyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTotalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -82,16 +162,18 @@ public class InfoShift extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblShift, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(65, 65, 65)
+                            .addComponent(txtEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtShift, javax.swing.GroupLayout.PREFERRED_SIZE, 429, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtShift, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 591, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlNotify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -105,7 +187,11 @@ public class InfoShift extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtEmployee, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtShift, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 11, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlNotify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -126,9 +212,16 @@ public class InfoShift extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel lblCalculatePrice;
     private javax.swing.JLabel lblEmployee;
+    private javax.swing.JLabel lblExcess;
+    private javax.swing.JLabel lblMiss;
+    private javax.swing.JLabel lblNote;
     private javax.swing.JLabel lblShift;
     private javax.swing.JLabel lblTitle;
+    private javax.swing.JLabel lblTotalPrice;
+    private javax.swing.JPanel pnlNotify;
+    private javax.swing.JPanel pnlPrice;
     private iuh.fit.se.group1.ui.component.custom.TextField txtEmployee;
     private iuh.fit.se.group1.ui.component.custom.TextField txtShift;
     // End of variables declaration//GEN-END:variables

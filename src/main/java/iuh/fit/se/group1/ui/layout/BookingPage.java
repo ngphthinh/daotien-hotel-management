@@ -290,7 +290,7 @@ public class BookingPage extends javax.swing.JPanel {
             if (FIXED_HOLIDAYS.contains(key)) return true;
 
             // Kiểm tra ngày âm lịch
-//            ChineseDate lunar = new ChineseDate(java.sql.Date.valueOf(date));
+//            ChineseDate lunar = new Chin  eseDate(java.sql.Date.valueOf(date));
 //            int lunarDay = lunar.getDay();
 //            int lunarMonth = lunar.getMonth();
 //
@@ -550,4 +550,10 @@ public class BookingPage extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11 scrollPaneWin111;
     private iuh.fit.se.group1.ui.component.booking2.SequenceBooking sequenceBooking;
     // End of variables declaration//GEN-END:variables
+
+
+    public void loadData() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'loadData'");
+    }
 }

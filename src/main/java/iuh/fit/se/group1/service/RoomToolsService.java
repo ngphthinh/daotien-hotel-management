@@ -4,8 +4,8 @@ import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.repository.OrderRepository;
-import iuh.fit.se.group1.repository.TransferRoomRepository;
-import iuh.fit.se.group1.repository.TransferRoomRepository.BookingDTO;
+import iuh.fit.se.group1.repository.RoomToolsRepository;
+import iuh.fit.se.group1.repository.RoomToolsRepository.BookingDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,18 +16,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TransferRoomService {
-    private static final Logger log = LoggerFactory.getLogger(TransferRoomService.class);
+public class RoomToolsService {
+    private static final Logger log = LoggerFactory.getLogger(RoomToolsService.class);
     private static final String SINGLE_ROOM_TYPE = "SINGLE";
     private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
 
-    private final TransferRoomRepository repository;
+    private final RoomToolsRepository repository;
     private final OrderRepository orderRepository;
     private final RoomService roomService;
     private final RoomTypeService roomTypeService;
 
-    public TransferRoomService() {
-        this.repository = new TransferRoomRepository();
+    public RoomToolsService() {
+        this.repository = new RoomToolsRepository();
         this.orderRepository = new OrderRepository();
         this.roomService = new RoomService();
         this.roomTypeService = new RoomTypeService();
@@ -114,7 +114,7 @@ public class TransferRoomService {
      * Tính phụ phí chuyển phòng với thông tin booking
      */
     public long calculateSurcharge(List<Room> oldRooms, List<Room> newRooms,
-            BookingType bookingType, long orderId) {
+                                   BookingType bookingType, long orderId) {
         // Validate input lists
         if (oldRooms == null || oldRooms.isEmpty() || newRooms == null || newRooms.isEmpty()) {
             log.warn("Empty room lists provided for surcharge calculation");
@@ -204,12 +204,12 @@ public class TransferRoomService {
 
         return switch (bookingTypeIndex) {
             case 0 -> // Theo giờ: giá giờ đầu + giá giờ thêm × (số giờ - 1)
-                roomDTO.getHourlyRate().longValueExact()
-                        + ((duration - 1) * roomDTO.getAdditionalHourRate().longValueExact());
+                    roomDTO.getHourlyRate().longValueExact()
+                            + ((duration - 1) * roomDTO.getAdditionalHourRate().longValueExact());
             case 1 -> // Theo ngày: giá theo ngày × số ngày
-                roomDTO.getDailyRate().longValueExact() * duration;
+                    roomDTO.getDailyRate().longValueExact() * duration;
             case 2 -> // Qua đêm: giá cố định
-                roomDTO.getOvernightRate().longValueExact();
+                    roomDTO.getOvernightRate().longValueExact();
             default -> 0L;
         };
     }
@@ -232,6 +232,8 @@ public class TransferRoomService {
 
         RoomDTO roomDTO = roomService.toRoomDTO(room.getRoomType());
 
+
+
         int bookingTypeIndex = BookingType.toIndex(bookingType);
         return calculatePriceByTypeAndDuration(bookingTypeIndex, roomDTO, (int) duration);
     }
@@ -240,9 +242,9 @@ public class TransferRoomService {
      * Thực hiện chuyển phòng
      */
     public TransferResult transferRooms(long orderId,
-            List<Room> oldRooms,
-            List<Room> newRooms,
-            BookingType bookingType) {
+                                        List<Room> oldRooms,
+                                        List<Room> newRooms,
+                                        BookingType bookingType) {
 
         TransferResult result = new TransferResult();
 
@@ -299,8 +301,8 @@ public class TransferRoomService {
      * Các trường hợp khác đều KHÔNG hợp lệ
      */
     public ValidationResult validateTransfer(List<Room> oldRooms,
-            List<Room> newRooms,
-            BookingType bookingType) {
+                                             List<Room> newRooms,
+                                             BookingType bookingType) {
         ValidationResult result = new ValidationResult();
 
         if (oldRooms.isEmpty()) {
@@ -403,8 +405,139 @@ public class TransferRoomService {
         public String message;
     }
 
+    public boolean cancelRoomBooking(Long orderId, Long roomId, BookingType bookingType) {
+        try {
+            log.info("Canceling room booking - OrderId: {}, RoomId: {}, BookingType: {}",
+                    orderId, roomId, bookingType);
+            Room room = roomService.getRoomByRoomId(roomId);
+            if (room == null) {
+                log.warn("Room not found: {}", roomId);
+                return false;
+            }
+            Booking booking = repository.getBookingByOrderIdAndType(
+                    orderId, bookingType.name(), room.getRoomId());
+
+            if (booking == null) {
+                log.warn("Booking not found for room {}", roomId);
+                return false;
+            }
+            long duration = calculateBookingDuration(
+                    booking.getCheckInDate(),
+                    booking.getCheckOutDate(),
+                    bookingType
+            );
+            RoomDTO roomDTO = roomService.toRoomDTO(room.getRoomType());
+            int bookingTypeIndex = BookingType.toIndex(bookingType);
+            long roomPrice = calculatePriceByTypeAndDuration(
+                    bookingTypeIndex, roomDTO, (int) duration
+            );
+            boolean subtractSuccess = repository.subtractAmountFromOrder(orderId, roomPrice);
+            if (!subtractSuccess) {
+                log.error("Failed to subtract {} from order {}", roomPrice, orderId);
+                return false;
+            }
+            boolean cancelSuccess = repository.cancelRoomBooking(orderId, roomId, bookingType.name());
+            if (!cancelSuccess) {
+                log.error("Failed to cancel booking in DB — rolling back not implemented");
+                return false;
+            }
+
+            log.info("Successfully cancelled booking: -{} VND removed from order {}", roomPrice, orderId);
+            return true;
+
+        } catch (Exception e) {
+            log.error("Error canceling room booking", e);
+            return false;
+        }
+    }
+
+    // Tính tiền gia hạn
+    public boolean extendRoomBooking(Long orderId, List<Room> rooms,
+                                     int extendValue, BookingType bookingType) {
+        try {
+            // Validate: Qua đêm không cho phép gia hạn
+            if (bookingType == BookingType.OVERNIGHT) {
+                log.warn("Cannot extend overnight booking");
+                return false;
+            }
+
+            if (rooms == null || rooms.isEmpty()) {
+                log.warn("No rooms to extend");
+                return false;
+            }
+
+            // Lấy danh sách room IDs
+            List<Long> roomIds = rooms.stream()
+                    .map(Room::getRoomId)
+                    .collect(Collectors.toList());
+
+            // Tính số tiền gia hạn
+            BigDecimal extensionAmount = calculateExtensionAmount(rooms, bookingType, extendValue);
+
+            // 1. Extend booking trong database (cập nhật checkOutDate)
+            boolean extendSuccess = repository.extendRoomBooking(
+                    orderId, roomIds, extendValue, bookingType.name());
+
+            if (!extendSuccess) {
+                log.error("Failed to extend booking in database");
+                return false;
+            }
+
+            // 2. Cộng tiền vào hóa đơn
+            boolean addAmountSuccess = repository.addRoomAmountToOrder(
+                    orderId, extensionAmount.longValue());
+
+            if (!addAmountSuccess) {
+                log.error("Failed to add extension amount to order");
+                return false;
+            }
+
+            log.info("Successfully extended booking {} with {} {} and added {} to order",
+                    orderId, extendValue,
+                    bookingType == BookingType.HOURLY ? "hours" : "days",
+                    extensionAmount);
+
+            return true;
+
+        } catch (Exception e) {
+            log.error("Error extending room booking", e);
+            return false;
+        }
+    }
+
+    /**
+     * Tính số tiền gia hạn dựa trên loại booking và số lượng
+     */
+    public BigDecimal calculateExtensionAmount(List<Room> rooms, BookingType bookingType,
+                                               int extendValue) {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Room room : rooms) {
+            BigDecimal roomExtension = BigDecimal.ZERO;
+
+            switch (bookingType) {
+                case HOURLY:
+                    roomExtension = room.getRoomType()
+                            .getAdditionalHourRate()
+                            .multiply(BigDecimal.valueOf(extendValue));
+                    break;
+
+                case DAILY:
+                    roomExtension = room.getRoomType().getDailyRate()
+                            .multiply(BigDecimal.valueOf(extendValue));
+                    break;
+
+                case OVERNIGHT:
+                    // Qua đêm không cho gia hạn
+                    return BigDecimal.ZERO;
+            }
+
+            total = total.add(roomExtension);
+        }
+        return total;
+    }
     public long calculateNewRoomPriceWithBookingDuration(Room newRoom, BookingType bookingType,
-            long orderId, Room referenceOldRoom) {
+                                                         long orderId, Room referenceOldRoom) {
 
         // Lấy thông tin booking từ phòng cũ để biết duration
         Booking bookingInfo = repository.getBookingByOrderIdAndType(
@@ -427,4 +560,5 @@ public class TransferRoomService {
 
         return calculatePriceByTypeAndDuration(bookingTypeIndex, newRoomDTO, (int) duration);
     }
+
 }

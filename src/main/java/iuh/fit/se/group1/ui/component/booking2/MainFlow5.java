@@ -716,6 +716,7 @@ public class MainFlow5 extends javax.swing.JPanel {
             String totalRoom,
             boolean isHoliday
     ) {
+           
 
         lblCheckIn.setText(checkIn);
         lblCheckOut.setText(checkOut);
@@ -748,6 +749,7 @@ public class MainFlow5 extends javax.swing.JPanel {
 
         var totalPrice = Constants.parseVND(totalRoom) + Constants.parseVND(lblTotalAmenity.getText());
 
+    System.out.println();
 
         lblSurchargeHoliday.setText(holidayPrice != 0 ? Constants.VND_FORMAT.format(holidayPrice) : "Không có");
 
