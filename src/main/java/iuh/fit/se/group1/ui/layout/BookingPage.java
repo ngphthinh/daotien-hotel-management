@@ -272,7 +272,15 @@ public class BookingPage extends javax.swing.JPanel {
                 "01-01", // Tết Dương lịch
                 "30-04", // Giải phóng miền Nam
                 "01-05", // Quốc tế Lao động
-                "02-09"  // Quốc khánh
+                "02-09",  // Quốc khánh
+                "25-12",  // Giáng sinh
+                "24-12",   // Giáng sinh Eve
+                "31-12",    // Năm mới Eve
+                "14-02",    // Valentine
+                "08-03",    // Quốc tế Phụ nữ
+                "20-10",     // Ngày Phụ nữ Việt Nam
+                "20-11",      // Ngày Nhà giáo Việt Nam
+                "01-06"     // Ngày Quốc tế Thiếu nhi
         );
 
         LocalDate date = startDate;
