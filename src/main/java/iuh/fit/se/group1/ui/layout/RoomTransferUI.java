@@ -20,17 +20,17 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class RoomTransferUI extends JPanel {
-    private JPanel mainPanel;
-    private JTextField searchField;
-    private JTable bookingsTable;
+    private JPanel pnlMain;
+    private JTextField txtSearch;
+    private JTable tblBookings;
     private DefaultTableModel bookingsModel;
-    private JTable currentRoomsTable;
+    private JTable tblCurrentRooms;
     private DefaultTableModel currentRoomsModel;
-    private JTable newRoomsTable;
+    private JTable tblNewRooms;
     private DefaultTableModel newRoomsModel;
-    private JTextField totalSurchargeField;
-    private JButton removeRoomBtn, clearAllBtn;
-    private JLabel bookingTypeLabel;
+    private JTextField txtTotalSurcharge;
+    private JButton btnRemoveRoom, btnClearAll;
+    private JLabel lblBookingType;
 
     private final TransferRoomService service;
 
@@ -51,97 +51,79 @@ public class RoomTransferUI extends JPanel {
     }
 
     private void initComponents() {
-        mainPanel = new JPanel(new BorderLayout(0, 0));
-        mainPanel.setBackground(new Color(245, 247, 250));
+        pnlMain = new JPanel(new BorderLayout(0, 0));
+        pnlMain.setBackground(new Color(245, 247, 250));
 
-        JPanel headerPanel = createHeaderPanel();
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        JPanel pnlHeader = createHeaderPanel();
+        pnlMain.add(pnlHeader, BorderLayout.NORTH);
 
-        JPanel contentPanel = new JPanel(new BorderLayout(20, 0));
-        contentPanel.setBackground(new Color(245, 247, 250));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel pnlContent = new JPanel(new BorderLayout(20, 0));
+        pnlContent.setBackground(new Color(245, 247, 250));
+        pnlContent.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel leftPanel = createBookingsPanel();
-        leftPanel.setPreferredSize(new Dimension(450, 0));
-        contentPanel.add(leftPanel, BorderLayout.WEST);
+        JPanel pnlLeft = createBookingsPanel();
+        pnlLeft.setPreferredSize(new Dimension(450, 0));
+        pnlContent.add(pnlLeft, BorderLayout.WEST);
 
-        JPanel rightPanel = createTransferPanel();
-        contentPanel.add(rightPanel, BorderLayout.CENTER);
+        JPanel pnlRight = createTransferPanel();
+        pnlContent.add(pnlRight, BorderLayout.CENTER);
 
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
-        add(mainPanel);
+        pnlMain.add(pnlContent, BorderLayout.CENTER);
+        add(pnlMain);
     }
 
     private JPanel createHeaderPanel() {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(new Color(108, 165, 200));
-        header.setPreferredSize(new Dimension(0, 80));
-        header.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
+        JPanel pnlHeader = new JPanel(new BorderLayout());
+        pnlHeader.setBackground(new Color(108, 165, 200));
+        pnlHeader.setPreferredSize(new Dimension(0, 80));
+        pnlHeader.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
 
-        JLabel titleLabel = new JLabel("CHUYỂN PHÒNG KHÁCH SẠN");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        titleLabel.setForeground(Color.WHITE);
+        JLabel lblTitle = new JLabel("CHUYỂN PHÒNG KHÁCH SẠN");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        lblTitle.setForeground(Color.WHITE);
 
-        JLabel subtitleLabel = new JLabel("Quản lý chuyển phòng cho khách hàng");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        subtitleLabel.setForeground(new Color(219, 234, 254));
+        JLabel lblSubtitle = new JLabel("Quản lý chuyển phòng cho khách hàng");
+        lblSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblSubtitle.setForeground(new Color(219, 234, 254));
 
-        JPanel titlePanel = new JPanel(new GridLayout(2, 1, 0, 5));
-        titlePanel.setOpaque(false);
-        titlePanel.add(titleLabel);
-        titlePanel.add(subtitleLabel);
+        JPanel pnlTitle = new JPanel(new GridLayout(2, 1, 0, 5));
+        pnlTitle.setOpaque(false);
+        pnlTitle.add(lblTitle);
+        pnlTitle.add(lblSubtitle);
 
-        header.add(titlePanel, BorderLayout.WEST);
-        return header;
+        pnlHeader.add(pnlTitle, BorderLayout.WEST);
+        return pnlHeader;
     }
 
     private JPanel createBookingsPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 15));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createCompoundBorder(
+        JPanel pnlBookings = new JPanel(new BorderLayout(0, 15));
+        pnlBookings.setBackground(Color.WHITE);
+        pnlBookings.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(229, 231, 235), 1, true),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)));
 
-        JLabel titleLabel = new JLabel("Danh sách đặt phòng");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        titleLabel.setForeground(new Color(31, 41, 55));
+        JLabel lblTitle = new JLabel("Danh sách đặt phòng");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitle.setForeground(new Color(31, 41, 55));
 
-        JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
-        searchPanel.setBackground(Color.WHITE);
+        JPanel pnlSearch = new JPanel(new BorderLayout(10, 0));
+        pnlSearch.setBackground(Color.WHITE);
 
-        searchField = new JTextField();
-        searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchField.setBorder(BorderFactory.createCompoundBorder(
+        txtSearch = new JTextField();
+        txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtSearch.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(209, 213, 219), 1, true),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)));
-        searchField.setToolTipText("Nhập CCCD để tìm kiếm (tự động tìm khi gõ)");
+        txtSearch.setToolTipText("Nhập CCCD để tìm kiếm (tự động tìm khi gõ)");
 
-//        searchField.getDocument().addDocumentListener(new DocumentListener() {
-//            @Override
-//            public void insertUpdate(DocumentEvent e) {
-//                System.out.println("insert");
-//                searchBooking();
-//            }
-//
-//            @Override
-//            public void removeUpdate(DocumentEvent e) {
-//                System.out.println("remove");
-//                searchBooking();
-//            }
-//
-//            @Override
-//            public void changedUpdate(DocumentEvent e) {
-//
-//            }
-//        });
-        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyReleased(java.awt.event.KeyEvent e) {
                 searchBooking();
             }
         });
 
-        searchPanel.add(searchField, BorderLayout.CENTER);
+        pnlSearch.add(txtSearch, BorderLayout.CENTER);
 
         String[] columns = { "CCCD", "Khách hàng", "Phòng", "Loại thuê" };
         bookingsModel = new DefaultTableModel(columns, 0) {
@@ -151,82 +133,82 @@ public class RoomTransferUI extends JPanel {
             }
         };
 
-        bookingsTable = new JTable(bookingsModel);
-        styleTable(bookingsTable);
-        bookingsTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-        bookingsTable.getColumnModel().getColumn(1).setPreferredWidth(120);
-        bookingsTable.getColumnModel().getColumn(2).setPreferredWidth(80);
-        bookingsTable.getColumnModel().getColumn(3).setPreferredWidth(90);
+        tblBookings = new JTable(bookingsModel);
+        styleTable(tblBookings);
+        tblBookings.getColumnModel().getColumn(0).setPreferredWidth(100);
+        tblBookings.getColumnModel().getColumn(1).setPreferredWidth(120);
+        tblBookings.getColumnModel().getColumn(2).setPreferredWidth(80);
+        tblBookings.getColumnModel().getColumn(3).setPreferredWidth(90);
 
-        bookingsTable.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && bookingsTable.getSelectedRow() != -1) {
+        tblBookings.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblBookings.getSelectedRow() != -1) {
                 loadSelectedBooking();
             }
         });
 
-        JScrollPane scrollPane = new JScrollPane(bookingsTable);
+        JScrollPane scrollPane = new JScrollPane(tblBookings);
         scrollPane.setBorder(new LineBorder(new Color(229, 231, 235), 1));
 
-        JPanel topPanel = new JPanel(new BorderLayout(0, 15));
-        topPanel.setBackground(Color.WHITE);
-        topPanel.add(titleLabel, BorderLayout.NORTH);
-        topPanel.add(searchPanel, BorderLayout.CENTER);
+        JPanel pnlTop = new JPanel(new BorderLayout(0, 15));
+        pnlTop.setBackground(Color.WHITE);
+        pnlTop.add(lblTitle, BorderLayout.NORTH);
+        pnlTop.add(pnlSearch, BorderLayout.CENTER);
 
-        panel.add(topPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        pnlBookings.add(pnlTop, BorderLayout.NORTH);
+        pnlBookings.add(scrollPane, BorderLayout.CENTER);
 
-        return panel;
+        return pnlBookings;
     }
 
     private JPanel createTransferPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 15));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createCompoundBorder(
+        JPanel pnlTransfer = new JPanel(new BorderLayout(0, 15));
+        pnlTransfer.setBackground(Color.WHITE);
+        pnlTransfer.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(229, 231, 235), 1, true),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)));
 
-        JLabel titleLabel = new JLabel("Thông tin chuyển phòng");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        titleLabel.setForeground(new Color(31, 41, 55));
+        JLabel lblTitle = new JLabel("Thông tin chuyển phòng");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitle.setForeground(new Color(31, 41, 55));
 
-        JPanel bookingTypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        bookingTypePanel.setBackground(new Color(254, 243, 199));
-        bookingTypePanel.setBorder(BorderFactory.createCompoundBorder(
+        JPanel pnlBookingTypeWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        pnlBookingTypeWrapper.setBackground(new Color(254, 243, 199));
+        pnlBookingTypeWrapper.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(251, 191, 36), 2, true),
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)));
 
-        bookingTypeLabel = new JLabel("Chưa chọn phòng - Vui lòng chọn phòng để bắt đầu");
-        bookingTypeLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        bookingTypeLabel.setForeground(new Color(146, 64, 14));
-        bookingTypePanel.add(bookingTypeLabel);
+        lblBookingType = new JLabel("Chưa chọn phòng - Vui lòng chọn phòng để bắt đầu");
+        lblBookingType.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblBookingType.setForeground(new Color(146, 64, 14));
+        pnlBookingTypeWrapper.add(lblBookingType);
 
-        JPanel contentPanel = new JPanel(new GridLayout(1, 2, 20, 0));
-        contentPanel.setBackground(Color.WHITE);
+        JPanel pnlContent = new JPanel(new GridLayout(1, 2, 20, 0));
+        pnlContent.setBackground(Color.WHITE);
 
-        contentPanel.add(createOldRoomsPanel());
-        contentPanel.add(createNewRoomsPanel());
+        pnlContent.add(createOldRoomsPanel());
+        pnlContent.add(createNewRoomsPanel());
 
-        JPanel bottomPanel = createBottomPanel();
+        JPanel pnlBottom = createBottomPanel();
 
-        JPanel topSection = new JPanel(new BorderLayout(0, 10));
-        topSection.setBackground(Color.WHITE);
-        topSection.add(titleLabel, BorderLayout.NORTH);
-        topSection.add(bookingTypePanel, BorderLayout.CENTER);
+        JPanel pnlTopSection = new JPanel(new BorderLayout(0, 10));
+        pnlTopSection.setBackground(Color.WHITE);
+        pnlTopSection.add(lblTitle, BorderLayout.NORTH);
+        pnlTopSection.add(pnlBookingTypeWrapper, BorderLayout.CENTER);
 
-        panel.add(topSection, BorderLayout.NORTH);
-        panel.add(contentPanel, BorderLayout.CENTER);
-        panel.add(bottomPanel, BorderLayout.SOUTH);
+        pnlTransfer.add(pnlTopSection, BorderLayout.NORTH);
+        pnlTransfer.add(pnlContent, BorderLayout.CENTER);
+        pnlTransfer.add(pnlBottom, BorderLayout.SOUTH);
 
-        return panel;
+        return pnlTransfer;
     }
 
     private JPanel createOldRoomsPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 10));
-        panel.setBackground(Color.WHITE);
+        JPanel pnlOldRooms = new JPanel(new BorderLayout(0, 10));
+        pnlOldRooms.setBackground(Color.WHITE);
 
-        JLabel label = new JLabel("Phòng hiện tại");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        label.setForeground(new Color(55, 65, 81));
+        JLabel lblTitle = new JLabel("Phòng hiện tại");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblTitle.setForeground(new Color(55, 65, 81));
 
         String[] columns = { "Phòng", "Loại", "Giá" };
         currentRoomsModel = new DefaultTableModel(columns, 0) {
@@ -235,7 +217,7 @@ public class RoomTransferUI extends JPanel {
                 return false;
             }
         };
-        currentRoomsTable = new JTable(currentRoomsModel) {
+        tblCurrentRooms = new JTable(currentRoomsModel) {
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
                 if (isRowSelected(rowIndex)) {
@@ -246,52 +228,52 @@ public class RoomTransferUI extends JPanel {
             }
         };
 
-        styleTable(currentRoomsTable);
-        currentRoomsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        styleTable(tblCurrentRooms);
+        tblCurrentRooms.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-        JScrollPane scrollPane = new JScrollPane(currentRoomsTable);
+        JScrollPane scrollPane = new JScrollPane(tblCurrentRooms);
         scrollPane.setBorder(new LineBorder(new Color(229, 231, 235), 1));
         scrollPane.setPreferredSize(new Dimension(0, 200));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        buttonPanel.setBackground(Color.WHITE);
+        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        pnlButtons.setBackground(Color.WHITE);
 
-        JButton selectBtn = createStyledButton("Chọn phòng cần đổi", new Color(59, 130, 246), 180, 35);
-        selectBtn.addActionListener(e -> selectOldRooms());
-        buttonPanel.add(selectBtn);
+        JButton btnSelect = createStyledButton("Chọn phòng cần đổi", new Color(59, 130, 246), 180, 35);
+        btnSelect.addActionListener(e -> selectOldRooms());
+        pnlButtons.add(btnSelect);
 
-        panel.add(label, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+        pnlOldRooms.add(lblTitle, BorderLayout.NORTH);
+        pnlOldRooms.add(scrollPane, BorderLayout.CENTER);
+        pnlOldRooms.add(pnlButtons, BorderLayout.SOUTH);
 
-        return panel;
+        return pnlOldRooms;
     }
 
     private JPanel createNewRoomsPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 10));
-        panel.setBackground(Color.WHITE);
+        JPanel pnlNewRooms = new JPanel(new BorderLayout(0, 10));
+        pnlNewRooms.setBackground(Color.WHITE);
 
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.WHITE);
+        JPanel pnlHeader = new JPanel(new BorderLayout());
+        pnlHeader.setBackground(Color.WHITE);
 
-        JLabel label = new JLabel("Phòng mới");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        label.setForeground(new Color(55, 65, 81));
+        JLabel lblTitle = new JLabel("Phòng mới");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblTitle.setForeground(new Color(55, 65, 81));
 
-        JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        typePanel.setBackground(Color.WHITE);
+        JPanel pnlTypes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        pnlTypes.setBackground(Color.WHITE);
 
-        JButton singleBtn = createStyledButton("Phòng đơn", new Color(99, 102, 241), 100, 30);
-        JButton doubleBtn = createStyledButton("Phòng đôi", new Color(139, 92, 246), 100, 30);
+        JButton btnSingle = createStyledButton("Phòng đơn", new Color(99, 102, 241), 100, 30);
+        JButton btnDouble = createStyledButton("Phòng đôi", new Color(139, 92, 246), 100, 30);
 
-        singleBtn.addActionListener(e -> showAvailableRooms("SINGLE"));
-        doubleBtn.addActionListener(e -> showAvailableRooms("DOUBLE"));
+        btnSingle.addActionListener(e -> showAvailableRooms("SINGLE"));
+        btnDouble.addActionListener(e -> showAvailableRooms("DOUBLE"));
 
-        typePanel.add(singleBtn);
-        typePanel.add(doubleBtn);
+        pnlTypes.add(btnSingle);
+        pnlTypes.add(btnDouble);
 
-        headerPanel.add(label, BorderLayout.WEST);
-        headerPanel.add(typePanel, BorderLayout.EAST);
+        pnlHeader.add(lblTitle, BorderLayout.WEST);
+        pnlHeader.add(pnlTypes, BorderLayout.EAST);
 
         String[] columns = { "Phòng", "Loại", "Giá" };
         newRoomsModel = new DefaultTableModel(columns, 0) {
@@ -301,95 +283,95 @@ public class RoomTransferUI extends JPanel {
             }
         };
 
-        newRoomsTable = new JTable(newRoomsModel);
-        styleTable(newRoomsTable);
+        tblNewRooms = new JTable(newRoomsModel);
+        styleTable(tblNewRooms);
 
-        JScrollPane scrollPane = new JScrollPane(newRoomsTable);
+        JScrollPane scrollPane = new JScrollPane(tblNewRooms);
         scrollPane.setBorder(new LineBorder(new Color(229, 231, 235), 1));
         scrollPane.setPreferredSize(new Dimension(0, 200));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        buttonPanel.setBackground(Color.WHITE);
+        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        pnlButtons.setBackground(Color.WHITE);
 
-        removeRoomBtn = createStyledButton("Xóa phòng", new Color(239, 68, 68), 120, 35);
-        clearAllBtn = createStyledButton("Xóa tất cả", new Color(156, 163, 175), 100, 35);
+        btnRemoveRoom = createStyledButton("Xóa phòng", new Color(239, 68, 68), 120, 35);
+        btnClearAll = createStyledButton("Xóa tất cả", new Color(156, 163, 175), 100, 35);
 
-        removeRoomBtn.addActionListener(e -> removeNewRoom());
-        clearAllBtn.addActionListener(e -> clearNewRooms());
+        btnRemoveRoom.addActionListener(e -> removeNewRoom());
+        btnClearAll.addActionListener(e -> clearNewRooms());
 
-        buttonPanel.add(removeRoomBtn);
-        buttonPanel.add(clearAllBtn);
+        pnlButtons.add(btnRemoveRoom);
+        pnlButtons.add(btnClearAll);
 
-        panel.add(headerPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+        pnlNewRooms.add(pnlHeader, BorderLayout.NORTH);
+        pnlNewRooms.add(scrollPane, BorderLayout.CENTER);
+        pnlNewRooms.add(pnlButtons, BorderLayout.SOUTH);
 
-        return panel;
+        return pnlNewRooms;
     }
 
     private JPanel createBottomPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 15));
-        panel.setBackground(Color.WHITE);
+        JPanel pnlBottom = new JPanel(new BorderLayout(0, 15));
+        pnlBottom.setBackground(Color.WHITE);
 
-        JPanel summaryPanel = new JPanel(new GridLayout(2, 1, 0, 10));
-        summaryPanel.setBackground(new Color(254, 252, 232));
-        summaryPanel.setBorder(BorderFactory.createCompoundBorder(
+        JPanel pnlSummary = new JPanel(new GridLayout(2, 1, 0, 10));
+        pnlSummary.setBackground(new Color(254, 252, 232));
+        pnlSummary.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(250, 204, 21), 2, true),
                 BorderFactory.createEmptyBorder(15, 20, 15, 20)));
 
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
-        row1.setBackground(new Color(254, 252, 232));
+        JPanel pnlRow1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        pnlRow1.setBackground(new Color(254, 252, 232));
 
-        JLabel oldRoomsLabel = new JLabel("Phòng cũ: 0 phòng");
-        oldRoomsLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        oldRoomsLabel.setName("oldRoomsLabel");
+        JLabel lblOldRooms = new JLabel("Phòng cũ: 0 phòng");
+        lblOldRooms.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblOldRooms.setName("oldRoomsLabel");
 
-        JLabel newRoomsLabel = new JLabel("Phòng mới: 0 phòng");
-        newRoomsLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        newRoomsLabel.setName("newRoomsLabel");
+        JLabel lblNewRooms = new JLabel("Phòng mới: 0 phòng");
+        lblNewRooms.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblNewRooms.setName("newRoomsLabel");
 
-        row1.add(oldRoomsLabel);
-        row1.add(new JLabel("→"));
-        row1.add(newRoomsLabel);
+        pnlRow1.add(lblOldRooms);
+        pnlRow1.add(new JLabel("→"));
+        pnlRow1.add(lblNewRooms);
 
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        row2.setBackground(new Color(254, 252, 232));
+        JPanel pnlRow2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        pnlRow2.setBackground(new Color(254, 252, 232));
 
-        JLabel surchargeLabel = new JLabel("Tổng phụ phí: ");
-        surchargeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JLabel lblSurcharge = new JLabel("Tổng phụ phí: ");
+        lblSurcharge.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        totalSurchargeField = new JTextField(20);
-        totalSurchargeField.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        totalSurchargeField.setForeground(new Color(220, 38, 38));
-        totalSurchargeField.setEditable(false);
-        totalSurchargeField.setBackground(Color.WHITE);
-        totalSurchargeField.setBorder(BorderFactory.createCompoundBorder(
+        txtTotalSurcharge = new JTextField(20);
+        txtTotalSurcharge.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        txtTotalSurcharge.setForeground(new Color(220, 38, 38));
+        txtTotalSurcharge.setEditable(false);
+        txtTotalSurcharge.setBackground(Color.WHITE);
+        txtTotalSurcharge.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(252, 165, 165), 2, true),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
-        totalSurchargeField.setText("0đ");
+        txtTotalSurcharge.setText("0đ");
 
-        row2.add(surchargeLabel);
-        row2.add(totalSurchargeField);
+        pnlRow2.add(lblSurcharge);
+        pnlRow2.add(txtTotalSurcharge);
 
-        summaryPanel.add(row1);
-        summaryPanel.add(row2);
+        pnlSummary.add(pnlRow1);
+        pnlSummary.add(pnlRow2);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        buttonPanel.setBackground(Color.WHITE);
+        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        pnlButtons.setBackground(Color.WHITE);
 
-        JButton cancelBtn = createStyledButton("Hủy bỏ", new Color(156, 163, 175), 120, 40);
-        JButton confirmBtn = createStyledButton("Xác nhận chuyển", new Color(16, 185, 129), 150, 40);
+        JButton btnCancel = createStyledButton("Hủy bỏ", new Color(156, 163, 175), 120, 40);
+        JButton btnConfirm = createStyledButton("Xác nhận chuyển", new Color(16, 185, 129), 150, 40);
 
-        cancelBtn.addActionListener(e -> resetForm());
-        confirmBtn.addActionListener(e -> performTransfer());
+        btnCancel.addActionListener(e -> resetForm());
+        btnConfirm.addActionListener(e -> performTransfer());
 
-        buttonPanel.add(cancelBtn);
-        buttonPanel.add(confirmBtn);
+        pnlButtons.add(btnCancel);
+        pnlButtons.add(btnConfirm);
 
-        panel.add(summaryPanel, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+        pnlBottom.add(pnlSummary, BorderLayout.CENTER);
+        pnlBottom.add(pnlButtons, BorderLayout.SOUTH);
 
-        return panel;
+        return pnlBottom;
     }
 
     private JButton createStyledButton(String text, Color bgColor, int width, int height) {
@@ -467,7 +449,7 @@ public class RoomTransferUI extends JPanel {
     }
 
     private void loadSelectedBooking() {
-        int row = bookingsTable.getSelectedRow();
+        int row = tblBookings.getSelectedRow();
         if (row == -1)
             return;
 
@@ -475,12 +457,12 @@ public class RoomTransferUI extends JPanel {
         currentBookingType = currentBooking.getBookings().get(0).getBookingType();
 
         String typeDisplay = currentBookingType.getDisplayName();
-        bookingTypeLabel.setText(String.format(
+        lblBookingType.setText(String.format(
                 "%s (%s) - Loại thuê: %s",
                 currentBooking.getCustomer().getFullName(),
                 currentBooking.getCustomer().getCitizenId(),
                 typeDisplay));
-        bookingTypeLabel.setForeground(new Color(5, 150, 105));
+        lblBookingType.setForeground(new Color(5, 150, 105));
 
         List<Room> rooms = service.getRoomsByOrderAndType(currentBooking.getOrderId(), currentBookingType);
 
@@ -489,7 +471,6 @@ public class RoomTransferUI extends JPanel {
 
         for (Room room : rooms) {
             currentRoomsMap.put(room.getRoomNumber(), room);
-            // Tính giá với duration
             long price = service.getRoomPriceWithDuration(room, currentBookingType, currentBooking.getOrderId());
             currentRoomsModel.addRow(new Object[] {
                     room.getRoomNumber(),
@@ -513,7 +494,7 @@ public class RoomTransferUI extends JPanel {
             return;
         }
 
-        int[] rows = currentRoomsTable.getSelectedRows();
+        int[] rows = tblCurrentRooms.getSelectedRows();
         if (rows.length == 0) {
             CustomDialog.showMessage(this,
                     "Vui lòng chọn phòng cần đổi!",
@@ -571,9 +552,7 @@ public class RoomTransferUI extends JPanel {
 
         if (selectedRoom != null && !selectedNewRooms.contains(selectedRoom)) {
             selectedNewRooms.add(selectedRoom);
-            // Hiển thị giá với duration cho phòng mới
-            long price = service.getRoomPriceWithDuration(selectedRoom, currentBookingType,
-                    currentBooking.getOrderId());
+            long price = calculateNewRoomPrice(selectedRoom);
             newRoomsModel.addRow(new Object[] {
                     selectedRoom.getRoomNumber(),
                     selectedRoom.getRoomType().getName(),
@@ -583,6 +562,19 @@ public class RoomTransferUI extends JPanel {
         }
     }
 
+    /**
+     * Tính giá phòng mới dựa trên duration của booking hiện tại
+     */
+    private long calculateNewRoomPrice(Room newRoom) {
+        if (currentBooking == null || currentBookingType == null || selectedOldRooms.isEmpty()) {
+            return service.getRoomPriceByType(newRoom, currentBookingType);
+        }
+
+        Room referenceRoom = selectedOldRooms.get(0);
+        return service.calculateNewRoomPriceWithBookingDuration(
+                newRoom, currentBookingType, currentBooking.getOrderId(), referenceRoom);
+    }
+
     private Room showRoomSelectionDialog(List<Room> available) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(parentFrame, "Chọn Phòng Trống", true);
@@ -590,53 +582,53 @@ public class RoomTransferUI extends JPanel {
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout(10, 10));
 
-        JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(52, 152, 219));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        JLabel titleLabel = new JLabel("DANH SÁCH PHÒNG TRỐNG");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        titleLabel.setForeground(Color.WHITE);
-        headerPanel.add(titleLabel);
+        JPanel pnlHeader = new JPanel();
+        pnlHeader.setBackground(new Color(52, 152, 219));
+        pnlHeader.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JLabel lblTitle = new JLabel("DANH SÁCH PHÒNG TRỐNG");
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 20));
+        lblTitle.setForeground(Color.WHITE);
+        pnlHeader.add(lblTitle);
 
         DefaultListModel<Room> listModel = new DefaultListModel<>();
         available.forEach(listModel::addElement);
 
-        JList<Room> roomList = new JList<>(listModel);
-        roomList.setFont(new Font("Arial", Font.PLAIN, 16));
-        roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        roomList.setCellRenderer(new RoomListCellRenderer());
-        roomList.setFixedCellHeight(60);
+        JList<Room> lstRooms = new JList<>(listModel);
+        lstRooms.setFont(new Font("Arial", Font.PLAIN, 16));
+        lstRooms.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        lstRooms.setCellRenderer(new RoomListCellRenderer());
+        lstRooms.setFixedCellHeight(60);
 
-        JScrollPane scrollPane = new JScrollPane(roomList);
+        JScrollPane scrollPane = new JScrollPane(lstRooms);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        pnlButtons.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JButton selectButton = new JButton("Chọn Phòng");
-        selectButton.setFont(new Font("Arial", Font.BOLD, 14));
-        selectButton.setPreferredSize(new Dimension(150, 40));
-        selectButton.setBackground(new Color(46, 204, 113));
-        selectButton.setForeground(Color.WHITE);
-        selectButton.setFocusPainted(false);
-        selectButton.setBorderPainted(false);
+        JButton btnSelect = new JButton("Chọn Phòng");
+        btnSelect.setFont(new Font("Arial", Font.BOLD, 14));
+        btnSelect.setPreferredSize(new Dimension(150, 40));
+        btnSelect.setBackground(new Color(46, 204, 113));
+        btnSelect.setForeground(Color.WHITE);
+        btnSelect.setFocusPainted(false);
+        btnSelect.setBorderPainted(false);
 
-        JButton cancelButton = new JButton("Hủy");
-        cancelButton.setFont(new Font("Arial", Font.BOLD, 14));
-        cancelButton.setPreferredSize(new Dimension(150, 40));
-        cancelButton.setBackground(new Color(231, 76, 60));
-        cancelButton.setForeground(Color.WHITE);
-        cancelButton.setFocusPainted(false);
-        cancelButton.setBorderPainted(false);
+        JButton btnCancel = new JButton("Hủy");
+        btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
+        btnCancel.setPreferredSize(new Dimension(150, 40));
+        btnCancel.setBackground(new Color(231, 76, 60));
+        btnCancel.setForeground(Color.WHITE);
+        btnCancel.setFocusPainted(false);
+        btnCancel.setBorderPainted(false);
 
-        addButtonHoverEffect(selectButton, new Color(46, 204, 113), new Color(39, 174, 96));
-        addButtonHoverEffect(cancelButton, new Color(231, 76, 60), new Color(192, 57, 43));
+        addButtonHoverEffect(btnSelect, new Color(46, 204, 113), new Color(39, 174, 96));
+        addButtonHoverEffect(btnCancel, new Color(231, 76, 60), new Color(192, 57, 43));
 
         final Room[] selectedRoom = { null };
 
-        selectButton.addActionListener(e -> {
-            if (roomList.getSelectedValue() != null) {
-                selectedRoom[0] = roomList.getSelectedValue();
+        btnSelect.addActionListener(e -> {
+            if (lstRooms.getSelectedValue() != null) {
+                selectedRoom[0] = lstRooms.getSelectedValue();
                 dialog.dispose();
             } else {
                 JOptionPane.showMessageDialog(dialog,
@@ -646,27 +638,27 @@ public class RoomTransferUI extends JPanel {
             }
         });
 
-        cancelButton.addActionListener(e -> dialog.dispose());
+        btnCancel.addActionListener(e -> dialog.dispose());
 
-        roomList.addMouseListener(new java.awt.event.MouseAdapter() {
+        lstRooms.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (evt.getClickCount() == 2) {
-                    int index = roomList.locationToIndex(evt.getPoint());
+                    int index = lstRooms.locationToIndex(evt.getPoint());
                     if (index >= 0) {
-                        selectedRoom[0] = roomList.getModel().getElementAt(index);
+                        selectedRoom[0] = lstRooms.getModel().getElementAt(index);
                         dialog.dispose();
                     }
                 }
             }
         });
 
-        buttonPanel.add(selectButton);
-        buttonPanel.add(cancelButton);
+        pnlButtons.add(btnSelect);
+        pnlButtons.add(btnCancel);
 
-        dialog.add(headerPanel, BorderLayout.NORTH);
+        dialog.add(pnlHeader, BorderLayout.NORTH);
         dialog.add(scrollPane, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.add(pnlButtons, BorderLayout.SOUTH);
 
         dialog.setVisible(true);
         return selectedRoom[0];
@@ -678,29 +670,29 @@ public class RoomTransferUI extends JPanel {
                 int index, boolean isSelected, boolean cellHasFocus) {
 
             Room room = (Room) value;
-            JPanel panel = new JPanel(new BorderLayout(10, 5));
-            panel.setBorder(BorderFactory.createCompoundBorder(
+            JPanel pnlCell = new JPanel(new BorderLayout(10, 5));
+            pnlCell.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)),
                     BorderFactory.createEmptyBorder(10, 15, 10, 15)));
 
             if (isSelected) {
-                panel.setBackground(new Color(52, 152, 219, 50));
+                pnlCell.setBackground(new Color(52, 152, 219, 50));
             } else {
-                panel.setBackground(Color.WHITE);
+                pnlCell.setBackground(Color.WHITE);
             }
 
-            JLabel roomLabel = new JLabel("Phòng " + room.getRoomNumber());
-            roomLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            roomLabel.setForeground(new Color(44, 62, 80));
+            JLabel lblRoom = new JLabel("Phòng " + room.getRoomNumber());
+            lblRoom.setFont(new Font("Arial", Font.BOLD, 16));
+            lblRoom.setForeground(new Color(44, 62, 80));
 
-            JLabel typeLabel = new JLabel(room.getRoomType().getName());
-            typeLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-            typeLabel.setForeground(new Color(127, 140, 141));
+            JLabel lblType = new JLabel(room.getRoomType().getName());
+            lblType.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblType.setForeground(new Color(127, 140, 141));
 
-            panel.add(roomLabel, BorderLayout.WEST);
-            panel.add(typeLabel, BorderLayout.EAST);
+            pnlCell.add(lblRoom, BorderLayout.WEST);
+            pnlCell.add(lblType, BorderLayout.EAST);
 
-            return panel;
+            return pnlCell;
         }
     }
 
@@ -721,7 +713,7 @@ public class RoomTransferUI extends JPanel {
     }
 
     private void removeNewRoom() {
-        int row = newRoomsTable.getSelectedRow();
+        int row = tblNewRooms.getSelectedRow();
         if (row == -1) {
             CustomDialog.showMessage(this,
                     "Chọn phòng cần xóa!",
@@ -742,7 +734,7 @@ public class RoomTransferUI extends JPanel {
     }
 
     private void updateSummary() {
-        for (Component comp : ((JPanel) ((JPanel) totalSurchargeField.getParent().getParent()).getComponent(0))
+        for (Component comp : ((JPanel) ((JPanel) txtTotalSurcharge.getParent().getParent()).getComponent(0))
                 .getComponents()) {
             if (comp instanceof JLabel label) {
                 if ("oldRoomsLabel".equals(label.getName())) {
@@ -755,29 +747,28 @@ public class RoomTransferUI extends JPanel {
 
         if (currentBookingType == null || currentBooking == null ||
                 selectedOldRooms.isEmpty() || selectedNewRooms.isEmpty()) {
-            totalSurchargeField.setText("0đ");
-            totalSurchargeField.setForeground(new Color(107, 114, 128));
+            txtTotalSurcharge.setText("0đ");
+            txtTotalSurcharge.setForeground(new Color(107, 114, 128));
             return;
         }
 
-        // Tính phụ phí với duration
         long surcharge = service.calculateSurcharge(selectedOldRooms, selectedNewRooms,
                 currentBookingType, currentBooking.getOrderId());
 
         if (surcharge > 0) {
-            totalSurchargeField.setText(String.format("+%,dđ", surcharge));
-            totalSurchargeField.setForeground(new Color(220, 38, 38));
+            txtTotalSurcharge.setText(String.format("+%,dđ", surcharge));
+            txtTotalSurcharge.setForeground(new Color(220, 38, 38));
         } else if (surcharge < 0) {
-            totalSurchargeField.setText(String.format("%,dđ", surcharge));
-            totalSurchargeField.setForeground(new Color(16, 185, 129));
+            txtTotalSurcharge.setText(String.format("%,dđ", surcharge));
+            txtTotalSurcharge.setForeground(new Color(16, 185, 129));
         } else {
-            totalSurchargeField.setText("0đ");
-            totalSurchargeField.setForeground(new Color(107, 114, 128));
+            txtTotalSurcharge.setText("0đ");
+            txtTotalSurcharge.setForeground(new Color(107, 114, 128));
         }
     }
 
     private void searchBooking() {
-        String keyword = searchField.getText().trim();
+        String keyword = txtSearch.getText().trim();
         orders = service.findOrdersUnPendingByKeyWord(keyword);
         loadBookingsToTable();
     }
@@ -800,7 +791,6 @@ public class RoomTransferUI extends JPanel {
             return;
         }
 
-        // Tính tổng giá với duration
         long surcharge = service.calculateSurcharge(selectedOldRooms, selectedNewRooms,
                 currentBookingType, currentBooking.getOrderId());
 
@@ -866,7 +856,7 @@ public class RoomTransferUI extends JPanel {
     }
 
     private void resetForm() {
-        bookingsTable.clearSelection();
+        tblBookings.clearSelection();
         currentRoomsModel.setRowCount(0);
         newRoomsModel.setRowCount(0);
         selectedOldRooms.clear();
@@ -875,26 +865,9 @@ public class RoomTransferUI extends JPanel {
         currentBookingType = null;
         currentRoomsMap.clear();
 
-        bookingTypeLabel.setText("Chưa chọn phòng đã đặt - Vui lòng chọn để bắt đầu");
-        bookingTypeLabel.setForeground(new Color(146, 64, 14));
+        lblBookingType.setText("Chưa chọn phòng đã đặt - Vui lòng chọn để bắt đầu");
+        lblBookingType.setForeground(new Color(146, 64, 14));
 
         updateSummary();
-    }
-
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Test RoomTransferUI");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1500, 900);
-            frame.setLocationRelativeTo(null);
-            frame.setContentPane(new RoomTransferUI());
-            frame.setVisible(true);
-        });
     }
 }

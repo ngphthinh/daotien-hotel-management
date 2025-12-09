@@ -27,13 +27,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" pref="141" max="-2" attributes="0"/>
               <EmptySpace pref="45" max="32767" attributes="0"/>
-              <Component id="textField1" min="-2" pref="128" max="-2" attributes="0"/>
+              <Component id="txtFromDate" min="-2" pref="128" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="textField2" min="-2" pref="128" max="-2" attributes="0"/>
+              <Component id="txtToDate" min="-2" pref="128" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="button1" min="-2" max="-2" attributes="0"/>
+              <Component id="btnView" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -43,9 +43,9 @@
           <Group type="103" alignment="0" groupAlignment="3" attributes="0">
               <Component id="jLabel1" alignment="3" pref="75" max="32767" attributes="0"/>
               <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-              <Component id="button1" alignment="3" min="-2" max="-2" attributes="0"/>
-              <Component id="textField1" alignment="3" min="-2" max="-2" attributes="0"/>
-              <Component id="textField2" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="btnView" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="txtFromDate" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="txtToDate" alignment="3" min="-2" max="-2" attributes="0"/>
               <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -68,10 +68,10 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="18" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Doanh thu"/>
+        <Property name="text" type="java.lang.String" value="&gt;Doanh thu"/>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="button1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnView">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="3" green="6c" red="ff" type="rgb"/>
@@ -85,7 +85,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField1">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtFromDate">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -104,7 +104,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="textField2">
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtToDate">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="c8" green="a5" red="6c" type="rgb"/>

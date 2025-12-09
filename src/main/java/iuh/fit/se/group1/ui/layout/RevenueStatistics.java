@@ -5,7 +5,12 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.enums.TimeType;
+import iuh.fit.se.group1.service.OrderService;
+import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -14,31 +19,77 @@ import java.util.List;
  */
 public class RevenueStatistics extends javax.swing.JPanel {
 
+    private OrderService orderService = new OrderService();
+
     /**
      * Creates new form RevenueStatistics
      */
     public RevenueStatistics() {
         initComponents();
         setActionButtonRange();
+
+        headerChart1.getBtnView().addActionListener(e -> {
+            String fromDate = headerChart1.getTxtFromDate().getText();
+            String toDate = headerChart1.getTxtToDate().getText();
+
+            LocalDate from = parseDate(fromDate);
+            LocalDate to = parseDate(toDate);
+
+            loadData(from, to);
+        });
     }
+
+    private void loadData(LocalDate from, LocalDate to) {
+        // Lấy tổng doanh thu
+        BigDecimal totalRevenue = orderService.getTotalRevenueBetweenDates(from, to);
+
+        card1.setValue(totalRevenue);
+
+//        // Calculate total revenue
+//        double totalRevenue = revenueData.stream()
+//                .mapToDouble(data -> ((Number) data[1]).doubleValue())
+//                .sum();
+//
+//        card1.setValue(String.format("%.2f", totalRevenue));
+    }
+
+    public LocalDate parseDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return LocalDate.parse(date, formatter);
+    }
+
+
 
     private void setActionButtonRange() {
         rangeDateButton1.getBtn7Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_7);
-            System.out.println("click 7");
-            // todo: update chart here
+
+            LocalDate to = LocalDate.now();
+            LocalDate from = to.minusDays(7);
+            headerChart1.getTxtFromDate().setText(from.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            headerChart1.getTxtToDate().setText(to.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+            loadData(from,to);
+
         });
         rangeDateButton1.getBtn30Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_30);
-            System.out.println("click 30");
 
-            // todo: update chart here
+            LocalDate to = LocalDate.now();
+            LocalDate from = to.minusDays(30);
+
+            headerChart1.getTxtFromDate().setText(from.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            headerChart1.getTxtToDate().setText(to.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+            loadData(from,to);
         });
         rangeDateButton1.getBtn90Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_90);
-            System.out.println("click 90");
-
-            // todo: update chart here
+            LocalDate to = LocalDate.now();
+            LocalDate from = to.minusDays(90);
+            headerChart1.getTxtFromDate().setText(from.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            headerChart1.getTxtToDate().setText(to.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            loadData(from,to);
         });
     }
 

@@ -374,7 +374,7 @@ public class CloseShift extends javax.swing.JPanel {
     }
 
     /**
-     * ✅ TÍNH CHÊNH LỆCH - SỬ DỤNG totalRevenue TỪ BIẾN (ĐÃ ĐƯỢC AUTO-REFRESH)
+     * ✅ TÍNH CHÊNH LỆCH
      */
     private void calculateDifference() {
         try {

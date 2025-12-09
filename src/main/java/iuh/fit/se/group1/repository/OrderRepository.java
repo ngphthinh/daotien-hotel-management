@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -209,6 +210,9 @@ public class OrderRepository implements Repository<Order, Long> {
                 // Ánh xạ Booking
                 Booking booking = new Booking();
                 booking.setBookingId(rs.getLong("bookingId"));
+                booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
+                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
                 booking.setOrder(order);
 
                 // Lấy Room
@@ -343,7 +347,7 @@ public class OrderRepository implements Repository<Order, Long> {
     }
 
     public void updateOrderStatusToPaid(Order order) {
-            String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ? WHERE orderId = ?";
+            String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ?, paymentDate = ? WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setBigDecimal(1, order.getTotalAmount());
             preparedStatement.setString(2, order.getPaymentType().name());
@@ -352,7 +356,8 @@ public class OrderRepository implements Repository<Order, Long> {
             } else {
                 preparedStatement.setNull(3, java.sql.Types.BIGINT);
             }
-            preparedStatement.setLong(4, order.getOrderId());
+            preparedStatement.setDate(4, Date.valueOf(order.getPaymentDate()));
+            preparedStatement.setLong(5, order.getOrderId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("Error updating order status to paid for Order ID {}: ", order.getOrderId(), e);
@@ -590,4 +595,21 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+
+    public BigDecimal calculateTotalRevenueBetweenDates(LocalDate from, LocalDate to) {
+        String sql = "SELECT SUM(totalAmount) AS totalRevenue FROM Orders WHERE orderTypeId = 1 AND paymentDate BETWEEN ? AND ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setDate(1, Date.valueOf(from));
+            preparedStatement.setDate(2, Date.valueOf(to));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getBigDecimal("totalRevenue") != null ? resultSet.getBigDecimal("totalRevenue") : BigDecimal.ZERO;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error calculating total revenue between dates: ", e);
+            throw new RuntimeException(e);
+        }
+        return BigDecimal.ZERO;
+    }
 }

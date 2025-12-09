@@ -9,6 +9,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.math.BigDecimal;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -26,7 +28,7 @@ public class Card extends javax.swing.JPanel {
     public Card() {
         initComponents();
         setOpaque(false); // để panel có thể bo góc nhìn thấy
-        jLabel4.setIcon(FontIcon.of(FontAwesomeSolid.DOLLAR_SIGN, 30, Color.WHITE));
+        lbl5.setIcon(FontIcon.of(FontAwesomeSolid.DOLLAR_SIGN, 30, Color.WHITE));
     }
 
     @Override
@@ -54,12 +56,12 @@ public class Card extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        lbl1 = new javax.swing.JLabel();
+        lbl2 = new javax.swing.JLabel();
+        lbl3 = new javax.swing.JLabel();
+        lblTotalRevenue = new javax.swing.JLabel();
         criclePanel2 = new iuh.fit.se.group1.ui.component.custom.CriclePanel();
-        jLabel4 = new javax.swing.JLabel();
+        lbl5 = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -76,31 +78,31 @@ public class Card extends javax.swing.JPanel {
         setBorder(javax.swing.BorderFactory.createMatteBorder(5, 0, 0, 0, new java.awt.Color(143, 191, 250)));
         setPreferredSize(new java.awt.Dimension(690, 184));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(140, 140, 140));
-        jLabel1.setText("TỔNG DOANH THU ");
-        jLabel1.setPreferredSize(new java.awt.Dimension(690, 184));
+        lbl1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lbl1.setForeground(new java.awt.Color(140, 140, 140));
+        lbl1.setText("TỔNG DOANH THU ");
+        lbl1.setPreferredSize(new java.awt.Dimension(690, 184));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 13)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(235, 39, 39));
-        jLabel2.setText("Xem chi tiết");
-        jLabel2.setPreferredSize(new java.awt.Dimension(168, 28));
+        lbl2.setFont(new java.awt.Font("Segoe UI", 2, 13)); // NOI18N
+        lbl2.setForeground(new java.awt.Color(235, 39, 39));
+        lbl2.setText("Xem chi tiết");
+        lbl2.setPreferredSize(new java.awt.Dimension(168, 28));
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(91, 189, 64));
-        jLabel3.setText("Tăng 20% so với tháng trước");
-        jLabel3.setPreferredSize(new java.awt.Dimension(168, 28));
+        lbl3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lbl3.setForeground(new java.awt.Color(91, 189, 64));
+        lbl3.setText("Tăng 20% so với tháng trước");
+        lbl3.setPreferredSize(new java.awt.Dimension(168, 28));
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel5.setText("235.500.000đ");
-        jLabel5.setPreferredSize(new java.awt.Dimension(168, 28));
+        lblTotalRevenue.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblTotalRevenue.setForeground(new java.awt.Color(51, 51, 51));
+        lblTotalRevenue.setText("235.500.000đ");
+        lblTotalRevenue.setPreferredSize(new java.awt.Dimension(168, 28));
 
         criclePanel2.setMinimumSize(new java.awt.Dimension(40, 40));
         criclePanel2.setPreferredSize(new java.awt.Dimension(60, 60));
 
-        jLabel4.setBackground(new java.awt.Color(143, 191, 250));
-        jLabel4.setForeground(new java.awt.Color(143, 191, 250));
+        lbl5.setBackground(new java.awt.Color(143, 191, 250));
+        lbl5.setForeground(new java.awt.Color(143, 191, 250));
 
         javax.swing.GroupLayout criclePanel2Layout = new javax.swing.GroupLayout(criclePanel2);
         criclePanel2.setLayout(criclePanel2Layout);
@@ -108,14 +110,14 @@ public class Card extends javax.swing.JPanel {
             criclePanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(criclePanel2Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addComponent(lbl5, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                .addContainerGap())
         );
         criclePanel2Layout.setVerticalGroup(
             criclePanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(criclePanel2Layout.createSequentialGroup()
                 .addGap(17, 17, 17)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbl5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
@@ -126,10 +128,10 @@ public class Card extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(lbl2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbl3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblTotalRevenue, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
+                    .addComponent(lbl1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addGap(93, 93, 93)
                 .addComponent(criclePanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(26, 26, 26))
@@ -140,28 +142,32 @@ public class Card extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(14, 14, 14)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblTotalRevenue, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addComponent(criclePanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbl3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbl2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(9, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
+    public void setValue(BigDecimal totalRevenue) {
+        lblTotalRevenue.setText(Constants.VND_FORMAT.format(totalRevenue));
+        lbl3.setText("");
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.CriclePanel criclePanel2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lbl1;
+    private javax.swing.JLabel lbl2;
+    private javax.swing.JLabel lbl3;
+    private javax.swing.JLabel lbl5;
+    private javax.swing.JLabel lblTotalRevenue;
     // End of variables declaration//GEN-END:variables
 }

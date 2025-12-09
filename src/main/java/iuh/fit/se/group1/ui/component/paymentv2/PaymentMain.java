@@ -23,6 +23,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -783,7 +784,8 @@ public class PaymentMain extends javax.swing.JPanel {
 
             currentOrder.setPromotion(promotion);
             currentOrder.setPaymentType(PaymentType.CASH);
-            currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())));
+            currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())).add(BigDecimal.valueOf(Constants.parseVND(lblDeposit.getText()))));
+            currentOrder.setPaymentDate(LocalDate.now());
             saveOrder();
             GlassPanePopup.closePopupAll();
         });
@@ -848,6 +850,7 @@ public class PaymentMain extends javax.swing.JPanel {
         currentOrder.setPromotion(promotion);
         currentOrder.setPaymentType(PaymentType.E_WALLET);
         currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())));
+        currentOrder.setPaymentDate(LocalDate.now());
         try {
             String response = paymentService.createPayment(currentOrder);
             String payUrl = paymentService.extractJsonValue(response, "payUrl");
@@ -893,6 +896,7 @@ public class PaymentMain extends javax.swing.JPanel {
                         CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS,380,200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
+                        currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())).add(BigDecimal.valueOf(Constants.parseVND(lblDeposit.getText()))));
                         saveOrder();
                     } else {
                         CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING,500,200);
