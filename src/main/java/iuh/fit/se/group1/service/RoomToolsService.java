@@ -4,8 +4,8 @@ import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.repository.OrderRepository;
-import iuh.fit.se.group1.repository.TransferRoomRepository;
-import iuh.fit.se.group1.repository.TransferRoomRepository.BookingDTO;
+import iuh.fit.se.group1.repository.RoomToolsRepository;
+import iuh.fit.se.group1.repository.RoomToolsRepository.BookingDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,18 +16,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TransferRoomService {
-    private static final Logger log = LoggerFactory.getLogger(TransferRoomService.class);
+public class RoomToolsService {
+    private static final Logger log = LoggerFactory.getLogger(RoomToolsService.class);
     private static final String SINGLE_ROOM_TYPE = "SINGLE";
     private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
 
-    private final TransferRoomRepository repository;
+    private final RoomToolsRepository repository;
     private final OrderRepository orderRepository;
     private final RoomService roomService;
     private final RoomTypeService roomTypeService;
 
-    public TransferRoomService() {
-        this.repository = new TransferRoomRepository();
+    public RoomToolsService() {
+        this.repository = new RoomToolsRepository();
         this.orderRepository = new OrderRepository();
         this.roomService = new RoomService();
         this.roomTypeService = new RoomTypeService();

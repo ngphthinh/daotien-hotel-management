@@ -38,7 +38,7 @@ public class MainLayout extends JPanel {
     private AmenityManagement amenityManagement;
     private PromotionManagement promotionManagement;
     private RoomManagement roomManagement;
-    private RoomTransferUI roomTransferUI;
+    private RoomToolsManagement roomToolsManagement;
     private OrderManagement orderManagement;
     private CheckForVersionPanel checkForVersionPanel;
     private RevenueStatistics revenueStatistics;
@@ -117,8 +117,8 @@ public class MainLayout extends JPanel {
                         setMainContent(roomManagement);
                         roomManagement.loadData();
                     } else if (index == 8) {
-                        roomTransferUI.loadData();
-                        setMainContent(roomTransferUI);
+                        roomToolsManagement.loadData();
+                        setMainContent(roomToolsManagement);
                     }else if (index == 9) {
 
                         setMainContent(orderManagement);
@@ -169,7 +169,7 @@ public class MainLayout extends JPanel {
                         setMainContent(new PaymentPagev2());
 
                     } else if (index == 3){
-                        setMainContent(new RoomTransferUI());
+                        setMainContent(new RoomToolsManagement());
                     } else if (index == 4) {
                         if (currentEmployee == null) {
                             Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
@@ -430,7 +430,7 @@ public class MainLayout extends JPanel {
             amenityManagement = new AmenityManagement();
             promotionManagement = new PromotionManagement();
             roomManagement = new RoomManagement();
-            roomTransferUI= new RoomTransferUI();
+            roomToolsManagement= new RoomToolsManagement();
             orderManagement = new OrderManagement();
             orderManagement.setParent(this);
             orderManagement.setPaymentPage(paymentPage);

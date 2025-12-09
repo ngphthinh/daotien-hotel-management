@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransferRoomRepository {
-    private static final Logger log = LoggerFactory.getLogger(TransferRoomRepository.class);
+public class RoomToolsRepository {
+    private static final Logger log = LoggerFactory.getLogger(RoomToolsRepository.class);
     private final Connection connection;
 
-    public TransferRoomRepository() {
+    public RoomToolsRepository() {
         connection = DatabaseUtil.getConnection();
     }
 
