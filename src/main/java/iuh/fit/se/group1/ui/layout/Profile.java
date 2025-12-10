@@ -383,47 +383,128 @@ public class Profile extends javax.swing.JPanel {
     }
     
     private void handleChangePassword() {
-    System.out.println(">>> CLICK DOI MAT KHAU <<<");
-    JPasswordField oldPass = new JPasswordField();
-    JPasswordField newPass = new JPasswordField();
+    JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
+            "Đổi mật khẩu", Dialog.ModalityType.APPLICATION_MODAL);
+    dialog.setSize(420, 330);
+    dialog.setLocationRelativeTo(this);
 
-    Object[] message = {
-        "Mật khẩu cũ:", oldPass,
-        "Mật khẩu mới:", newPass
-    };
+    JPanel panel = new JPanel(null);
+    panel.setBackground(Color.WHITE);
 
-    int option = JOptionPane.showConfirmDialog(
-            this,
-            message,
-            "Đổi mật khẩu",
-            JOptionPane.OK_CANCEL_OPTION
-    );
+    JLabel lblOld = new JLabel("Mật khẩu cũ");
+    lblOld.setBounds(30, 20, 200, 20);
 
-    if (option == JOptionPane.OK_OPTION) {
-        String oldP = new String(oldPass.getPassword());
-        String newP = new String(newPass.getPassword());
+    JPasswordField txtOld = new JPasswordField();
+    txtOld.setBounds(30, 45, 300, 38);
 
-        if (oldP.isEmpty() || newP.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Không được để trống");
+    JLabel lblNew = new JLabel("Mật khẩu mới");
+    lblNew.setBounds(30, 90, 200, 20);
+
+    JPasswordField txtNew = new JPasswordField();
+    txtNew.setBounds(30, 115, 300, 38);
+
+    JLabel lblConfirm = new JLabel("Xác nhận mật khẩu");
+    lblConfirm.setBounds(30, 160, 200, 20);
+
+    JPasswordField txtConfirm = new JPasswordField();
+    txtConfirm.setBounds(30, 185, 300, 38);
+
+    // 👁 Eye buttons
+    JButton eyeOld = createEyeButton(txtOld);
+    eyeOld.setBounds(340, 45, 38, 38);
+
+    JButton eyeNew = createEyeButton(txtNew);
+    eyeNew.setBounds(340, 115, 38, 38);
+
+    JButton eyeConfirm = createEyeButton(txtConfirm);
+    eyeConfirm.setBounds(340, 185, 38, 38);
+
+    JButton btnSave = new JButton("Xác nhận");
+    btnSave.setBounds(80, 240, 120, 38);
+
+    JButton btnCancel = new JButton("Hủy");
+    btnCancel.setBounds(220, 240, 120, 38);
+
+    btnSave.addActionListener(e -> {
+        String oldPass = new String(txtOld.getPassword());
+        String newPass = new String(txtNew.getPassword());
+        String confirm = new String(txtConfirm.getPassword());
+
+        if (oldPass.isEmpty() || newPass.isEmpty() || confirm.isEmpty()) {
+            JOptionPane.showMessageDialog(dialog,
+                    "Vui lòng nhập đầy đủ thông tin",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        AccountService service = new AccountService();
-        boolean success = service.changePassword(
-                txtUserName.getText(),
-                oldP,
-                newP
-        );
+        if (!newPass.equals(confirm)) {
+            JOptionPane.showMessageDialog(dialog,
+                    "Mật khẩu xác nhận không khớp",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        boolean success = AccountService.getInstance()
+                .changePassword(txtUserName.getText(), oldPass, newPass);
 
         if (success) {
-            JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công");
+            JOptionPane.showMessageDialog(dialog,
+                    "Đổi mật khẩu thành công ",
+                    "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            dialog.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Mật khẩu cũ không đúng");
+            JOptionPane.showMessageDialog(dialog,
+                    "Mật khẩu cũ không đúng ",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-    }
+    });
+
+    btnCancel.addActionListener(e -> dialog.dispose());
+
+    panel.add(lblOld);
+    panel.add(txtOld);
+    panel.add(lblNew);
+    panel.add(txtNew);
+    panel.add(lblConfirm);
+    panel.add(txtConfirm);
+    panel.add(eyeOld);
+    panel.add(eyeNew);
+    panel.add(eyeConfirm);
+    panel.add(btnSave);
+    panel.add(btnCancel);
+
+    dialog.add(panel);
+    dialog.setVisible(true);
+}
+    private JButton createEyeButton(JPasswordField passwordField) {
+    JButton btn = new JButton(
+        FontIcon.of(FontAwesomeSolid.EYE_SLASH, 18, new Color(100, 116, 139))
+    );
+
+    btn.setBorder(null);
+    btn.setContentAreaFilled(false);
+    btn.setFocusPainted(false);
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+    passwordField.setEchoChar('*');
+
+    btn.addActionListener(e -> {
+        if (passwordField.getEchoChar() == '*') {
+            passwordField.setEchoChar((char) 0);
+            btn.setIcon(
+                FontIcon.of(FontAwesomeSolid.EYE, 18, new Color(66, 133, 244))
+            );
+        } else {
+            passwordField.setEchoChar('*');
+            btn.setIcon(
+                FontIcon.of(FontAwesomeSolid.EYE_SLASH, 18, new Color(100, 116, 139))
+            );
+        }
+    });
+
+    return btn;
 }
 
-    
     private Color brighten(Color color, float factor) {
         int r = Math.min(255, (int)(color.getRed() + (255 - color.getRed()) * factor));
         int g = Math.min(255, (int)(color.getGreen() + (255 - color.getGreen()) * factor));
@@ -437,6 +518,7 @@ public class Profile extends javax.swing.JPanel {
         int b = (int)(color.getBlue() * (1 - factor));
         return new Color(r, g, b);
     }
+    
     
     @FunctionalInterface
     private interface ComponentSupplier {

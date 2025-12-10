@@ -32,4 +32,12 @@ public class AccountService {
     return accountRepository.updatePassword(acc.getAccountId(), newHashed);
 }
 
+    public static AccountService getInstance() {
+    if (instance == null) {
+        instance = new AccountService();
+    }
+    return instance;
+}
+    private static AccountService instance;
+
 }
