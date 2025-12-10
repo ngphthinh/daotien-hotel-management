@@ -108,7 +108,7 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (imported != null && !imported.isEmpty()) {
                     roomService.getAllRooms().addAll(imported);
                     loadTable(roomService.getAllRooms());
-                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " phòng!");
                 } else {
                     Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
                 }
