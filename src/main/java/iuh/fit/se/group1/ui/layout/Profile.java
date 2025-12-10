@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.service.AccountService;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 /**
@@ -381,12 +383,46 @@ public class Profile extends javax.swing.JPanel {
     }
     
     private void handleChangePassword() {
-        JOptionPane.showMessageDialog(this, 
-            "Tính năng đổi mật khẩu sẽ được cập nhật sau.", 
-            "Đổi mật khẩu", 
-            JOptionPane.INFORMATION_MESSAGE);
+    System.out.println(">>> CLICK DOI MAT KHAU <<<");
+    JPasswordField oldPass = new JPasswordField();
+    JPasswordField newPass = new JPasswordField();
+
+    Object[] message = {
+        "Mật khẩu cũ:", oldPass,
+        "Mật khẩu mới:", newPass
+    };
+
+    int option = JOptionPane.showConfirmDialog(
+            this,
+            message,
+            "Đổi mật khẩu",
+            JOptionPane.OK_CANCEL_OPTION
+    );
+
+    if (option == JOptionPane.OK_OPTION) {
+        String oldP = new String(oldPass.getPassword());
+        String newP = new String(newPass.getPassword());
+
+        if (oldP.isEmpty() || newP.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không được để trống");
+            return;
+        }
+
+        AccountService service = new AccountService();
+        boolean success = service.changePassword(
+                txtUserName.getText(),
+                oldP,
+                newP
+        );
+
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công");
+        } else {
+            JOptionPane.showMessageDialog(this, "Mật khẩu cũ không đúng");
+        }
     }
-    
+}
+
     
     private Color brighten(Color color, float factor) {
         int r = Math.min(255, (int)(color.getRed() + (255 - color.getRed()) * factor));

@@ -123,4 +123,21 @@ public class AccountRepository implements Repository<Account, Long> {
         }
         return null;
     }
+
+    public boolean updatePassword(Long accountId, String newHashedPassword) {
+    String sql = "UPDATE Account SET password = ? WHERE accountId = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, newHashedPassword);
+        ps.setLong(2, accountId);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
+
+
+    
 }
