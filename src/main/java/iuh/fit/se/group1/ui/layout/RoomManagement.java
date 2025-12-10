@@ -264,25 +264,36 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void setupTableModel() {
-        String[] cols = { "Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng" };
-        DefaultTableModel model = new DefaultTableModel(cols, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        tblRoom.getTbl().setModel(model);
-        tblRoom.getTbl().setAutoCreateRowSorter(false);
-        tblRoom.getTbl().getTableHeader().setReorderingAllowed(false);
-
-        tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);
-        tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(120);
-        tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(170);
-        tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(140);
-        tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(140);
+    String[] cols = { "Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng" };
+    DefaultTableModel model = new DefaultTableModel(cols, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    tblRoom.getTbl().setModel(model);
+    
+    // ===== THÊM PHẦN NÀY: Khởi tạo TableRowSorter =====
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    tblRoom.getTbl().setRowSorter(sorter);
+    
+    // Tắt sort cho tất cả các cột (chỉ dùng cho filter)
+    for (int i = 0; i < tblRoom.getTbl().getColumnCount(); i++) {
+        sorter.setSortable(i, false);
     }
+    // ===== HẾT PHẦN THÊM =====
+    
+    tblRoom.getTbl().setAutoCreateRowSorter(false);
+    tblRoom.getTbl().getTableHeader().setReorderingAllowed(false);
 
-    private void setupTableActions() {
+    tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);
+    tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(120);
+    tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(170);
+    tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(140);
+    tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(140);
+}
+
+private void setupTableActions() {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -462,23 +473,6 @@ public class RoomManagement extends javax.swing.JPanel {
     });
 }
 
-    private void showComboboxFilter(Component header, Combobox<?> cmb, int col) {
-        TableColumn column = tblRoom.getTbl().getColumnModel().getColumn(col);
-        Rectangle rect = tblRoom.getTbl().getTableHeader().getHeaderRect(col);
-        cmb.setBounds(rect);
-        cmb.setVisible(true);
-    }
-
-    private void showComboboxFilter(JComponent header, Combobox<?> cmb, int col) {
-        cmb.showPopup();
-        cmb.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent fe) {
-                cmb.setVisible(false);
-                header.remove(cmb);
-            }
-        });
-    }
 
     private void applyFilters() {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblRoom.getTbl().getRowSorter();
