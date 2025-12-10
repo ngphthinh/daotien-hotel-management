@@ -9,11 +9,13 @@ import iuh.fit.se.group1.ui.swing.AdvancedSplashScreen;
 import javax.swing.*;
 
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 
 public class Main {
     public static void main(String[] args) {
+        Locale.setDefault(Locale.US);
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {

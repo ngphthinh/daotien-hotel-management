@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <NonVisualComponents>
+    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtPriceRoom">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblPriceRoom">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Segoe UI" size="12" style="1"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Gi&#xe1; ph&#xf2;ng:"/>
+      </Properties>
+    </Component>
+  </NonVisualComponents>
   <Properties>
     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
       <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -27,16 +39,17 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="lblTypeRoom" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblPriceRoom" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="lblStatus" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="btnSave" min="-2" pref="129" max="-2" attributes="0"/>
                           <Component id="cmbStatus" pref="210" max="32767" attributes="0"/>
-                          <Component id="txtPriceRoom" alignment="1" max="32767" attributes="0"/>
                           <Component id="cmbTypeRoom" max="32767" attributes="0"/>
-                          <Component id="lblErrolPriceRoom" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="btnSave" min="-2" pref="129" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="lblErrolPriceRoom" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -87,21 +100,22 @@
                   <Component id="cmbTypeRoom" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
                   <Component id="lblTypeRoom" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblPriceRoom" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtPriceRoom" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-              <Component id="lblErrolPriceRoom" min="-2" pref="23" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="cmbStatus" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
                   <Component id="lblStatus" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cmbStatus" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="31" max="32767" attributes="0"/>
-              <Component id="btnSave" min="-2" pref="35" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                      <Component id="lblErrolPriceRoom" min="-2" pref="23" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="btnSave" min="-2" pref="35" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace pref="29" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -131,14 +145,6 @@
         <Property name="text" type="java.lang.String" value="Lo&#x1ea1;i ph&#xf2;ng:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblPriceRoom">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Segoe UI" size="12" style="1"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Gi&#xe1; ph&#xf2;ng:"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JLabel" name="lblStatus">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -165,8 +171,6 @@
       </Events>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtNumberRoom">
-    </Component>
-    <Component class="iuh.fit.se.group1.ui.component.custom.TextField" name="txtPriceRoom">
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.Combobox" name="cmbTypeRoom">
       <Events>
