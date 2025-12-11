@@ -436,6 +436,13 @@ public class Profile extends javax.swing.JPanel {
                     "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (!isValidPassword(newPass)) {
+        String errorMessage = getPasswordValidationMessage(newPass);
+        JOptionPane.showMessageDialog(dialog,
+                errorMessage,
+                "Mật khẩu không hợp lệ", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
         if (!newPass.equals(confirm)) {
             JOptionPane.showMessageDialog(dialog,
@@ -517,6 +524,81 @@ public class Profile extends javax.swing.JPanel {
         int g = (int)(color.getGreen() * (1 - factor));
         int b = (int)(color.getBlue() * (1 - factor));
         return new Color(r, g, b);
+    }
+    /**
+ * Kiểm tra mật khẩu có hợp lệ không
+ */
+private boolean isValidPassword(String password) {
+    if (password == null || password.length() < 8) {
+        return false;
+    }
+    
+    boolean hasUpperCase = false;
+    boolean hasDigit = false;
+    boolean hasSpecialChar = false;
+    
+    for (char c : password.toCharArray()) {
+        if (Character.isUpperCase(c)) {
+            hasUpperCase = true;
+        } else if (Character.isDigit(c)) {
+            hasDigit = true;
+        } else if (isSpecialCharacter(c)) {
+            hasSpecialChar = true;
+        }
+    }
+    
+    return hasUpperCase && hasDigit && hasSpecialChar;
+}
+
+/**
+ * Kiểm tra ký tự có phải ký tự đặc biệt không
+ */
+private boolean isSpecialCharacter(char c) {
+    String specialChars = "!@#$%^&*()_+-=[]{}|;:',.<>?/`~\"\\";
+    return specialChars.indexOf(c) >= 0;
+}
+
+/**
+ * Lấy thông báo lỗi cho mật khẩu không hợp lệ
+ */
+private String getPasswordValidationMessage(String password) {
+    if (password == null || password.isEmpty()) {
+        return "Mật khẩu không được để trống";
+    }
+    
+    StringBuilder message = new StringBuilder("Mật khẩu không hợp lệ:\n");
+    
+    if (password.length() < 8) {
+        message.append("• Mật khẩu phải có ít nhất 8 ký tự\n");
+    }
+    
+    boolean hasUpperCase = false;
+    boolean hasDigit = false;
+    boolean hasSpecialChar = false;
+    
+    for (char c : password.toCharArray()) {
+        if (Character.isUpperCase(c)) {
+            hasUpperCase = true;
+        } else if (Character.isDigit(c)) {
+            hasDigit = true;
+        } else if (isSpecialCharacter(c)) {
+            hasSpecialChar = true;
+        }
+    }
+    
+    if (!hasUpperCase) {
+        message.append("• Mật khẩu phải có ít nhất 1 ký tự in hoa\n");
+    }
+    
+    if (!hasDigit) {
+        message.append("• Mật khẩu phải có ít nhất 1 chữ số\n");
+    }
+    
+    if (!hasSpecialChar) {
+        message.append("• Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%^&*...)\n");
+    }
+    
+    return message.toString().trim();
     }
     
     
