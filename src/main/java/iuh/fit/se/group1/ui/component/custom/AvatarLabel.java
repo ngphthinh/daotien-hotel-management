@@ -26,6 +26,7 @@ public class AvatarLabel extends JPanel {
     private BufferedImage scaled;
     private BufferedImage defaultImage;
 
+
     public AvatarLabel() {
         this(true);
     }

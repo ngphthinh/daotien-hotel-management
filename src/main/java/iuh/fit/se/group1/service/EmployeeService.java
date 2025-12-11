@@ -88,4 +88,7 @@ public class EmployeeService {
     public Employee getEmployeeById(Long employeeId) {
         return employeeRepository.findById(employeeId);
     }
+    public Employee existsByCitizenId(String citizenId){
+        return employeeRepository.findByCitizenId(citizenId);
+    }
 }

@@ -876,7 +876,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         Valid result = getValid(modal);
 
         if (!result.valid) {
-            Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào!");
+            Message.showMessage("Lỗi", result.errorMessage);
             return false;
         }
 
@@ -1003,6 +1003,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         String hireDateStr = modal.getTxtHireDate().getText().trim();
         boolean gender = modal.getCmbGender().getSelectedItem() != null
                 && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nữ");
+        EmployeeService service = new EmployeeService();
 
         // Reset lỗi
         Color white = Color.WHITE;
@@ -1014,13 +1015,27 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         boolean valid = true;
         Color red = Color.RED;
+        String errorMessage = ""; // Lưu thông báo lỗi cụ thể
+
+        // Kiểm tra Avatar
+        AvatarLabel avatarLabel = modal.getAvatarLabel();
+        byte[] avatarBytes = avatarLabel != null ? avatarLabel.getImageAsBytes("jpg") : null;
+
+        if (avatarBytes == null || avatarBytes.length == 0) {
+            errorMessage = "Vui lòng chọn ảnh đại diện!";
+            modal.getLblStatus().setText(errorMessage);
+            modal.getLblStatus().setForeground(Color.RED);
+            valid = false;
+        }
 
         // Tên
         if (name.isEmpty()) {
+            if (errorMessage.isEmpty()) errorMessage = "Họ tên không được để trống!";
             modal.getLblErrolName().setText("Họ tên không được để trống!");
             modal.getLblErrolName().setForeground(red);
             valid = false;
         } else if (name.length() < 2) {
+            if (errorMessage.isEmpty()) errorMessage = "Họ tên quá ngắn!";
             modal.getLblErrolName().setText("Họ tên quá ngắn!");
             modal.getLblErrolName().setForeground(red);
             valid = false;
@@ -1028,10 +1043,12 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         // Số điện thoại
         if (phone.isEmpty()) {
+            if (errorMessage.isEmpty()) errorMessage = "Số điện thoại không được để trống!";
             modal.getLblErrolPhone().setText("Số điện thoại không được để trống!");
             modal.getLblErrolPhone().setForeground(red);
             valid = false;
         } else if (!phone.matches("^0\\d{9}$")) {
+            if (errorMessage.isEmpty()) errorMessage = "Số điện thoại không hợp lệ!";
             modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ!");
             modal.getLblErrolPhone().setForeground(red);
             valid = false;
@@ -1039,26 +1056,36 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         // CCCD
         if (citizenId.isEmpty()) {
+            if (errorMessage.isEmpty()) errorMessage = "CCCD không được để trống!";
             modal.getLblErrolCitizen().setText("CCCD không được để trống!");
             modal.getLblErrolCitizen().setForeground(red);
             valid = false;
         } else if (!citizenId.matches("\\d{12}")) {
+            if (errorMessage.isEmpty()) errorMessage = "CCCD phải có 12 chữ số!";
             modal.getLblErrolCitizen().setText("CCCD phải có 12 chữ số!");
+            modal.getLblErrolCitizen().setForeground(red);
+            valid = false;
+        } else if (service.existsByCitizenId(citizenId) != null) {
+            if (errorMessage.isEmpty()) errorMessage = "CCCD đã tồn tại trong hệ thống!";
+            modal.getLblErrolCitizen().setText("CCCD đã tồn tại!");
             modal.getLblErrolCitizen().setForeground(red);
             valid = false;
         }
 
         // Email
         if (email.isEmpty()) {
+            if (errorMessage.isEmpty()) errorMessage = "Email không được để trống!";
             modal.getLblErrolEmail().setText("Email không được để trống!");
             modal.getLblErrolEmail().setForeground(red);
             valid = false;
         } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            if (errorMessage.isEmpty()) errorMessage = "Email không hợp lệ!";
             modal.getLblErrolEmail().setText("Email không hợp lệ!");
             modal.getLblErrolEmail().setForeground(red);
             valid = false;
         }
 
+        // Ngày tuyển dụng
         LocalDate hireDate = null;
         try {
             if (!hireDateStr.isEmpty()) {
@@ -1067,16 +1094,18 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 hireDate = LocalDate.now();
             }
         } catch (DateTimeParseException e) {
-            modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd-MM-yyyy)!");
+            if (errorMessage.isEmpty()) errorMessage = "Ngày tuyển dụng không hợp lệ (dd/MM/yyyy)!";
+            modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd/MM/yyyy)!");
             modal.getLblErrolHireDate().setForeground(red);
             valid = false;
             log.error("Error parsing hire date: ", e);
         }
 
-        return new Valid(name, valid, gender, phone, citizenId, email, hireDate);
+        // Trả về kết quả kèm message lỗi
+        return new Valid(name, valid, gender, phone, citizenId, email, hireDate, errorMessage);
     }
 
-
+    // Cập nhật record Valid để chứa errorMessage
     private record Valid(
             String fullName,
             boolean valid,
@@ -1084,8 +1113,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String phone,
             String citizenId,
             String email,
-            LocalDate hireDate) {
-
+            LocalDate hireDate,
+            String errorMessage) {
     }
 
     private iuh.fit.se.group1.ui.component.custom.Button btnAddEmployee;
