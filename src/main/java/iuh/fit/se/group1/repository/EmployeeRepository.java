@@ -356,8 +356,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     role.setRoleId(rs.getString("roleId"));
                     role.setRoleName(rs.getString("roleName"));
                     account.setRole(role);
-
-                    // Liên kết
                     employee.setAccount(account);
 
                     return employee;
