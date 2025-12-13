@@ -43,6 +43,7 @@ public class PaymentMain extends javax.swing.JPanel {
     private static final long SURCHARGE_HOLIDAY = 50_000;
     private static final Logger log = LoggerFactory.getLogger(PaymentMain.class);
     private Promotion promotion = null;
+    private Runnable backStep1Action;
 
     public Button getBtnPrev() {
         return btnPrev;
@@ -795,6 +796,7 @@ public class PaymentMain extends javax.swing.JPanel {
          saveSurchargesByOrderId(currentOrder.getOrderId());
         orderService.updateOrderStatusToPaid(currentOrder);
         resetPanel();
+        backStep1Action.run();
 
     }
 
@@ -1180,6 +1182,10 @@ public class PaymentMain extends javax.swing.JPanel {
         }
     }
 
+
+    public void setStep1(Runnable backStep1Action) {
+        this.backStep1Action = backStep1Action;
+    }
     private void setSurcharge(List<SurchargeDTO> surchargeDTOS) {
         tblSurcharge.clearSelection();
         updateSurchargeTable(surchargeDTOS);

@@ -15,6 +15,7 @@ import iuh.fit.se.group1.util.Constants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +36,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
     public PaymentPagev2() {
         initComponents();
         paymentMain = new PaymentMain();
+        paymentMain.setStep1(backStep1Action);
         sequencePayment1.setActiveStep(0);
 
         loadDataTable();
@@ -68,8 +70,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
         });
 
         paymentMain.getBtnPrev().addActionListener(e->{
-            sequencePayment1.setActiveStep(0);
-            scrollPaneWin111.setViewportView(jPanel1);
+            backStep1();
         });
 
         search1.setText("");
@@ -90,6 +91,15 @@ public class PaymentPagev2 extends javax.swing.JPanel {
             }
         });
 
+    }
+
+    private final Runnable backStep1Action = this::backStep1;
+
+
+    private void backStep1() {
+        sequencePayment1.setActiveStep(0);
+        loadDataTable();
+        scrollPaneWin111.setViewportView(jPanel1);
     }
 
     private void findPendingOrders(String keyword) {
@@ -121,7 +131,6 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
     private void loadDataTable() {
         tbl.clearData();
-
         for (Order order : orderService.getUnpaidOrders()) {
             displayOrderOnTable(order);
         }

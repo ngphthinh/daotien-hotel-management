@@ -360,6 +360,7 @@ public class MainFlow4 extends javax.swing.JPanel {
             txtDob.setText(dobStr);
 
             rdoGender.setSelectedGender(existingCustomer.isGender());
+            txtDob.requestFocus();
             return;
         }
         txtFullName.requestFocus();

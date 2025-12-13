@@ -154,6 +154,10 @@ public class SurchargeManagement extends javax.swing.JPanel {
                 Valid result = getValid(modal);
                 if (result.valid()) {
                     Surcharge surchargeSave = surchargeService.createSurcharge(new Surcharge(result.name(), result.price()));
+                    if (surchargeSave == null) {
+                        Message.showMessage("Lỗi", "Phụ phí với tên '" + result.name() + "' đã tồn tại!");
+                        return;
+                    }
                     DefaultTableModel model = (DefaultTableModel) tblSurchage.getTbl().getModel();
                     model.addRow(new Object[]{surchargeSave.getSurchargeId(), surchargeSave.getName(), Constants.VND_FORMAT.format(surchargeSave.getPrice())});
                     GlassPanePopup.closePopupLast();

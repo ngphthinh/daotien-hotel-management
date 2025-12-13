@@ -749,8 +749,6 @@ public class MainFlow5 extends javax.swing.JPanel {
 
         var totalPrice = Constants.parseVND(totalRoom) + Constants.parseVND(lblTotalAmenity.getText());
 
-    System.out.println();
-
         lblSurchargeHoliday.setText(holidayPrice != 0 ? Constants.VND_FORMAT.format(holidayPrice) : "Không có");
 
         lblTotalPrice.setText(Constants.VND_FORMAT.format(totalPrice + holidayPrice));
@@ -809,7 +807,6 @@ public class MainFlow5 extends javax.swing.JPanel {
         if (lblSurchargeHoliday.getText().equals("N/a") || lblSurchargeHoliday.getText().equals("Không có")) {
             return new OrderResult(order,null);
         }
-
         Surcharge surchargeHoliday = surchargeService.getSurchargeByName(lblSurchargeHolidayName.getText().trim());
 
         SurchargeDetail surchargeDetail = new SurchargeDetail();

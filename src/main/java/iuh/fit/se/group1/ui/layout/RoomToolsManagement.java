@@ -272,7 +272,7 @@ public class RoomToolsManagement extends JPanel {
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         pnlButtons.setBackground(Color.WHITE);
 
-        JButton btnSelect = createStyledButton("Chọn phòng cần đổi", new Color(59, 130, 246), 155, 35);
+        JButton btnSelect = createStyledButton("Chọn phòng hiện tại", new Color(59, 130, 246), 155, 35);
         JButton btnExtend = createStyledButton("Gia hạn phòng", new Color(16, 185, 129), 125, 35);
 
         btnSelect.addActionListener(e -> selectOldRooms());
