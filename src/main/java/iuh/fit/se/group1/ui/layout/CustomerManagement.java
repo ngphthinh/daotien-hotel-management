@@ -86,10 +86,6 @@ public class CustomerManagement extends javax.swing.JPanel {
     }
 
     private void custom() {
-        btnAddCustomer.setBackground(new Color(108, 165, 200));
-        btnAddCustomer.setForeground(Color.WHITE);
-        btnAddCustomer.setBorderRadius(10);
-
         btnExport.setBackground(new Color(13, 200, 7));
         btnExport.setForeground(Color.WHITE);
         btnExport.setBorderRadius(10);
@@ -114,7 +110,6 @@ public class CustomerManagement extends javax.swing.JPanel {
             }
         });
 
-        btnAddCustomer.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
@@ -177,7 +172,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                 modal.getLblErrolDob().setForeground(red);
 
                 modal.saveData(ae -> {
-                    Valid rs = getValid(modal);
+                    Valid rs = getValidForEdit(modal);
                     if (!rs.valid) {
                         return;
                     }
@@ -377,45 +372,34 @@ public class CustomerManagement extends javax.swing.JPanel {
         if (keyword.isEmpty()) {
             result = customerService.getAllCustomer();
         } else {
-            result = customerService.getAmenityByKeyword(keyword); // đã có trong service
+            result = customerService.getAmenityByKeyword(keyword);
         }
         loadTable(result);
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated
-    // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
         headerCustom1 = new iuh.fit.se.group1.ui.component.HeaderCustom();
         lblTitleCustomer = new javax.swing.JLabel();
-        btnAddCustomer = new iuh.fit.se.group1.ui.component.custom.Button();
         tblCustomer = new iuh.fit.se.group1.ui.component.table.Table();
         btnExport = new iuh.fit.se.group1.ui.component.custom.Button();
         btnImport = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(241, 241, 241));
 
-        lblTitleCustomer.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
+        lblTitleCustomer.setFont(new java.awt.Font("Segoe UI", 1, 30));
         lblTitleCustomer.setForeground(new java.awt.Color(102, 102, 102));
         lblTitleCustomer.setText("Quản lý khách hàng");
-
-        btnAddCustomer.setText("Thêm khách hàng");
-        btnAddCustomer.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnAddCustomer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddCustomerActionPerformed(evt);
-
-            }
-        });
 
         tblCustomer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 20, 20, 20));
 
         btnExport.setText("Xuất Excel");
-        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14));
 
         btnImport.setText("Tải excel");
-        btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnImport.setFont(new java.awt.Font("Segoe UI", 1, 14));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -426,16 +410,13 @@ public class CustomerManagement extends javax.swing.JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(36, 36, 36)
                                 .addComponent(lblTitleCustomer)
-                                .addGap(346, 346, 346)
-                                .addComponent(btnAddCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 180,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 148,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 148,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(36, 36, 36))
                         .addComponent(tblCustomer, javax.swing.GroupLayout.DEFAULT_SIZE,
                                 javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         layout.setVerticalGroup(
@@ -445,8 +426,6 @@ public class CustomerManagement extends javax.swing.JPanel {
                                         javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(30, 30, 30)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnAddCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(lblTitleCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 58,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
@@ -457,7 +436,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                                 .addComponent(tblCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 663,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap()));
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>
 
     private void filterCustomerTable(String genderFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblCustomer.getTbl()
@@ -479,69 +458,8 @@ public class CustomerManagement extends javax.swing.JPanel {
         sorter.setSortKeys(null);
     }
 
-    private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddCustomerActionPerformed
-        InfoCustomerModal modal = new InfoCustomerModal();
-
-        modal.closeModel(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                GlassPanePopup.closePopupLast();
-            }
-        });
-
-        modal.saveData(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                saveData(modal);
-            }
-
-        });
-
-        raven.glasspanepopup.GlassPanePopup.showPopup(modal);
-    }// GEN-LAST:event_btnAddCustomerActionPerformed
-
-    private void saveData(InfoCustomerModal modal) {
-        Valid rs = getValid(modal);
-        if (!rs.valid) {
-            Message.showMessage("Lỗi", "Kiểm tra lại thông tin");
-            return;
-        }
-        try {
-            Customer customer = new Customer();
-            customer.setFullName(rs.name);
-            customer.setGender(rs.gender);
-            customer.setEmail(rs.email);
-            customer.setCitizenId(rs.citizen);
-            customer.setPhone(rs.phone);
-            customer.setDateOfBirth(rs.dob);
-
-            Customer customerSave = customerService.createCustomer(customer);
-
-            if (customerSave == null) {
-                Message.showMessage("Lỗi", "Không thể thêm khách hàng!");
-                return;
-            }
-
-            DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
-            String genderStr = customer.isGender() ? "Nam" : "Nữ";
-            System.out.println(customerSave);
-            model.addRow(new Object[]{
-                    customerSave.getCustomerId(),
-                    customerSave.getFullName(),
-                    genderStr,
-                    customerSave.getEmail(),
-                    customerSave.getCitizenId(),
-                    customerSave.getPhone(),});
-            Message.showMessage("Thành công", "Đã thêm khách hàng thành công!");
-            GlassPanePopup.closePopupAll();
-
-        } catch (Exception e) {
-
-            Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
-        }
-    }
-
-    private static Valid getValid(InfoCustomerModal modal) {
+    // Method getValidForEdit - không bắt buộc email
+    private static Valid getValidForEdit(InfoCustomerModal modal) {
         String name = modal.getTxtName().getText().trim();
         String phone = modal.getTxtPhone().getText().trim();
         String email = modal.getTxtEmail().getText().trim();
@@ -554,12 +472,14 @@ public class CustomerManagement extends javax.swing.JPanel {
         modal.getLblErrolPhone().setText("");
         modal.getLblErrolEmail().setText("");
         modal.getLblErrolCitizen().setText("");
+        modal.getLblErrolDob().setText("");
 
         Color red = Color.RED;
         modal.getLblErrolName().setForeground(red);
         modal.getLblErrolPhone().setForeground(red);
         modal.getLblErrolEmail().setForeground(red);
         modal.getLblErrolCitizen().setForeground(red);
+        modal.getLblErrolDob().setForeground(red);
         boolean isValid = true;
 
         if (name.isEmpty()) {
@@ -574,7 +494,9 @@ public class CustomerManagement extends javax.swing.JPanel {
             modal.getLblErrolPhone().setText("Số điện thoại không hợp lệ (10 chữ số, bắt đầu bằng 0)!");
             isValid = false;
         }
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+        // Email không bắt buộc khi chỉnh sửa, chỉ validate format nếu có nhập
+        if (!email.isEmpty() && !email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             modal.getLblErrolEmail().setText("Email không hợp lệ!");
             isValid = false;
         }
@@ -612,12 +534,11 @@ public class CustomerManagement extends javax.swing.JPanel {
 
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.custom.Button btnAddCustomer;
+    // Variables declaration - do not modify
     private iuh.fit.se.group1.ui.component.custom.Button btnExport;
     private iuh.fit.se.group1.ui.component.custom.Button btnImport;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom1;
     private javax.swing.JLabel lblTitleCustomer;
     private iuh.fit.se.group1.ui.component.table.Table tblCustomer;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration
 }

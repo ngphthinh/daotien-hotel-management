@@ -179,6 +179,10 @@ public class SurchargeManagement extends javax.swing.JPanel {
 
     private void custom() {
 
+        headerCustom1.getLblTitle().setText(
+                "<html><span style='color:white;'>Quản lý phụ phí</span>");
+        headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
+
         btnAddSurchage.setBackground(new Color(108, 165, 200));
         btnAddSurchage.setForeground(Color.WHITE);
         btnAddSurchage.setBorderRadius(10);
