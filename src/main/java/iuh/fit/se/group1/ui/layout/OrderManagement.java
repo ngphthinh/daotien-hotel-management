@@ -108,6 +108,11 @@ public class OrderManagement extends javax.swing.JPanel {
 
 
     private void custom() {
+
+        headerCustom1.getLblTitle().setText(
+                "<html><span style='color:white;'>Quản lý hóa đơn</span>");
+        headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
+
         String cols[] = {"Mã", "Tên khách hàng", "CCCD/Passport", "Tổng tiền", "Trạng thái", "Số phòng","Ngày nhận","Ngày trả", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 5);
         tblOrder.getTbl().setModel(model);

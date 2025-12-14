@@ -21,6 +21,7 @@ Dec 14, 2025 11:19:34 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully
 Dec 14, 2025 11:28:01 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
+<<<<<<< HEAD
 Dec 14, 2025 11:29:03 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 Dec 14, 2025 11:29:13 AM iuh.fit.se.group1.config.AppLogger info
@@ -43,3 +44,255 @@ INFO: Order created successfully with order details
 thg 12 09, 2025 5:42:54 CH iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 >>>>>>> 74368c5e8b98eabfedeab53da65b62eb3ee19ebe
+=======
+thg 12 05, 2025 8:45:03 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+thg 12 05, 2025 8:45:42 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+thg 12 05, 2025 8:46:35 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+thg 12 05, 2025 8:51:56 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+thg 12 05, 2025 8:53:23 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+thg 12 05, 2025 8:56:56 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 05, 2025 9:20:27 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 05, 2025 9:26:11 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 05, 2025 9:34:59 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 05, 2025 9:41:15 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 05, 2025 9:43:50 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 08, 2025 6:32:04 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:05 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:07 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:08 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:08 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:08 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:09 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:09 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:09 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:10 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:12 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:12 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 08, 2025 6:32:12 CH iuh.fit.se.group1.config.AppLogger error
+SEVERE: Error finding rooms by keyword:  - The connection is closed.
+thg 12 09, 2025 9:15:03 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:17:06 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:26:17 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:37 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:39 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:42 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:43 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:44 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:45 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:45 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:34:52 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:03 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:04 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:04 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:04 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:05 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:05 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:05 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:05 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:17 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:17 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:17 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:17 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:18 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:18 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:18 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:19 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:19 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:19 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:19 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:20 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:20 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:21 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:30 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:31 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:31 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:31 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:31 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:32 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:41 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:41 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:41 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:46 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:47 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:47 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:47 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:35:48 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:23 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:23 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:23 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:23 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:24 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:24 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:24 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:24 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:32 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:33 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:33 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:33 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:33 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:34 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:34 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:34 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:37 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:37 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:38 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:38 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:42 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:42 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:42 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:43 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:44 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:44 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:44 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:58 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:58 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:58 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:59 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:59 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:59 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:36:59 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:37:00 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:37:08 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:37:08 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:37:10 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:37:10 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:37:11 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 9:42:46 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 10:11:39 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 11:45:58 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 11:50:57 SA iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 2:32:32 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 2:59:07 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 3:05:39 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 3:15:52 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 4:18:26 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 4:25:48 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 4:42:38 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 09, 2025 4:43:58 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 10, 2025 5:22:02 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 10, 2025 5:24:09 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+>>>>>>> e0ba3e0e03083dddcc7c5bf58ae3974465509e07

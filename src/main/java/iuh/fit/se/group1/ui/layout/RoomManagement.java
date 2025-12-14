@@ -79,6 +79,10 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void custom() {
+        headerCustom.getLblTitle().setText(
+                "<html><span style='color:white;'>Quản lý phòng</span>");
+        headerCustom.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
+
         btnAddRoom.setBackground(new Color(108, 165, 200));
         btnAddRoom.setForeground(Color.WHITE);
         btnAddRoom.setBorderRadius(10);
