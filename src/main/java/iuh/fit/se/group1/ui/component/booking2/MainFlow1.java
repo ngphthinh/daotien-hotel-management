@@ -23,6 +23,12 @@ import javax.swing.*;
  */
 public class MainFlow1 extends javax.swing.JPanel {
 
+    public void resetInput (){
+        resetInputDate();
+        txtNumberOfAdult.setText("0");
+        txtNumberOfChildren.setText("0");
+
+    }
 
     /**
      * Creates new form MainFlow1

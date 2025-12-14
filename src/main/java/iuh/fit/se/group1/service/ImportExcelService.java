@@ -307,7 +307,11 @@ public class ImportExcelService {
     private String cleanNumberString(String str) {
         if (str == null) {
             return "";
+
         }
+
+        str = str.split(" ")[0];
+
         str = str.replaceAll("[₫%]", "")
                 .replaceAll("[\\s\u00A0]", "")
                 .replace(",", ".");

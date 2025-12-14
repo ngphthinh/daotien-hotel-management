@@ -2,10 +2,7 @@ package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
-import iuh.fit.se.group1.entity.Order;
-import iuh.fit.se.group1.entity.OrderDetail;
-import iuh.fit.se.group1.entity.OrderType;
-import iuh.fit.se.group1.entity.Room;
+import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.repository.BookingRepository;
@@ -39,6 +36,8 @@ public class OrderService {
             return null;
         }
 
+
+
         // nếu 2 là đặt phòng thì cập nhật trạng thái phòng thành đang sử dụng
         if (order.getOrderType().getOrderTypeId() == 2) {
             List<Long> roomsIdx = order.getBookings().stream()
@@ -63,6 +62,57 @@ public class OrderService {
             return savedOrder;
         }
         return null;
+    }
+
+
+    public Order createOrderFromOrder(Order order) {
+        if (order == null) {
+            AppLogger.info("Order is null");
+            return null;
+        }
+
+        if (order.getEmployee() == null || order.getCustomer() == null || order.getBookings() == null || order.getBookings().isEmpty()) {
+            System.out.println("Employee :" + order.getEmployee());
+            System.out.println("Customer :" + order.getCustomer());
+            System.out.println("Bookings :" + order.getBookings());
+            AppLogger.info(getClass() +" Order is missing required fields ");
+            return null;
+        }
+
+
+        Order savedOrder = orderRepository.save(order);
+        if (savedOrder == null) {
+            AppLogger.info("Failed to save order");
+            return null;
+        }
+
+        bookingRepository.saveAllBookingsForOrder(savedOrder, order.getBookings());
+        AppLogger.info("Order created successfully");
+        return savedOrder;
+    }
+
+    /**
+     * Create an empty order record (no bookings saved) based on the provided order object.
+     * Returns the saved Order with generated orderId.
+     */
+    public Order createOrderRecord(Order order) {
+        if (order == null) return null;
+        if (order.getEmployee() == null || order.getCustomer() == null) return null;
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Move existing booking rows to another order by bookingId list.
+     */
+    public void moveBookingsToOrder(Long targetOrderId, List<Long> bookingIds) {
+        bookingRepository.moveBookingsToOrder(targetOrderId, bookingIds);
+    }
+
+    /**
+     * Update total amount for a given order id.
+     */
+    public void updateOrderTotalAmount(Long orderId, java.math.BigDecimal amount) {
+        orderRepository.updateTotalAmount(orderId, amount);
     }
 
     public List<Order> getAllOrders() {
@@ -97,5 +147,9 @@ public class OrderService {
 
     public BigDecimal getTotalRevenueBetweenDates(LocalDate from, LocalDate to) {
         return orderRepository.calculateTotalRevenueBetweenDates(from, to);
+    }
+
+    public void removeBookingsFromOrder(Order currentOrder, List<Booking> result) {
+       bookingRepository.removeBookingsFromOrder(currentOrder, result);
     }
 }

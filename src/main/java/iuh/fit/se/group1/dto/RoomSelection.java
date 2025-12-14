@@ -37,4 +37,9 @@ public class RoomSelection {
     public void setRoomType(String roomType) {
         this.roomType = roomType;
     }
+
+    @Override
+    public String toString() {
+        return number;
+    }
 }

@@ -4,11 +4,12 @@
  */
 package iuh.fit.se.group1.ui.component.paymentv2;
 
-import iuh.fit.se.group1.dto.SurchargeDTO;
+import iuh.fit.se.group1.config.AppLogger;
+import iuh.fit.se.group1.config.Runner;
+import iuh.fit.se.group1.dto.*;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.service.*;
-import iuh.fit.se.group1.dto.AmenityDTO;
-import iuh.fit.se.group1.dto.RoomSelection;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -23,11 +24,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,11 +41,19 @@ public class PaymentMain extends javax.swing.JPanel {
     private OrderService orderService;
     private Order currentOrder = null;
 
+    private static final String SURCHARGE_CHECKOUT = "Phụ thu trả phòng trễ";
     private SurchargeService surchargeService = new SurchargeService();
     private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private static final long SURCHARGE_HOLIDAY = 50_000;
     private static final Logger log = LoggerFactory.getLogger(PaymentMain.class);
     private Promotion promotion = null;
+    private Runnable backStep1Action;
+    private Runnable backStep3Action;
+
+
+    public void setBackStep3Action (Runnable backStep3Action) {
+        this.backStep3Action = backStep3Action;
+    }
 
     public Button getBtnPrev() {
         return btnPrev;
@@ -68,7 +79,24 @@ public class PaymentMain extends javax.swing.JPanel {
 
         ((DefaultTableModel) tblSurcharge.getModel()).setRowCount(0);
         tblSurcharge.setDefaultEditor(Object.class, null);
-        
+
+        // Register callback so lblTotalRoom is updated when room selection changes
+        try {
+            // tblRoom is CustomTableRoom; set listener to update label using VND format
+            if (tblRoom instanceof iuh.fit.se.group1.ui.component.paymentv2.CustomTableRoom) {
+                iuh.fit.se.group1.ui.component.paymentv2.CustomTableRoom custom = (iuh.fit.se.group1.ui.component.paymentv2.CustomTableRoom) tblRoom;
+                custom.setOnSelectionChanged(total -> {
+                    SwingUtilities.invokeLater(() -> {
+                        lblTotalRoom.setText(Constants.VND_FORMAT.format(new java.math.BigDecimal(total)));
+                        // Also recalc other totals if you have methods for that
+                        recalculateTotalAndPromotion();
+                    });
+                });
+            }
+        } catch (Exception ex) {
+            log.warn("Failed to register room selection listener", ex);
+        }
+
     }
 
     /**
@@ -89,20 +117,11 @@ public class PaymentMain extends javax.swing.JPanel {
         lbl1 = new javax.swing.JLabel();
         lbl2 = new javax.swing.JLabel();
         pnl2 = new javax.swing.JPanel();
-        lbl3 = new javax.swing.JLabel();
-        lblCheckIn = new javax.swing.JLabel();
         spn1 = new javax.swing.JSeparator();
-        lbl4 = new javax.swing.JLabel();
-        lblCheckOut = new javax.swing.JLabel();
-        spn2 = new javax.swing.JSeparator();
-        lbl6 = new javax.swing.JLabel();
-        lblDoubleRooms = new javax.swing.JLabel();
-        lbl7 = new javax.swing.JLabel();
-        lblSingleRooms = new javax.swing.JLabel();
-        spn4 = new javax.swing.JSeparator();
         lbl20 = new javax.swing.JLabel();
         lblBookingType = new javax.swing.JLabel();
-        spn6 = new javax.swing.JSeparator();
+        scr3 = new iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11();
+        tblRoom = new iuh.fit.se.group1.ui.component.paymentv2.CustomTableRoom();
         pnl3 = new javax.swing.JPanel();
         lbl18 = new javax.swing.JLabel();
         lblTotalRoom = new javax.swing.JLabel();
@@ -160,70 +179,30 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl1Layout = new javax.swing.GroupLayout(pnl1);
         pnl1.setLayout(pnl1Layout);
         pnl1Layout.setHorizontalGroup(
-            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl1Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addGroup(pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl2, javax.swing.GroupLayout.PREFERRED_SIZE, 741, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 689, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl1Layout.createSequentialGroup()
+                                .addGap(30, 30, 30)
+                                .addGroup(pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lbl2, javax.swing.GroupLayout.PREFERRED_SIZE, 741, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 689, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))
         );
         pnl1Layout.setVerticalGroup(
-            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl1Layout.createSequentialGroup()
-                .addGap(8, 8, 8)
-                .addComponent(lbl1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbl2)
-                .addContainerGap(18, Short.MAX_VALUE))
+                pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl1Layout.createSequentialGroup()
+                                .addGap(8, 8, 8)
+                                .addComponent(lbl1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbl2)
+                                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pnl2.setBackground(new java.awt.Color(255, 255, 255));
         pnl2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Chi tiết đặt phòng", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Segoe UI", 1, 13), new java.awt.Color(102, 102, 102))); // NOI18N
 
-        lbl3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lbl3.setForeground(new java.awt.Color(91, 91, 91));
-        lbl3.setText("Ngày nhận phòng:");
-
-        lblCheckIn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblCheckIn.setForeground(new java.awt.Color(91, 91, 91));
-        lblCheckIn.setText("n/a");
-
         spn1.setBackground(new java.awt.Color(91, 91, 91));
         spn1.setForeground(new java.awt.Color(91, 91, 91));
         spn1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-
-        lbl4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lbl4.setForeground(new java.awt.Color(91, 91, 91));
-        lbl4.setText("Ngày trả phòng:");
-
-        lblCheckOut.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblCheckOut.setForeground(new java.awt.Color(91, 91, 91));
-        lblCheckOut.setText("n/a");
-
-        spn2.setBackground(new java.awt.Color(91, 91, 91));
-        spn2.setForeground(new java.awt.Color(91, 91, 91));
-        spn2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-
-        lbl6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lbl6.setForeground(new java.awt.Color(91, 91, 91));
-        lbl6.setText("Phòng đôi:");
-
-        lblDoubleRooms.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblDoubleRooms.setForeground(new java.awt.Color(91, 91, 91));
-        lblDoubleRooms.setText("0");
-
-        lbl7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lbl7.setForeground(new java.awt.Color(91, 91, 91));
-        lbl7.setText("Phòng đơn:");
-
-        lblSingleRooms.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblSingleRooms.setForeground(new java.awt.Color(91, 91, 91));
-        lblSingleRooms.setText("0");
-
-        spn4.setBackground(new java.awt.Color(91, 91, 91));
-        spn4.setForeground(new java.awt.Color(91, 91, 91));
-        spn4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
         lbl20.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lbl20.setForeground(new java.awt.Color(91, 91, 91));
@@ -233,78 +212,36 @@ public class PaymentMain extends javax.swing.JPanel {
         lblBookingType.setForeground(new java.awt.Color(91, 91, 91));
         lblBookingType.setText("n/a");
 
-        spn6.setBackground(new java.awt.Color(91, 91, 91));
-        spn6.setForeground(new java.awt.Color(91, 91, 91));
-        spn6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        scr3.setViewportView(tblRoom);
 
         javax.swing.GroupLayout pnl2Layout = new javax.swing.GroupLayout(pnl2);
         pnl2.setLayout(pnl2Layout);
         pnl2Layout.setHorizontalGroup(
-            pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl2Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(pnl2Layout.createSequentialGroup()
-                        .addComponent(lbl3, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblCheckIn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(pnl2Layout.createSequentialGroup()
-                        .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnl2Layout.createSequentialGroup()
-                                .addComponent(lbl20, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblBookingType, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(pnl2Layout.createSequentialGroup()
-                                .addComponent(lbl6, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblDoubleRooms, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(pnl2Layout.createSequentialGroup()
-                                .addComponent(lbl4, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(pnl2Layout.createSequentialGroup()
-                                .addComponent(lbl7, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblSingleRooms, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 43, Short.MAX_VALUE))
-                    .addComponent(spn2)
-                    .addComponent(spn1)
-                    .addComponent(spn4)
-                    .addComponent(spn6))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl2Layout.createSequentialGroup()
+                                .addGap(20, 20, 20)
+                                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(scr3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(spn1, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl2Layout.createSequentialGroup()
+                                                .addComponent(lbl20, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(lblBookingType, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 33, Short.MAX_VALUE)))
+                                .addGap(32, 32, 32))
         );
         pnl2Layout.setVerticalGroup(
-            pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl3)
-                    .addComponent(lblCheckIn))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(spn1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl4)
-                    .addComponent(lblCheckOut))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(spn2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl7)
-                    .addComponent(lblSingleRooms))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(spn4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl6)
-                    .addComponent(lblDoubleRooms))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(spn6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl20)
-                    .addComponent(lblBookingType))
-                .addContainerGap())
+                pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl20)
+                                        .addComponent(lblBookingType))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(spn1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(scr3, javax.swing.GroupLayout.PREFERRED_SIZE, 288, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6))
         );
 
         pnl3.setBackground(new java.awt.Color(185, 215, 254));
@@ -321,19 +258,19 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl3Layout = new javax.swing.GroupLayout(pnl3);
         pnl3.setLayout(pnl3Layout);
         pnl3Layout.setHorizontalGroup(
-            pnl3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl18, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblTotalRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                pnl3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lbl18, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblTotalRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnl3Layout.setVerticalGroup(
-            pnl3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(lbl18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblTotalRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                pnl3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(lbl18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblTotalRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pnl4.setBackground(new java.awt.Color(255, 255, 255));
@@ -344,12 +281,12 @@ public class PaymentMain extends javax.swing.JPanel {
 
         tblAmenity.setBackground(new java.awt.Color(255, 255, 255));
         tblAmenity.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+                new Object[][]{
 
-            },
-            new String [] {
-                "STT", "Tên dịch vụ", "Giá", "Số lượng"
-            }
+                },
+                new String[]{
+                        "STT", "Tên dịch vụ", "Giá", "Số lượng"
+                }
         ));
         tblAmenity.getTableHeader().setReorderingAllowed(false);
         scr.setViewportView(tblAmenity);
@@ -357,18 +294,18 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl4Layout = new javax.swing.GroupLayout(pnl4);
         pnl4.setLayout(pnl4Layout);
         pnl4Layout.setHorizontalGroup(
-            pnl4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scr, javax.swing.GroupLayout.PREFERRED_SIZE, 776, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                pnl4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl4Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(scr, javax.swing.GroupLayout.PREFERRED_SIZE, 776, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnl4Layout.setVerticalGroup(
-            pnl4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                .addContainerGap())
+                pnl4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl4Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(scr, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         pnl5.setBackground(new java.awt.Color(185, 215, 254));
@@ -385,19 +322,19 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl5Layout = new javax.swing.GroupLayout(pnl5);
         pnl5.setLayout(pnl5Layout);
         pnl5Layout.setHorizontalGroup(
-            pnl5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblTotalAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                pnl5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lbl17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblTotalAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
         pnl5Layout.setVerticalGroup(
-            pnl5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(lbl17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblTotalAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                pnl5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(lbl17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblTotalAmenity, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pnl6.setBackground(new java.awt.Color(255, 255, 255));
@@ -454,68 +391,68 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl6Layout = new javax.swing.GroupLayout(pnl6);
         pnl6.setLayout(pnl6Layout);
         pnl6Layout.setHorizontalGroup(
-            pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl6Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl6Layout.createSequentialGroup()
-                        .addComponent(lbl10, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 449, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl6Layout.createSequentialGroup()
-                        .addComponent(lbl9, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblFullName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(pnl6Layout.createSequentialGroup()
-                        .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lbl14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lbl11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGroup(pnl6Layout.createSequentialGroup()
-                                    .addComponent(lbl12, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(28, 28, 28)))
-                            .addGroup(pnl6Layout.createSequentialGroup()
-                                .addComponent(lbl13, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(120, 120, 120)))
-                        .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblGender, javax.swing.GroupLayout.PREFERRED_SIZE, 437, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(pnl6Layout.createSequentialGroup()
-                                    .addComponent(lblDob, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addGap(3, 3, 3))
-                                .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 455, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblCitizenid, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl6Layout.createSequentialGroup()
+                                .addGap(25, 25, 25)
+                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl6Layout.createSequentialGroup()
+                                                .addComponent(lbl10, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 449, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl6Layout.createSequentialGroup()
+                                                .addComponent(lbl9, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblFullName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(pnl6Layout.createSequentialGroup()
+                                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                        .addComponent(lbl14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                        .addComponent(lbl11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                                .addGroup(pnl6Layout.createSequentialGroup()
+                                                                        .addComponent(lbl12, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addGap(28, 28, 28)))
+                                                        .addGroup(pnl6Layout.createSequentialGroup()
+                                                                .addComponent(lbl13, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(120, 120, 120)))
+                                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(lblGender, javax.swing.GroupLayout.PREFERRED_SIZE, 437, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                .addGroup(pnl6Layout.createSequentialGroup()
+                                                                        .addComponent(lblDob, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                        .addGap(3, 3, 3))
+                                                                .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 455, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(lblCitizenid, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnl6Layout.setVerticalGroup(
-            pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl9)
-                    .addComponent(lblFullName))
-                .addGap(10, 10, 10)
-                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl10)
-                    .addComponent(lblPhone))
-                .addGap(10, 10, 10)
-                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl11)
-                    .addComponent(lblEmail))
-                .addGap(10, 10, 10)
-                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCitizenid)
-                    .addComponent(lbl14))
-                .addGap(10, 10, 10)
-                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl12)
-                    .addComponent(lblDob))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl13)
-                    .addComponent(lblGender))
-                .addContainerGap(9, Short.MAX_VALUE))
+                pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl6Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl9)
+                                        .addComponent(lblFullName))
+                                .addGap(10, 10, 10)
+                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl10)
+                                        .addComponent(lblPhone))
+                                .addGap(10, 10, 10)
+                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl11)
+                                        .addComponent(lblEmail))
+                                .addGap(10, 10, 10)
+                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblCitizenid)
+                                        .addComponent(lbl14))
+                                .addGap(10, 10, 10)
+                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl12)
+                                        .addComponent(lblDob))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(pnl6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl13)
+                                        .addComponent(lblGender))
+                                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         btnPrev.setBackground(new java.awt.Color(227, 227, 227));
@@ -536,12 +473,12 @@ public class PaymentMain extends javax.swing.JPanel {
 
         tblSurcharge.setBackground(new java.awt.Color(255, 255, 255));
         tblSurcharge.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+                new Object[][]{
 
-            },
-            new String [] {
-                "STT", "Tên phụ phí", "Giá", "Số lượng", "Tổng tiền"
-            }
+                },
+                new String[]{
+                        "STT", "Tên phụ phí", "Giá", "Số lượng", "Tổng tiền"
+                }
         ));
         tblSurcharge.getTableHeader().setReorderingAllowed(false);
         scr1.setViewportView(tblSurcharge);
@@ -549,18 +486,18 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl31Layout = new javax.swing.GroupLayout(pnl31);
         pnl31.setLayout(pnl31Layout);
         pnl31Layout.setHorizontalGroup(
-            pnl31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl31Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scr1, javax.swing.GroupLayout.PREFERRED_SIZE, 781, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                pnl31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl31Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(scr1, javax.swing.GroupLayout.PREFERRED_SIZE, 781, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(25, Short.MAX_VALUE))
         );
         pnl31Layout.setVerticalGroup(
-            pnl31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl31Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scr1, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                .addContainerGap())
+                pnl31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl31Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(scr1, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         pnl9.setBackground(new java.awt.Color(185, 215, 254));
@@ -577,19 +514,19 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl9Layout = new javax.swing.GroupLayout(pnl9);
         pnl9.setLayout(pnl9Layout);
         pnl9Layout.setHorizontalGroup(
-            pnl9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl21, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblTotalSurcharge, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                pnl9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl9Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lbl21, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblTotalSurcharge, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         pnl9Layout.setVerticalGroup(
-            pnl9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(lbl21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblTotalSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                pnl9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(lbl21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblTotalSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         btnAddSurcharge.setBackground(new java.awt.Color(255, 0, 0));
@@ -669,104 +606,114 @@ public class PaymentMain extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(pnl2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnl6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnl9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnl5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnl4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnl3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnl31, javax.swing.GroupLayout.PREFERRED_SIZE, 800, Short.MAX_VALUE)
-                        .addComponent(pnl1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                            .addGap(6, 6, 6)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(lbl932, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(0, 0, Short.MAX_VALUE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(lbl19, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(lblTotalPricePayment, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(12, 12, 12)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                .addComponent(pnl6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(pnl9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(pnl5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(pnl4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(pnl3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(pnl31, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(pnl1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addGroup(layout.createSequentialGroup()
+                                                                        .addGap(6, 6, 6)
+                                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                .addGroup(layout.createSequentialGroup()
+                                                                                        .addComponent(lbl932, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                        .addGap(0, 0, Short.MAX_VALUE))
+                                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                                .addGroup(layout.createSequentialGroup()
+                                                                                                        .addComponent(lbl19, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                                                        .addComponent(lblTotalPricePayment, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                                                .addGroup(layout.createSequentialGroup()
+                                                                                                        .addComponent(lbl15, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                                                        .addComponent(lblTotalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                                                .addGroup(layout.createSequentialGroup()
+                                                                                                        .addComponent(lbl16, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                                                        .addComponent(lblDeposit, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                                                .addGroup(layout.createSequentialGroup()
+                                                                                                        .addComponent(lblPromotionName, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                        .addGap(81, 81, 81)
+                                                                                                        .addComponent(lblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                                                                        .addGap(1, 1, 1)))))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(btnAddSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(214, 214, 214)
+                                                                .addComponent(btnCash, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(bntTranfer, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                         .addGroup(layout.createSequentialGroup()
-                                            .addComponent(lbl15, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(lblTotalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(lbl16, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(lblDeposit, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(lblPromotionName, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(81, 81, 81)
-                                            .addComponent(lblPromotion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addGap(1, 1, 1)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnAddSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(214, 214, 214)
-                        .addComponent(btnCash, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bntTranfer, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(33, Short.MAX_VALUE))
+                                                .addContainerGap()
+                                                .addComponent(pnl2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(11, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(pnl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnl2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnl3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnl4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnl5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnl31, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnl9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25)
-                .addComponent(pnl6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbl932)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPromotionName, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl16)
-                    .addComponent(lblDeposit, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl15)
-                    .addComponent(lblTotalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTotalPricePayment, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl19))
-                .addGap(45, 45, 45)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAddSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCash, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bntTranfer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(24, 24, 24)
+                                .addComponent(pnl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addComponent(pnl2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnl3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnl4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnl5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnl31, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(pnl9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(25, 25, 25)
+                                .addComponent(pnl6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lbl932)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblPromotionName, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(7, 7, 7)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl16)
+                                        .addComponent(lblDeposit, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(7, 7, 7)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl15)
+                                        .addComponent(lblTotalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblTotalPricePayment, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lbl19))
+                                .addGap(45, 45, 45)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnAddSurcharge, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnCash, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(bntTranfer, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCashActionPerformed
+        backStep3Action.run();
         double totalPayment = Constants.parseVND(lblTotalPricePayment.getText());
+        if (!setupBookingPayment()) {
+            AppLogger.info(getClass() + " Lỗi nghen ");
+            return;
+        }
         var modal = new CashPaymentModal(totalPayment);
+
 
         GlassPanePopup.showPopup(modal);
 
@@ -774,13 +721,13 @@ public class PaymentMain extends javax.swing.JPanel {
             if (modal.getMoneyGiven() < totalPayment) {
                 CustomDialog.showMessage(null,
                         "Khách đưa chưa đủ tiền!",
-                        "Thông báo", CustomDialog.MessageType.WARNING, 300,200);
+                        "Thông báo", CustomDialog.MessageType.WARNING, 300, 200);
                 return;
             }
             double change = modal.getMoneyGiven() - totalPayment;
             CustomDialog.showMessage(null,
                     "Thanh toán thành công! Tiền thừa: " + Constants.VND_FORMAT.format(change),
-                    "Thông báo", CustomDialog.MessageType.SUCCESS, 500,200);
+                    "Thông báo", CustomDialog.MessageType.SUCCESS, 500, 200);
 
             currentOrder.setPromotion(promotion);
             currentOrder.setPaymentType(PaymentType.CASH);
@@ -792,9 +739,10 @@ public class PaymentMain extends javax.swing.JPanel {
     }//GEN-LAST:event_btnCashActionPerformed
 
     private void saveOrder() {
-         saveSurchargesByOrderId(currentOrder.getOrderId());
+        saveSurchargesByOrderId(currentOrder.getOrderId());
         orderService.updateOrderStatusToPaid(currentOrder);
         resetPanel();
+        backStep1Action.run();
 
     }
 
@@ -816,14 +764,12 @@ public class PaymentMain extends javax.swing.JPanel {
         lblDob.setText("");
         lblGender.setText("");
 
-        lblCheckIn.setText("");
-        lblCheckOut.setText("");
+
+        tblRoom.clearData();
+
         lblTotalRoom.setText("");
         currentOrder = null;
         promotion = null;
-
-
-
 
 
     }
@@ -847,6 +793,11 @@ public class PaymentMain extends javax.swing.JPanel {
 
     private void bntTranferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntTranferActionPerformed
         PaymentService paymentService = new PaymentService();
+        backStep3Action.run();
+        if (!setupBookingPayment()) {
+            AppLogger.info(getClass() + " Lỗi nghen ");
+            return;
+        }
         currentOrder.setPromotion(promotion);
         currentOrder.setPaymentType(PaymentType.E_WALLET);
         currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())));
@@ -859,7 +810,7 @@ public class PaymentMain extends javax.swing.JPanel {
             if (payUrl != null && !payUrl.isEmpty()) {
                 modal.getLblQrCode().setIcon(new ImageIcon(paymentService.generateQRCodeImage(payUrl, 200, 200)));
             } else {
-                CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR,380,200);
+                CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố khi tạo QR code vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR, 380, 200);
             }
 
             modal.getLblTotaPrice().setText("Tổng tiền: " + currentOrder.getTotalAmount().longValue() + " VND");
@@ -893,13 +844,13 @@ public class PaymentMain extends javax.swing.JPanel {
                     String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
                     String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
                     if ("0".equals(responseCodeCheck)) {
-                        CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS,380,200);
+                        CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS, 380, 200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
                         currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())).add(BigDecimal.valueOf(Constants.parseVND(lblDeposit.getText()))));
                         saveOrder();
                     } else {
-                        CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING,500,200);
+                        CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING, 700, 200);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -908,9 +859,97 @@ public class PaymentMain extends javax.swing.JPanel {
             });
 
         } catch (Exception e) {
-            CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố, vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR,380,200);
+            CustomDialog.showMessage(null, "Hệ thống đang gặp sự cố, vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR, 380, 200);
         }
     }//GEN-LAST:event_bntTranferActionPerformed
+
+    private boolean setupBookingPayment() {
+
+        Set<Booking> selectedBookings =
+                new HashSet<>(tblRoom.getSelectedRoom());
+
+        List<Booking> allBookings = currentOrder.getBookings();
+
+        if (selectedBookings.isEmpty()) {
+            CustomDialog.showMessage(this,
+                    "Vui lòng chọn ít nhất một phòng để thanh toán.",
+                    "Chưa chọn phòng",
+                    CustomDialog.MessageType.WARNING,
+                    500, 200);
+            return false;
+        }
+
+        // Nếu chọn tất cả → currentOrder thanh toán toàn bộ
+        if (selectedBookings.size() == allBookings.size()) {
+            return true;
+        }
+
+        // Booking KHÔNG được chọn → lưu lại
+        List<Booking> remainingBookings = allBookings.stream()
+                .filter(b -> !selectedBookings.contains(b))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        // Keep selected bookings in memory for payment
+        currentOrder.setBookings(new ArrayList<>(selectedBookings));
+
+        // Create a new order record for the remaining bookings (without duplicating booking rows)
+        Order newOrderRecord = new Order();
+        newOrderRecord.setEmployee(currentOrder.getEmployee());
+        newOrderRecord.setCustomer(currentOrder.getCustomer());
+        newOrderRecord.setOrderDate(java.time.LocalDateTime.now());
+        newOrderRecord.setOrderType(currentOrder.getOrderType());
+        newOrderRecord.setPromotion(currentOrder.getPromotion());
+        newOrderRecord.setDeposit(java.math.BigDecimal.ZERO);
+        newOrderRecord.setTotalAmount(java.math.BigDecimal.ZERO);
+
+        Order createdOrder = orderService.createOrderRecord(newOrderRecord);
+        if (createdOrder == null) {
+            CustomDialog.showMessage(this, "Không thể tạo đơn mới cho phần còn lại của phòng", "Lỗi", CustomDialog.MessageType.ERROR, 400, 180);
+            return false;
+        }
+
+        // Collect bookingIds to move (the ones we want to remain in the new order)
+        List<Long> bookingIdsToMove = remainingBookings.stream()
+                .map(Booking::getBookingId)
+                .toList();
+
+        // Move booking rows in DB to the new order id
+        orderService.moveBookingsToOrder(createdOrder.getOrderId(), bookingIdsToMove);
+
+        // --- Calculate totals for both orders ---
+        // Original total of current order (may include room + amenity + surcharge)
+        java.math.BigDecimal originalTotal = currentOrder.getTotalAmount() != null ? currentOrder.getTotalAmount() : java.math.BigDecimal.ZERO;
+
+        // Total for remaining bookings (new order) = sum price of remainingBookings (rooms only)
+        java.math.BigDecimal totalRemainingRooms = remainingBookings.stream()
+                .map(b -> java.math.BigDecimal.valueOf(getPriceFromBooking(b)))
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+
+        orderService.updateOrderTotalAmount(createdOrder.getOrderId(), totalRemainingRooms);
+
+
+        java.math.BigDecimal newPaidOrderTotal = originalTotal.subtract(totalRemainingRooms);
+        if (newPaidOrderTotal.compareTo(java.math.BigDecimal.ZERO) < 0) {
+            newPaidOrderTotal = java.math.BigDecimal.ZERO;
+        }
+
+        orderService.updateOrderTotalAmount(currentOrder.getOrderId(), newPaidOrderTotal);
+
+        currentOrder.setTotalAmount(newPaidOrderTotal);
+        lblTotalRoom.setText(Constants.VND_FORMAT.format(newPaidOrderTotal));
+        recalculateTotalAndPromotion();
+
+        // Update in-memory representation: original order in DB should now have only selected bookings; currentOrder contains selected bookings
+        currentOrder.setBookings(new ArrayList<>(selectedBookings));
+
+        // Refresh currentOrder from DB to ensure consistent state (optional)
+        this.currentOrder = orderService.getOrderById(currentOrder.getOrderId());
+
+        // done
+        return true;
+    }
+
 
     private void btnPrevActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnPrevActionPerformed
         // TODO add your handling code here:
@@ -995,7 +1034,7 @@ public class PaymentMain extends javax.swing.JPanel {
         for (SurchargeDTO surcharge : surcharges) {
             BigDecimal itemTotal = surcharge.getPrice().multiply(new BigDecimal(surcharge.getQuantity()));
 
-            Object[] row = new Object[] {
+            Object[] row = new Object[]{
                     index++, // Store ID in STT column for later retrieval
                     surcharge,
                     surcharge.getPrice(), // Store as BigDecimal, will be formatted by renderer
@@ -1052,7 +1091,7 @@ public class PaymentMain extends javax.swing.JPanel {
         int index = 1;
         BigDecimal total = BigDecimal.ZERO;
         for (AmenityDTO amenity : selectedAmenities) {
-            Object[] row = new Object[] {
+            Object[] row = new Object[]{
                     index++,
                     amenity.getName(),
                     Constants.VND_FORMAT.format(amenity.getPrice()),
@@ -1075,62 +1114,98 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
     public void setInfoBooking(
-            String checkIn,
-            String checkOut,
             String bookingType,
-            List<RoomSelection> selectedRoom,
+            List<Booking> selectedRoom,
             BigDecimal deposit,
             BigDecimal totalPrice) {
 
-        lblCheckOut.setText(checkOut);
+//        lblCheckOut.setText(checkOut);
         lblBookingType.setText(bookingType);
-        lblCheckIn.setText(checkIn);
-        System.out.println("Deposit: " + deposit);
-        lblDeposit.setText(Constants.VND_FORMAT.format(deposit));
-        Map<String, List<RoomSelection>> map = selectedRoom.stream()
-                .collect(Collectors.groupingBy(RoomSelection::getRoomType));
+//        lblCheckIn.setText(checkIn);
 
-        for (Map.Entry<String, List<RoomSelection>> entry : map.entrySet()) {
-            String roomTypeKey = entry.getKey();
-            var listRoom = entry.getValue();
-            String valueNew = listRoom.stream()
-                    .map(RoomSelection::getNumber)
-                    .collect(Collectors.joining(", "));
-            if (roomTypeKey.equals("SINGLE")) {
-                lblSingleRooms.setText(valueNew);
-            } else if (roomTypeKey.equals("DOUBLE")) {
-                lblDoubleRooms.setText(valueNew);
+        tblRoom.clearData();
+
+        for (Booking booking : selectedRoom) {
+            Room room = booking.getRoom();
+
+            RoomType roomType = room.getRoomType();
+
+            if (roomType == null) {
+                System.out.println("Room ID " + room.getRoomId() + " has no associated room type.");
+            } else {
+                System.out.println(roomType);
             }
+
+
+            tblRoom.addRow(true, booking, getPriceFromBooking(booking));
         }
-        lblTotalPrice.setText(Constants.VND_FORMAT.format(totalPrice));
+
+
         lblTotalRoom.setText(Constants.VND_FORMAT.format(totalPrice));
+
+        lblDeposit.setText(Constants.VND_FORMAT.format(deposit));
+        lblTotalPrice.setText(Constants.VND_FORMAT.format(totalPrice));
     }
-    
+
+
+    public Long getPriceFromBooking(Booking booking) {
+
+        int timePlus = (int) calculateBookingDuration(booking.getCheckInDate(), booking.getCheckOutDate(), booking.getBookingType());
+
+        RoomType roomType = booking.getRoom().getRoomType();
+
+        if (booking.getBookingType().equals(BookingType.HOURLY)) { // Theo giờ
+            return roomType.getHourlyRate().longValueExact() + ((timePlus - 1) * roomType.getAdditionalHourRate().longValueExact());
+        } else if (booking.getBookingType().equals(BookingType.DAILY)) { // Theo ngày
+            return roomType.getDailyRate().longValueExact() * timePlus;
+        } else if (booking.getBookingType().equals(BookingType.OVERNIGHT)) { // qua đêm
+            return roomType.getOvernightRate().longValueExact();
+        }
+        return 0L;
+    }
+
+    private long calculateBookingDuration(LocalDateTime checkIn, LocalDateTime checkOut, BookingType bookingType) {
+        switch (bookingType) {
+            case HOURLY:
+                // Tính số giờ, làm tròn lên
+                long hours = Duration.between(checkIn, checkOut).toHours();
+                long minutes = Duration.between(checkIn, checkOut).toMinutes() % 60;
+                return minutes > 0 ? hours + 1 : hours;
+
+            case DAILY:
+                // Tính số ngày thuê: mốc 12h trưa
+                // Check-out trước 12h -> không tính ngày đó
+                // Check-out từ 12h trở đi -> tính ngày đó
+                // VD: 08/12 14:00 -> 12/12 12:00 = 4 ngày (8,9,10,11)
+                // 08/12 14:00 -> 12/12 14:00 = 5 ngày (8,9,10,11,12)
+                long days = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
+
+                // Nếu check-out từ 12h trở đi, cộng thêm 1 ngày
+                if (checkOut.getHour() >= 12) {
+                    days++;
+                }
+
+                return Math.max(1, days);
+
+            case OVERNIGHT:
+                return 1;
+
+            default:
+                return 1;
+        }
+    }
+
 
     public void setOrder(Long orderId, OrderService orderService, OrderDetailService orderDetailService,
-            SurchargeDetailService surchargeDetailService) {
+                         SurchargeDetailService surchargeDetailService) {
         this.orderService = orderService;
         Order order = orderService.getOrderById(orderId);
         this.currentOrder = order;
-        String checkInStr = order.getBookings().get(0).getCheckInDate()
-                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-        String checkOutStr = order.getBookings().get(0).getCheckOutDate()
-                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 
         String bookingTypeStr = order.getBookings().get(0).getBookingType().getDisplayName();
-
-        List<RoomSelection> selectedRooms = order.getBookings().stream()
-                .map(b -> new RoomSelection(
-                        b.getRoom().getRoomId(),
-                        b.getRoom().getRoomNumber(),
-                        b.getRoom().getRoomType().getRoomTypeId()))
-                .toList();
-
         setInfoBooking(
-                checkInStr,
-                checkOutStr,
                 bookingTypeStr,
-                selectedRooms,
+                order.getBookings(),
                 order.getDeposit(),
                 order.getTotalAmount());
         setupCustomer(order.getCustomer());
@@ -1157,12 +1232,41 @@ public class PaymentMain extends javax.swing.JPanel {
                     dto.setPrice(surcharge.getPrice());
                     dto.setQuantity(e.getQuantity());
                     return dto;
-                }).toList();
+                }).collect(Collectors.toList());
+
+        List<LocalDateTime> checkOutDates = order.getBookings().stream()
+                .map(Booking::getCheckOutDate)
+                .toList();
+
+
+        int countAfterNow = countAfterNow(checkOutDates);
+        if (countAfterNow < 1) {
+            Surcharge surchargeCheckOut = surchargeService.getSurchargeByName(SURCHARGE_CHECKOUT);
+            if (surchargeCheckOut != null) {
+                SurchargeDTO dto = new SurchargeDTO();
+                dto.setSurchargeId(surchargeCheckOut.getSurchargeId());
+                dto.setName(surchargeCheckOut.getName());
+                dto.setPrice(surchargeCheckOut.getPrice());
+                dto.setQuantity(1);
+                surchargeDTOS.add(dto);
+            }
+        }
+
         setSurcharge(surchargeDTOS);
 
         setPromotion(order.getTotalAmount());
 
     }
+
+    private int countAfterNow(List<LocalDateTime> dates) {
+        if (dates == null || dates.isEmpty()) return 0;
+
+        LocalDateTime now = LocalDateTime.now();
+        return (int) dates.stream()
+                .filter(d -> d.isAfter(now))
+                .count();
+    }
+
 
     private void setPromotion(BigDecimal totalAmount) {
         PromotionService promotionService = new PromotionService();
@@ -1178,6 +1282,11 @@ public class PaymentMain extends javax.swing.JPanel {
             lblPromotionName.setText("Không có khuyến mãi");
             lblPromotion.setText(Constants.VND_FORMAT.format(0));
         }
+    }
+
+
+    public void setStep1(Runnable backStep1Action) {
+        this.backStep1Action = backStep1Action;
     }
 
     private void setSurcharge(List<SurchargeDTO> surchargeDTOS) {
@@ -1204,26 +1313,18 @@ public class PaymentMain extends javax.swing.JPanel {
     private javax.swing.JLabel lbl2;
     private javax.swing.JLabel lbl20;
     private javax.swing.JLabel lbl21;
-    private javax.swing.JLabel lbl3;
-    private javax.swing.JLabel lbl4;
-    private javax.swing.JLabel lbl6;
-    private javax.swing.JLabel lbl7;
     private javax.swing.JLabel lbl9;
     private javax.swing.JLabel lbl932;
     private javax.swing.JLabel lblBookingType;
-    private javax.swing.JLabel lblCheckIn;
-    private javax.swing.JLabel lblCheckOut;
     private javax.swing.JLabel lblCitizenid;
     private javax.swing.JLabel lblDeposit;
     private javax.swing.JLabel lblDob;
-    private javax.swing.JLabel lblDoubleRooms;
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblFullName;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblPhone;
     private javax.swing.JLabel lblPromotion;
     private javax.swing.JLabel lblPromotionName;
-    private javax.swing.JLabel lblSingleRooms;
     private javax.swing.JLabel lblTotalAmenity;
     private javax.swing.JLabel lblTotalPrice;
     private javax.swing.JLabel lblTotalPricePayment;
@@ -1239,11 +1340,10 @@ public class PaymentMain extends javax.swing.JPanel {
     private javax.swing.JPanel pnl9;
     private javax.swing.JScrollPane scr;
     private javax.swing.JScrollPane scr1;
+    private iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11 scr3;
     private javax.swing.JSeparator spn1;
-    private javax.swing.JSeparator spn2;
-    private javax.swing.JSeparator spn4;
-    private javax.swing.JSeparator spn6;
     private javax.swing.JTable tblAmenity;
+    private iuh.fit.se.group1.ui.component.paymentv2.CustomTableRoom tblRoom;
     private javax.swing.JTable tblSurcharge;
     // End of variables declaration//GEN-END:variables
 }

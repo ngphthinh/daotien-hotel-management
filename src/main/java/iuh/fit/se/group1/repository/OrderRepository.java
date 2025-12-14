@@ -81,7 +81,7 @@ public class OrderRepository implements Repository<Order, Long> {
                     B.bookingId, B.checkInDate, B.checkOutDate,B.bookingType,
                     B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
                     OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt,email, fullName, gender,phone,dateOfBirth,citizenId, rt.name as rtName, rt.roomTypeId,
-                    R.roomNumber AS rRoomNumber
+                    R.roomNumber AS rRoomNumber, hourlyRate, dailyRate, overnightRate,additionalHourRate
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
                 JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
@@ -123,12 +123,21 @@ public class OrderRepository implements Repository<Order, Long> {
                         order.setDeposit(rs.getBigDecimal("deposit"));
                         order.setOrderType(orderType);
                         order.setCustomer(customer);
+
+                        Employee employee = new Employee();
+                        employee.setEmployeeId(rs.getLong("employeeId"));
+                        order.setEmployee(employee);
                     }
 
                     // 🔹 Map Booking
                     RoomType roomType = new RoomType();
                     roomType.setRoomTypeId(rs.getString("roomTypeId"));
                     roomType.setName(rs.getString("rtName"));
+                    roomType.setHourlyRate(rs.getBigDecimal("hourlyRate"));
+                    roomType.setDailyRate(rs.getBigDecimal("dailyRate"));
+                    roomType.setOvernightRate(rs.getBigDecimal("overnightRate"));
+                    roomType.setAdditionalHourRate(rs.getBigDecimal("additionalHourRate"));
+
 
                     Room room = new Room();
                     room.setRoomId(rs.getLong("roomId"));

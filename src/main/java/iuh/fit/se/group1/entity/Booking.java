@@ -103,11 +103,7 @@ public class Booking {
 
     @Override
     public String toString() {
-        return "Booking{" +
-                "bookingId=" + bookingId +
-                ", room=" + room +
-                ", createdAt=" + createdAt +
-                '}';
+        return room.getRoomNumber();
     }
 
     public Order getOrder() {

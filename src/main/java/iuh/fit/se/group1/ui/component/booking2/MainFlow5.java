@@ -41,8 +41,16 @@ public class MainFlow5 extends javax.swing.JPanel {
         return btnComplete;
     }
 
+    public Button getBtnCancel() {
+        return btnCancel;
+    }
+
+    public void setBtnCancel(Button btnCancel) {
+        this.btnComplete = btnCancel;
+    }
+
     public void setBtnComplete(Button btnComplete) {
-        this.btnComplete = btnComplete;
+        this.btnCancel = btnComplete;
     }
 
     public void setBtnPrev(Button btnPrev) {
@@ -117,10 +125,11 @@ public class MainFlow5 extends javax.swing.JPanel {
         lbl16 = new javax.swing.JLabel();
         lblDeposit = new javax.swing.JLabel();
         lblTotalPrice = new javax.swing.JLabel();
-        btnComplete = new iuh.fit.se.group1.ui.component.custom.Button();
+        btnCancel = new iuh.fit.se.group1.ui.component.custom.Button();
         btnPrev = new iuh.fit.se.group1.ui.component.custom.Button();
         lblSurchargeHolidayName = new javax.swing.JLabel();
         lblSurchargeHoliday = new javax.swing.JLabel();
+        btnComplete = new iuh.fit.se.group1.ui.component.custom.Button();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -586,14 +595,14 @@ public class MainFlow5 extends javax.swing.JPanel {
                 .addGap(9, 9, 9))
         );
 
-        btnComplete.setBackground(new java.awt.Color(13, 200, 7));
-        btnComplete.setForeground(new java.awt.Color(255, 255, 255));
-        btnComplete.setText("XÁC NHẬN ĐẶT PHÒNG");
-        btnComplete.setBorderRadius(5);
-        btnComplete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnComplete.addActionListener(new java.awt.event.ActionListener() {
+        btnCancel.setBackground(new java.awt.Color(204, 0, 0));
+        btnCancel.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancel.setText("Hủy thao tác");
+        btnCancel.setBorderRadius(5);
+        btnCancel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCompleteActionPerformed(evt);
+                btnCancelActionPerformed(evt);
             }
         });
 
@@ -617,6 +626,17 @@ public class MainFlow5 extends javax.swing.JPanel {
         lblSurchargeHoliday.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblSurchargeHoliday.setText("N/a");
 
+        btnComplete.setBackground(new java.awt.Color(13, 200, 7));
+        btnComplete.setForeground(new java.awt.Color(255, 255, 255));
+        btnComplete.setText("XÁC NHẬN ĐẶT PHÒNG");
+        btnComplete.setBorderRadius(5);
+        btnComplete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnComplete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCompleteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -638,8 +658,14 @@ public class MainFlow5 extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(203, 203, 203)))
                 .addContainerGap(36, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(628, Short.MAX_VALUE)
+                    .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(26, 26, 26)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -664,15 +690,24 @@ public class MainFlow5 extends javax.swing.JPanel {
                 .addComponent(pnl7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(1049, Short.MAX_VALUE)
+                    .addComponent(btnComplete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap()))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPrevActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrevActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnPrevActionPerformed
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompleteActionPerformed
         // TODO add your handling code here:
@@ -749,8 +784,6 @@ public class MainFlow5 extends javax.swing.JPanel {
 
         var totalPrice = Constants.parseVND(totalRoom) + Constants.parseVND(lblTotalAmenity.getText());
 
-    System.out.println();
-
         lblSurchargeHoliday.setText(holidayPrice != 0 ? Constants.VND_FORMAT.format(holidayPrice) : "Không có");
 
         lblTotalPrice.setText(Constants.VND_FORMAT.format(totalPrice + holidayPrice));
@@ -809,7 +842,6 @@ public class MainFlow5 extends javax.swing.JPanel {
         if (lblSurchargeHoliday.getText().equals("N/a") || lblSurchargeHoliday.getText().equals("Không có")) {
             return new OrderResult(order,null);
         }
-
         Surcharge surchargeHoliday = surchargeService.getSurchargeByName(lblSurchargeHolidayName.getText().trim());
 
         SurchargeDetail surchargeDetail = new SurchargeDetail();
@@ -846,6 +878,7 @@ public class MainFlow5 extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private iuh.fit.se.group1.ui.component.custom.Button btnCancel;
     private iuh.fit.se.group1.ui.component.custom.Button btnComplete;
     private iuh.fit.se.group1.ui.component.custom.Button btnPrev;
     private javax.swing.JLabel lbl1;

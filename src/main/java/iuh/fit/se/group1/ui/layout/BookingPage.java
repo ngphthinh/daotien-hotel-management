@@ -23,6 +23,8 @@ import iuh.fit.se.group1.ui.component.booking2.MainFlow5;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow5;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
@@ -75,6 +77,10 @@ public class BookingPage extends javax.swing.JPanel {
         header.getLblTile().setText("Đặt phòng khách sạn");
         header.getLblSubTitle().setText("");
 
+        mainFlow5.getBtnCancel().addActionListener(e -> {
+           resetAllInput();
+           scrollPaneWin111.setViewportView(mainFlow1);
+        });
 
         mainFlow1.getCbmBookingType().addActionListener(e -> {
                     mainFlow1.setVisiableTimeBooking(Objects.equals(mainFlow1.getCbmBookingType().getSelectedItem(), bookingType[0]));
@@ -92,6 +98,9 @@ public class BookingPage extends javax.swing.JPanel {
             }
             sequenceBooking.setActiveStep(1);
             scrollPaneWin111.setViewportView(mainFlow2);
+            SwingUtilities.invokeLater(() ->
+                    scrollPaneWin111.getViewport().setViewPosition(new Point(0, 0))
+            );
         });
 
         mainFlow2.getBtnPrev().addActionListener(e -> {
@@ -102,6 +111,9 @@ public class BookingPage extends javax.swing.JPanel {
         mainFlow2.getBtnNext().addActionListener(e -> {
             sequenceBooking.setActiveStep(2);
             scrollPaneWin111.setViewportView(mainFlow3);
+            SwingUtilities.invokeLater(() ->
+                    scrollPaneWin111.getViewport().setViewPosition(new Point(0, 0))
+            );
         });
 
 
@@ -113,6 +125,9 @@ public class BookingPage extends javax.swing.JPanel {
         mainFlow3.getBtnNext().addActionListener(e -> {
             sequenceBooking.setActiveStep(3);
             scrollPaneWin111.setViewportView(mainFlow4);
+            SwingUtilities.invokeLater(() ->
+                    scrollPaneWin111.getViewport().setViewPosition(new Point(0, 0))
+            );
         });
 
         mainFlow4.getBtnPrev().addActionListener(e -> {
@@ -130,6 +145,9 @@ public class BookingPage extends javax.swing.JPanel {
             setupInfoStep5();
             sequenceBooking.setActiveStep(4);
             scrollPaneWin111.setViewportView(mainFlow5);
+            SwingUtilities.invokeLater(() ->
+                    scrollPaneWin111.getViewport().setViewPosition(new Point(0, 0))
+            );
 
         });
 
@@ -234,7 +252,9 @@ public class BookingPage extends javax.swing.JPanel {
 
     private void resetAllInput() {
 //         reset 23
-        mainFlow1.resetInputDate();
+
+        sequenceBooking.setActiveStep(0);
+        mainFlow1.resetInput();
         mainFlow2.reset();
         mainFlow3.reset();
         mainFlow4.reset();
@@ -550,10 +570,4 @@ public class BookingPage extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11 scrollPaneWin111;
     private iuh.fit.se.group1.ui.component.booking2.SequenceBooking sequenceBooking;
     // End of variables declaration//GEN-END:variables
-
-
-    public void loadData() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loadData'");
-    }
 }

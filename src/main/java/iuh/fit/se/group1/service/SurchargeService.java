@@ -15,6 +15,11 @@ public class SurchargeService {
     }
 
     public Surcharge createSurcharge(Surcharge surcharge) {
+
+        if (getSurchargeByName(surcharge.getName()) != null) {
+            return null;
+        }
+
         return surchargeRepository.save(surcharge);
     }
 
@@ -37,6 +42,7 @@ public class SurchargeService {
     public Surcharge getSurchargeByName(String name) {
         return surchargeRepository.findBySurchargeName(name);
     }
+
 
     public Surcharge getSurchargeById(Long surchargeId) {
         return surchargeRepository.findById(surchargeId);

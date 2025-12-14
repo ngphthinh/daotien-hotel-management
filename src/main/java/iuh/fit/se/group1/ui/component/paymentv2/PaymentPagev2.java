@@ -12,9 +12,12 @@ import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.util.Constants;
 
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -35,10 +38,12 @@ public class PaymentPagev2 extends javax.swing.JPanel {
     public PaymentPagev2() {
         initComponents();
         paymentMain = new PaymentMain();
+        Runnable backStep1Action = this::backStep1;
+        paymentMain.setStep1(backStep1Action);
         sequencePayment1.setActiveStep(0);
-
+        Runnable toStep3Action = this::toStep3;
+        paymentMain.setBackStep3Action(toStep3Action);
         loadDataTable();
-
 
         headerShift1.getLblSubTitle().setText("");
         headerShift1.getLblTile().setText("Thanh toán hóa đơn");
@@ -64,12 +69,14 @@ public class PaymentPagev2 extends javax.swing.JPanel {
             
             paymentMain.setOrder(orderId, orderService,orderDetailService, surchargeDetailService);
             scrollPaneWin111.setViewportView(paymentMain);
+            SwingUtilities.invokeLater(() ->
+                    scrollPaneWin111.getViewport().setViewPosition(new Point(0, 0))
+            );
 
         });
 
         paymentMain.getBtnPrev().addActionListener(e->{
-            sequencePayment1.setActiveStep(0);
-            scrollPaneWin111.setViewportView(jPanel1);
+            backStep1();
         });
 
         search1.setText("");
@@ -90,6 +97,17 @@ public class PaymentPagev2 extends javax.swing.JPanel {
             }
         });
 
+    }
+
+    private void backStep1() {
+        sequencePayment1.setActiveStep(0);
+        loadDataTable();
+        scrollPaneWin111.setViewportView(jPanel1);
+
+    }
+
+    private void toStep3() {
+        sequencePayment1.setActiveStep(2);
     }
 
     private void findPendingOrders(String keyword) {
@@ -121,7 +139,6 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
     private void loadDataTable() {
         tbl.clearData();
-
         for (Order order : orderService.getUnpaidOrders()) {
             displayOrderOnTable(order);
         }

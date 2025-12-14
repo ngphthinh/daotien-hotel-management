@@ -98,4 +98,39 @@ public class BookingRepository implements Repository<Booking, Long>{
             this.save(booking);
         }
     }
+
+    public void removeBookingsFromOrder(Order currentOrder, List<Booking> result) {
+        String sql = "DELETE FROM Booking WHERE orderId = ? AND bookingId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            for (Booking booking : currentOrder.getBookings()) {
+                if (!result.contains(booking)) {
+                    preparedStatement.setLong(1, currentOrder.getOrderId());
+                    preparedStatement.setLong(2, booking.getBookingId());
+                    preparedStatement.addBatch();
+                }
+            }
+            preparedStatement.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Move a set of existing booking records to another order by updating their orderId.
+     * This performs a batch UPDATE Booking SET orderId = ? WHERE bookingId = ?
+     */
+    public void moveBookingsToOrder(Long targetOrderId, List<Long> bookingIds) {
+        if (bookingIds == null || bookingIds.isEmpty()) return;
+        String sql = "UPDATE Booking SET orderId = ? WHERE bookingId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (Long bookingId : bookingIds) {
+                ps.setLong(1, targetOrderId);
+                ps.setLong(2, bookingId);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -66,18 +66,64 @@ public class Constants {
     public static double parseVND(String formatted) {
         if (formatted == null || formatted.isEmpty())
             return 0.0;
-        try {
-            // Loại bỏ ký tự không phải số hoặc dấu . , trước khi parse
-            String cleaned = formatted.replaceAll("[^\\d,\\.]", "");
-            return Double.parseDouble(cleaned.replace(",", ""));
-        } catch (NumberFormatException e) {
-            try {
-                // fallback: thử dùng parse của DecimalFormat
-                Number number = VND_FORMAT.parse(formatted);
-                return number.doubleValue();
-            } catch (ParseException ex) {
-                throw new RuntimeException("Không thể parse chuỗi tiền: " + formatted, ex);
+
+        // Chỉ giữ số và dấu , .
+        String cleaned = formatted.replaceAll("[^\\d.,]", "");
+
+        // Trường hợp chỉ có số, không có dấu , hoặc .
+        if (!cleaned.contains(",") && !cleaned.contains(".")) {
+            return Double.parseDouble(cleaned);
+        }
+
+        // Nếu có cả dấu ',' và '.'
+        if (cleaned.contains(",") && cleaned.contains(".")) {
+            // Xác định dấu thập phân: cái nào nằm *cuối* hơn
+            int lastComma = cleaned.lastIndexOf(',');
+            int lastDot = cleaned.lastIndexOf('.');
+
+            char decimalSeparator = lastComma > lastDot ? ',' : '.';
+
+            // Chuẩn hóa về dấu thập phân = '.'
+            if (decimalSeparator == ',') {
+                cleaned = cleaned.replace(".", "");   // bỏ dấu ngàn
+                cleaned = cleaned.replace(",", "."); // chuyển sang dấu thập phân
+            } else {
+                cleaned = cleaned.replace(",", "");  // bỏ dấu ngàn
+            }
+
+            return Double.parseDouble(cleaned);
+        }
+
+        // Nếu chỉ có dấu ',' → có thể là dấu ngàn hoặc thập phân
+        if (cleaned.contains(",")) {
+            // Nếu sau dấu phẩy có 3 số → đây là dấu ngàn ("12,000")
+            int idx = cleaned.lastIndexOf(',');
+            int digitsAfter = cleaned.length() - idx - 1;
+
+            if (digitsAfter == 3) {
+                cleaned = cleaned.replace(",", "");
+                return Double.parseDouble(cleaned);
+            } else {
+                // dấu ',' là thập phân → chuyển về '.'
+                cleaned = cleaned.replace(",", ".");
+                return Double.parseDouble(cleaned);
             }
         }
+
+        // Nếu chỉ có '.' làm dấu tương tự
+        if (cleaned.contains(".")) {
+            int idx = cleaned.lastIndexOf('.');
+            int digitsAfter = cleaned.length() - idx - 1;
+
+            if (digitsAfter == 3) {
+                cleaned = cleaned.replace(".", "");
+                return Double.parseDouble(cleaned);
+            } else {
+                return Double.parseDouble(cleaned);
+            }
+        }
+
+        return Double.parseDouble(cleaned);
     }
+
 }

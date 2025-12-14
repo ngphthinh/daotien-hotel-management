@@ -116,6 +116,14 @@ public class RoomType {
 
     @Override
     public String toString() {
-        return "RoomType{" + "roomTypeId=" + roomTypeId + ", name=" + name + ", createdAt=" + createdAt + '}';
+        return "RoomType{" +
+                "roomTypeId='" + roomTypeId + '\'' +
+                ", name='" + name + '\'' +
+                ", hourlyRate=" + hourlyRate +
+                ", dailyRate=" + dailyRate +
+                ", overnightRate=" + overnightRate +
+                ", additionalHourRate=" + additionalHourRate +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

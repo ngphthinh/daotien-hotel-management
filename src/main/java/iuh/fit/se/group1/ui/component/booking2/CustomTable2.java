@@ -338,7 +338,9 @@ public class CustomTable2 extends JTable {
                 boolean isSelected, boolean hasFocus, int row, int column) {
 
             QuantityComponent comp = new QuantityComponent();
-            comp.quantityLabel.setText(value != null ? value.toString() : "0");
+            comp.quantityField.setText(value != null ? value.toString() : "0");
+            comp.quantityField.setEditable(false);
+            comp.quantityField.setFocusable(false);
 
             comp.setBackground(Color.WHITE);
 
@@ -353,13 +355,14 @@ public class CustomTable2 extends JTable {
     class QuantityEditor extends AbstractCellEditor implements TableCellEditor {
         private QuantityComponent comp;
         private int currentValue;
+        private javax.swing.event.DocumentListener docListener;
 
         public QuantityEditor() {
             comp = new QuantityComponent();
 
             comp.plusBtn.addActionListener(e -> {
                 currentValue++;
-                comp.quantityLabel.setText(String.valueOf(currentValue));
+                comp.quantityField.setText(String.valueOf(currentValue));
                 fireEditingStopped();
 
                 if (quantityChangeListener != null) {
@@ -371,7 +374,7 @@ public class CustomTable2 extends JTable {
             comp.minusBtn.addActionListener(e -> {
                 if (currentValue > 0) {
                     currentValue--;
-                    comp.quantityLabel.setText(String.valueOf(currentValue));
+                    comp.quantityField.setText(String.valueOf(currentValue));
                     fireEditingStopped();
 
                     if (quantityChangeListener != null) {
@@ -392,9 +395,50 @@ public class CustomTable2 extends JTable {
                 int column) {
             editingRow = row;
             currentValue = value != null ? (Integer) value : 0;
-            comp.quantityLabel.setText(String.valueOf(currentValue));
+            comp.quantityField.setText(String.valueOf(currentValue));
 
+            // Make editable when editing
+            comp.quantityField.setEditable(true);
+            comp.quantityField.setFocusable(true);
             comp.setBackground(Color.WHITE);
+
+            // Remove previous document listener if exists
+            if (docListener != null) {
+                comp.quantityField.getDocument().removeDocumentListener(docListener);
+                docListener = null;
+            }
+
+            // Add document listener to handle text changes
+            docListener = new javax.swing.event.DocumentListener() {
+                private void update() {
+                    String text = comp.quantityField.getText().trim();
+                    try {
+                        int parsed = Integer.parseInt(text);
+                        if (parsed < 0) parsed = 0;
+                        currentValue = parsed;
+
+                        if (quantityChangeListener != null) {
+                            quantityChangeListener.onQuantityChange(editingRow, currentValue);
+                        }
+                    } catch (NumberFormatException ex) {
+                        // Invalid input, keep current value
+                        if (text.isEmpty()) {
+                            currentValue = 0;
+                        }
+                    }
+                }
+
+                @Override
+                public void insertUpdate(javax.swing.event.DocumentEvent e) { update(); }
+
+                @Override
+                public void removeUpdate(javax.swing.event.DocumentEvent e) { update(); }
+
+                @Override
+                public void changedUpdate(javax.swing.event.DocumentEvent e) { update(); }
+            };
+
+            comp.quantityField.getDocument().addDocumentListener(docListener);
 
             return comp;
         }
@@ -404,7 +448,7 @@ public class CustomTable2 extends JTable {
 
         public JButton minusBtn;
         public JButton plusBtn;
-        public JLabel quantityLabel;
+        public JTextField quantityField;
 
         public QuantityComponent() {
 
@@ -417,15 +461,26 @@ public class CustomTable2 extends JTable {
             minusBtn = createStyledButton("-", FontAwesomeSolid.MINUS, new Color(220, 53, 69));
             plusBtn = createStyledButton("+", FontAwesomeSolid.PLUS, new Color(40, 167, 69));
 
-            quantityLabel = new JLabel("0", SwingConstants.CENTER);
-            quantityLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            quantityLabel.setPreferredSize(new Dimension(40, 25));
-            quantityLabel.setOpaque(true);
-            quantityLabel.setBackground(Color.WHITE);
-            quantityLabel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.LIGHT_GRAY));
+            quantityField = new JTextField("0");
+            quantityField.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            quantityField.setPreferredSize(new Dimension(40, 25));
+            quantityField.setHorizontalAlignment(JTextField.CENTER);
+            quantityField.setBackground(Color.WHITE);
+            quantityField.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.LIGHT_GRAY));
+
+            // Restrict input to numbers only
+            quantityField.addKeyListener(new java.awt.event.KeyAdapter() {
+                @Override
+                public void keyTyped(java.awt.event.KeyEvent e) {
+                    char c = e.getKeyChar();
+                    if (!Character.isDigit(c) && c != '\b') {
+                        e.consume();
+                    }
+                }
+            });
 
             buttonPanel.add(minusBtn);
-            buttonPanel.add(quantityLabel);
+            buttonPanel.add(quantityField);
             buttonPanel.add(plusBtn);
 
             add(buttonPanel, BorderLayout.CENTER);

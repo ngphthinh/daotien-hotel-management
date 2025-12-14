@@ -64,11 +64,4 @@ public class PaymentSuggestionService {
     private int roundUp(int value, int unit) {
         return ((value + unit - 1) / unit) * unit;
     }
-
-    public static void main(String[] args) {
-        PaymentSuggestionService service = new PaymentSuggestionService();
-        List<Integer> options = service.getPaymentOptions(1250);
-        System.out.println("Gợi ý thanh toán cho 287.000 VND: " + options);
-    }
-
 }

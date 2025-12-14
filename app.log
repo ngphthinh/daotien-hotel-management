@@ -1,0 +1,34 @@
+Dec 13, 2025 4:31:22 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 14, 2025 10:33:38 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 14, 2025 11:07:03 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order is missing required fields
+Dec 14, 2025 11:09:22 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 14, 2025 11:13:17 AM iuh.fit.se.group1.config.AppLogger info
+INFO: class iuh.fit.se.group1.service.OrderService Order is missing required fields 
+Dec 14, 2025 11:14:59 AM iuh.fit.se.group1.config.AppLogger info
+INFO: class iuh.fit.se.group1.service.OrderService Order is missing required fields 
+Dec 14, 2025 11:14:59 AM iuh.fit.se.group1.config.AppLogger info
+INFO: class iuh.fit.se.group1.ui.component.paymentv2.PaymentMain Lỗi nghen 
+Dec 14, 2025 11:17:33 AM iuh.fit.se.group1.config.AppLogger info
+INFO: class iuh.fit.se.group1.service.OrderService Order is missing required fields 
+Dec 14, 2025 11:17:33 AM iuh.fit.se.group1.config.AppLogger info
+INFO: class iuh.fit.se.group1.ui.component.paymentv2.PaymentMain Lỗi nghen 
+Dec 14, 2025 11:19:34 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully
+Dec 14, 2025 11:28:01 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 14, 2025 11:29:03 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 14, 2025 11:29:13 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully
+Dec 14, 2025 11:31:47 AM iuh.fit.se.group1.config.AppLogger info
+INFO: class iuh.fit.se.group1.ui.component.paymentv2.PaymentMain Lỗi nghen 
+Dec 14, 2025 11:40:43 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 14, 2025 11:49:46 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+Dec 14, 2025 11:53:03 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
