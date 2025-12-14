@@ -164,19 +164,22 @@ cmbStatus.addItem("Bảo trì");
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        txtPriceRoom = new iuh.fit.se.group1.ui.component.custom.TextField();
+        lblPriceRoom = new javax.swing.JLabel();
         lblTitle = new javax.swing.JLabel();
         lblNumberRoom = new javax.swing.JLabel();
         lblTypeRoom = new javax.swing.JLabel();
-        lblPriceRoom = new javax.swing.JLabel();
         lblStatus = new javax.swing.JLabel();
         btnSave = new iuh.fit.se.group1.ui.component.custom.Button();
         txtNumberRoom = new iuh.fit.se.group1.ui.component.custom.TextField();
-        txtPriceRoom = new iuh.fit.se.group1.ui.component.custom.TextField();
         cmbTypeRoom = new iuh.fit.se.group1.ui.component.custom.Combobox();
         cmbStatus = new iuh.fit.se.group1.ui.component.custom.Combobox();
         btnClose = new iuh.fit.se.group1.ui.component.custom.Button();
         lblErrolNumberRoom = new javax.swing.JLabel();
         lblErrolPriceRoom = new javax.swing.JLabel();
+
+        lblPriceRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblPriceRoom.setText("Giá phòng:");
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -188,9 +191,6 @@ cmbStatus.addItem("Bảo trì");
 
         lblTypeRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblTypeRoom.setText("Loại phòng:");
-
-        lblPriceRoom.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblPriceRoom.setText("Giá phòng:");
 
         lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblStatus.setText("Trạng thái:");
@@ -245,15 +245,15 @@ cmbStatus.addItem("Bảo trì");
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblTypeRoom)
-                            .addComponent(lblPriceRoom)
                             .addComponent(lblStatus))
                         .addGap(40, 40, 40)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cmbStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
-                            .addComponent(txtPriceRoom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cmbTypeRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblErrolPriceRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblErrolPriceRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblNumberRoom)
                         .addGap(50, 50, 50)
@@ -289,19 +289,18 @@ cmbStatus.addItem("Bảo trì");
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbTypeRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblTypeRoom))
-                .addGap(32, 32, 32)
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPriceRoom)
-                    .addComponent(txtPriceRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(2, 2, 2)
-                .addComponent(lblErrolPriceRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblStatus))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
+                    .addComponent(lblStatus)
+                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(lblErrolPriceRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.service.AccountService;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 /**
@@ -381,13 +383,135 @@ public class Profile extends javax.swing.JPanel {
     }
     
     private void handleChangePassword() {
-        JOptionPane.showMessageDialog(this, 
-            "Tính năng đổi mật khẩu sẽ được cập nhật sau.", 
-            "Đổi mật khẩu", 
-            JOptionPane.INFORMATION_MESSAGE);
+    JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
+            "Đổi mật khẩu", Dialog.ModalityType.APPLICATION_MODAL);
+    dialog.setSize(420, 330);
+    dialog.setLocationRelativeTo(this);
+
+    JPanel panel = new JPanel(null);
+    panel.setBackground(Color.WHITE);
+
+    JLabel lblOld = new JLabel("Mật khẩu cũ");
+    lblOld.setBounds(30, 20, 200, 20);
+
+    JPasswordField txtOld = new JPasswordField();
+    txtOld.setBounds(30, 45, 300, 38);
+
+    JLabel lblNew = new JLabel("Mật khẩu mới");
+    lblNew.setBounds(30, 90, 200, 20);
+
+    JPasswordField txtNew = new JPasswordField();
+    txtNew.setBounds(30, 115, 300, 38);
+
+    JLabel lblConfirm = new JLabel("Xác nhận mật khẩu");
+    lblConfirm.setBounds(30, 160, 200, 20);
+
+    JPasswordField txtConfirm = new JPasswordField();
+    txtConfirm.setBounds(30, 185, 300, 38);
+
+    // 👁 Eye buttons
+    JButton eyeOld = createEyeButton(txtOld);
+    eyeOld.setBounds(340, 45, 38, 38);
+
+    JButton eyeNew = createEyeButton(txtNew);
+    eyeNew.setBounds(340, 115, 38, 38);
+
+    JButton eyeConfirm = createEyeButton(txtConfirm);
+    eyeConfirm.setBounds(340, 185, 38, 38);
+
+    JButton btnSave = new JButton("Xác nhận");
+    btnSave.setBounds(80, 240, 120, 38);
+
+    JButton btnCancel = new JButton("Hủy");
+    btnCancel.setBounds(220, 240, 120, 38);
+
+    btnSave.addActionListener(e -> {
+        String oldPass = new String(txtOld.getPassword());
+        String newPass = new String(txtNew.getPassword());
+        String confirm = new String(txtConfirm.getPassword());
+
+        if (oldPass.isEmpty() || newPass.isEmpty() || confirm.isEmpty()) {
+            JOptionPane.showMessageDialog(dialog,
+                    "Vui lòng nhập đầy đủ thông tin",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidPassword(newPass)) {
+        String errorMessage = getPasswordValidationMessage(newPass);
+        JOptionPane.showMessageDialog(dialog,
+                errorMessage,
+                "Mật khẩu không hợp lệ", JOptionPane.ERROR_MESSAGE);
+        return;
     }
-    
-    
+
+        if (!newPass.equals(confirm)) {
+            JOptionPane.showMessageDialog(dialog,
+                    "Mật khẩu xác nhận không khớp",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        boolean success = AccountService.getInstance()
+                .changePassword(txtUserName.getText(), oldPass, newPass);
+
+        if (success) {
+            JOptionPane.showMessageDialog(dialog,
+                    "Đổi mật khẩu thành công ",
+                    "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            dialog.dispose();
+        } else {
+            JOptionPane.showMessageDialog(dialog,
+                    "Mật khẩu cũ không đúng ",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    btnCancel.addActionListener(e -> dialog.dispose());
+
+    panel.add(lblOld);
+    panel.add(txtOld);
+    panel.add(lblNew);
+    panel.add(txtNew);
+    panel.add(lblConfirm);
+    panel.add(txtConfirm);
+    panel.add(eyeOld);
+    panel.add(eyeNew);
+    panel.add(eyeConfirm);
+    panel.add(btnSave);
+    panel.add(btnCancel);
+
+    dialog.add(panel);
+    dialog.setVisible(true);
+}
+    private JButton createEyeButton(JPasswordField passwordField) {
+    JButton btn = new JButton(
+        FontIcon.of(FontAwesomeSolid.EYE_SLASH, 18, new Color(100, 116, 139))
+    );
+
+    btn.setBorder(null);
+    btn.setContentAreaFilled(false);
+    btn.setFocusPainted(false);
+    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+    passwordField.setEchoChar('*');
+
+    btn.addActionListener(e -> {
+        if (passwordField.getEchoChar() == '*') {
+            passwordField.setEchoChar((char) 0);
+            btn.setIcon(
+                FontIcon.of(FontAwesomeSolid.EYE, 18, new Color(66, 133, 244))
+            );
+        } else {
+            passwordField.setEchoChar('*');
+            btn.setIcon(
+                FontIcon.of(FontAwesomeSolid.EYE_SLASH, 18, new Color(100, 116, 139))
+            );
+        }
+    });
+
+    return btn;
+}
+
     private Color brighten(Color color, float factor) {
         int r = Math.min(255, (int)(color.getRed() + (255 - color.getRed()) * factor));
         int g = Math.min(255, (int)(color.getGreen() + (255 - color.getGreen()) * factor));
@@ -401,6 +525,82 @@ public class Profile extends javax.swing.JPanel {
         int b = (int)(color.getBlue() * (1 - factor));
         return new Color(r, g, b);
     }
+    /**
+ * Kiểm tra mật khẩu có hợp lệ không
+ */
+private boolean isValidPassword(String password) {
+    if (password == null || password.length() < 8) {
+        return false;
+    }
+    
+    boolean hasUpperCase = false;
+    boolean hasDigit = false;
+    boolean hasSpecialChar = false;
+    
+    for (char c : password.toCharArray()) {
+        if (Character.isUpperCase(c)) {
+            hasUpperCase = true;
+        } else if (Character.isDigit(c)) {
+            hasDigit = true;
+        } else if (isSpecialCharacter(c)) {
+            hasSpecialChar = true;
+        }
+    }
+    
+    return hasUpperCase && hasDigit && hasSpecialChar;
+}
+
+/**
+ * Kiểm tra ký tự có phải ký tự đặc biệt không
+ */
+private boolean isSpecialCharacter(char c) {
+    String specialChars = "!@#$%^&*()_+-=[]{}|;:',.<>?/`~\"\\";
+    return specialChars.indexOf(c) >= 0;
+}
+
+/**
+ * Lấy thông báo lỗi cho mật khẩu không hợp lệ
+ */
+private String getPasswordValidationMessage(String password) {
+    if (password == null || password.isEmpty()) {
+        return "Mật khẩu không được để trống";
+    }
+    
+    StringBuilder message = new StringBuilder("Mật khẩu không hợp lệ:\n");
+    
+    if (password.length() < 8) {
+        message.append("• Mật khẩu phải có ít nhất 8 ký tự\n");
+    }
+    
+    boolean hasUpperCase = false;
+    boolean hasDigit = false;
+    boolean hasSpecialChar = false;
+    
+    for (char c : password.toCharArray()) {
+        if (Character.isUpperCase(c)) {
+            hasUpperCase = true;
+        } else if (Character.isDigit(c)) {
+            hasDigit = true;
+        } else if (isSpecialCharacter(c)) {
+            hasSpecialChar = true;
+        }
+    }
+    
+    if (!hasUpperCase) {
+        message.append("• Mật khẩu phải có ít nhất 1 ký tự in hoa\n");
+    }
+    
+    if (!hasDigit) {
+        message.append("• Mật khẩu phải có ít nhất 1 chữ số\n");
+    }
+    
+    if (!hasSpecialChar) {
+        message.append("• Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%^&*...)\n");
+    }
+    
+    return message.toString().trim();
+    }
+    
     
     @FunctionalInterface
     private interface ComponentSupplier {

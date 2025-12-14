@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Dec 13, 2025 4:31:22 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 Dec 14, 2025 10:33:38 AM iuh.fit.se.group1.config.AppLogger info
@@ -32,3 +33,13 @@ Dec 14, 2025 11:49:46 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 Dec 14, 2025 11:53:03 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
+=======
+thg 12 09, 2025 5:15:55 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 5:20:14 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 5:33:48 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+thg 12 09, 2025 5:42:54 CH iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
+>>>>>>> 74368c5e8b98eabfedeab53da65b62eb3ee19ebe

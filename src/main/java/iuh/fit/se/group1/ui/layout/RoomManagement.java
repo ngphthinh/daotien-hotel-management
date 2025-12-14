@@ -108,7 +108,7 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (imported != null && !imported.isEmpty()) {
                     roomService.getAllRooms().addAll(imported);
                     loadTable(roomService.getAllRooms());
-                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                    Message.showMessage("Thành công", "Đã import " + imported.size() + " phòng!");
                 } else {
                     Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
                 }
@@ -264,25 +264,36 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void setupTableModel() {
-        String[] cols = { "Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng" };
-        DefaultTableModel model = new DefaultTableModel(cols, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        tblRoom.getTbl().setModel(model);
-        tblRoom.getTbl().setAutoCreateRowSorter(false);
-        tblRoom.getTbl().getTableHeader().setReorderingAllowed(false);
-
-        tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);
-        tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(120);
-        tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(170);
-        tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(140);
-        tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(140);
+    String[] cols = { "Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng" };
+    DefaultTableModel model = new DefaultTableModel(cols, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    tblRoom.getTbl().setModel(model);
+    
+    // ===== THÊM PHẦN NÀY: Khởi tạo TableRowSorter =====
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    tblRoom.getTbl().setRowSorter(sorter);
+    
+    // Tắt sort cho tất cả các cột (chỉ dùng cho filter)
+    for (int i = 0; i < tblRoom.getTbl().getColumnCount(); i++) {
+        sorter.setSortable(i, false);
     }
+    // ===== HẾT PHẦN THÊM =====
+    
+    tblRoom.getTbl().setAutoCreateRowSorter(false);
+    tblRoom.getTbl().getTableHeader().setReorderingAllowed(false);
 
-    private void setupTableActions() {
+    tblRoom.getTbl().getColumnModel().getColumn(0).setPreferredWidth(100);
+    tblRoom.getTbl().getColumnModel().getColumn(1).setPreferredWidth(120);
+    tblRoom.getTbl().getColumnModel().getColumn(2).setPreferredWidth(170);
+    tblRoom.getTbl().getColumnModel().getColumn(3).setPreferredWidth(140);
+    tblRoom.getTbl().getColumnModel().getColumn(4).setPreferredWidth(140);
+}
+
+private void setupTableActions() {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -369,113 +380,99 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void setupHeaderFilters() {
-        var header = tblRoom.getTbl().getTableHeader();
-        List<RoomType> types = roomTypeService.getAllRoomTypes();
-        String[] typeItems = new String[types.size() + 1];
-        typeItems[0] = "Tất cả";
-        for (int i = 0; i < types.size(); i++) {
-            typeItems[i + 1] = types.get(i).getName();
+    var header = tblRoom.getTbl().getTableHeader();
+    List<RoomType> types = roomTypeService.getAllRoomTypes();
+    String[] typeItems = new String[types.size() + 1];
+    typeItems[0] = "Tất cả";
+    for (int i = 0; i < types.size(); i++) {
+        typeItems[i + 1] = types.get(i).getName();
+    }
+
+    Combobox<String> cmbType = new Combobox<>(typeItems);
+    Combobox<String> cmbStatus = new Combobox<>(new String[] { "Tất cả", "AVAILABLE", "OCCUPIED", "MAINTENANCE" });
+
+    // ===== SỬA PHẦN NÀY: Dùng defaultRenderer thay vì custom renderer =====
+    TableCellRenderer defaultRenderer = header.getDefaultRenderer();
+
+    // Reset tất cả cột về default renderer
+    for (int i = 0; i < tblRoom.getTbl().getColumnCount(); i++) {
+        tblRoom.getTbl().getColumnModel().getColumn(i).setHeaderRenderer(defaultRenderer);
+    }
+
+    // Cột Loại phòng - Dùng defaultRenderer với text có mũi tên
+    TableColumn colType = tblRoom.getTbl().getColumnModel().getColumn(2);
+    colType.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+        Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+        if (comp instanceof JLabel lbl) {
+            // Thêm khoảng trắng và mũi tên xuống
+            String text = "Loại phòng                            \u25BC";
+            lbl.setText(text);
+            lbl.setHorizontalAlignment(SwingConstants.LEFT);
         }
+        return comp;
+    });
 
-        Combobox<String> cmbType = new Combobox<>(typeItems);
-        Combobox<String> cmbStatus = new Combobox<>(new String[] { "Tất cả", "AVAILABLE", "OCCUPIED", "MAINTENANCE" });
+    // Cột Trạng thái - Dùng defaultRenderer với text có mũi tên
+    TableColumn colStatus = tblRoom.getTbl().getColumnModel().getColumn(3);
+    colStatus.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+        Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+        if (comp instanceof JLabel lbl) {
+            String text = "Trạng thái                            \u25BC";
+            lbl.setText(text);
+            lbl.setHorizontalAlignment(SwingConstants.LEFT);
+        }
+        return comp;
+    });
 
-        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
+    // ===== ACTION LISTENERS =====
+    cmbType.addActionListener(ev -> {
+        currentTypeFilter = (String) cmbType.getSelectedItem();
+        applyFilters();
+        header.remove(cmbType);
+        header.repaint();
+    });
 
-        TableColumn colType = tblRoom.getTbl().getColumnModel().getColumn(2);
-        colType.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
-            JPanel panel = new JPanel(new BorderLayout());
-            panel.setBackground(header.getBackground());
+    cmbStatus.addActionListener(ev -> {
+        currentStatusFilter = (String) cmbStatus.getSelectedItem();
+        applyFilters();
+        header.remove(cmbStatus);
+        header.repaint();
+    });
 
-            JLabel lbl = new JLabel("Loại phòng ▼");
-            lbl.setFont(header.getFont());
-            lbl.setForeground(new Color(102, 102, 102));
-            lbl.setHorizontalAlignment(SwingConstants.CENTER);
-            lbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    // ===== MOUSE LISTENER: Click vào header để show combobox =====
+    header.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int col = tblRoom.getTbl().columnAtPoint(e.getPoint());
+            
+            // Remove các combobox cũ
+            header.remove(cmbType);
+            header.remove(cmbStatus);
 
-            panel.add(lbl, BorderLayout.CENTER);
-            panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
-
-            return panel;
-        });
-
-
-
-        TableColumn colStatus = tblRoom.getTbl().getColumnModel().getColumn(3);
-        colStatus.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
-            JPanel panel = new JPanel(new BorderLayout());
-            panel.setBackground(header.getBackground());
-
-            JLabel lbl = new JLabel("Trạng thái ▼");
-            lbl.setFont(header.getFont());
-            lbl.setForeground(new Color(102, 102, 102));
-            lbl.setHorizontalAlignment(SwingConstants.CENTER);
-            lbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-            panel.add(lbl, BorderLayout.CENTER);
-            panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY));
-
-            return panel;
-        });
-
-
-        cmbType.addActionListener(ev -> {
-            currentTypeFilter = (String) cmbType.getSelectedItem();
-            applyFilters();
-        });
-
-        cmbStatus.addActionListener(ev -> {
-            currentStatusFilter = (String) cmbStatus.getSelectedItem();
-            applyFilters();
-        });
-
-        header.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int col = tblRoom.getTbl().columnAtPoint(e.getPoint());
-                if (col == 2) {
-                    showComboboxAtHeader(cmbType, 2);
-                } else if (col == 3) {
-                    showComboboxAtHeader(cmbStatus, 3);
-                }
+            // Chỉ show combobox khi click vào cột 2 hoặc 3
+            if (col != 2 && col != 3) {
+                return;
             }
 
-            private void showComboboxAtHeader(Combobox<String> cmb, int columnIndex) {
-                JTableHeader header = tblRoom.getTbl().getTableHeader();
-                Rectangle headerRect = header.getHeaderRect(columnIndex);
+            Rectangle rect = header.getHeaderRect(col);
 
-                JPopupMenu popup = new JPopupMenu();
-                popup.setLayout(new BorderLayout());
-                popup.add(cmb, BorderLayout.CENTER);
-
-                popup.setPreferredSize(new Dimension(headerRect.width, 60)); 
-                popup.setBackground(Color.WHITE);
-                cmb.setBackground(Color.WHITE);
-
-                popup.show(header, headerRect.x, headerRect.height);
-
-                cmb.addActionListener(e -> popup.setVisible(false));
+            if (col == 2) {
+                // Show combobox Loại phòng
+                cmbType.setBounds(rect);
+                header.add(cmbType);
+                cmbType.setVisible(true);
+                cmbType.showPopup();
+            } else if (col == 3) {
+                // Show combobox Trạng thái
+                cmbStatus.setBounds(rect);
+                header.add(cmbStatus);
+                cmbStatus.setVisible(true);
+                cmbStatus.showPopup();
             }
-        });
-    }
+        }
+    });
+}
 
-    private void showComboboxFilter(Component header, Combobox<?> cmb, int col) {
-        TableColumn column = tblRoom.getTbl().getColumnModel().getColumn(col);
-        Rectangle rect = tblRoom.getTbl().getTableHeader().getHeaderRect(col);
-        cmb.setBounds(rect);
-        cmb.setVisible(true);
-    }
-
-    private void showComboboxFilter(JComponent header, Combobox<?> cmb, int col) {
-        cmb.showPopup();
-        cmb.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent fe) {
-                cmb.setVisible(false);
-                header.remove(cmb);
-            }
-        });
-    }
 
     private void applyFilters() {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblRoom.getTbl().getRowSorter();

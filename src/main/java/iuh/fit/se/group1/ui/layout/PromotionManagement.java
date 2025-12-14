@@ -352,26 +352,24 @@ public class PromotionManagement extends javax.swing.JPanel {
 
     private void btnAddPromotionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPromotionActionPerformed
         InfoPromotionModal modal = new InfoPromotionModal();
-        modal.closeModel(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                GlassPanePopup.closePopupLast();
-            }
+
+        modal.closeModel(ae -> GlassPanePopup.closePopupLast());
+
+        modal.saveData(ae -> {
+            saveData(modal);
         });
 
-        modal.saveData(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                saveData(modal);
+        GlassPanePopup.showPopup(modal);
             }
-        });
-
-        raven.glasspanepopup.GlassPanePopup.showPopup(modal);
-    }//GEN-LAST:event_btnAddPromotionActionPerformed
 
     private void saveData(InfoPromotionModal modal) {
         Valid result = getValid(modal);
-        if (result.valid) {
+        if (!result.valid) {
+            Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin!");
+            return;
+        }
+
+        try {
             Promotion promotion = new Promotion();
             promotion.setPromotionName(result.name);
             promotion.setMinOrderAmount(result.discountPrice);
@@ -382,25 +380,31 @@ public class PromotionManagement extends javax.swing.JPanel {
 
             Promotion entitySave = promotionService.createPromotion(promotion);
 
+            if (entitySave == null) {
+                Message.showMessage("Lỗi", "Không thể thêm khuyến mãi!");
+                return;
+            }
+
             DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
-            // SỬA: Thêm đủ 7 cột dữ liệu (cột 8 là action tự động)
             model.addRow(new Object[]{
-                entitySave.getPromotionId(), // Cột 0
-                entitySave.getPromotionName(), // Cột 1
-                Constants.VND_FORMAT.format(promotion.getPromotionName()), // Cột 2
-                entitySave.getDiscountPercent() + " %", // Cột 3
-                entitySave.getStartDate().format(Constants.DATE_FORMATTER), // Cột 4
-                entitySave.getEndDate().format(Constants.DATE_FORMATTER), // Cột 5
-                entitySave.getCreatedAt().format(Constants.DATE_FORMATTER), // Cột 6
-                entitySave.getPromotionId(), // Cột 0
-                entitySave.getPromotionName(), // Cột 1
-                entitySave.getMinOrderAmount(), // Cột 2
-                entitySave.getDiscountPercent(), // Cột 3
-                entitySave.getStartDate().format(Constants.DATE_FORMATTER), // Cột 4
-                entitySave.getEndDate().format(Constants.DATE_FORMATTER), // Cột 5
-                entitySave.getCreatedAt().format(Constants.DATE_FORMATTER) // Cột 6
+                    entitySave.getPromotionId(),
+                    entitySave.getPromotionName(),
+                    Constants.VND_FORMAT.format(entitySave.getMinOrderAmount()),
+                    entitySave.getDiscountPercent() + "%",
+                    entitySave.getStartDate().format(Constants.DATE_FORMATTER),
+                    entitySave.getEndDate().format(Constants.DATE_FORMATTER),
+                    entitySave.getCreatedAt().format(Constants.DATE_FORMATTER)
             });
+
+            // ✅ Đóng popup TRƯỚC khi hiện thông báo
             GlassPanePopup.closePopupLast();
+
+            // ✅ Hiện thông báo SAU khi đã đóng popup
+            Message.showMessage("Thành công", "Đã thêm khuyến mãi thành công!");
+
+        } catch (Exception e) {
+            Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
+            log.error("Lỗi khi thêm khuyến mãi: ", e);
         }
     }
 
