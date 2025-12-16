@@ -109,18 +109,13 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
     private void showImageInPanel(String imagePath) {
         try {
             BufferedImage image = ImageIO.read(new File(imagePath));
-
-            // QUAN TRỌNG: Set image vào avatarLabel field CÓ SẴN
-            // KHÔNG tạo AvatarLabel mới!
             if (avatarLabel != null) {
                 avatarLabel.setImage(image);
                 avatarLabel.revalidate();
                 avatarLabel.repaint();
-
-                // Log để debug
-                System.out.println("✅ Image set to existing avatarLabel: " + image.getWidth() + "x" + image.getHeight());
+                System.out.println("Image set to existing avatarLabel: " + image.getWidth() + "x" + image.getHeight());
             } else {
-                System.err.println("❌ avatarLabel is null!");
+                System.err.println("avatarLabel is null!");
             }
 
         } catch (Exception ex) {
@@ -377,12 +372,12 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         lblCode.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblCode.setForeground(new java.awt.Color(255, 102, 51));
         lblCode.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblCode.setText("NV36");
+        lblCode.setText("");
 
         lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblStatus.setForeground(new java.awt.Color(0, 204, 0));
         lblStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblStatus.setText("Đang làm việc");
+        lblStatus.setText("");
 
         lblName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblName.setText("Họ tên:");
@@ -402,28 +397,28 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         lblHireDate.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblHireDate.setText("Ngày vào làm:");
 
-        txtName.setText("Trầm Hồng Viên Thiệu");
+        txtName.setText("");
         txtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
             }
         });
 
-        txtPhone.setText("0977707088");
+        txtPhone.setText("");
         txtPhone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPhoneActionPerformed(evt);
             }
         });
 
-        txtEmail.setText("vienthieu692005@gmail.com");
+        txtEmail.setText("");
         txtEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtEmailActionPerformed(evt);
             }
         });
 
-        txtHireDate.setText("06/09/2025");
+        txtHireDate.setText("");
         txtHireDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtHireDateActionPerformed(evt);
@@ -477,7 +472,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         lblCitizen.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblCitizen.setText("CCCD:");
 
-        txtCitizen.setText("084205004821");
+        txtCitizen.setText("");
         txtCitizen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCitizenActionPerformed(evt);

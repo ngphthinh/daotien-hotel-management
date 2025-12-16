@@ -229,7 +229,7 @@ public class ConfirmInfoModal extends JPanel {
     public void clearFields() {
         txtUsername.setText("");
         txtPassword.setText("");
-        isProcessing = false; // ✅ Reset cờ khi clear
+        isProcessing = false; //  Reset cờ khi clear
         SwingUtilities.invokeLater(() -> txtUsername.requestFocusInWindow());
     }
     @Override
