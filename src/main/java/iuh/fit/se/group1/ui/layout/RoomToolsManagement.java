@@ -1074,20 +1074,4 @@ public class RoomToolsManagement extends JPanel {
         updateSummary();
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Test RoomTransferUI");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1500, 900);
-            frame.setLocationRelativeTo(null);
-            frame.setContentPane(new RoomToolsManagement());
-            frame.setVisible(true);
-        });
-    }
 }

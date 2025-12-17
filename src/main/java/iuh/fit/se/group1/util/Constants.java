@@ -126,4 +126,9 @@ public class Constants {
         return Double.parseDouble(cleaned);
     }
 
+    public static java.math.BigDecimal parseVNDToBigDecimal(String formatted) {
+        double value = parseVND(formatted);
+        return java.math.BigDecimal.valueOf(value);
+    }
+
 }

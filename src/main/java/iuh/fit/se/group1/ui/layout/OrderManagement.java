@@ -1,47 +1,39 @@
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.entity.Customer;
-import iuh.fit.se.group1.entity.Order;
+import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.service.OrderService;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.custom.InvoicePanel;
+import iuh.fit.se.group1.ui.component.custom.OrderEditDialog;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import iuh.fit.se.group1.util.Constants;
 
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import javax.swing.RowFilter;
 
 /**
  * @author Windows
  */
 public class OrderManagement extends javax.swing.JPanel {
 
-    public static void main(String[] args) {
-        Frame frame = new Frame();
-        OrderManagement orderManagement = new OrderManagement();
-        frame.add(orderManagement);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-
-        frame.setVisible(true);
-    }
-
     private final OrderService orderService;
-    private MainLayout parent;
-    private PaymentPage paymentPage;
+    private String currentTypeFilter = "Tất cả";
 
     /**
      * Creates new form OrderManagement
@@ -53,22 +45,6 @@ public class OrderManagement extends javax.swing.JPanel {
         loadData();
     }
 
-    public void loadData(List<Order> orders) {
-        DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
-        model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
-
-        System.out.println(orders);
-
-        for (Order order : orders) {
-            model.addRow(new Object[]{
-                    order.getOrderId(),
-                    Constants.DATE_FORMATTER.format(order.getOrderDate()),
-                    order.getTotalAmount(),
-                    order.getOrderType().getName(),
-                    order.getCustomer().getFullName()
-            });
-        }
-    }
     public void loadData() {
         DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
         model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
@@ -77,7 +53,7 @@ public class OrderManagement extends javax.swing.JPanel {
 
             String rooms = order.getBookings().stream()
                     .map(booking -> booking.getRoom().getRoomNumber())
-                            .collect(Collectors.joining(", "));
+                    .collect(Collectors.joining(", "));
 
             String checkIn = null;
             String checkOut = null;
@@ -92,20 +68,18 @@ public class OrderManagement extends javax.swing.JPanel {
                 throw new RuntimeException(e);
             }
 
-
-            model.addRow(new Object[]{
+            model.addRow(new Object[] {
                     order.getOrderId(),
                     order.getCustomer().getFullName(),
                     order.getCustomer().getCitizenId(),
                     Constants.VND_FORMAT.format(order.getTotalAmount()),
                     order.getOrderType().getName(),
-                    rooms ,
+                    rooms,
                     checkIn,
                     checkOut
             });
         }
     }
-
 
     private void custom() {
 
@@ -113,96 +87,157 @@ public class OrderManagement extends javax.swing.JPanel {
                 "<html><span style='color:white;'>Quản lý hóa đơn</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
-        String cols[] = {"Mã", "Tên khách hàng", "CCCD/Passport", "Tổng tiền", "Trạng thái", "Số phòng","Ngày nhận","Ngày trả", "Chức năng"};
-        DefaultTableModel model = new DefaultTableModel(cols, 5);
+        String cols[] = { "Mã", "Tên khách hàng", "CCCD/Passport", "Tổng tiền", "Trạng thái", "Số phòng", "Ngày nhận",
+                "Ngày trả", "Chức năng" };
+        DefaultTableModel model = new DefaultTableModel(cols, 5) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Chỉ cho phép edit cột "Chức năng" (column 8) để button hoạt động
+                return column == 8;
+            }
+        };
         tblOrder.getTbl().setModel(model);
+
+        // Khởi tạo TableRowSorter
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        tblOrder.getTbl().setRowSorter(sorter);
+
+        // Tắt sort cho tất cả các cột (chỉ dùng cho filter)
+        for (int i = 0; i < tblOrder.getTbl().getColumnCount(); i++) {
+            sorter.setSortable(i, false);
+        }
+
+
+        headerCustom1.handleSearch(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                handleSearch(headerCustom1.getSearchText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                handleSearch(headerCustom1.getSearchText());
+
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
+
+        tblOrder.getTbl().setAutoCreateRowSorter(false);
+        tblOrder.getTbl().getTableHeader().setReorderingAllowed(false);
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row: " + row);
+                int modelRow = tblOrder.getTbl().convertRowIndexToModel(row);
+
+                try {
+
+
+                    Long id = Long.valueOf(tblOrder.getTbl().getModel().getValueAt(modelRow, 0).toString());
+                    Order order = orderService.getOrderById(id);
+                    if (order == null) {
+                        JOptionPane.showMessageDialog(OrderManagement.this,
+                                "Không tìm thấy hóa đơn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    if (order.getOrderType().getOrderTypeId() == 1) {
+                        JOptionPane.showMessageDialog(OrderManagement.this,
+                                "Không thể sửa hóa đơn đã thanh toán", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    // Show edit dialog
+                    OrderEditDialog editDialog = new OrderEditDialog(SwingUtilities.getWindowAncestor(OrderManagement.this), order);
+                    editDialog.setVisible(true);
+
+                    // After dialog closed, reload data
+                    loadData();
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(OrderManagement.this,
+                            "Lỗi khi mở cửa sổ chỉnh sửa: " + ex.getMessage(),
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
             }
 
             @Override
             public void onDelete(int row) {
-                if (tblOrder.getTbl().isEditing()) {
-                    tblOrder.getTbl().getCellEditor().stopCellEditing();
+
+                String orderType = tblOrder.getTbl().getModel().getValueAt(
+                        tblOrder.getTbl().convertRowIndexToModel(row), 4).toString();
+                if (!orderType.equals("Đặt trước")) {
+                    JOptionPane.showMessageDialog(OrderManagement.this,
+                            "Chỉ có thể xóa hóa đơn đặt trước!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-                DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
-                model.removeRow(row);
+                int confirm = JOptionPane.showConfirmDialog(OrderManagement.this,
+                        "Bạn có chắc chắn muốn xóa hóa đơn này?", "Xác nhận xóa",
+                        JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    Long id = Long.valueOf(tblOrder.getTbl().getModel().getValueAt(
+                            tblOrder.getTbl().convertRowIndexToModel(row), 0).toString());
+                    orderService.deleteOrderById(id);
+                    loadData();
+                }
             }
 
             @Override
             public void onView(int row) {
-//                Long id = Long.valueOf(tblOrder.getTbl().getValueAt(row, 0).toString());
-//                Customer customer = orderService.getAllOrders()
-//                        .stream()
-//                        .filter(e -> e.getOrderId().equals(id))
-//                        .findFirst().get()
-//                        .getCustomer();
-//                paymentPage.setCustomer(customer);
-//                parent.setMainContent(paymentPage);
+                try {
+                    // Convert view row to model row khi có filter
+                    int modelRow = tblOrder.getTbl().convertRowIndexToModel(row);
+                    System.out.println("View row: " + modelRow);
+
+                    Long id = Long.valueOf(tblOrder.getTbl().getModel().getValueAt(modelRow, 0).toString());
+                    Order order = orderService.getOrderById(id);
+
+                    if (order == null) {
+                        JOptionPane.showMessageDialog(OrderManagement.this,
+                                "Không tìm thấy hóa đơn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+
+                    EmployeeService employeeService = new EmployeeService();
+                    Employee employee = employeeService.getEmployeeById(order.getEmployee().getEmployeeId());
+                    order.setEmployee(employee);
+
+                    InvoicePanel invoicePanel = new InvoicePanel(order);
+                    JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(OrderManagement.this),
+                            "Chi tiết hóa đơn #" + id, true);
+                    dialog.getContentPane().add(invoicePanel);
+                    dialog.setSize(900, 700);
+                    dialog.setLocationRelativeTo(OrderManagement.this);
+                    dialog.setVisible(true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(OrderManagement.this,
+                            "Lỗi khi hiển thị hóa đơn: " + ex.getMessage(),
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
             }
         };
 
-        var header = tblOrder.getTbl().getTableHeader();
+        setupHeaderFilters();
 
-        Combobox<String> cmbType = new Combobox<>(new String[]{"Đã hoàn thành", "Đang xử lí", "Đặt trước"});
-        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
-        TableColumn column = tblOrder.getTbl().getColumnModel().getColumn(4);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 tblOrder.getTbl().clearSelection();
             }
         });
-        column.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
-            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
-
-            if (comp instanceof JLabel lbl) {
-                lbl.setText("Loại hóa đơn      \u25BC");
-                lbl.setHorizontalTextPosition(SwingConstants.LEFT);
-                lbl.setHorizontalAlignment(SwingConstants.LEFT);
-                lbl.setIconTextGap(5);
-            }
-            return comp;
-        });
-
-        cmbType.addActionListener(ev -> {
-            String selected = (String) cmbType.getSelectedItem();
-//            filterCustomerTable(selected);
-            header.remove(cmbType);
-            header.repaint();
-        });
-
-        header.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int col = tblOrder.getTbl().columnAtPoint(e.getPoint());
-                if (col == 4) {
-                    Rectangle rect = header.getHeaderRect(col);
-
-                    cmbType.setBounds(rect);
-                    cmbType.setVisible(true);
-                    header.add(cmbType);
-                    cmbType.showPopup();
-
-                    cmbType.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusLost(FocusEvent fe) {
-                            cmbType.setVisible(false);
-                            header.remove(cmbType);
-                        }
-                    });
-                }
-            }
-        });
 
         tblOrder.setTableActionColumn(tblOrder.getTbl(), 8, event, true);
-        tblOrder.getTbl().getColumnModel().getColumn(0).setPreferredWidth(70);  // chiều rộng mong muốn
+        tblOrder.getTbl().getColumnModel().getColumn(0).setPreferredWidth(70); // chiều rộng mong muốn
         tblOrder.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
         tblOrder.getTbl().getColumnModel().getColumn(2).setPreferredWidth(150);
         tblOrder.getTbl().getColumnModel().getColumn(3).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(4).setPreferredWidth(100);
+        tblOrder.getTbl().getColumnModel().getColumn(4).setPreferredWidth(150);
         tblOrder.getTbl().getColumnModel().getColumn(5).setPreferredWidth(150);
         tblOrder.getTbl().getColumnModel().getColumn(6).setPreferredWidth(150);
         tblOrder.getTbl().getColumnModel().getColumn(7).setPreferredWidth(150);
@@ -223,6 +258,43 @@ public class OrderManagement extends javax.swing.JPanel {
         setupOrderTableColumnAlignment(tblOrder.getTbl());
     }
 
+    private void handleSearch(String searchText) {
+        java.util.List<Order> orders = orderService.searchOrdersByKeyword(searchText);
+        DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
+        model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
+
+        for (Order order : orders) {
+
+            String rooms = order.getBookings().stream()
+                    .map(booking -> booking.getRoom().getRoomNumber())
+                    .collect(Collectors.joining(", "));
+
+            String checkIn = null;
+            String checkOut = null;
+            try {
+                checkIn = order.getBookings().get(0).getCheckInDate().format(Constants.DATE_FORMATTER);
+
+                checkOut = order.getBookings().get(0).getCheckOutDate().format(Constants.DATE_FORMATTER);
+            } catch (Exception e) {
+                order.getBookings().forEach(booking -> {
+                    System.out.println(booking.getBookingId());
+                });
+                throw new RuntimeException(e);
+            }
+
+            model.addRow(new Object[] {
+                    order.getOrderId(),
+                    order.getCustomer().getFullName(),
+                    order.getCustomer().getCitizenId(),
+                    Constants.VND_FORMAT.format(order.getTotalAmount()),
+                    order.getOrderType().getName(),
+                    rooms,
+                    checkIn,
+                    checkOut
+            });
+        }
+    }
+
     public void setupOrderTableColumnAlignment(JTable tblOrder) {
 
         DefaultTableCellRenderer left = new DefaultTableCellRenderer();
@@ -235,10 +307,9 @@ public class OrderManagement extends javax.swing.JPanel {
         right.setHorizontalAlignment(SwingConstants.RIGHT);
 
         // Căn trái mặc định toàn bộ
-        for (int i = 0; i < tblOrder.getColumnCount() -1 ; i++) {
+        for (int i = 0; i < tblOrder.getColumnCount() - 1; i++) {
             tblOrder.getColumnModel().getColumn(i).setCellRenderer(left);
         }
-
 
         tblOrder.getColumnModel().getColumn(0).setCellRenderer(center);
         tblOrder.getColumnModel().getColumn(4).setCellRenderer(center);
@@ -250,6 +321,81 @@ public class OrderManagement extends javax.swing.JPanel {
         tblOrder.getColumnModel().getColumn(7).setCellRenderer(right);
     }
 
+    private void setupHeaderFilters() {
+        var header = tblOrder.getTbl().getTableHeader();
+
+        Combobox<String> cmbType = new Combobox<>(
+                new String[] { "Tất cả", "Đã hoàn thành", "Đang xử lí", "Đặt trước" });
+
+        TableCellRenderer defaultRenderer = header.getDefaultRenderer();
+
+        // Reset tất cả cột về default renderer
+        for (int i = 0; i < tblOrder.getTbl().getColumnCount(); i++) {
+            tblOrder.getTbl().getColumnModel().getColumn(i).setHeaderRenderer(defaultRenderer);
+        }
+
+        // Cột Trạng thái - Dùng defaultRenderer với text có mũi tên
+        TableColumn colStatus = tblOrder.getTbl().getColumnModel().getColumn(4);
+        colStatus.setHeaderRenderer((tbl, value, isSelected, hasFocus, row, col) -> {
+            Component comp = defaultRenderer.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
+            if (comp instanceof JLabel lbl) {
+                lbl.setText("Trạng thái \u25BC");
+                lbl.setHorizontalAlignment(SwingConstants.LEFT);
+            }
+            return comp;
+        });
+
+        // ACTION LISTENER
+        cmbType.addActionListener(ev -> {
+            currentTypeFilter = (String) cmbType.getSelectedItem();
+            applyFilters();
+            header.remove(cmbType);
+            header.repaint();
+        });
+
+        // MOUSE LISTENER: Click vào header để show combobox
+        header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = tblOrder.getTbl().columnAtPoint(e.getPoint());
+
+                // Remove combobox cũ
+                header.remove(cmbType);
+
+                // Chỉ show combobox khi click vào cột 4 (Trạng thái)
+                if (col != 4) {
+                    return;
+                }
+
+                Rectangle rect = header.getHeaderRect(col);
+
+                if (col == 4) {
+                    // Show combobox Trạng thái
+                    cmbType.setBounds(rect);
+                    header.add(cmbType);
+                    cmbType.setVisible(true);
+                    cmbType.showPopup();
+                }
+            }
+        });
+    }
+
+    private void applyFilters() {
+        TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblOrder.getTbl().getRowSorter();
+        RowFilter<DefaultTableModel, Object> rf = new RowFilter<DefaultTableModel, Object>() {
+            @Override
+            public boolean include(Entry<? extends DefaultTableModel, ? extends Object> entry) {
+                String status = entry.getStringValue(4);
+
+                boolean statusMatches = currentTypeFilter.equals("Tất cả")
+                        || (status != null && status.equals(currentTypeFilter));
+
+                return statusMatches;
+            }
+        };
+        sorter.setRowFilter(rf);
+        sorter.setSortKeys(null);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -257,7 +403,8 @@ public class OrderManagement extends javax.swing.JPanel {
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         headerCustom1 = new iuh.fit.se.group1.ui.component.HeaderCustom();
@@ -277,31 +424,24 @@ public class OrderManagement extends javax.swing.JPanel {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(headerCustom1, javax.swing.GroupLayout.DEFAULT_SIZE, 1212, Short.MAX_VALUE)
-                        .addComponent(tblOrder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(tblOrder, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(32, 32, 32)
                                 .addComponent(jLabel1)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                                .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15,
+                                        Short.MAX_VALUE)
                                 .addComponent(jLabel1)
                                 .addGap(15, 15, 15)
-                                .addComponent(tblOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 637, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+                                .addComponent(tblOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 637,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)));
     }// </editor-fold>//GEN-END:initComponents
-
-    public void setPaymentPage(PaymentPage paymentPage) {
-        this.paymentPage = paymentPage;
-    }
-
-    public void setParent(MainLayout parent) {
-        this.parent = parent;
-    }
-
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

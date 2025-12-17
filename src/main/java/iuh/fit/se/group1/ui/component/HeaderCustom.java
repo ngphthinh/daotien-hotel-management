@@ -93,8 +93,4 @@ public class HeaderCustom extends javax.swing.JPanel {
     private javax.swing.JLabel lblTitle;
     private iuh.fit.se.group1.ui.component.SeachBar seachBar;
     // End of variables declaration//GEN-END:variables
-    public DocumentEvent getTxtSearch() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTxtSearch'");
-    }
 }

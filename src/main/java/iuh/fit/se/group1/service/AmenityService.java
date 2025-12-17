@@ -47,4 +47,7 @@ public class AmenityService {
         );
     }
 
+    public Amenity getAmenityById(Long amenityId) {
+        return amenityRepository.findById(amenityId);
+    }
 }

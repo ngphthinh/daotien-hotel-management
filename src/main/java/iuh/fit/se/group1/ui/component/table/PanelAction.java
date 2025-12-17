@@ -62,7 +62,6 @@ public class PanelAction extends javax.swing.JPanel {
         }
     }
 
-
     @SuppressWarnings("unchecked")
     private void initComponents() {
         btnEdit = new iuh.fit.se.group1.ui.component.custom.ActionButton();

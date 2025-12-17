@@ -133,4 +133,30 @@ public class BookingRepository implements Repository<Booking, Long>{
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Update check-in and check-out timestamps for a specific booking
+     */
+    public void updateBookingDates(Long bookingId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        String sql = "UPDATE Booking SET checkInDate = ?, checkOutDate = ? WHERE bookingId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(checkIn));
+            ps.setTimestamp(2, Timestamp.valueOf(checkOut));
+            ps.setLong(3, bookingId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating booking dates", e);
+        }
+    }
+
+
+    public void deleteByOrderId(Long id) {
+        String sql = "DELETE FROM Booking WHERE orderId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

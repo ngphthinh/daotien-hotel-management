@@ -24,6 +24,11 @@ public class ScrollPaneWin11 extends JScrollPane {
         setLayout(new ScrollLayout());
     }
 
+    public ScrollPaneWin11(Container view) {
+        this();
+        setViewportView(view);
+    }
+
     @Override
     public boolean isOptimizedDrawingEnabled() {
         return false;

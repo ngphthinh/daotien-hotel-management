@@ -264,7 +264,6 @@ public class RoomManagement extends javax.swing.JPanel {
                     ""
             });
         }
-        System.out.println("UI Load: Found " + rooms.size() + " rooms from DB");
     }
 
     private void setupTableModel() {
@@ -393,7 +392,7 @@ private void setupTableActions() {
     }
 
     Combobox<String> cmbType = new Combobox<>(typeItems);
-    Combobox<String> cmbStatus = new Combobox<>(new String[] { "Tất cả", "AVAILABLE", "OCCUPIED", "MAINTENANCE" });
+    Combobox<String> cmbStatus = new Combobox<>(new String[] { "Tất cả", RoomStatus.AVAILABLE.toString(), RoomStatus.OCCUPIED.toString() , RoomStatus.OUT_OF_ORDER.toString() });
 
     // ===== SỬA PHẦN NÀY: Dùng defaultRenderer thay vì custom renderer =====
     TableCellRenderer defaultRenderer = header.getDefaultRenderer();

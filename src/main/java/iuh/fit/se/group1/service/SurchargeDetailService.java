@@ -45,4 +45,25 @@ public class SurchargeDetailService {
             }
 
     }
+
+    public void deleteByOrderId(Long orderId) {
+        surchargeDetailRepository.deleteByOrderId(orderId);
+    }
+
+    public boolean saveByOrderId(Long orderId, List<SurchargeDetail> surchargeDetails) {
+        return surchargeDetailRepository.saveByOrderId(orderId, surchargeDetails);
+    }
+
+    public void deleteById(long surchargeId, Long orderId) {
+        surchargeDetailRepository.deleteById(surchargeId, orderId);
+    }
+    public void deleteById(Long orderId) {
+        surchargeDetailRepository.deleteById(orderId);
+    }
+
+    public void updateSurchargeDetail(Long surchargeId, int quantity, Long orderId) {
+        surchargeDetailRepository.updateSurchargeDetail(surchargeId, quantity, orderId);
+
+    }
+
 }

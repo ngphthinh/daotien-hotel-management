@@ -3,9 +3,18 @@ package iuh.fit.se.group1.enums;
 import iuh.fit.se.group1.config.AppLogger;
 
 public enum RoomStatus {
-    AVAILABLE,
-    OCCUPIED,
-    OUT_OF_ORDER;
+    AVAILABLE("Phòng trống"),
+    OCCUPIED("Đang sử dụng"),
+    OUT_OF_ORDER("Phòng hỏng");
+    private final String displayName;
+    RoomStatus(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
 
     public static RoomStatus fromString(String status) {
         for (RoomStatus rs : RoomStatus.values()) {

@@ -1,8 +1,7 @@
-package iuh.fit.se.group1.ui.component.paymentv2;
+package iuh.fit.se.group1.ui.component.custom;
 
-import iuh.fit.se.group1.dto.SurchargeDTO;
-import iuh.fit.se.group1.entity.Surcharge;
-import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.dto.AmenityDTO;
+import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -19,20 +18,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Panel quản lý phụ phí với UX/UI tối ưu
- * Bảng trái: Danh sách phụ phí hiện có (có thể click để chọn)
- * Bảng phải: Phụ phí đã chọn (dữ liệu lưu trong database)
+ * Panel quản lý dịch vụ với UX/UI tối ưu
+ * Bảng trái: Danh sách dịch vụ hiện có (có thể click để chọn)
+ * Bảng phải: Dịch vụ đã chọn
  */
-public class SurchargeManagementPanel extends JPanel {
+public class AmenityManagementPanel extends JPanel {
 
     // Components
-    private JTable availableSurchargesTable;
-    private JTable selectedSurchargesTable;
+    private JTable availableAmenitiesTable;
+    private JTable selectedAmenitiesTable;
     private DefaultTableModel availableModel;
     private DefaultTableModel selectedModel;
     private JLabel totalLabel;
@@ -41,7 +39,7 @@ public class SurchargeManagementPanel extends JPanel {
     private Button clearAllButton;
 
     // Data storage
-    private Map<String, SurchargeDTO> selectedSurcharges;
+    private Map<String, AmenityDTO> selectedAmenities;
     private double totalAmount = 0.0;
 
     // UI Colors
@@ -55,18 +53,16 @@ public class SurchargeManagementPanel extends JPanel {
 
     private NumberFormat currencyFormat;
 
-    public SurchargeManagementPanel() {
+    public AmenityManagementPanel() {
         currencyFormat = Constants.VND_FORMAT;
-        selectedSurcharges = new HashMap<>();
+        selectedAmenities = new HashMap<>();
 
-        // Set preferred and maximum dimensions
         setPreferredSize(new Dimension(1200, 800));
         setMaximumSize(new Dimension(1200, 800));
         setMinimumSize(new Dimension(800, 600));
 
         initializeComponents();
         setupLayout();
-        // loadSampleData();
         setupEventHandlers();
     }
 
@@ -74,15 +70,11 @@ public class SurchargeManagementPanel extends JPanel {
         setBackground(BACKGROUND_COLOR);
         setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        // Available surcharges table (left)
-        setupAvailableSurchargesTable();
+        setupAvailableAmenitiesTable();
+        setupSelectedAmenitiesTable();
 
-        // Selected surcharges table (right)
-        setupSelectedSurchargesTable();
-
-        // Labels
         instructionLabel = new JLabel("<html><div style='text-align: center; color: #666;'>" +
-                "💡 <b>Hướng dẫn:</b> Click vào phụ phí bên trái để thêm • " +
+                "💡 <b>Hướng dẫn:</b> Click vào dịch vụ bên trái để thêm • " +
                 "Click chuột phải vào bảng bên phải để xóa/sửa</div></html>");
         instructionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         instructionLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -92,8 +84,7 @@ public class SurchargeManagementPanel extends JPanel {
         totalLabel.setForeground(ACCENT_COLOR);
         totalLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        // Buttons
-        saveButton = Button.createSuccessButton("Lưu phụ phí", FontIcon.of(FontAwesomeSolid.SAVE, 16, Color.WHITE));
+        saveButton = Button.createSuccessButton("Lưu dịch vụ", FontIcon.of(FontAwesomeSolid.SAVE, 16, Color.WHITE));
         saveButton.setPreferredSize(new Dimension(130, 40));
 
         clearAllButton = Button.createWarningButton("Xóa tất cả",
@@ -101,60 +92,40 @@ public class SurchargeManagementPanel extends JPanel {
         clearAllButton.setPreferredSize(new Dimension(120, 40));
     }
 
-    private void setupAvailableSurchargesTable() {
-        String[] columnNames = { "Mã phụ phí", "Tên phụ phí", "Giá" };
+    private void setupAvailableAmenitiesTable() {
+        String[] columnNames = { "Mã dịch vụ", "Tên dịch vụ", "Giá" };
         availableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 0)
-                    return Integer.class;
-                if (columnIndex == 2 || columnIndex == 3)
-                    return Double.class;
-                return String.class;
-            }
         };
 
-        availableSurchargesTable = new JTable(availableModel);
-        setupTableAppearance(availableSurchargesTable, "Danh sách phụ phí hiện có");
+        availableAmenitiesTable = new JTable(availableModel);
+        setupTableAppearance(availableAmenitiesTable, "Danh sách dịch vụ hiện có");
 
-        // Column widths for available table
-        availableSurchargesTable.getColumnModel().getColumn(0).setPreferredWidth(100); // STT
-        availableSurchargesTable.getColumnModel().getColumn(1).setPreferredWidth(200); // Tên
-        availableSurchargesTable.getColumnModel().getColumn(2).setPreferredWidth(120); // Giá
+        availableAmenitiesTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        availableAmenitiesTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+        availableAmenitiesTable.getColumnModel().getColumn(2).setPreferredWidth(120);
     }
 
-    private void setupSelectedSurchargesTable() {
-        String[] columnNames = { "STT", "Tên phụ phí", "Giá", "SL", "Thành tiền" };
+    private void setupSelectedAmenitiesTable() {
+        String[] columnNames = { "STT", "Tên dịch vụ", "Giá", "SL", "Thành tiền" };
         selectedModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 2 || columnIndex == 4)
-                    return Double.class;
-                if (columnIndex == 3)
-                    return Integer.class;
-                return String.class;
-            }
         };
 
-        selectedSurchargesTable = new JTable(selectedModel);
-        setupTableAppearance(selectedSurchargesTable, "Dữ liệu lưu trong database");
+        selectedAmenitiesTable = new JTable(selectedModel);
+        setupTableAppearance(selectedAmenitiesTable, "Dữ liệu lưu");
 
-        // Column widths for selected table
-        selectedSurchargesTable.getColumnModel().getColumn(0).setPreferredWidth(100); // Mã
-        selectedSurchargesTable.getColumnModel().getColumn(1).setPreferredWidth(180); // Tên
-        selectedSurchargesTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Giá
-        selectedSurchargesTable.getColumnModel().getColumn(3).setPreferredWidth(50); // Số lượng
-        selectedSurchargesTable.getColumnModel().getColumn(4).setPreferredWidth(120); // Thành tiền
+        selectedAmenitiesTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        selectedAmenitiesTable.getColumnModel().getColumn(1).setPreferredWidth(180);
+        selectedAmenitiesTable.getColumnModel().getColumn(2).setPreferredWidth(100);
+        selectedAmenitiesTable.getColumnModel().getColumn(3).setPreferredWidth(50);
+        selectedAmenitiesTable.getColumnModel().getColumn(4).setPreferredWidth(120);
     }
 
     private void setupTableAppearance(JTable table, String title) {
@@ -166,17 +137,13 @@ public class SurchargeManagementPanel extends JPanel {
         table.setSelectionBackground(SELECTED_COLOR);
         table.setSelectionForeground(Color.BLACK);
 
-        // Header styling
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
         header.setBackground(HEADER_COLOR);
         header.setForeground(Color.WHITE);
         header.setPreferredSize(new Dimension(0, 45));
-
-        // Custom header renderer to force colors
         header.setDefaultRenderer(new HeaderRenderer());
 
-        // Custom cell renderers
         table.setDefaultRenderer(Object.class, new AlternatingRowRenderer());
         table.setDefaultRenderer(Double.class, new CurrencyRenderer());
         table.setDefaultRenderer(Integer.class, new CenterRenderer());
@@ -185,35 +152,29 @@ public class SurchargeManagementPanel extends JPanel {
     private void setupLayout() {
         setLayout(new BorderLayout());
 
-        // Top panel with instruction
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(BACKGROUND_COLOR);
         topPanel.setBorder(new EmptyBorder(0, 0, 15, 0));
         topPanel.add(instructionLabel, BorderLayout.CENTER);
 
-        // Center panel with tables
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 15, 0));
         centerPanel.setBackground(BACKGROUND_COLOR);
 
-        // Left panel (Available surcharges)
-        JPanel leftPanel = createTablePanel(availableSurchargesTable,
-                "Danh sách phụ phí hiện có",
+        JPanel leftPanel = createTablePanel(availableAmenitiesTable,
+                "Danh sách dịch vụ hiện có",
                 "Click để thêm vào đơn hàng");
 
-        // Right panel (Selected surcharges)
-        JPanel rightPanel = createTablePanel(selectedSurchargesTable,
-                "Dữ liệu lưu trong database",
+        JPanel rightPanel = createTablePanel(selectedAmenitiesTable,
+                "Dữ liệu lưu",
                 "Click chuột phải để xóa/sửa");
 
         centerPanel.add(leftPanel);
         centerPanel.add(rightPanel);
 
-        // Bottom panel with total and buttons
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(BACKGROUND_COLOR);
         bottomPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
 
-        // Total panel
         JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         totalPanel.setBackground(BACKGROUND_COLOR);
         totalPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -221,7 +182,6 @@ public class SurchargeManagementPanel extends JPanel {
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)));
         totalPanel.add(totalLabel);
 
-        // Buttons panel
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonsPanel.setBackground(BACKGROUND_COLOR);
         buttonsPanel.add(saveButton);
@@ -247,13 +207,11 @@ public class SurchargeManagementPanel extends JPanel {
                 new Font("Segoe UI", Font.BOLD, 14),
                 HEADER_COLOR));
 
-        // Subtitle label
         JLabel subtitleLabel = new JLabel(subtitle);
         subtitleLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         subtitleLabel.setForeground(Color.GRAY);
         subtitleLabel.setBorder(new EmptyBorder(5, 10, 10, 10));
 
-        // Table with scroll
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(0, 300));
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
@@ -265,18 +223,16 @@ public class SurchargeManagementPanel extends JPanel {
     }
 
     private void setupEventHandlers() {
-        // Click on available table to add surcharge
-        availableSurchargesTable.addMouseListener(new MouseAdapter() {
+        availableAmenitiesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 1) {
-                    addSurchargeFromAvailable();
+                    addAmenityFromAvailable();
                 }
             }
         });
 
-        // Right click on selected table for context menu
-        selectedSurchargesTable.addMouseListener(new MouseAdapter() {
+        selectedAmenitiesTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -285,27 +241,24 @@ public class SurchargeManagementPanel extends JPanel {
             }
         });
 
-        // Clear all button
-        clearAllButton.addActionListener(e -> clearAllSurcharges());
+        clearAllButton.addActionListener(e -> clearAllAmenities());
     }
 
-    private void addSurchargeFromAvailable() {
-        int selectedRow = availableSurchargesTable.getSelectedRow();
-        if (selectedRow == -1)
-            return;
+    private void addAmenityFromAvailable() {
+        int selectedRow = availableAmenitiesTable.getSelectedRow();
+        if (selectedRow == -1) return;
 
-        SurchargeDTO surchargeDTO = new SurchargeDTO();
-        surchargeDTO.setSurchargeId((Long) availableModel.getValueAt(selectedRow, 0));
+        AmenityDTO amenityDTO = new AmenityDTO();
+        amenityDTO.setId((Long) availableModel.getValueAt(selectedRow, 0));
+        amenityDTO.setName((String) availableModel.getValueAt(selectedRow, 1));
+        BigDecimal priceObj = (BigDecimal) availableModel.getValueAt(selectedRow, 2);
+        double price = priceObj.doubleValue();
+        amenityDTO.setPrice(price);
+        Long id = amenityDTO.getId();
 
-        surchargeDTO.setName((String) availableModel.getValueAt(selectedRow, 1));
-        BigDecimal price = (BigDecimal) availableModel.getValueAt(selectedRow, 2);
-        surchargeDTO.setPrice(price);
-        Long id = surchargeDTO.getSurchargeId();
-
-        // Check if exists
         boolean exists = false;
-        for (SurchargeDTO data : selectedSurcharges.values()) {
-            if (data.getSurchargeId().equals(id)) {
+        for (AmenityDTO data : selectedAmenities.values()) {
+            if (data.getId().equals(id)) {
                 data.setQuantity(data.getQuantity() + 1);
                 exists = true;
                 showNotification("Đã tăng số lượng: " + data.getName(), ACCENT_COLOR);
@@ -314,69 +267,51 @@ public class SurchargeManagementPanel extends JPanel {
         }
 
         if (!exists) {
-            selectedModel.addRow(new Object[] {
-                    id,
-                    surchargeDTO,
-                    surchargeDTO.getPrice(),
-                    1,
-                    surchargeDTO.getPrice()
-            });
-
-            surchargeDTO.setQuantity(1);
-            selectedSurcharges.put(id.toString(), surchargeDTO);
-            showNotification("Đã thêm: " + surchargeDTO, ACCENT_COLOR);
+            amenityDTO.setQuantity(1);
+            selectedAmenities.put(id.toString(), amenityDTO);
+            showNotification("Đã thêm: " + amenityDTO.getName(), ACCENT_COLOR);
         }
 
-        totalAmount += surchargeDTO.getPrice().doubleValue();
+        totalAmount += amenityDTO.getPrice();
         updateTotalLabel();
         refreshSelectedTable();
-        selectedSurchargesTable.revalidate();
-        selectedSurchargesTable.repaint();
     }
 
     private void showContextMenu(MouseEvent e) {
-        int row = selectedSurchargesTable.rowAtPoint(e.getPoint());
-        if (row == -1)
-            return;
+        int row = selectedAmenitiesTable.rowAtPoint(e.getPoint());
+        if (row == -1) return;
 
-        selectedSurchargesTable.setRowSelectionInterval(row, row);
+        selectedAmenitiesTable.setRowSelectionInterval(row, row);
 
         JPopupMenu popup = new JPopupMenu();
         popup.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(BORDER_COLOR),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        var surchargeDTO = (SurchargeDTO) selectedModel.getValueAt(row, 1);
-        if (surchargeDTO == null) {
-            return; // No data to show context menu
-        }
+        var amenityDTO = (AmenityDTO) selectedModel.getValueAt(row, 1);
+        if (amenityDTO == null) return;
 
-        String id = surchargeDTO.getSurchargeId().toString();
-        SurchargeDTO data = selectedSurcharges.get(id);
+        String id = amenityDTO.getId().toString();
+        AmenityDTO data = selectedAmenities.get(id);
+        if (data == null) return;
 
-        if (data == null) {
-            return; // Data not found in map
-        }
-
-        // Edit quantity menu
         JMenuItem editItem = new JMenuItem("Sửa số lượng (" + data.getQuantity() + ")");
         editItem.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         editItem.addActionListener(e2 -> editQuantity(row, id, data));
 
-        // Delete menu
         JMenuItem deleteItem = new JMenuItem("Xóa \"" + data.getName() + "\"");
         deleteItem.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         deleteItem.setForeground(new Color(220, 53, 69));
-        deleteItem.addActionListener(e2 -> deleteSurcharge(row, id, data));
+        deleteItem.addActionListener(e2 -> deleteAmenity(row, id, data));
 
         popup.add(editItem);
         popup.addSeparator();
         popup.add(deleteItem);
 
-        popup.show(selectedSurchargesTable, e.getX(), e.getY());
+        popup.show(selectedAmenitiesTable, e.getX(), e.getY());
     }
 
-    private void editQuantity(int row, String id, SurchargeDTO data) {
+    private void editQuantity(int row, String id, AmenityDTO data) {
         String input = CustomDialog.showInput(
                 this,
                 "Nhập số lượng mới cho \"" + data.getName() + "\":",
@@ -393,10 +328,9 @@ public class SurchargeManagementPanel extends JPanel {
                     return;
                 }
 
-                // Update quantity
-                double oldTotal = data.getPrice().doubleValue() * data.getQuantity();
+                double oldTotal = data.getPrice() * data.getQuantity();
                 data.setQuantity(newQuantity);
-                double newTotal = data.getPrice().doubleValue() * newQuantity;
+                double newTotal = data.getPrice() * newQuantity;
 
                 totalAmount = totalAmount - oldTotal + newTotal;
                 updateTotalLabel();
@@ -405,14 +339,12 @@ public class SurchargeManagementPanel extends JPanel {
                 showNotification("Đã cập nhật số lượng: " + data.getName() + " x" + newQuantity, ACCENT_COLOR);
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Số lượng không hợp lệ!",
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Số lượng không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
-    private void deleteSurcharge(int row, String id, SurchargeDTO data) {
-
+    private void deleteAmenity(int row, String id, AmenityDTO data) {
         int opt = CustomDialog.showConfirm(this,
                 "Bạn có chắc muốn xóa \"" + data.getName() + "\"?",
                 "Xác nhận xóa",
@@ -421,39 +353,30 @@ public class SurchargeManagementPanel extends JPanel {
 
         if (opt == JOptionPane.YES_OPTION) {
             selectedModel.removeRow(row);
-            selectedSurcharges.remove(id);
-            totalAmount -= data.getPrice().doubleValue() * data.getQuantity();
+            selectedAmenities.remove(id);
+            totalAmount -= data.getPrice() * data.getQuantity();
             updateTotalLabel();
 
             showNotification("Đã xóa: " + data.getName(), WARNING_COLOR);
         }
     }
 
-    public Button getSaveButton() {
-        return saveButton;
-    }
-
-    public void setSaveButton(Button saveButton) {
-        this.saveButton = saveButton;
-    }
-
-    private void clearAllSurcharges() {
-        if (selectedSurcharges.isEmpty())
-            return;
+    private void clearAllAmenities() {
+        if (selectedAmenities.isEmpty()) return;
 
         int confirm = CustomDialog.showConfirm(this,
-                "Bạn có chắc muốn xóa tất cả phụ phí?",
+                "Bạn có chắc muốn xóa tất cả dịch vụ?",
                 "Xác nhận xóa tất cả",
                 CustomDialog.MessageType.WARNING,
                 400, 200);
 
         if (confirm == JOptionPane.YES_OPTION) {
             selectedModel.setRowCount(0);
-            selectedSurcharges.clear();
+            selectedAmenities.clear();
             totalAmount = 0.0;
             updateTotalLabel();
 
-            showNotification("Đã xóa tất cả phụ phí", WARNING_COLOR);
+            showNotification("Đã xóa tất cả dịch vụ", WARNING_COLOR);
         }
     }
 
@@ -464,8 +387,8 @@ public class SurchargeManagementPanel extends JPanel {
     private void refreshSelectedTable() {
         selectedModel.setRowCount(0);
         int idx = 1;
-        for (SurchargeDTO data : selectedSurcharges.values()) {
-            double total = data.getPrice().doubleValue() * data.getQuantity();
+        for (AmenityDTO data : selectedAmenities.values()) {
+            double total = data.getPrice() * data.getQuantity();
             selectedModel.addRow(new Object[] {
                     idx++,
                     data,
@@ -482,7 +405,6 @@ public class SurchargeManagementPanel extends JPanel {
         notification.setForeground(color);
         notification.setBorder(new EmptyBorder(5, 0, 5, 0));
 
-        // Replace instruction label temporarily
         Container parent = instructionLabel.getParent();
         if (parent != null) {
             parent.remove(instructionLabel);
@@ -491,7 +413,6 @@ public class SurchargeManagementPanel extends JPanel {
             parent.repaint();
         }
 
-        // Restore original instruction after 2 seconds
         Timer timer = new Timer(2000, e -> {
             if (parent != null) {
                 parent.remove(notification);
@@ -557,9 +478,6 @@ public class SurchargeManagementPanel extends JPanel {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
-            // if (value instanceof Double) {
-            // value = currencyFormat.format((Double) value).split(" ")[0];
-            // }
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setFont(new Font("Segoe UI", Font.BOLD, 13));
             return this;
@@ -573,80 +491,41 @@ public class SurchargeManagementPanel extends JPanel {
     }
 
     // Public methods
-    public Map<String, SurchargeDTO> getSelectedSurcharges() {
-        return new HashMap<>(selectedSurcharges);
+    public Button getSaveButton() {
+        return saveButton;
     }
 
-    public double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void addSurcharge(String id, String name, double price, int quantity) {
-        double total = price * quantity;
-        selectedModel.addRow(new Object[] { id, name, price, quantity, total });
-        SurchargeDTO dto = new SurchargeDTO();
-        dto.setSurchargeId(Long.parseLong(id));
-        dto.setName(name);
-        dto.setPrice(BigDecimal.valueOf(price));
-        dto.setQuantity(quantity);
-        selectedSurcharges.put(id, dto);
-        totalAmount += total;
-        updateTotalLabel();
-    }
-
-    /**
-     * Lấy danh sách dữ liệu từ bảng bên phải (bảng phụ phí đã chọn)
-     * 
-     * @return List các SurchargeDTO từ bảng phụ phí đã chọn
-     */
-    public java.util.List<SurchargeDTO> getSelectedTableData() {
-        java.util.List<SurchargeDTO> data = new java.util.ArrayList<>();
+    public java.util.List<AmenityDTO> getSelectedTableData() {
+        java.util.List<AmenityDTO> data = new java.util.ArrayList<>();
         for (int i = 0; i < selectedModel.getRowCount(); i++) {
-
-
-
-            Integer quantity = (Integer) selectedModel.getValueAt(i, 3); // Số lượng
-
-            SurchargeDTO dto = (SurchargeDTO) selectedModel.getValueAt(i, 1);
-
+            Integer quantity = (Integer) selectedModel.getValueAt(i, 3);
+            AmenityDTO dto = (AmenityDTO) selectedModel.getValueAt(i, 1);
             dto.setQuantity(quantity);
-
             data.add(dto);
         }
         return data;
     }
 
-    /**
-     * Đưa dữ liệu vào 2 bảng
-     * 
-     * @param availableData Dữ liệu cho bảng trái (danh sách phụ phí có sẵn)
-     *                      Format: [STT, Tên phụ phí, Giá, Thành tiền]
-     * @param selectedData  Dữ liệu cho bảng phải (phụ phí đã chọn)
-     *                      Format: [Mã, Tên, Giá, Số lượng, Thành tiền]
-     */
-    public void loadData(java.util.List<Surcharge> availableData, ArrayList<SurchargeDTO> selectedData) {
-        // Clear existing data
+    public void loadData(java.util.List<Amenity> availableData, java.util.List<AmenityDTO> selectedData) {
         availableModel.setRowCount(0);
         selectedModel.setRowCount(0);
-        selectedSurcharges.clear();
+        selectedAmenities.clear();
         totalAmount = 0.0;
 
-        // Load available surcharges (left table)
         if (availableData != null) {
-            for (Surcharge surcharge : availableData) {
+            for (Amenity amenity : availableData) {
                 availableModel.addRow(new Object[] {
-                        surcharge.getSurchargeId(),
-                        surcharge.getName(),
-                        surcharge.getPrice(),
+                        amenity.getAmenityId(),
+                        amenity.getNameAmenity(),
+                        amenity.getPrice(),
                 });
             }
         }
 
-        // Load selected surcharges (right table)
         if (selectedData != null) {
             int index = 1;
-            for (SurchargeDTO dto : selectedData) {
-                BigDecimal total = dto.getPrice().multiply(new BigDecimal(dto.getQuantity()));
+            for (AmenityDTO dto : selectedData) {
+                double total = dto.getPrice() * dto.getQuantity();
                 selectedModel.addRow(new Object[] {
                         index++,
                         dto,
@@ -654,15 +533,16 @@ public class SurchargeManagementPanel extends JPanel {
                         dto.getQuantity(),
                         total
                 });
-                selectedSurcharges.put(dto.getSurchargeId().toString(), dto);
-                totalAmount += total.doubleValue();
+                selectedAmenities.put(dto.getId().toString(), dto);
+                totalAmount += total;
             }
         }
 
         updateTotalLabel();
-        selectedSurchargesTable.revalidate();
-        selectedSurchargesTable.repaint();
-        availableSurchargesTable.revalidate();
-        availableSurchargesTable.repaint();
+        selectedAmenitiesTable.revalidate();
+        selectedAmenitiesTable.repaint();
+        availableAmenitiesTable.revalidate();
+        availableAmenitiesTable.repaint();
     }
 }
+

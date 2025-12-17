@@ -37,7 +37,6 @@ public class OrderService {
         }
 
 
-
         // nếu 2 là đặt phòng thì cập nhật trạng thái phòng thành đang sử dụng
         if (order.getOrderType().getOrderTypeId() == 2) {
             List<Long> roomsIdx = order.getBookings().stream()
@@ -75,7 +74,7 @@ public class OrderService {
             System.out.println("Employee :" + order.getEmployee());
             System.out.println("Customer :" + order.getCustomer());
             System.out.println("Bookings :" + order.getBookings());
-            AppLogger.info(getClass() +" Order is missing required fields ");
+            AppLogger.info(getClass() + " Order is missing required fields ");
             return null;
         }
 
@@ -137,6 +136,14 @@ public class OrderService {
         roomRepository.updateRoomStatusBatch(roomIds, RoomStatus.AVAILABLE);
     }
 
+    public void updateOrderDeposit(Long orderId, java.math.BigDecimal deposit) {
+        orderRepository.updateDeposit(orderId, deposit);
+    }
+
+    public void updateOrderType(Long orderId, Long newOrderTypeId) {
+        orderRepository.updateOrderType(orderId, newOrderTypeId);
+    }
+
     public List<Order> getUnpaidOrders() {
         return orderRepository.findAllByOrderUnPaid();
     }
@@ -150,6 +157,41 @@ public class OrderService {
     }
 
     public void removeBookingsFromOrder(Order currentOrder, List<Booking> result) {
-       bookingRepository.removeBookingsFromOrder(currentOrder, result);
+        bookingRepository.removeBookingsFromOrder(currentOrder, result);
+    }
+
+
+    public void recalculateOrderTotal(Long orderId) {
+        Order order = orderRepository.findById(orderId);
+        if (order == null) {
+            AppLogger.info("Order not found with id: " + orderId);
+            return;
+        }
+//        lấy tổng tièn phòng
+        List<Booking> bookings = order.getBookings();
+
+
+        BigDecimal totalRoom = BigDecimal.valueOf(bookings.stream().mapToDouble(e->bookingService.getPriceFromBooking(e)).sum());
+
+//        lấy tổng tiền dịch vu
+        BigDecimal totalAmenity = orderDetailsService.getOrderDetailsByOrderId(orderId).stream().map(OrderDetail::getUnitPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+//        lấy tổng tiền phụ phí
+        BigDecimal totalSurcharge = surchargeDetailService.getSurchargeDetailsByOrderId(orderId).stream().map(e -> e.getSurcharge().getPrice().multiply(BigDecimal.valueOf(e.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalAmount = totalAmenity.add(totalSurcharge).add(totalRoom).subtract(order.getDeposit());
+        orderRepository.updateTotalAmount(orderId, totalAmount);
+    }
+    private BookingService bookingService = new  BookingService();
+    private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
+
+    public void deleteOrderById(Long id) {
+        surchargeDetailService.deleteById(id);
+        orderDetailsService.deleteById(id);
+        bookingRepository.deleteByOrderId(id);
+        orderRepository.deleteById(id);
+    }
+
+    public List<Order> searchOrdersByKeyword(String searchText) {
+        return orderRepository.searchOrdersByKeyword(searchText);
     }
 }

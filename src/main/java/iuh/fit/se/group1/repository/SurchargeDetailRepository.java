@@ -76,4 +76,63 @@ public class SurchargeDetailRepository {
             throw new RuntimeException("Error checking existence of SurchargeDetail", e);
         }
     }
+
+    public void deleteByOrderId(Long orderId) {
+        String sql = "DELETE FROM SurchargeDetail WHERE orderId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting surcharge details by orderId", e);
+        }
+    }
+
+    public boolean saveByOrderId(Long orderId, List<SurchargeDetail> surchargeDetails) {
+        String sql = "INSERT INTO SurchargeDetail (orderId, surchargerId, quantity) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (SurchargeDetail sd : surchargeDetails) {
+                ps.setLong(1, orderId);
+                ps.setLong(2, sd.getSurcharge().getSurchargeId());
+                ps.setInt(3, sd.getQuantity());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving surcharge details by orderId", e);
+        }
+    }
+
+    public void deleteById(long surchargeId, Long orderId) {
+        String sql = "DELETE FROM SurchargeDetail WHERE surchargerId = ? AND orderId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, surchargeId);
+            ps.setLong(2, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting surcharge detail by id and orderId", e);
+        }
+    }
+
+    public void deleteById(Long orderId) {
+        String sql = "DELETE FROM SurchargeDetail where orderId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting surcharge detail by id and orderId", e);
+        }
+    }
+
+    public void updateSurchargeDetail(Long surchargeId, int quantity, Long orderId) {
+        String sql = "UPDATE SurchargeDetail SET quantity = ? WHERE surchargerId = ? AND orderId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setLong(2, surchargeId);
+            ps.setLong(3, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating surcharge detail", e);
+        }
+    }
 }

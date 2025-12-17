@@ -134,9 +134,9 @@ public class MainLayout extends JPanel {
                     } else if (index == 12 && subIndex == 2) {
                         setMainContent(new Regulation());
                     } else if (index == 12 && subIndex == 3) {
-                        var modal = new CheckForVersionPanel();
-                        GlassPanePopup.showPopup(modal);
-                        modal.getBtnClose().addActionListener(e
+
+                        GlassPanePopup.showPopup(checkForVersionPanel);
+                        checkForVersionPanel.getBtnClose().addActionListener(e
                                 -> GlassPanePopup.closePopupLast()
                         );
                     } else if (index == 12 && subIndex == 4) {
@@ -385,35 +385,6 @@ public class MainLayout extends JPanel {
         closeShift.saveData();
     }
 
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-                    JFrame frame = new JFrame("Main Layout");
-                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    GlassPanePopup.install(frame);
-                    frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
-                    frame.setLocationRelativeTo(null);
-                    frame.setContentPane(new MainLayout());
-                    frame.setVisible(true);
-                }
-        );
-    }
 
     public void setAuth(boolean isAdmin) {
         this.isAdmin = isAdmin;
@@ -432,8 +403,6 @@ public class MainLayout extends JPanel {
             roomManagement = new RoomManagement();
             roomToolsManagement= new RoomToolsManagement();
             orderManagement = new OrderManagement();
-            orderManagement.setParent(this);
-            orderManagement.setPaymentPage(paymentPage);
             checkForVersionPanel = new CheckForVersionPanel();
             revenueStatistics = new RevenueStatistics();
             surchargeManagement = new SurchargeManagement();

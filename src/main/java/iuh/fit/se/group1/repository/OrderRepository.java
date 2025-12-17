@@ -81,7 +81,7 @@ public class OrderRepository implements Repository<Order, Long> {
                     B.bookingId, B.checkInDate, B.checkOutDate,B.bookingType,
                     B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
                     OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt,email, fullName, gender,phone,dateOfBirth,citizenId, rt.name as rtName, rt.roomTypeId,
-                    R.roomNumber AS rRoomNumber, hourlyRate, dailyRate, overnightRate,additionalHourRate
+                    R.roomNumber AS rRoomNumber, hourlyRate, dailyRate, overnightRate,additionalHourRate, paymentDate, paymentType
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
                 JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
@@ -123,6 +123,10 @@ public class OrderRepository implements Repository<Order, Long> {
                         order.setDeposit(rs.getBigDecimal("deposit"));
                         order.setOrderType(orderType);
                         order.setCustomer(customer);
+                        order.setPaymentDate(rs.getDate("paymentDate") != null ? rs.getDate("paymentDate").toLocalDate() : null);
+
+                        order.setPaymentType(rs.getString("paymentType") !=null? PaymentType.valueOf(rs.getString("paymentType")): null);
+
 
                         Employee employee = new Employee();
                         employee.setEmployeeId(rs.getLong("employeeId"));
@@ -165,6 +169,14 @@ public class OrderRepository implements Repository<Order, Long> {
 
     @Override
     public void deleteById(Long aLong) {
+        String sql = "DELETE FROM Orders WHERE orderId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, aLong);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Error deleting Order with ID {}: ", aLong, e);
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -292,6 +304,31 @@ public class OrderRepository implements Repository<Order, Long> {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("Error updating total amount for Order ID {}: ", orderId, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateDeposit(Long orderId, BigDecimal deposit) {
+        String sql = "UPDATE Orders SET deposit = ? WHERE orderId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setBigDecimal(1, deposit);
+            preparedStatement.setLong(2, orderId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Error updating deposit for Order ID {}: ", orderId, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateOrderType(Long orderId, Long newOrderTypeId) {
+        String sql = "UPDATE Orders SET orderTypeId = ? WHERE orderId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, newOrderTypeId);
+            preparedStatement.setLong(2, orderId);
+            preparedStatement.executeUpdate();
+            log.info("Updated orderTypeId to {} for Order ID {}", newOrderTypeId, orderId);
+        } catch (SQLException e) {
+            log.error("Error updating orderType for Order ID {}: ", orderId, e);
             throw new RuntimeException(e);
         }
     }
@@ -620,5 +657,89 @@ public class OrderRepository implements Repository<Order, Long> {
             throw new RuntimeException(e);
         }
         return BigDecimal.ZERO;
+    }
+
+    public List<Order> searchOrdersByKeyword(String searchText) {
+        String sql = """
+                SELECT
+                    O.orderId, O.orderDate, O.totalAmount, O.employeeId,
+                    O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
+                    B.bookingId, B.checkInDate, B.checkOutDate,
+                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
+                    OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
+                FROM Orders O
+                JOIN Booking B ON O.orderId = B.orderId
+                JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+                JOIN Room R ON B.roomId = R.roomId
+                where O.customerId IN (
+                    SELECT customerId FROM Customer
+                    WHERE fullName LIKE ? OR phone LIKE ? OR citizenId LIKE ?
+                ) OR R.roomNumber LIKE ? or O.orderId LIKE ?
+                """;
+
+        List<Order> orders = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)){
+
+            String like = "%" + searchText + "%";
+            ps.setString(1, like);
+            ps.setString(2, like);
+            ps.setString(3, like);
+            ps.setString(4, like);
+            ps.setString(5, like);
+
+            ResultSet rs = ps.executeQuery();
+
+                Map<Long, Order> orderMap = new HashMap<>();
+
+                while (rs.next()) {
+                    long orderId = rs.getLong("orderId");
+                    Order order = orderMap.get(orderId);
+                    if (order == null) {
+                        order = new Order();
+                        order.setOrderId(orderId);
+                        order.setOrderDate(rs.getTimestamp("orderDate").toLocalDateTime());
+                        order.setTotalAmount(rs.getBigDecimal("totalAmount"));
+                        order.setDeposit(rs.getBigDecimal("deposit"));
+
+                        long orderTypeId = rs.getLong("otId");
+                        OrderType orderType = new OrderType();
+                        orderType.setOrderTypeId(orderTypeId);
+                        orderType.setName(rs.getString("otName"));
+                        order.setOrderType(orderType);
+
+                        long customerId = rs.getLong("customerId");
+                        if (!rs.wasNull()) {
+                            Customer customer = customerRepository.findById(customerId);
+                            order.setCustomer(customer);
+                        }
+
+                        order.setBookings(new ArrayList<>());
+                        orderMap.put(orderId, order);
+                    }
+
+                    // Ánh xạ Booking
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getLong("bookingId"));
+                    booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
+                    booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                    booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
+                    booking.setOrder(order);
+
+                    // Lấy Room
+                    Room room = new Room();
+                    room.setRoomId(rs.getLong("roomId"));
+                    room.setRoomNumber(rs.getString("rRoomNumber"));
+                    booking.setRoom(room);
+
+                    order.getBookings().add(booking);
+                }
+
+                orders.addAll(orderMap.values());
+                return orders;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
