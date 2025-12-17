@@ -197,6 +197,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 AvatarLabel avatarLabel = modal.getAvatarLabel();
                 if (avatarLabel != null && employee.getAvt() != null && employee.getAvt().length > 0) {
                     avatarLabel.setImageFromBytes(employee.getAvt());
+                    avatarLabel.setImageChanged(false);
                 }
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
@@ -353,15 +354,17 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 if (avatarLabel != null) {
                     if (employee.getAvt() != null && employee.getAvt().length > 0) {
                         try {
-                            // Convert byte array sang BufferedImage
-                            ByteArrayInputStream bais = new ByteArrayInputStream(employee.getAvt());
-                            BufferedImage image = ImageIO.read(bais);
-                            if (image != null) {
-                                avatarLabel.setImage(image);
-                                log.info("Avatar loaded successfully for employee: {}", employeeId);
-                            } else {
-                                log.warn("Failed to read image from byte array for employee: {}", employeeId);
-                            }
+//                            ByteArrayInputStream bais = new ByteArrayInputStream(employee.getAvt());
+//                            BufferedImage image = ImageIO.read(bais);
+//                            if (image != null) {
+//                                avatarLabel.setImage(image);
+//                                log.info("Avatar loaded successfully for employee: {}", employeeId);
+//                            } else {
+//                                log.warn("Failed to read image from byte array for employee: {}", employeeId);
+//                            }
+                            avatarLabel.setImageFromBytes(employee.getAvt());
+                            // QUAN TRỌNG: View mode - không cho phép thay đổi
+                            avatarLabel.setImageChanged(false);
                         } catch (Exception e) {
                             log.error("Error loading avatar image: ", e);
                         }
@@ -371,7 +374,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     }
                 }
                 modal.getBtnChooseImg().setVisible(false);
-                // Disable các trường nhập liệu
                 modal.getTxtName().setEditable(false);
                 modal.getTxtPhone().setEditable(false);
                 modal.getTxtEmail().setEditable(false);
@@ -773,6 +775,11 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.getLblCode().setVisible(false);
         modal.getLblStatus().setText("Hãy chọn avatar!");
         modal.getLblStatus().setForeground(Color.red);
+        if (modal.getAvatarLabel() != null) {
+            modal.getAvatarLabel().resetToDefault();
+            modal.getAvatarLabel().setImageChanged(false);
+            log.info("New employee modal: avatar reset to default, imageChanged = false");
+        }
         modal.closeModel(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -876,7 +883,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         Valid result = getValid(modal);
 
         if (!result.valid) {
-            Message.showMessage("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào!");
             return false;
         }
 
@@ -962,15 +968,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         return style;
     }
 
-
-    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {
-        ExportExcelService.exportTableToExcel(
-                this,
-                tblEmployee.getTbl(),
-                "Danh sách nhân viên",
-                "DanhSachNhanVien");
-    }
-
     private void filterTable(String genderFilter, String positionFilter) {
         TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblEmployee.getTbl()
                 .getRowSorter();
@@ -1003,8 +1000,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         String hireDateStr = modal.getTxtHireDate().getText().trim();
         boolean gender = modal.getCmbGender().getSelectedItem() != null
                 && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nữ");
-
-        // Reset lỗi
+        EmployeeService service = new EmployeeService();
         Color white = Color.WHITE;
         modal.getLblErrolName().setForeground(white);
         modal.getLblErrolPhone().setForeground(white);
@@ -1014,6 +1010,12 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         boolean valid = true;
         Color red = Color.RED;
+
+        // Kiểm tra Avatar
+        AvatarLabel avatarLabel = modal.getAvatarLabel();
+        if (avatarLabel == null || !avatarLabel.isImageChanged()) {
+            valid = false;
+        }
 
         // Tên
         if (name.isEmpty()) {
@@ -1046,6 +1048,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
             modal.getLblErrolCitizen().setText("CCCD phải có 12 chữ số!");
             modal.getLblErrolCitizen().setForeground(red);
             valid = false;
+        } else if (service.existsByCitizenId(citizenId) != null) {
+            modal.getLblErrolCitizen().setText("CCCD đã tồn tại!");
+            modal.getLblErrolCitizen().setForeground(red);
+            valid = false;
         }
 
         // Email
@@ -1059,6 +1065,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             valid = false;
         }
 
+        // Ngày tuyển dụng
         LocalDate hireDate = null;
         try {
             if (!hireDateStr.isEmpty()) {
@@ -1067,16 +1074,13 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 hireDate = LocalDate.now();
             }
         } catch (DateTimeParseException e) {
-            modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd-MM-yyyy)!");
+            modal.getLblErrolHireDate().setText("Ngày không hợp lệ (dd/MM/yyyy)!");
             modal.getLblErrolHireDate().setForeground(red);
             valid = false;
             log.error("Error parsing hire date: ", e);
         }
-
         return new Valid(name, valid, gender, phone, citizenId, email, hireDate);
     }
-
-
     private record Valid(
             String fullName,
             boolean valid,
@@ -1085,7 +1089,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
             String citizenId,
             String email,
             LocalDate hireDate) {
-
     }
 
     private iuh.fit.se.group1.ui.component.custom.Button btnAddEmployee;

@@ -25,6 +25,7 @@ public class AvatarLabel extends JPanel {
     private BufferedImage image;
     private BufferedImage scaled;
     private BufferedImage defaultImage;
+    private boolean imageChanged = false;
 
     public AvatarLabel() {
         this(true);
@@ -32,7 +33,7 @@ public class AvatarLabel extends JPanel {
     public AvatarLabel(boolean loadDefaultImage) {
         setPreferredSize(new Dimension(60, 60));
         setOpaque(false);
-
+        this.imageChanged = false;
         if (loadDefaultImage) {
             loadDefaultImage();
             if (defaultImage != null) {
@@ -60,6 +61,7 @@ public class AvatarLabel extends JPanel {
         if (defaultImage != null) {
             this.image = defaultImage;
             this.scaled = null;
+            this.imageChanged = false;
             repaint();
             log.info("Avatar reset to default image");
         } else {
@@ -78,6 +80,7 @@ public class AvatarLabel extends JPanel {
         }
         this.image = image;
         this.scaled = null;
+        this.imageChanged = true;
         repaint();
         log.info("Avatar image updated successfully");
     }
@@ -97,15 +100,6 @@ public class AvatarLabel extends JPanel {
             return null;
         }
     }
-    public String getImageAsBase64(String format) {
-        byte[] bytes = getImageAsBytes(format);
-        if (bytes == null) {
-            return null;
-        }
-        String base64 = Base64.getEncoder().encodeToString(bytes);
-        log.info("Image converted to Base64 successfully");
-        return base64;
-    }
     public boolean setImageFromBytes(byte[] imageBytes) {
         if (imageBytes == null || imageBytes.length == 0) {
             log.warn("Image bytes is null or empty, resetting to default");
@@ -118,7 +112,9 @@ public class AvatarLabel extends JPanel {
             BufferedImage loadedImage = ImageIO.read(bais);
 
             if (loadedImage != null) {
-                setImage(loadedImage);
+                this.image = loadedImage;
+                this.scaled = null;
+                this.imageChanged = true;
                 log.info("Image loaded from bytes successfully");
                 return true;
             } else {
@@ -131,6 +127,13 @@ public class AvatarLabel extends JPanel {
             resetToDefault();
             return false;
         }
+    }
+    public boolean isImageChanged() {
+        return imageChanged;
+    }
+    public void setImageChanged(boolean changed) {
+        this.imageChanged = changed;
+        log.info("imageChanged manually set to: {}", changed);
     }
     @Override
     protected void paintComponent(Graphics g) {
