@@ -99,6 +99,12 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
     }
 
+    public void setOnPayment (){
+        sequencePayment1.setActiveStep(0);
+        loadDataTable();
+        scrollPaneWin111.setViewportView(jPanel1);
+    }
+
     private void backStep1() {
         sequencePayment1.setActiveStep(0);
         loadDataTable();

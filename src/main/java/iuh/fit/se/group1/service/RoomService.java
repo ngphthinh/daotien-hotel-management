@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.RoomDTO;
+import iuh.fit.se.group1.entity.Booking;
+import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
@@ -18,7 +20,7 @@ public class RoomService {
     private final RoomTypeRepository roomTypeRepository = new RoomTypeRepository();
     private static final String SINGLE_ROOM_TYPE = "SINGLE";
     private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
-
+    private final OrderService orderService = new OrderService();
     public RoomService() {
         this.roomRepository = new RoomRepository();
     }
@@ -28,6 +30,7 @@ public class RoomService {
     }
 
     public void deleteRoom(Long roomId) {
+
         roomRepository.deleteById(roomId);
     }
 
@@ -37,6 +40,11 @@ public class RoomService {
 
     public Room updateRoom(Room room) {
         return roomRepository.update(room);
+    }
+
+
+    public boolean existsByRoomNumber(String roomNumber) {
+        return roomRepository.existsByRoomNumber(roomNumber);
     }
 
     public List<Room> getRoomByKeyword(String keyword) {
@@ -236,5 +244,59 @@ public class RoomService {
 
     public Room getRoomByRoomId(Long roomId) {
         return roomRepository.findById(roomId);
+    }
+
+    public boolean canDeleteRoom(Long roomId) {
+        // Tìm trong hóa đơn ordertype = 3 (Đặt trước) xem có roomId này không
+        // Nếu có thì thay bằng 1 phòng khác cùng loại, đang trống và chưa được đặt trước
+        Long orderTypeBooked = 3L;
+        List<Order> ordersUsingRoom = orderService.getOrdersByRoomIdAndOrderType(roomId, orderTypeBooked);
+
+        if (!ordersUsingRoom.isEmpty()) {
+            // Lấy thông tin phòng cần xóa
+            Room roomToDelete = roomRepository.findById(roomId);
+            if (roomToDelete == null) {
+                return false;
+            }
+
+            String roomTypeId = roomToDelete.getRoomType().getRoomTypeId();
+
+            // Duyệt qua từng order đang dùng phòng này
+            for (Order order : ordersUsingRoom) {
+                // Lấy booking của phòng này trong order
+                Booking bookingToReplace = order.getBookings().stream()
+                    .filter(b -> b.getRoom().getRoomId().equals(roomId))
+                    .findFirst()
+                    .orElse(null);
+
+                if (bookingToReplace == null) {
+                    continue;
+                }
+
+                // Tìm phòng thay thế: cùng loại, trống, chưa được đặt trong khoảng thời gian này
+                List<Room> availableRooms = roomRepository.findAvailableRooms(
+                    bookingToReplace.getCheckInDate(),
+                    bookingToReplace.getCheckOutDate(),
+                    RoomStatus.AVAILABLE
+                );
+
+                Room replacementRoom = availableRooms.stream()
+                    .filter(r -> r.getRoomType().getRoomTypeId().equals(roomTypeId))
+                    .filter(r -> !r.getRoomId().equals(roomId)) // Loại trừ phòng đang xóa
+                    .findFirst()
+                    .orElse(null);
+
+                if (replacementRoom == null) {
+                    // Không tìm thấy phòng thay thế -> không thể xóa
+                    return false;
+                }
+
+                // Cập nhật booking sang phòng mới
+                roomRepository.updateBookingRoom(bookingToReplace.getBookingId(), replacementRoom.getRoomId());
+            }
+        }
+
+        // Kiểm tra phòng có đang được sử dụng trong các order khác không
+        return !roomRepository.isRoomInUse(roomId);
     }
 }

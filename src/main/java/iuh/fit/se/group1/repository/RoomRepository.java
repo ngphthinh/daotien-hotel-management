@@ -29,7 +29,7 @@ public class RoomRepository implements Repository<Room, Long> {
     public Room save(Room room) {
         String sql = "INSERT INTO Room (roomNumber, roomTypeId, createdAt, roomStatus) VALUES (?, ?, ?, ?)";
         try (
-             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             connection.setAutoCommit(true);
 
@@ -73,7 +73,7 @@ public class RoomRepository implements Repository<Room, Long> {
 
             preparedStatement.setString(1, entity.getRoomNumber());
             preparedStatement.setString(2, entity.getRoomTypeId());
-            preparedStatement.setString(3, entity.getRoomStatus().toString());
+            preparedStatement.setString(3, entity.getRoomStatus().name());
             preparedStatement.setLong(4, entity.getRoomId());
 
             int affectedRows = preparedStatement.executeUpdate();
@@ -137,74 +137,74 @@ public class RoomRepository implements Repository<Room, Long> {
         }
     }
 
-   @Override
-public List<Room> findAll() {
-    List<Room> rooms = new ArrayList<>();
+    @Override
+    public List<Room> findAll() {
+        List<Room> rooms = new ArrayList<>();
 
-    String sql = """
-        SELECT
-            r.roomId,
-            r.roomNumber,
-            r.createdAt AS roomCreatedAt,
-            r.roomStatus,
-            r.roomTypeId,
+        String sql = """
+                SELECT
+                    r.roomId,
+                    r.roomNumber,
+                    r.createdAt AS roomCreatedAt,
+                    r.roomStatus,
+                    r.roomTypeId,
+                
+                    rt.name AS roomTypeName,
+                    rt.hourlyRate,
+                    rt.dailyRate,
+                    rt.overnightRate,
+                    rt.additionalHourRate,
+                    rt.createdAt AS roomTypeCreatedAt
+                FROM Room r
+                JOIN RoomType rt ON r.roomTypeId = rt.roomTypeId
+                ORDER BY r.roomId
+                """;
 
-            rt.name AS roomTypeName,
-            rt.hourlyRate,
-            rt.dailyRate,
-            rt.overnightRate,
-            rt.additionalHourRate,
-            rt.createdAt AS roomTypeCreatedAt
-        FROM Room r
-        JOIN RoomType rt ON r.roomTypeId = rt.roomTypeId
-        ORDER BY r.roomId
-        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-    try (PreparedStatement ps = connection.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Room room = new Room();
 
-        while (rs.next()) {
-            Room room = new Room();
+                // ===== ROOM =====
+                room.setRoomId(rs.getLong("roomId"));
 
-            // ===== ROOM =====
-            room.setRoomId(rs.getLong("roomId"));
+                // ✅ FIX LỖI COMPILER Ở ĐÂY
+                room.setRoomNumber(String.valueOf(rs.getInt("roomNumber")));
 
-            // ✅ FIX LỖI COMPILER Ở ĐÂY
-            room.setRoomNumber(String.valueOf(rs.getInt("roomNumber")));
+                room.setRoomStatus(RoomStatus.valueOf(rs.getString("roomStatus")));
 
-            room.setRoomStatus(RoomStatus.valueOf(rs.getString("roomStatus")));
+                Date roomCreatedAt = rs.getDate("roomCreatedAt");
+                room.setCreateAt(roomCreatedAt != null ? roomCreatedAt.toLocalDate() : null);
 
-            Date roomCreatedAt = rs.getDate("roomCreatedAt");
-            room.setCreateAt(roomCreatedAt != null ? roomCreatedAt.toLocalDate() : null);
+                // ===== ROOM TYPE =====
+                RoomType roomType = new RoomType();
+                roomType.setRoomTypeId(rs.getString("roomTypeId"));
+                roomType.setName(rs.getString("roomTypeName"));
+                roomType.setHourlyRate(rs.getBigDecimal("hourlyRate"));
+                roomType.setDailyRate(rs.getBigDecimal("dailyRate"));
+                roomType.setOvernightRate(rs.getBigDecimal("overnightRate"));
+                roomType.setAdditionalHourRate(rs.getBigDecimal("additionalHourRate"));
 
-            // ===== ROOM TYPE =====
-            RoomType roomType = new RoomType();
-            roomType.setRoomTypeId(rs.getString("roomTypeId"));
-            roomType.setName(rs.getString("roomTypeName"));
-            roomType.setHourlyRate(rs.getBigDecimal("hourlyRate"));
-            roomType.setDailyRate(rs.getBigDecimal("dailyRate"));
-            roomType.setOvernightRate(rs.getBigDecimal("overnightRate"));
-            roomType.setAdditionalHourRate(rs.getBigDecimal("additionalHourRate"));
+                Date rtCreatedAt = rs.getDate("roomTypeCreatedAt");
+                roomType.setCreatedAt(
+                        rtCreatedAt != null ? rtCreatedAt.toLocalDate() : null
+                );
 
-            Date rtCreatedAt = rs.getDate("roomTypeCreatedAt");
-            roomType.setCreatedAt(
-                rtCreatedAt != null ? rtCreatedAt.toLocalDate() : null
-            );
+                room.setRoomType(roomType);
 
-            room.setRoomType(roomType);
+                rooms.add(room);
+            }
 
-            rooms.add(room);
+            log.info("Found {} rooms with RoomType", rooms.size());
+
+        } catch (SQLException e) {
+            log.error("Error loading rooms with RoomType", e);
+            throw new RuntimeException(e);
         }
 
-        log.info("Found {} rooms with RoomType", rooms.size());
-
-    } catch (SQLException e) {
-        log.error("Error loading rooms with RoomType", e);
-        throw new RuntimeException(e);
+        return rooms;
     }
-
-    return rooms;
-}
 
     public List<Room> findByRoomNumberOrId(String keyword) {
         List<Room> rooms = new ArrayList<>();
@@ -350,4 +350,76 @@ public List<Room> findAll() {
         }
         return rooms;
     }
+
+    public boolean existsByRoomNumber(String roomNumber) {
+        String sql = "SELECT COUNT(*) FROM Room WHERE roomNumber = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, roomNumber);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error checking existence of room number: ", e);
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
+    /**
+     * Kiểm tra xem phòng có đang được sử dụng trong các hóa đơn đang hoạt động không
+     * @param roomId ID phòng cần kiểm tra
+     * @return true nếu phòng đang được dùng, false nếu có thể xóa
+     */
+    public boolean isRoomInUse(Long roomId) {
+        // Kiểm tra xem phòng có trong booking của các order đang hoạt động không
+        // Order type: 1 = Đã hoàn thành (có thể xóa), 2 = Đang xử lí (không thể xóa), 3 = Đặt trước (đã xử lý bởi canDeleteRoom)
+        String sql = """
+            SELECT COUNT(*) 
+            FROM Booking b
+            JOIN Orders o ON b.orderId = o.orderId
+            WHERE b.roomId = ? 
+              AND o.orderTypeId IN (2) 
+            """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, roomId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0; // true = đang được dùng, không thể xóa
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error checking if room is in use: ", e);
+            throw new RuntimeException(e);
+        }
+        return false; // Không tìm thấy -> có thể xóa
+    }
+
+    /**
+     * Cập nhật phòng trong booking
+     * @param bookingId ID của booking cần cập nhật
+     * @param newRoomId ID của phòng mới
+     */
+    public void updateBookingRoom(Long bookingId, Long newRoomId) {
+        String sql = "UPDATE Booking SET roomId = ? WHERE bookingId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, newRoomId);
+            ps.setLong(2, bookingId);
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                log.warn("No booking found with id: {}", bookingId);
+            } else {
+                log.info("Updated booking {} to use room {}", bookingId, newRoomId);
+            }
+        } catch (SQLException e) {
+            log.error("Error updating booking room: ", e);
+            throw new RuntimeException("Failed to update booking room", e);
+        }
+    }
+
+
 }

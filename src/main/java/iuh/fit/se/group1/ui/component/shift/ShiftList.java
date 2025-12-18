@@ -287,7 +287,6 @@ public class ShiftList extends JPanel {
         shiftProfile.updateEmployeeCodeLabel(code);
         // todo:
         try {
-            // Nếu ảnh nằm trong thư mục resources (ví dụ: /images/avttest.jpg)
             URL url = getClass().getResource(imagePath);
             if (url != null) {
                 BufferedImage original = ImageIO.read(url);

@@ -17,6 +17,11 @@ public class PromotionService {
     public void deletePromotion(Long promotionId) {
         promotionRepository.deleteById(promotionId);
     }
+
+    public Promotion getPromotionById(Long promotionId) {
+        return promotionRepository.findById(promotionId);
+    }
+
     public List<Promotion> getAllPromotions() {
         return promotionRepository.findAll();
     }

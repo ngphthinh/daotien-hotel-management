@@ -3,6 +3,7 @@ package iuh.fit.se.group1.ui.component.custom;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.service.BookingService;
 import iuh.fit.se.group1.service.OrderDetailService;
+import iuh.fit.se.group1.service.PromotionService;
 import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
@@ -32,10 +33,10 @@ public class InvoicePanel extends JPanel {
     private List<OrderDetail> orderDetails;
     private List<SurchargeDetail> surchargeDetails;
     // services to load details
-    private BookingService bookingService =new BookingService();
+    private BookingService bookingService = new BookingService();
     private final OrderDetailService orderDetailService = new OrderDetailService();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
-
+    private final PromotionService promotionService = new PromotionService();
     // Header components
     private JLabel lblInvoiceTitle;
     private JLabel lblInvoiceId;
@@ -350,7 +351,8 @@ public class InvoicePanel extends JPanel {
             @Override
             public boolean isCellEditable(int row, int column) {
                 // Allow editing price (col 1) and quantity (col 2) when in editMode
-                if (!editMode) return false;
+                if (!editMode)
+                    return false;
                 return column == 1 || column == 2;
             }
         };
@@ -377,7 +379,8 @@ public class InvoicePanel extends JPanel {
         surchargeModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                if (!editMode) return false;
+                if (!editMode)
+                    return false;
                 return column == 1 || column == 2;
             }
         };
@@ -412,7 +415,8 @@ public class InvoicePanel extends JPanel {
         header.setOpaque(true);
         header.setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+            public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int col) {
                 JLabel lbl = (JLabel) super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
                 lbl.setBackground(PALETTE_NAVY);
                 lbl.setForeground(Color.WHITE);
@@ -434,7 +438,8 @@ public class InvoicePanel extends JPanel {
         // Custom renderer for alternating rows and edit highlighting
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (isSelected) {
                     c.setBackground(PALETTE_SELECTION);
@@ -450,7 +455,8 @@ public class InvoicePanel extends JPanel {
                         if (editMode && table.getModel().isCellEditable(row, column)) {
                             c.setBackground(PALETTE_EDIT_HIGHLIGHT);
                         }
-                    } catch (Exception ignore) {}
+                    } catch (Exception ignore) {
+                    }
                     c.setForeground(new Color(34, 47, 62));
                 }
                 setHorizontalAlignment(SwingConstants.CENTER);
@@ -589,7 +595,7 @@ public class InvoicePanel extends JPanel {
                         booking.getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
                         booking.getCheckOutDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
                         booking.getBookingType().getDisplayName(),
-                       bookingService.getPriceFromBooking(booking)
+                        bookingService.getPriceFromBooking(booking)
                 });
             }
         }
@@ -612,7 +618,8 @@ public class InvoicePanel extends JPanel {
 
     private void updateAmenities() {
         amenityModel.setRowCount(0);
-        if (order == null || order.getOrderId() == null) return;
+        if (order == null || order.getOrderId() == null)
+            return;
 
         List<OrderDetail> details = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
         if (details != null) {
@@ -621,29 +628,35 @@ public class InvoicePanel extends JPanel {
                 int qty = d.getQuantity();
                 BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(qty));
                 String amenityName = d.getAmenity() != null ? d.getAmenity().getNameAmenity() : "-";
-                amenityModel.addRow(new Object[] { amenityName, Constants.VND_FORMAT.format(unitPrice), qty, Constants.VND_FORMAT.format(total) });
+                amenityModel.addRow(new Object[] { amenityName, Constants.VND_FORMAT.format(unitPrice), qty,
+                        Constants.VND_FORMAT.format(total) });
             }
         }
     }
 
     private void updateSurcharges() {
         surchargeModel.setRowCount(0);
-        if (order == null || order.getOrderId() == null) return;
+        if (order == null || order.getOrderId() == null)
+            return;
 
         List<SurchargeDetail> details = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
         if (details != null) {
             for (SurchargeDetail d : details) {
-                BigDecimal unitPrice = d.getSurcharge() != null && d.getSurcharge().getPrice() != null ? d.getSurcharge().getPrice() : BigDecimal.ZERO;
+                BigDecimal unitPrice = d.getSurcharge() != null && d.getSurcharge().getPrice() != null
+                        ? d.getSurcharge().getPrice()
+                        : BigDecimal.ZERO;
                 int qty = d.getQuantity();
                 BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(qty));
                 String name = d.getSurcharge() != null ? d.getSurcharge().getName() : "-";
-                surchargeModel.addRow(new Object[] { name, Constants.VND_FORMAT.format(unitPrice), qty, Constants.VND_FORMAT.format(total) });
+                surchargeModel.addRow(new Object[] { name, Constants.VND_FORMAT.format(unitPrice), qty,
+                        Constants.VND_FORMAT.format(total) });
             }
         }
     }
 
     private void updatePromotion() {
-        Promotion promotion = order.getPromotion();
+        Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+
         if (promotion != null) {
             lblPromotionName.setText(promotion.getPromotionName());
             lblPromotionDiscount.setText(promotion.getDiscountPercent() + "%");
@@ -746,9 +759,11 @@ public class InvoicePanel extends JPanel {
     }
 
     private BigDecimal parseCurrency(Object obj) {
-        if (obj == null) return BigDecimal.ZERO;
+        if (obj == null)
+            return BigDecimal.ZERO;
         String s = obj.toString().replaceAll("[^\\d.-]", "");
-        if (s.isEmpty()) return BigDecimal.ZERO;
+        if (s.isEmpty())
+            return BigDecimal.ZERO;
         try {
             return new BigDecimal(s);
         } catch (Exception ex) {
@@ -757,9 +772,11 @@ public class InvoicePanel extends JPanel {
     }
 
     private int parseInt(Object obj) {
-        if (obj == null) return 0;
+        if (obj == null)
+            return 0;
         String s = obj.toString().replaceAll("[^\\d-]", "");
-        if (s.isEmpty()) return 0;
+        if (s.isEmpty())
+            return 0;
         try {
             return Integer.parseInt(s);
         } catch (Exception ex) {

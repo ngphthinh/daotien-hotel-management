@@ -13,8 +13,8 @@ public class RoomType {
     private BigDecimal additionalHourRate;
     private LocalDate createdAt;
 
-    public RoomType(String name) {
-        this.name = name;
+    public RoomType(String roomTypeId) {
+        this.roomTypeId = roomTypeId;
     }
 
     public RoomType() {

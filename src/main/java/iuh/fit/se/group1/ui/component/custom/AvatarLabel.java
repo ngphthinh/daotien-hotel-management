@@ -43,7 +43,7 @@ public class AvatarLabel extends JPanel {
     }
     private void loadDefaultImage() {
         try {
-            URL url = getClass().getResource("/images/conmeo.jpg");
+            URL url = getClass().getResource("/images/loginImg.jpg");
             if (url != null) {
                 defaultImage = ImageIO.read(url);
                 log.info("Default avatar loaded from URL: {}", url);

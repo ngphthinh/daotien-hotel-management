@@ -11,7 +11,6 @@ public class Room {
     private RoomType roomType;
     private LocalDate createdAt;
     private RoomStatus roomStatus;
-    private BigDecimal price;  // Thêm trường price dựa trên schema SQL (DECIMAL(18,2) -> BigDecimal cho độ chính xác)
 
     public Room(Long roomId, String roomNumber) {
         this.roomId = roomId;
@@ -22,23 +21,21 @@ public class Room {
         return createdAt;
     }
 
-    public Room(Long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus, BigDecimal price) {
+    public Room(Long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus) {
         this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.roomType = roomType;
         this.createdAt = createdAt;
         this.roomStatus = roomStatus;
-        this.price = price;
     }
 
     public Room() {
     }
 
-    public Room(String roomNumber, RoomType roomType, RoomStatus roomStatus, BigDecimal price) {
+    public Room(String roomNumber, RoomType roomType, RoomStatus roomStatus) {
         this.roomNumber = roomNumber;
         this.roomType = roomType;
         this.roomStatus = roomStatus;
-        this.price = price;
     }
 
     public Room(Long roomId) {
@@ -85,13 +82,6 @@ public class Room {
         this.roomStatus = roomStatus;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 
     @Override
     public int hashCode() {
@@ -117,7 +107,7 @@ public class Room {
 
     @Override
     public String toString() {
-        return "Room{" + "roomId=" + roomId + ", roomNumber=" + roomNumber + ", roomType=" + roomType + ", createAt=" + createdAt + ", roomStatus=" + roomStatus + ", price=" + price + '}';
+        return "Room{" + "roomId=" + roomId + ", roomNumber=" + roomNumber + ", roomType=" + roomType + ", createAt=" + createdAt + ", roomStatus=" + roomStatus + '}';
     }
 
     public String getRoomTypeId() {

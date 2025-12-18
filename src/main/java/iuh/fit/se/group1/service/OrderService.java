@@ -118,17 +118,12 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    public List<Order> getAllOrdersUnPaid() {
-        return orderRepository.findAllByOrderUnPaid();
-    }
+
 
     public Order getOrderById(Long id) {
         return orderRepository.findById(id);
     }
 
-    public List<BookingDisplayDTO> findAllBookingDisplay() {
-        return orderRepository.findAllBookingDisplay();
-    }
 
     public void updateOrderStatusToPaid(Order order) {
         orderRepository.updateOrderStatusToPaid(order);
@@ -193,5 +188,10 @@ public class OrderService {
 
     public List<Order> searchOrdersByKeyword(String searchText) {
         return orderRepository.searchOrdersByKeyword(searchText);
+    }
+
+    public List<Order> getOrdersByRoomIdAndOrderType(Long roomId, Long orderTypeId) {
+        return orderRepository.findOrdersByRoomIdAndOrderType(roomId, orderTypeId);
+
     }
 }

@@ -98,6 +98,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                     setMainContent(bookingPage);
                     } else if (index == 2) {
+                        paymentPage.setOnPayment();
                         setMainContent(paymentPage);
                     } else if (index == 3 && subIndex == 1) {
                         shiftManagement.getShiftList().reloadEmployees();
@@ -132,7 +133,6 @@ public class MainLayout extends JPanel {
                     } else if (index == 12 && subIndex == 2) {
                         setMainContent(new Regulation());
                     } else if (index == 12 && subIndex == 3) {
-
                         GlassPanePopup.showPopup(checkForVersionPanel);
                         checkForVersionPanel.getBtnClose().addActionListener(e
                                 -> GlassPanePopup.closePopupLast()

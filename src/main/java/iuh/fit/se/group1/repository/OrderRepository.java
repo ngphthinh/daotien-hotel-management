@@ -115,6 +115,9 @@ public class OrderRepository implements Repository<Order, Long> {
                         customer.setCitizenId(rs.getString("citizenId"));
                         customer.setEmail(rs.getString("email"));
 
+                        Promotion promotion = new Promotion();
+                        promotion.setPromotionId(rs.getLong("promotionId"));
+
                         // 🔹 Map Order
                         order = new Order();
                         order.setOrderId(rs.getLong("orderId"));
@@ -124,7 +127,7 @@ public class OrderRepository implements Repository<Order, Long> {
                         order.setOrderType(orderType);
                         order.setCustomer(customer);
                         order.setPaymentDate(rs.getDate("paymentDate") != null ? rs.getDate("paymentDate").toLocalDate() : null);
-
+                        order.setPromotion(promotion);
                         order.setPaymentType(rs.getString("paymentType") !=null? PaymentType.valueOf(rs.getString("paymentType")): null);
 
 
@@ -198,7 +201,7 @@ public class OrderRepository implements Repository<Order, Long> {
         List<Order> orders = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
 
             Map<Long, Order> orderMap = new HashMap<>();
 
@@ -228,7 +231,6 @@ public class OrderRepository implements Repository<Order, Long> {
                     orderMap.put(orderId, order);
                 }
 
-
                 if (rs.getString("bookingType") != null) {
                     Booking booking = new Booking();
                     booking.setBookingId(rs.getLong("bookingId"));
@@ -246,8 +248,6 @@ public class OrderRepository implements Repository<Order, Long> {
                     order.getBookings().add(booking);
                 }
 
-
-
             }
 
             orders.addAll(orderMap.values());
@@ -258,7 +258,6 @@ public class OrderRepository implements Repository<Order, Long> {
             throw new RuntimeException(e);
         }
     }
-
 
     public List<BookingDisplayDTO> findAllBookingDisplay() {
         String sql = """
@@ -277,7 +276,7 @@ public class OrderRepository implements Repository<Order, Long> {
         List<BookingDisplayDTO> list = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Long bookingId = rs.getLong("bookingId");
@@ -340,7 +339,7 @@ public class OrderRepository implements Repository<Order, Long> {
 
     public List<Order> findAllByOrderUnPaid() {
         String sql = """
-               
+
                 SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount, C.phone, C.fullName, R.roomNumber
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
@@ -353,7 +352,7 @@ public class OrderRepository implements Repository<Order, Long> {
         List<Order> orders = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
 
             Map<Long, Order> orderMap = new HashMap<>();
 
@@ -398,7 +397,7 @@ public class OrderRepository implements Repository<Order, Long> {
     }
 
     public void updateOrderStatusToPaid(Order order) {
-            String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ?, paymentDate = ? WHERE orderId = ?";
+        String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ?, paymentDate = ? WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setBigDecimal(1, order.getTotalAmount());
             preparedStatement.setString(2, order.getPaymentType().name());
@@ -418,16 +417,16 @@ public class OrderRepository implements Repository<Order, Long> {
 
     public List<Order> findUnpaidOrdersByKeyword(String keyword) {
         String sql = """
-            SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount, 
-                   C.phone, C.fullName, R.roomNumber
-            FROM Orders O
-            JOIN Booking B ON O.orderId = B.orderId
-            JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
-            JOIN Room R ON B.roomId = R.roomId
-            JOIN Customer C ON O.customerId = C.customerId
-            WHERE O.orderTypeId = 2 
-              AND (C.fullName LIKE ? OR C.phone LIKE ? OR R.roomNumber LIKE ?)
-            """;
+                SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount,
+                       C.phone, C.fullName, R.roomNumber
+                FROM Orders O
+                JOIN Booking B ON O.orderId = B.orderId
+                JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+                JOIN Room R ON B.roomId = R.roomId
+                JOIN Customer C ON O.customerId = C.customerId
+                WHERE O.orderTypeId = 2
+                  AND (C.fullName LIKE ? OR C.phone LIKE ? OR R.roomNumber LIKE ?)
+                """;
 
         List<Order> orders = new ArrayList<>();
 
@@ -481,100 +480,100 @@ public class OrderRepository implements Repository<Order, Long> {
     }
 
     public List<Order> findAllOrders() {
-    String sql = """
-            SELECT
-                O.orderId, O.orderDate, O.totalAmount, O.employeeId,
-                O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
-                B.bookingId, B.checkInDate, B.checkOutDate,
-                B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
-                OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
-            FROM Orders O
-            JOIN Booking B ON O.orderId = B.orderId
-            JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
-            JOIN Room R ON B.roomId = R.roomId
-            WHERE O.orderTypeId != 1
-            """;
+        String sql = """
+                SELECT
+                    O.orderId, O.orderDate, O.totalAmount, O.employeeId,
+                    O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
+                    B.bookingId, B.checkInDate, B.checkOutDate,
+                    B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
+                    OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
+                FROM Orders O
+                JOIN Booking B ON O.orderId = B.orderId
+                JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+                JOIN Room R ON B.roomId = R.roomId
+                WHERE O.orderTypeId != 1
+                """;
 
-    List<Order> orders = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
 
-    try (PreparedStatement ps = connection.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
-        Map<Long, Order> orderMap = new HashMap<>();
+            Map<Long, Order> orderMap = new HashMap<>();
 
-        while (rs.next()) {
-            long orderId = rs.getLong("orderId");
-            Order order = orderMap.get(orderId);
-            if (order == null) {
-                order = new Order();
-                order.setOrderId(orderId);
-                order.setOrderDate(rs.getTimestamp("orderDate").toLocalDateTime());
-                order.setTotalAmount(rs.getBigDecimal("totalAmount"));
-                order.setDeposit(rs.getBigDecimal("deposit"));
+            while (rs.next()) {
+                long orderId = rs.getLong("orderId");
+                Order order = orderMap.get(orderId);
+                if (order == null) {
+                    order = new Order();
+                    order.setOrderId(orderId);
+                    order.setOrderDate(rs.getTimestamp("orderDate").toLocalDateTime());
+                    order.setTotalAmount(rs.getBigDecimal("totalAmount"));
+                    order.setDeposit(rs.getBigDecimal("deposit"));
 
-                long orderTypeId = rs.getLong("otId");
-                OrderType orderType = new OrderType();
-                orderType.setOrderTypeId(orderTypeId);
-                orderType.setName(rs.getString("otName"));
-                order.setOrderType(orderType);
+                    long orderTypeId = rs.getLong("otId");
+                    OrderType orderType = new OrderType();
+                    orderType.setOrderTypeId(orderTypeId);
+                    orderType.setName(rs.getString("otName"));
+                    order.setOrderType(orderType);
 
-                long customerId = rs.getLong("customerId");
-                if (!rs.wasNull()) {
-                    Customer customer = customerRepository.findById(customerId);
-                    order.setCustomer(customer);
+                    long customerId = rs.getLong("customerId");
+                    if (!rs.wasNull()) {
+                        Customer customer = customerRepository.findById(customerId);
+                        order.setCustomer(customer);
+                    }
+
+                    order.setBookings(new ArrayList<>());
+                    orderMap.put(orderId, order);
                 }
 
-                order.setBookings(new ArrayList<>());
-                orderMap.put(orderId, order);
+                // Ánh xạ Booking
+                Booking booking = new Booking();
+                booking.setBookingId(rs.getLong("bookingId"));
+                booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
+                booking.setOrder(order);
+
+                // Lấy Room
+                Room room = new Room();
+                room.setRoomId(rs.getLong("roomId"));
+                room.setRoomNumber(rs.getString("rRoomNumber"));
+                booking.setRoom(room);
+
+                order.getBookings().add(booking);
             }
 
-            // Ánh xạ Booking
-            Booking booking = new Booking();
-            booking.setBookingId(rs.getLong("bookingId"));
-            booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
-            booking.setOrder(order);
+            orders.addAll(orderMap.values());
+            return orders;
 
-            // Lấy Room
-            Room room = new Room();
-            room.setRoomId(rs.getLong("roomId"));
-            room.setRoomNumber(rs.getString("rRoomNumber"));
-            booking.setRoom(room);
-
-            order.getBookings().add(booking);
+        } catch (SQLException e) {
+            log.error("Error retrieving Orders with Bookings and OrderType: ", e);
+            throw new RuntimeException(e);
         }
-
-        orders.addAll(orderMap.values());
-        return orders;
-
-    } catch (SQLException e) {
-        log.error("Error retrieving Orders with Bookings and OrderType: ", e);
-        throw new RuntimeException(e);
     }
-}
 
     public List<Order> findOrdersUnPendingByKeyWord(String keyword) {
         String sql = """
-        SELECT
-            O.orderId, O.orderDate, O.totalAmount, O.deposit, 
-            O.orderTypeId, O.customerId, 
-            B.bookingId, B.checkInDate, B.checkOutDate,
-            B.orderId AS bookingOrderId, B.roomId, B.bookingType,
-            OT.orderTypeId AS otId, OT.name AS otName,
-            R.roomNumber AS rRoomNumber,
-            C.fullName AS cFullName, C.phone AS cPhone, C.citizenId AS cCitizenId
-            
-        FROM Orders O
-        JOIN Booking B ON O.orderId = B.orderId
-        JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
-        JOIN Room R ON B.roomId = R.roomId
-        JOIN Customer C ON O.customerId = C.customerId
-        
-        WHERE O.orderTypeId != 1
-          AND (C.fullName LIKE ? 
-            OR C.phone LIKE ? 
-            OR R.roomNumber LIKE ? 
-            OR C.citizenId LIKE ?)
-        """;
+                SELECT
+                    O.orderId, O.orderDate, O.totalAmount, O.deposit,
+                    O.orderTypeId, O.customerId,
+                    B.bookingId, B.checkInDate, B.checkOutDate,
+                    B.orderId AS bookingOrderId, B.roomId, B.bookingType,
+                    OT.orderTypeId AS otId, OT.name AS otName,
+                    R.roomNumber AS rRoomNumber,
+                    C.fullName AS cFullName, C.phone AS cPhone, C.citizenId AS cCitizenId
+
+                FROM Orders O
+                JOIN Booking B ON O.orderId = B.orderId
+                JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+                JOIN Room R ON B.roomId = R.roomId
+                JOIN Customer C ON O.customerId = C.customerId
+
+                WHERE O.orderTypeId != 1
+                  AND (C.fullName LIKE ?
+                    OR C.phone LIKE ?
+                    OR R.roomNumber LIKE ?
+                    OR C.citizenId LIKE ?)
+                """;
 
         List<Order> orders = new ArrayList<>();
 
@@ -646,7 +645,6 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
-
     public BigDecimal calculateTotalRevenueBetweenDates(LocalDate from, LocalDate to) {
         String sql = "SELECT SUM(totalAmount) AS totalRevenue FROM Orders WHERE orderTypeId = 1 AND paymentDate BETWEEN ? AND ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -654,7 +652,8 @@ public class OrderRepository implements Repository<Order, Long> {
             preparedStatement.setDate(2, Date.valueOf(to));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return resultSet.getBigDecimal("totalRevenue") != null ? resultSet.getBigDecimal("totalRevenue") : BigDecimal.ZERO;
+                    return resultSet.getBigDecimal("totalRevenue") != null ? resultSet.getBigDecimal("totalRevenue")
+                            : BigDecimal.ZERO;
                 }
             }
         } catch (SQLException e) {
@@ -684,7 +683,7 @@ public class OrderRepository implements Repository<Order, Long> {
 
         List<Order> orders = new ArrayList<>();
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)){
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             String like = "%" + searchText + "%";
             ps.setString(1, like);
@@ -695,10 +694,87 @@ public class OrderRepository implements Repository<Order, Long> {
 
             ResultSet rs = ps.executeQuery();
 
+            Map<Long, Order> orderMap = new HashMap<>();
+
+            while (rs.next()) {
+                long orderId = rs.getLong("orderId");
+                Order order = orderMap.get(orderId);
+                if (order == null) {
+                    order = new Order();
+                    order.setOrderId(orderId);
+                    order.setOrderDate(rs.getTimestamp("orderDate").toLocalDateTime());
+                    order.setTotalAmount(rs.getBigDecimal("totalAmount"));
+                    order.setDeposit(rs.getBigDecimal("deposit"));
+
+                    long orderTypeId = rs.getLong("otId");
+                    OrderType orderType = new OrderType();
+                    orderType.setOrderTypeId(orderTypeId);
+                    orderType.setName(rs.getString("otName"));
+                    order.setOrderType(orderType);
+
+                    long customerId = rs.getLong("customerId");
+                    if (!rs.wasNull()) {
+                        Customer customer = customerRepository.findById(customerId);
+                        order.setCustomer(customer);
+                    }
+
+                    order.setBookings(new ArrayList<>());
+                    orderMap.put(orderId, order);
+                }
+
+                // Ánh xạ Booking
+                Booking booking = new Booking();
+                booking.setBookingId(rs.getLong("bookingId"));
+                booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
+                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
+                booking.setOrder(order);
+
+                // Lấy Room
+                Room room = new Room();
+                room.setRoomId(rs.getLong("roomId"));
+                room.setRoomNumber(rs.getString("rRoomNumber"));
+                booking.setRoom(room);
+
+                order.getBookings().add(booking);
+            }
+
+            orders.addAll(orderMap.values());
+            return orders;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Order> findOrdersByRoomIdAndOrderType(Long roomId, Long orderTypeId) {
+        String sql = """
+                SELECT O.orderId, O.orderDate, O.totalAmount, O.deposit,
+                       O.orderTypeId, O.customerId,
+                       B.bookingId, B.checkInDate, B.checkOutDate,
+                       B.orderId AS bookingOrderId, B.roomId, B.bookingType,
+                       OT.orderTypeId AS otId, OT.name AS otName,
+                       R.roomNumber AS rRoomNumber
+                FROM Orders O
+                JOIN Booking B ON O.orderId = B.orderId
+                JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
+                JOIN Room R ON B.roomId = R.roomId
+                WHERE R.roomId = ? AND O.orderTypeId = ?
+                """;
+
+        List<Order> orders = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, roomId);
+            ps.setLong(2, orderTypeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
                 Map<Long, Order> orderMap = new HashMap<>();
 
                 while (rs.next()) {
                     long orderId = rs.getLong("orderId");
+
                     Order order = orderMap.get(orderId);
                     if (order == null) {
                         order = new Order();
@@ -707,31 +783,21 @@ public class OrderRepository implements Repository<Order, Long> {
                         order.setTotalAmount(rs.getBigDecimal("totalAmount"));
                         order.setDeposit(rs.getBigDecimal("deposit"));
 
-                        long orderTypeId = rs.getLong("otId");
+                        long otId = rs.getLong("otId");
                         OrderType orderType = new OrderType();
-                        orderType.setOrderTypeId(orderTypeId);
+                        orderType.setOrderTypeId(otId);
                         orderType.setName(rs.getString("otName"));
                         order.setOrderType(orderType);
-
-                        long customerId = rs.getLong("customerId");
-                        if (!rs.wasNull()) {
-                            Customer customer = customerRepository.findById(customerId);
-                            order.setCustomer(customer);
-                        }
 
                         order.setBookings(new ArrayList<>());
                         orderMap.put(orderId, order);
                     }
 
-                    // Ánh xạ Booking
                     Booking booking = new Booking();
                     booking.setBookingId(rs.getLong("bookingId"));
                     booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
-                    booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
-                    booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
                     booking.setOrder(order);
 
-                    // Lấy Room
                     Room room = new Room();
                     room.setRoomId(rs.getLong("roomId"));
                     room.setRoomNumber(rs.getString("rRoomNumber"));
@@ -742,8 +808,10 @@ public class OrderRepository implements Repository<Order, Long> {
 
                 orders.addAll(orderMap.values());
                 return orders;
+            }
 
         } catch (SQLException e) {
+            log.error("Error retrieving Orders by Room ID and Order Type: ", e);
             throw new RuntimeException(e);
         }
     }
