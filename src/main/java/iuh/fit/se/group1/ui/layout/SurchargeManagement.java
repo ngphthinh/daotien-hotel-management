@@ -341,7 +341,7 @@ public class SurchargeManagement extends javax.swing.JPanel {
         } else {
             try {
                 priceI = new BigDecimal(
-                        price.replaceAll("[^\\d.]", "").trim()
+                         price.replaceAll("[^\\d.-]", "").trim()
                 );
                 if (priceI.compareTo(BigDecimal.ZERO) <= 0) {
                     modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");

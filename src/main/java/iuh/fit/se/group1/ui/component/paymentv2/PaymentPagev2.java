@@ -259,4 +259,10 @@ public class PaymentPagev2 extends javax.swing.JPanel {
     private iuh.fit.se.group1.ui.component.paymentv2.SequencePayment sequencePayment1;
     private iuh.fit.se.group1.ui.component.paymentv2.CustomTable tbl;
     // End of variables declaration//GEN-END:variables
+
+    public void setOnPayment (){
+        sequencePayment1.setActiveStep(0);
+        loadDataTable();
+        scrollPaneWin111.setViewportView(jPanel1);
+    }
 }
