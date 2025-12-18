@@ -126,6 +126,70 @@ public class ShiftList extends JPanel {
             log.error("Error adding new employee to shift list: ", ex);
         }
     }
+    public void loadEmployees(List<Employee> employees) {
+        try {
+            pnlEmployees.removeAll();
+            pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
+
+            for (Employee e : employees) {
+                String name = e.getFullName();
+                String code = String.valueOf(e.getEmployeeId());
+
+                BufferedImage image = null;
+                try {
+                    if (e.getAvt() != null && e.getAvt().length > 0) {
+                        image = ImageIO.read(new ByteArrayInputStream(e.getAvt()));
+                    } else {
+                        URL defaultImg = getClass().getResource("/images/meomeo.jpg");
+                        if (defaultImg != null) {
+                            image = ImageIO.read(defaultImg);
+                        }
+                    }
+                } catch (Exception ex) {
+                    log.error("Error loading image for employee {}", name, ex);
+                }
+
+                ShiftProfile shiftProfile = new ShiftProfile();
+                shiftProfile.getLblName().setText(name);
+                shiftProfile.updateEmployeeCodeLabel(code);
+                shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
+                shiftProfile.setMaximumSize(new Dimension(303, 72));
+                shiftProfile.setMinimumSize(new Dimension(0, 72));
+
+                if (image != null) {
+                    BufferedImage resized = Scalr.resize(
+                            image,
+                            Scalr.Method.QUALITY,
+                            Scalr.Mode.FIT_EXACT,
+                            60,
+                            60
+                    );
+                    shiftProfile.getAvatarLabel().setImage(resized);
+                }
+
+                pnlEmployees.add(shiftProfile);
+
+                JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+                separator.setAlignmentX(Component.LEFT_ALIGNMENT);
+                separator.setMaximumSize(new Dimension(303, 1));
+                separator.setForeground(new Color(180, 180, 180));
+                separator.setBackground(new Color(180, 180, 180));
+                separator.setOpaque(true);
+                pnlEmployees.add(separator);
+
+                shiftProfile.addMouseListener(shiftProfile);
+            }
+
+            pnlEmployees.revalidate();
+            pnlEmployees.repaint();
+            SwingUtilities.invokeLater(() ->
+                    scrollPaneWin111.getVerticalScrollBar().setValue(0)
+            );
+
+        } catch (Exception ex) {
+            log.error("Error loading employees into ShiftList", ex);
+        }
+    }
 
     private void loadEmployeesFromDatabase() {
         try {

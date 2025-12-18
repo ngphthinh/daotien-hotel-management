@@ -72,9 +72,9 @@ public class Profile extends javax.swing.JPanel {
             txtPhone.setText(employee.getPhone());
         }
         if (employee.isGender()) {
-            cmbGender.setSelectedItem("Nam");
-        } else {
             cmbGender.setSelectedItem("Nữ");
+        } else {
+            cmbGender.setSelectedItem("Nam");
         }
         if (employee.getAccount() != null
                 && employee.getAccount().getRole() != null
@@ -192,7 +192,7 @@ public class Profile extends javax.swing.JPanel {
         
         // Row 1: Gender and Position
         addFormField(container, "Giới tính", leftColX, startY, fieldWidth, fieldHeight, labelHeight, () -> {
-            cmbGender = createStyledComboBox(new String[]{"Nam", "Nữ"});
+            cmbGender = createStyledComboBox(new String[]{"Nữ", "Nam"});
             return cmbGender;
         });
         
