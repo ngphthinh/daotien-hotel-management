@@ -6,6 +6,7 @@ import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.service.RoomToolsService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.modal.ExtendBookingModal;
+import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import raven.glasspanepopup.GlassPanePopup;
 
 import javax.swing.*;
@@ -145,8 +146,7 @@ public class RoomToolsManagement extends JPanel {
                 loadSelectedBooking();
             }
         });
-
-        JScrollPane scrollPane = new JScrollPane(tblBookings);
+        ScrollPaneWin11 scrollPane = new ScrollPaneWin11(tblBookings);
         scrollPane.setBorder(new LineBorder(new Color(229, 231, 235), 1));
 
         JPanel pnlTop = new JPanel(new BorderLayout(0, 15));
@@ -265,7 +265,7 @@ public class RoomToolsManagement extends JPanel {
             }
         });
 
-        JScrollPane scrollPane = new JScrollPane(tblCurrentRooms);
+        ScrollPaneWin11 scrollPane = new ScrollPaneWin11(tblCurrentRooms);
         scrollPane.setBorder(new LineBorder(new Color(229, 231, 235), 1));
         scrollPane.setPreferredSize(new Dimension(0, 200));
 
@@ -469,7 +469,7 @@ public class RoomToolsManagement extends JPanel {
         tblNewRooms = new JTable(newRoomsModel);
         styleTable(tblNewRooms);
 
-        JScrollPane scrollPane = new JScrollPane(tblNewRooms);
+        ScrollPaneWin11 scrollPane = new ScrollPaneWin11(tblNewRooms);
         scrollPane.setBorder(new LineBorder(new Color(229, 231, 235), 1));
         scrollPane.setPreferredSize(new Dimension(0, 200));
 
@@ -802,7 +802,7 @@ public class RoomToolsManagement extends JPanel {
         lstRooms.setCellRenderer(new RoomListCellRenderer());
         lstRooms.setFixedCellHeight(60);
 
-        JScrollPane scrollPane = new JScrollPane(lstRooms);
+        ScrollPaneWin11 scrollPane = new ScrollPaneWin11(lstRooms);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));

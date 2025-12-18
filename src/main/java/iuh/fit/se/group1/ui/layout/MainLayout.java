@@ -111,6 +111,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 5) {
                         setMainContent(amenityManagement);
                     } else if (index == 6) {
+                        promotionManagement.loadData();
                         setMainContent(promotionManagement);
                     } else if (index == 7) {
                         setMainContent(roomManagement);

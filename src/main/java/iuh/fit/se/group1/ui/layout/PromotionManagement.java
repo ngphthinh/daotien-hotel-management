@@ -59,6 +59,10 @@ public class PromotionManagement extends javax.swing.JPanel {
         loadTable(promotionService.getAllPromotions());
     }
 
+    public void loadData() {
+        loadTable(promotionService.getAllPromotions());
+    }
+
     private void loadTable(java.util.List<Promotion> promotions) {
         DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
         model.setRowCount(0);
@@ -143,21 +147,17 @@ public class PromotionManagement extends javax.swing.JPanel {
             public void onEdit(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
                 Long id = (Long) model.getValueAt(row, 0);
-                String name = (String) model.getValueAt(row, 1);
-                String discountPrice = String.valueOf(model.getValueAt(row, 2));
-                String discountPercent = String.valueOf(model.getValueAt(row, 3));
-                String startDate = (String) model.getValueAt(row, 4);
-                String endDate = (String) model.getValueAt(row, 5);
+                Promotion promotionFind = promotionService.getPromotionById(id);
 
                 InfoPromotionModal modal = new InfoPromotionModal();
                 modal.getLblTitle().setText("Cập nhật khuyến mãi");
                 modal.getBtnSave().setText("Cập nhật");
 
-                modal.getTxtName().setText(name);
-                modal.getTxtPrice().setText(discountPrice);
-                modal.getTxtDiscountPersent().setText(discountPercent);
-                modal.getTxtStarDate().setText(startDate);
-                modal.getTxtEndDate().setText(endDate);
+                modal.getTxtName().setText(promotionFind.getPromotionName());
+                modal.getTxtPrice().setText(promotionFind.getMinOrderAmount().toString());
+                modal.getTxtDiscountPersent().setText(promotionFind.getDiscountPercent().toString());
+                modal.getTxtStarDate().setText(promotionFind.getStartDate().format(Constants.DATE_FORMATTER));
+                modal.getTxtEndDate().setText(promotionFind.getEndDate().format(Constants.DATE_FORMATTER));
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 modal.saveData(ae -> {
@@ -180,16 +180,13 @@ public class PromotionManagement extends javax.swing.JPanel {
 
                         Promotion entitySave = promotionService.updatePromotion(promotion);
 
-                        model.setValueAt(entitySave.getPromotionName(), row, 1);
+                        if (entitySave == null) {
+                            Message.showMessage("Lỗi", "Không thể cập nhật khuyến mãi!");
+                            return;
+                        }
+                        loadData();
 
-                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getMinOrderAmount()), row, 2);
-                        model.setValueAt(entitySave.getDiscountPercent() + " %", row, 3);
 
-                        model.setValueAt(entitySave.getMinOrderAmount(), row, 2);
-                        model.setValueAt(entitySave.getDiscountPercent(), row, 3);
-
-                        model.setValueAt(entitySave.getStartDate().format(Constants.DATE_FORMATTER), row, 4);
-                        model.setValueAt(entitySave.getEndDate().format(Constants.DATE_FORMATTER), row, 5);
                         // Cột 6 là createdAt - không cập nhật
                         // Cột 7 là action column
 
@@ -450,7 +447,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         } else {
             try {
                 discountPrice = new BigDecimal(priceStr);
-                if (discountPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                if (discountPrice.compareTo(BigDecimal.ZERO) < 0) {
                     modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
                     valid = false;
                 } else {
@@ -464,7 +461,6 @@ public class PromotionManagement extends javax.swing.JPanel {
         }
 
         float discountPercent = 0;
-        boolean hasPercent = false;
         if (percentStr.isEmpty()) {
             modal.getLblErrolDiscountPersent().setText("Phần trăm không được để trống!");
             valid = false;
@@ -474,8 +470,6 @@ public class PromotionManagement extends javax.swing.JPanel {
                 if (discountPercent < 0 || discountPercent > 100) {
                     modal.getLblErrolDiscountPersent().setText("Phần trăm phải nằm trong khoảng 0-100!");
                     valid = false;
-                } else {
-                    hasPercent = true;
                 }
             } catch (NumberFormatException e) {
                 modal.getLblErrolDiscountPersent().setText("Phần trăm phải là số hợp lệ!");

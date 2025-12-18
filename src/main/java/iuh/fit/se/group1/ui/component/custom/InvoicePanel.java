@@ -674,8 +674,10 @@ public class InvoicePanel extends JPanel {
 
             // Calculate promotion discount
             BigDecimal promotionAmount = BigDecimal.ZERO;
-            if (order.getPromotion() != null) {
-                float discountPercent = order.getPromotion().getDiscountPercent();
+            Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+            if (promotion != null) {
+
+                float discountPercent = promotion.getDiscountPercent();
                 promotionAmount = totalAmount.multiply(BigDecimal.valueOf(discountPercent / 100));
             }
 
@@ -731,8 +733,9 @@ public class InvoicePanel extends JPanel {
         BigDecimal roomTotal = getRoomTotal();
 
         BigDecimal promotionAmount = BigDecimal.ZERO;
-        if (order.getPromotion() != null) {
-            float discountPercent = order.getPromotion().getDiscountPercent();
+        Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+        if (promotion != null) {
+            float discountPercent = promotion.getDiscountPercent();
             promotionAmount = roomTotal.multiply(BigDecimal.valueOf(discountPercent / 100));
         }
 
