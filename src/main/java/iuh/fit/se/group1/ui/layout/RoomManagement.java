@@ -731,7 +731,7 @@ private void setupTableActions() {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(headerCustom, javax.swing.GroupLayout.PREFERRED_SIZE,
                                         javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(30, 30, 30)
+                                .addGap(10, 10, 10)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -746,7 +746,7 @@ private void setupTableActions() {
                                 .addGap(10, 10, 10)
                                 .addComponent(pricePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(15, 15, 15)
+                                .addGap(10, 10, 10)
                                 .addComponent(tblRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 615,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(8, Short.MAX_VALUE)));
