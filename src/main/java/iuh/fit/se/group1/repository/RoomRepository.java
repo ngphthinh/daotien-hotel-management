@@ -27,7 +27,7 @@ public class RoomRepository implements Repository<Room, Long> {
 
     @Override
     public Room save(Room room) {
-        String sql = "INSERT INTO Room (roomNumber, roomTypeId, createdAt, roomStatus) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Room (roomNumber, roomTypeId, createdAt, roomStatus, isDeleted) VALUES (?, ?, ?, ?, ?)";
         try (
                 PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -46,6 +46,7 @@ public class RoomRepository implements Repository<Room, Long> {
             }
             ps.setDate(3, Date.valueOf(room.getCreateAt()));
             ps.setString(4, room.getRoomStatus().name());
+            ps.setBoolean(5, false);
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {
@@ -58,7 +59,6 @@ public class RoomRepository implements Repository<Room, Long> {
                 }
             }
 
-            System.out.println(" Room saved: " + room.getRoomNumber());
             return room;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,7 +93,7 @@ public class RoomRepository implements Repository<Room, Long> {
 
     @Override
     public Room findById(Long id) {
-        String sql = "SELECT * FROM Room WHERE roomId = ?";
+        String sql = "SELECT * FROM Room WHERE roomId = ? AND isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
 
@@ -124,7 +124,7 @@ public class RoomRepository implements Repository<Room, Long> {
 
     @Override
     public void deleteById(Long id) {
-        String sql = "DELETE FROM Room WHERE roomId = ?";
+        String sql = "UPDATE ROOM SET isDeleted = 1 where roomId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             int affectedRows = preparedStatement.executeUpdate();
@@ -157,6 +157,7 @@ public class RoomRepository implements Repository<Room, Long> {
                     rt.createdAt AS roomTypeCreatedAt
                 FROM Room r
                 JOIN RoomType rt ON r.roomTypeId = rt.roomTypeId
+                WHERE r.isDeleted = 0
                 ORDER BY r.roomId
                 """;
 
@@ -208,7 +209,7 @@ public class RoomRepository implements Repository<Room, Long> {
 
     public List<Room> findByRoomNumberOrId(String keyword) {
         List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT * FROM Room WHERE roomNumber LIKE ? OR roomId LIKE ? ORDER BY roomId ASC, roomNumber ASC";
+        String sql = "SELECT * FROM Room WHERE isDeleted = 0 and (roomNumber LIKE ? OR roomId LIKE ?) ORDER BY roomId ASC, roomNumber ASC";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             String likeKeyword = "%" + keyword + "%";
@@ -242,17 +243,13 @@ public class RoomRepository implements Repository<Room, Long> {
         return rooms;
     }
 
-    public Room findRoomByRoomTypeAndStatusAndOverNights(String roomTypeId, RoomStatus roomStatus) {
-
-        return null;
-    }
 
     public List<Room> findRoomByStatusAndRoomType(String roomTypeId, RoomStatus roomStatus) {
 
         String sql = """
                 select r.roomId, r.roomNumber, r.roomTypeId, r.roomStatus, rt.name
                 from Room r join RoomType rt on r.roomTypeId = rt.roomTypeId
-                where rt.roomTypeId = ? and r.roomStatus = ?
+                where rt.roomTypeId = ? and r.roomStatus = ? and r.isDeleted = 0
                 order by r.roomId asc
                 """;
 
@@ -308,7 +305,7 @@ public class RoomRepository implements Repository<Room, Long> {
         String sql = """
                 SELECT r.*
                 FROM Room r
-                WHERE r.roomStatus = ?
+                WHERE isDeleted = 0 and r.roomStatus = ?
                   AND r.roomId NOT IN (
                       SELECT b.roomId
                       FROM Booking b
@@ -352,7 +349,7 @@ public class RoomRepository implements Repository<Room, Long> {
     }
 
     public boolean existsByRoomNumber(String roomNumber) {
-        String sql = "SELECT COUNT(*) FROM Room WHERE roomNumber = ?";
+        String sql = "SELECT COUNT(*) FROM Room WHERE roomNumber = ? and isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, roomNumber);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -380,7 +377,7 @@ public class RoomRepository implements Repository<Room, Long> {
             SELECT COUNT(*) 
             FROM Booking b
             JOIN Orders o ON b.orderId = o.orderId
-            WHERE b.roomId = ? 
+            WHERE b.roomId = ?
               AND o.orderTypeId IN (2) 
             """;
 

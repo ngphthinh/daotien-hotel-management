@@ -263,8 +263,12 @@ public class RoomService {
 
             // Duyệt qua từng order đang dùng phòng này
             for (Order order : ordersUsingRoom) {
+                BookingService bookingService = new BookingService();
+
+                List<Booking> bookings = bookingService.getBookingsByOrderId(order.getOrderId());
+
                 // Lấy booking của phòng này trong order
-                Booking bookingToReplace = order.getBookings().stream()
+                Booking bookingToReplace = bookings.stream()
                     .filter(b -> b.getRoom().getRoomId().equals(roomId))
                     .findFirst()
                     .orElse(null);

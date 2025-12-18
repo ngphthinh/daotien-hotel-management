@@ -334,7 +334,6 @@ public class RoomManagement extends javax.swing.JPanel {
         String type = String.valueOf(model.getValueAt(modelRow, 2));
         String status = String.valueOf(model.getValueAt(modelRow, 3));
 
-        System.out.println("Room data - ID: " + roomId + ", Number: " + number + ", Type: " + type + ", Status: " + status);
 
         // Kiểm tra phòng có trong hóa đơn loại 2 hoặc 3 không
         if (!roomService.canDeleteRoom(roomId)) {
@@ -353,6 +352,8 @@ public class RoomManagement extends javax.swing.JPanel {
 
         // Mở modal để chỉnh sửa
         RoomManagementModal modal = new RoomManagementModal();
+        modal.getLblTitle().setText("Cập nhật");
+        modal.getBtnSave().setText("Cập nhật");
         modal.getTxtNumberRoom().setText(number);
         modal.getCmbTypeRoom().setSelectedItem(type);
         modal.getCmbStatus().setSelectedItem(status);
@@ -413,7 +414,7 @@ private void handleDeleteRoom(int row) {
                             "</div></html>",
                     "Không thể xóa",
                     CustomDialog.MessageType.ERROR,
-                    600, 250);
+                    700, 250);
             return;
         }
         roomService.deleteRoom(roomId);

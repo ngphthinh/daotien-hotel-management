@@ -2,6 +2,9 @@ package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
+import iuh.fit.se.group1.entity.Room;
+import iuh.fit.se.group1.entity.RoomType;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,6 +158,47 @@ public class BookingRepository implements Repository<Booking, Long>{
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Booking> findByOrderId(Long orderId) {
+        String sql = """
+                SELECT bookingId, orderId, checkInDate, checkOutDate, bookingType, R.roomId, roomNumber, roomStatus, RT.roomTypeId, name, hourlyRate, dailyRate, overnightRate, additionalHourRate
+                FROM Booking B join Room R on B.roomId = R.roomId join RoomType RT on RT.roomTypeId = R.roomTypeId
+                WHERE B.orderId = ?
+                    """;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setLong(1, orderId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<Booking> bookings = new java.util.ArrayList<>();
+                while (resultSet.next()) {
+
+                    Booking booking = new Booking();
+                    booking.setBookingId(resultSet.getLong("bookingId"));
+                    booking.setCheckInDate(resultSet.getTimestamp("checkInDate").toLocalDateTime());
+                    booking.setCheckOutDate(resultSet.getTimestamp("checkOutDate").toLocalDateTime());
+                    booking.setBookingType(BookingType.valueOf(resultSet.getString("bookingType")));
+
+                    Room room = new Room();
+                    room.setRoomId(resultSet.getLong("roomId"));
+                    room.setRoomNumber(resultSet.getString("roomNumber"));
+                    // Set RoomType
+                    RoomType roomType = new RoomType();
+                    roomType.setRoomTypeId(resultSet.getString("roomTypeId"));
+                    roomType.setName(resultSet.getString("name"));
+                    roomType.setHourlyRate(resultSet.getBigDecimal("hourlyRate"));
+                    roomType.setDailyRate(resultSet.getBigDecimal("dailyRate"));
+                    roomType.setOvernightRate(resultSet.getBigDecimal("overnightRate"));
+                    roomType.setAdditionalHourRate(resultSet.getBigDecimal("additionalHourRate"));
+                    room.setRoomType(roomType);
+                    booking.setRoom(room);
+
+                    bookings.add(booking);
+                }
+                return bookings;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

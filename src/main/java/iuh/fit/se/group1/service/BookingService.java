@@ -70,6 +70,7 @@ public class BookingService {
     }
 
 
-
-
+    public List<Booking> getBookingsByOrderId(Long orderId) {
+        return bookingRepository.findByOrderId(orderId);
+    }
 }

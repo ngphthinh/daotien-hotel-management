@@ -16,3 +16,5 @@ Dec 18, 2025 6:30:11 PM iuh.fit.se.group1.config.AppLogger error
 SEVERE: No enum constant for status: Phòng hỏng
 Dec 18, 2025 6:34:26 PM iuh.fit.se.group1.config.AppLogger error
 SEVERE: No enum constant for status: Phòng hỏng
+Dec 18, 2025 10:39:29 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
