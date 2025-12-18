@@ -95,11 +95,6 @@ public class RoomToolsService {
                 // 08/12 14:00 -> 12/12 14:00 = 5 ngày (8,9,10,11,12)
                 long days = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
 
-                // Nếu check-out từ 12h trở đi, cộng thêm 1 ngày
-                if (checkOut.getHour() >= 12) {
-                    days++;
-                }
-
                 return Math.max(1, days);
 
             case OVERNIGHT:
@@ -440,6 +435,12 @@ public class RoomToolsService {
             if (!cancelSuccess) {
                 log.error("Failed to cancel booking in DB — rolling back not implemented");
                 return false;
+            }
+
+            boolean isTransformType = !repository.existsTransformType(orderId);
+            if (isTransformType) {
+                log.info("Order {} is of transform type, updating order type", orderId);
+                orderRepository.updateOrderType(orderId, 4L); // Cập nhật sang loại "Đã hủy"
             }
 
             log.info("Successfully cancelled booking: -{} VND removed from order {}", roomPrice, orderId);

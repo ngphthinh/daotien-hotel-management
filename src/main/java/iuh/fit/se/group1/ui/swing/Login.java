@@ -4,8 +4,7 @@
  */
 package iuh.fit.se.group1.ui.swing;
 
-import java.awt.Color;
-import java.awt.Cursor;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -55,14 +54,17 @@ public class Login extends javax.swing.JFrame {
     private JButton btnEye = new JButton();
 
     public Login() {
+        Image icon = Toolkit.getDefaultToolkit()
+                .getImage(getClass().getResource("/images/logo64.png"));
+
+        this.setIconImage(icon);
+
+        this.setTitle("Đăng nhập hệ thống quản lý khách sạn Đào Tiên");
         this.authenticateService = new AuthenticateService();
         this.employeeService = new EmployeeService();
         this.emailSenderService = new EmailSenderService();
         initComponents();
         custom();
-        txtUser.setText("admin1");
-        txtPass.setText("User@123");
-
     }
 
     private void custom() {
@@ -389,6 +391,8 @@ public class Login extends javax.swing.JFrame {
 
 
             if (action) {
+                this.setTitle("Hệ thống quản lý khách sạn Đào Tiên");
+
                 Employee employee = authenticateService.getEmployeeByAccountId(authenticate.getAccountId());
                 boolean isManager = authenticate.getRole().getRoleId().equals(Role.MANAGER.toString());
                 log.info("User '{}' login with role '{}'", authenticate.getUsername(), authenticate.getRole().getRoleId());

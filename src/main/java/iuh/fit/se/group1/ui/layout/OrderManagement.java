@@ -51,33 +51,44 @@ public class OrderManagement extends javax.swing.JPanel {
 
         for (Order order : orderService.getAllOrders()) {
 
-            String rooms = order.getBookings().stream()
-                    .map(booking -> booking.getRoom().getRoomNumber())
-                    .collect(Collectors.joining(", "));
+            if (!order.getBookings().isEmpty() && order.getBookings() != null) {
 
-            String checkIn = null;
-            String checkOut = null;
-            try {
-                checkIn = order.getBookings().get(0).getCheckInDate().format(Constants.DATE_FORMATTER);
+                String rooms = order.getBookings().stream()
+                        .map(booking -> booking.getRoom().getRoomNumber())
+                        .collect(Collectors.joining(", "));
 
-                checkOut = order.getBookings().get(0).getCheckOutDate().format(Constants.DATE_FORMATTER);
-            } catch (Exception e) {
-                order.getBookings().forEach(booking -> {
-                    System.out.println(booking.getBookingId());
+                String checkIn = null;
+                String checkOut = null;
+                try {
+                    checkIn = order.getBookings().get(0).getCheckInDate().format(Constants.DATE_FORMATTER);
+
+                    checkOut = order.getBookings().get(0).getCheckOutDate().format(Constants.DATE_FORMATTER);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                model.addRow(new Object[]{
+                        order.getOrderId(),
+                        order.getCustomer().getFullName(),
+                        order.getCustomer().getCitizenId(),
+                        Constants.VND_FORMAT.format(order.getTotalAmount()),
+                        order.getOrderType().getName(),
+                        rooms,
+                        checkIn,
+                        checkOut
                 });
-                throw new RuntimeException(e);
+            } else {
+                model.addRow(new Object[]{
+                        order.getOrderId(),
+                        order.getCustomer().getFullName(),
+                        order.getCustomer().getCitizenId(),
+                        Constants.VND_FORMAT.format(order.getTotalAmount()),
+                        order.getOrderType().getName(),
+                        "",
+                        "",
+                        ""
+                });
             }
-
-            model.addRow(new Object[] {
-                    order.getOrderId(),
-                    order.getCustomer().getFullName(),
-                    order.getCustomer().getCitizenId(),
-                    Constants.VND_FORMAT.format(order.getTotalAmount()),
-                    order.getOrderType().getName(),
-                    rooms,
-                    checkIn,
-                    checkOut
-            });
         }
     }
 
@@ -87,8 +98,8 @@ public class OrderManagement extends javax.swing.JPanel {
                 "<html><span style='color:white;'>Quản lý hóa đơn</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
 
-        String cols[] = { "Mã", "Tên khách hàng", "CCCD/Passport", "Tổng tiền", "Trạng thái", "Số phòng", "Ngày nhận",
-                "Ngày trả", "Chức năng" };
+        String cols[] = {"Mã", "Tên khách hàng", "CCCD/Passport", "Tổng tiền", "Trạng thái", "Số phòng", "Ngày nhận",
+                "Ngày trả", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 5) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -282,7 +293,7 @@ public class OrderManagement extends javax.swing.JPanel {
                 throw new RuntimeException(e);
             }
 
-            model.addRow(new Object[] {
+            model.addRow(new Object[]{
                     order.getOrderId(),
                     order.getCustomer().getFullName(),
                     order.getCustomer().getCitizenId(),
@@ -325,8 +336,7 @@ public class OrderManagement extends javax.swing.JPanel {
         var header = tblOrder.getTbl().getTableHeader();
 
         Combobox<String> cmbType = new Combobox<>(
-                new String[] { "Tất cả", "Đã hoàn thành", "Đang xử lí", "Đặt trước" });
-
+                new String[]{"Tất cả", "Đã hoàn thành", "Đang xử lí", "Đặt trước", "Đã hủy"});
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
 
         // Reset tất cả cột về default renderer

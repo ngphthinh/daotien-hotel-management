@@ -190,9 +190,9 @@ public class OrderRepository implements Repository<Order, Long> {
                     B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
                     OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt, R.roomNumber AS rRoomNumber
                 FROM Orders O
-                JOIN Booking B ON O.orderId = B.orderId
+                Left JOIN Booking B ON O.orderId = B.orderId
                 JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
-                JOIN Room R ON B.roomId = R.roomId
+                left JOIN Room R ON B.roomId = R.roomId
                 """;
 
         List<Order> orders = new ArrayList<>();
@@ -228,21 +228,26 @@ public class OrderRepository implements Repository<Order, Long> {
                     orderMap.put(orderId, order);
                 }
 
-                // Ánh xạ Booking
-                Booking booking = new Booking();
-                booking.setBookingId(rs.getLong("bookingId"));
-                booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
-                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
-                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
-                booking.setOrder(order);
 
-                // Lấy Room
-                Room room = new Room();
-                room.setRoomId(rs.getLong("roomId"));
-                room.setRoomNumber(rs.getString("rRoomNumber"));
-                booking.setRoom(room);
+                if (rs.getString("bookingType") != null) {
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getLong("bookingId"));
+                    booking.setBookingType(BookingType.fromString(rs.getString("bookingType")));
+                    booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                    booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
+                    booking.setOrder(order);
 
-                order.getBookings().add(booking);
+                    // Lấy Room
+                    Room room = new Room();
+                    room.setRoomId(rs.getLong("roomId"));
+                    room.setRoomNumber(rs.getString("rRoomNumber"));
+                    booking.setRoom(room);
+
+                    order.getBookings().add(booking);
+                }
+
+
+
             }
 
             orders.addAll(orderMap.values());

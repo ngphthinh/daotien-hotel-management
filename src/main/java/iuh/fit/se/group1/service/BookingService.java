@@ -55,14 +55,9 @@ public class BookingService {
                 // Tính số ngày thuê: mốc 12h trưa
                 // Check-out trước 12h -> không tính ngày đó
                 // Check-out từ 12h trở đi -> tính ngày đó
-                // VD: 08/12 14:00 -> 12/12 12:00 = 4 ngày (8,9,10,11)
-                // 08/12 14:00 -> 12/12 14:00 = 5 ngày (8,9,10,11,12)
+                // VD: 08/12 14:00 -> 12/12 12:00 = 3 ngày
+                // 08/12 14:00 -> 12/12 14:00 = 4 ngày
                 long days = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
-
-                // Nếu check-out từ 12h trở đi, cộng thêm 1 ngày
-                if (checkOut.getHour() >= 12) {
-                    days++;
-                }
 
                 return Math.max(1, days);
 

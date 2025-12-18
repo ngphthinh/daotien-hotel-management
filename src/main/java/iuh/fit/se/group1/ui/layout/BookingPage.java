@@ -164,6 +164,9 @@ public class BookingPage extends javax.swing.JPanel {
             setupInfoStep5();
             sequenceBooking.setActiveStep(4);
             scrollPaneWin111.setViewportView(mainFlow5);
+            SwingUtilities.invokeLater(() ->
+                    scrollPaneWin111.getViewport().setViewPosition(new Point(0, 0))
+            );
         });
 
         mainFlow5.getBtnPrev().addActionListener(e -> {
@@ -333,8 +336,6 @@ public class BookingPage extends javax.swing.JPanel {
         String adultStr = mainFlow1.getTxtNumberOfAdult().getText().trim();
         String childrenStr = mainFlow1.getTxtNumberOfChildren().getText().trim();
 
-
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
         // Parse ngày
@@ -498,6 +499,19 @@ public class BookingPage extends javax.swing.JPanel {
 
     private void handleDailyCheckIn(String date) {
         String checkInDateFormCalender = mainFlow1.getTxtCheckInDate().getText();
+
+        LocalDate localDate = LocalDate.parse(checkInDateFormCalender.split(" ")[0], DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        if (localDate.isBefore(LocalDate.now()))
+        {
+            CustomDialog.showMessage(this,
+                    "Ngày nhận phòng phải là ngày hôm nay hoặc trong tương lai.",
+                    "Lỗi chọn ngày",
+                    CustomDialog.MessageType.ERROR,
+                    600, 200
+            );
+            return;
+        }
 
         String hour = " 14:00";
         // set giờ nhận phòng là 14:00

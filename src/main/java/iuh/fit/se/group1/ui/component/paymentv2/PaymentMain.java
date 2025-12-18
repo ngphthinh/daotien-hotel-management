@@ -705,6 +705,8 @@ public class PaymentMain extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+   private BookingService bookingService = new BookingService();
+
     private void btnCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCashActionPerformed
         backStep3Action.run();
         double totalPayment = Constants.parseVND(lblTotalPricePayment.getText());
@@ -920,9 +922,8 @@ public class PaymentMain extends javax.swing.JPanel {
         // Original total of current order (may include room + amenity + surcharge)
         java.math.BigDecimal originalTotal = currentOrder.getTotalAmount() != null ? currentOrder.getTotalAmount() : java.math.BigDecimal.ZERO;
 
-        // Total for remaining bookings (new order) = sum price of remainingBookings (rooms only)
         java.math.BigDecimal totalRemainingRooms = remainingBookings.stream()
-                .map(b -> java.math.BigDecimal.valueOf(getPriceFromBooking(b)))
+                .map(b -> java.math.BigDecimal.valueOf(bookingService.getPriceFromBooking(b)))
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
 
@@ -1136,8 +1137,7 @@ public class PaymentMain extends javax.swing.JPanel {
                 System.out.println(roomType);
             }
 
-
-            tblRoom.addRow(true, booking, getPriceFromBooking(booking));
+            tblRoom.addRow(true, booking, bookingService.getPriceFromBooking(booking));
         }
 
 
@@ -1148,52 +1148,7 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
 
-    public Long getPriceFromBooking(Booking booking) {
 
-        int timePlus = (int) calculateBookingDuration(booking.getCheckInDate(), booking.getCheckOutDate(), booking.getBookingType());
-
-        RoomType roomType = booking.getRoom().getRoomType();
-
-        if (booking.getBookingType().equals(BookingType.HOURLY)) { // Theo giờ
-            return roomType.getHourlyRate().longValueExact() + ((timePlus - 1) * roomType.getAdditionalHourRate().longValueExact());
-        } else if (booking.getBookingType().equals(BookingType.DAILY)) { // Theo ngày
-            return roomType.getDailyRate().longValueExact() * timePlus;
-        } else if (booking.getBookingType().equals(BookingType.OVERNIGHT)) { // qua đêm
-            return roomType.getOvernightRate().longValueExact();
-        }
-        return 0L;
-    }
-
-    private long calculateBookingDuration(LocalDateTime checkIn, LocalDateTime checkOut, BookingType bookingType) {
-        switch (bookingType) {
-            case HOURLY:
-                // Tính số giờ, làm tròn lên
-                long hours = Duration.between(checkIn, checkOut).toHours();
-                long minutes = Duration.between(checkIn, checkOut).toMinutes() % 60;
-                return minutes > 0 ? hours + 1 : hours;
-
-            case DAILY:
-                // Tính số ngày thuê: mốc 12h trưa
-                // Check-out trước 12h -> không tính ngày đó
-                // Check-out từ 12h trở đi -> tính ngày đó
-                // VD: 08/12 14:00 -> 12/12 12:00 = 4 ngày (8,9,10,11)
-                // 08/12 14:00 -> 12/12 14:00 = 5 ngày (8,9,10,11,12)
-                long days = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
-
-                // Nếu check-out từ 12h trở đi, cộng thêm 1 ngày
-                if (checkOut.getHour() >= 12) {
-                    days++;
-                }
-
-                return Math.max(1, days);
-
-            case OVERNIGHT:
-                return 1;
-
-            default:
-                return 1;
-        }
-    }
 
 
     public void setOrder(Long orderId, OrderService orderService, OrderDetailService orderDetailService,

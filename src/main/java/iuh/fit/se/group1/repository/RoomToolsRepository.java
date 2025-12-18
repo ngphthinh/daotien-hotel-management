@@ -6,6 +6,7 @@ import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -473,6 +474,18 @@ public class RoomToolsRepository {
         }
     }
 
+    public boolean existsTransformType(Long orderId) {
+        String sql = "SELECT 1 FROM Orders o join Booking b on o.orderId = b.orderId where b.orderId = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, orderId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            log.error("Error checking existence of transform type", e);
+            return false;
+        }
+    }
+
     /**
      * DTO class cho transfer data
      */
@@ -540,12 +553,12 @@ public class RoomToolsRepository {
                 stmt.executeUpdate();
             }
 
-            // 3. Update room status → AVAILABLE
-            String updateRoomSql = "UPDATE Room SET roomStatus = 'AVAILABLE' WHERE roomId = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(updateRoomSql)) {
-                stmt.setLong(1, roomId);
-                stmt.executeUpdate();
-            }
+//            // 3. Update room status → AVAILABLE
+//            String updateRoomSql = "UPDATE Room SET roomStatus = 'AVAILABLE' WHERE roomId = ?";
+//            try (PreparedStatement stmt = connection.prepareStatement(updateRoomSql)) {
+//                stmt.setLong(1, roomId);
+//                stmt.executeUpdate();
+//            }
 
             connection.commit();
             log.info("Cancelled booking for orderId {}, roomId {}", orderId, roomId);
@@ -686,7 +699,7 @@ public boolean extendRoomBooking(Long orderId, List<Long> roomIds,
             return false;
         }
     }
-    public boolean subtractAmountFromOrder(long orderId, long amount) {
+    public boolean subtractAmountFromOrder(long orderId, double amount) {
         String sql = """
         UPDATE Orders
         SET totalAmount = totalAmount - ?
@@ -694,7 +707,7 @@ public boolean extendRoomBooking(Long orderId, List<Long> roomIds,
     """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, amount);
+            stmt.setBigDecimal(1, BigDecimal.valueOf(amount));
             stmt.setLong(2, orderId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
