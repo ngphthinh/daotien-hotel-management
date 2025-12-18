@@ -45,7 +45,7 @@ public class PaymentService {
         String ipnUrl = "https://webhook.site/unique-id";
 
         BigDecimal amount = order.getTotalAmount()
-                .subtract(order.getDeposit())
+//                .subtract(order.getDeposit())
                 .setScale(0, RoundingMode.HALF_UP);
 
         String rawHash = String.format(

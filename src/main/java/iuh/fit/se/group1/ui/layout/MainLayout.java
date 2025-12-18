@@ -31,7 +31,7 @@ public class MainLayout extends JPanel {
     private Dashboard dashboard;
     private DashboardEmployee dashboardEmployee;
     private BookingPage bookingPage;
-    private PaymentPage paymentPage;
+    private PaymentPagev2 paymentPage;
     private ShiftManagement shiftManagement;
     private EmployeeManagement employeeManagement;
     private CustomerManagement customerManagement;
@@ -98,9 +98,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                     setMainContent(bookingPage);
                     } else if (index == 2) {
-                        paymentPage.clearForm();
-                        paymentPage.loadData();
-                        setMainContent(new PaymentPagev2());
+                        setMainContent(paymentPage);
                     } else if (index == 3 && subIndex == 1) {
                         shiftManagement.getShiftList().reloadEmployees();
                         setMainContent(shiftManagement);
@@ -165,11 +163,11 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
-                        paymentPage.clearForm();
-                        setMainContent(new PaymentPagev2());
+                        setMainContent(paymentPage);
 
                     } else if (index == 3){
-                        setMainContent(new RoomToolsManagement());
+                        roomToolsManagement.loadData();
+                        setMainContent(roomToolsManagement);
                     } else if (index == 4) {
                         if (currentEmployee == null) {
                             Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
@@ -330,7 +328,6 @@ public class MainLayout extends JPanel {
                         }
                     }
                     else {
-                        System.out.println("hihi");
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
                 }
@@ -393,9 +390,8 @@ public class MainLayout extends JPanel {
             dashboard = new Dashboard();
             bookingPage = new BookingPage();
             bookingPage.setCurrentEmployee(currentEmployee);
-            paymentPage = new PaymentPage();
-            paymentPage.setCurrentEmployee(currentEmployee);
             shiftManagement = new ShiftManagement();
+            paymentPage= new PaymentPagev2();
             employeeManagement = new EmployeeManagement();
             customerManagement = new CustomerManagement();
             amenityManagement = new AmenityManagement();
@@ -410,10 +406,14 @@ public class MainLayout extends JPanel {
         } else {
             dashboardEmployee = new DashboardEmployee();
             bookingPage = new BookingPage();
+             paymentPage= new PaymentPagev2();
+            roomToolsManagement= new RoomToolsManagement();
+            orderManagement = new OrderManagement();
             bookingPage.setCurrentEmployee(currentEmployee);
-            paymentPage = new PaymentPage();
-            paymentPage.setCurrentEmployee(currentEmployee);
             setMainContent(dashboardEmployee);
+            checkForVersionPanel = new CheckForVersionPanel();
+            revenueStatistics = new RevenueStatistics();
+            surchargeManagement = new SurchargeManagement();
         }
 
     }

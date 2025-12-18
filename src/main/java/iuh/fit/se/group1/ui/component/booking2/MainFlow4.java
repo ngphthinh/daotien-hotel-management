@@ -90,13 +90,15 @@ public class MainFlow4 extends javax.swing.JPanel {
 
 
         // Validate email (nếu không rỗng)
+        // Validate email (nếu không rỗng)
         if (!email.isEmpty()) {
-            String regexEmail = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            String regexEmail = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
             if (!email.matches(regexEmail)) {
                 showError("Email không hợp lệ!", 500, 200);
                 return false;
             }
         }
+
 
         // Validate số điện thoại VN
         // VN: 10 số, bắt đầu bằng 0
