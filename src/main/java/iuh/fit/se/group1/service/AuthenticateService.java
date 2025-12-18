@@ -20,13 +20,29 @@ public class AuthenticateService {
     }
 
     public Account authenticate (String username, String password) {
+        log.info("🔍 Attempting login - Username: '{}'", username);
+
         Account account = accountRepository.findByUsername(username);
+
         if (account == null) {
+            log.error("❌ Account NOT FOUND: '{}'", username);
             return null;
         }
-        if (!PasswordUtil.checkPassword(password, account.getPassword())) {
+
+        log.info("✅ Account FOUND: '{}'", username);
+        log.info("📝 Hash from DB: {}", account.getPassword());
+        log.info("🔑 Plain password: {}", password);
+
+        boolean isPasswordCorrect = PasswordUtil.checkPassword(password, account.getPassword());
+
+        log.info("🔐 Password check result: {}", isPasswordCorrect);
+
+        if (!isPasswordCorrect) {
+            log.error("❌ WRONG PASSWORD for: '{}'", username);
             return null;
         }
+
+        log.info("✅ LOGIN SUCCESS: '{}'", username);
         return account;
     }
     public Employee getEmployeeByAccountId(Long accountId) {

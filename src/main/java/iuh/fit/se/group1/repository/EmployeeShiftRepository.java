@@ -118,31 +118,43 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
 
     @Override
     public List<EmployeeShift> findAll() {
-        List<EmployeeShift> employeeShifts = new ArrayList<>();
-        String sql = "SELECT * FROM EmployeeShift;";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet rs = preparedStatement.executeQuery()) {
+        List<EmployeeShift> list = new ArrayList<>();
+        String sql = """
+        SELECT es.employeeShiftId, es.shiftDate, es.createdAt,
+               e.employeeId, e.fullName,
+               s.shiftId, s.name, s.startTime, s.endTime
+        FROM EmployeeShift es
+        JOIN Employee e ON es.employeeId = e.employeeId
+        JOIN Shift s ON es.shiftId = s.shiftId
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 EmployeeShift es = new EmployeeShift();
                 es.setEmployeeShiftId(rs.getLong("employeeShiftId"));
+                es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
+                es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
 
                 Employee emp = new Employee();
                 emp.setEmployeeId(rs.getLong("employeeId"));
+                emp.setFullName(rs.getString("fullName"));
                 es.setEmployee(emp);
 
                 Shift shift = new Shift();
                 shift.setShiftId(rs.getLong("shiftId"));
+                shift.setName(rs.getString("name"));
+                shift.setStartTime(rs.getString("startTime"));
+                shift.setEndTime(rs.getString("endTime"));
                 es.setShift(shift);
-                es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
-                es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
 
-                employeeShifts.add(es);
+                list.add(es);
             }
         } catch (SQLException e) {
-            log.error("Error finding all EmployeeShifts: ", e);
             throw new RuntimeException(e);
         }
-        return employeeShifts;
+        return list;
     }
 
     @Override
@@ -166,25 +178,36 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
         }
     }
     public List<EmployeeShift> findByShiftDate(LocalDate date) {
-        List<EmployeeShift> employeeShifts = new ArrayList<>();
-        String sql = "SELECT es.employeeShiftId, es.shiftDate, es.createdAt, es.employeeId, es.shiftId," +
-                "               e.fullName AS employeeName, e.phone AS employeePhone, e.email AS employeeEmail," +
-                "               s.name AS shiftName, s.startTime, s.endTime" +
-                "        FROM EmployeeShift es" +
-                "        JOIN Employee e ON es.employeeId = e.employeeId" +
-                "        JOIN Shift s ON es.shiftId = s.shiftId" +
-                "        where es.shiftDate=?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setDate(1, Date.valueOf(date));
-            try (ResultSet rs = preparedStatement.executeQuery()) {
+        List<EmployeeShift> list = new ArrayList<>();
+
+        String sql = """
+        SELECT es.employeeShiftId, es.shiftDate, es.createdAt,
+               e.employeeId, e.fullName, e.avt,
+               s.shiftId, s.name AS shiftName, s.startTime, s.endTime
+        FROM EmployeeShift es
+        JOIN Employee e ON es.employeeId = e.employeeId
+        JOIN Shift s ON es.shiftId = s.shiftId
+        WHERE es.shiftDate = ?
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(date));
+
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     EmployeeShift es = new EmployeeShift();
                     es.setEmployeeShiftId(rs.getLong("employeeShiftId"));
+                    es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
+                    es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
 
+                    // ===== EMPLOYEE =====
                     Employee emp = new Employee();
                     emp.setEmployeeId(rs.getLong("employeeId"));
+                    emp.setFullName(rs.getString("fullName"));
+                    emp.setAvt(rs.getBytes("avt"));
                     es.setEmployee(emp);
 
+                    // ===== SHIFT =====
                     Shift shift = new Shift();
                     shift.setShiftId(rs.getLong("shiftId"));
                     shift.setName(rs.getString("shiftName"));
@@ -192,18 +215,17 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
                     shift.setEndTime(rs.getString("endTime"));
                     es.setShift(shift);
 
-                    es.setCreatedAt(rs.getDate("createdAt").toLocalDate());
-                    es.setShiftDate(rs.getDate("shiftDate").toLocalDate());
-
-                    employeeShifts.add(es);
+                    list.add(es);
                 }
             }
         } catch (SQLException e) {
-            log.error("Error finding EmployeeShifts by shiftDate: ", e);
+            log.error("Error findByShiftDate", e);
             throw new RuntimeException(e);
         }
-        return employeeShifts;
+
+        return list;
     }
+
     /**
      * Tìm EmployeeShift với thông tin đầy đủ của Employee và Shift
      */
