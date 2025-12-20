@@ -48,7 +48,7 @@ public class AvatarLabel extends JPanel {
                 defaultImage = ImageIO.read(url);
                 log.info("Default avatar loaded from URL: {}", url);
             } else {
-                log.warn("Default avatar image resource not found at /images/conmeo.jpg");
+                log.warn("Default avatar image resource not found at /images/loginImg.jpg");
             }
         } catch (Exception e) {
             log.error("Error loading default avatar image: ", e);
@@ -63,7 +63,6 @@ public class AvatarLabel extends JPanel {
             this.scaled = null;
             this.imageChanged = false;
             repaint();
-            log.info("Avatar reset to default image");
         } else {
             log.warn("Default avatar not found when resetting");
         }
@@ -74,7 +73,6 @@ public class AvatarLabel extends JPanel {
 
     public void setImage(BufferedImage image) {
         if (image == null) {
-            log.warn("Attempting to set null image, resetting to default");
             resetToDefault();
             return;
         }

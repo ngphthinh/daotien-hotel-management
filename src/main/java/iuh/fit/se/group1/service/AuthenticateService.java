@@ -29,23 +29,13 @@ public class AuthenticateService {
         }
         return account;
     }
+
     public Employee getEmployeeByAccountId(Long accountId) {
         if (accountId == null) {
             return null;
         }
-        try {
-            for (Employee emp : employeeRepository.findAll()) {
-                if (emp.getAccount() != null
-                        && emp.getAccount().getAccountId() != null
-                        && emp.getAccount().getAccountId().equals(accountId)) {
-                    return emp;
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            log.error("Lỗi tìm Employee theo accountId: ", e);
-            return null;
-        }
+
+        return employeeRepository.findByAccountId(accountId);
     }
 
     public void resetPassword (String username){

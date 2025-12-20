@@ -34,7 +34,10 @@
               <transformers>
                 <transformer />
                 <transformer>
-                  <mainClass>iuh.fit.se.group1.Main</mainClass>
+                  <resource>jasperreports_extension.properties</resource>
+                </transformer>
+                <transformer>
+                  <mainClass>iuh.fit.se.group1.TestPrint</mainClass>
                 </transformer>
               </transformers>
               <filters>

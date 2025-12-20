@@ -439,4 +439,57 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return 0;
     }
 
+    public Employee findByAccountId(Long accountId) {
+
+        String sql = """
+                SELECT * 
+                FROM Employee E join Account A on E.accountId=A.accountId
+                JOIN Role R ON A.roleId = R.roleId
+                WHERE E.accountId = ? 
+                """;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setLong(1, accountId);
+
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+
+                    Employee employee = new Employee();
+                    employee.setEmployeeId(rs.getLong("employeeId"));
+                    employee.setFullName(rs.getString("fullName"));
+                    employee.setPhone(rs.getString("phone"));
+                    employee.setEmail(rs.getString("email"));
+                    employee.setHireDate(rs.getDate("hireDate").toLocalDate());
+                    employee.setCitizenId(rs.getString("citizenId"));
+                    employee.setGender(rs.getBoolean("gender"));
+                    String base64String = rs.getString("avt");
+                    if (base64String != null && !base64String.isEmpty()) {
+                        byte[] originalBytes = Base64.getDecoder().decode(base64String);
+                        employee.setAvt(originalBytes);
+                    }
+                    // Account
+                    Account account = new Account();
+                    account.setAccountId(rs.getLong("accountId"));
+                    account.setUsername(rs.getString("username"));
+                    account.setPassword(rs.getString("password"));
+
+                    // Role
+                    Role role = new Role();
+                    role.setRoleId(rs.getString("roleId"));
+                    role.setRoleName(rs.getString("roleName"));
+                    account.setRole(role);
+
+                    // Liên kết
+                    employee.setAccount(account);
+                    return employee;
+                }
+
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }

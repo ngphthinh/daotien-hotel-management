@@ -3,15 +3,18 @@ package iuh.fit.se.group1.service;
 import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.repository.BookingRepository;
 import iuh.fit.se.group1.repository.OrderRepository;
 import iuh.fit.se.group1.repository.RoomRepository;
+import iuh.fit.se.group1.util.Constants;
+import iuh.fit.se.group1.util.InvoiceItem;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 public class OrderService {
     private final OrderRepository orderRepository;
@@ -63,6 +66,9 @@ public class OrderService {
         return null;
     }
 
+
+    private static final String SINGLE_ROOM_TYPE = "SINGLE";
+    private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
 
     public Order createOrderFromOrder(Order order) {
         if (order == null) {
@@ -119,7 +125,6 @@ public class OrderService {
     }
 
 
-
     public Order getOrderById(Long id) {
         return orderRepository.findById(id);
     }
@@ -166,7 +171,7 @@ public class OrderService {
         List<Booking> bookings = order.getBookings();
 
 
-        BigDecimal totalRoom = BigDecimal.valueOf(bookings.stream().mapToDouble(e->bookingService.getPriceFromBooking(e)).sum());
+        BigDecimal totalRoom = BigDecimal.valueOf(bookings.stream().mapToDouble(e -> bookingService.getPriceFromBooking(e)).sum());
 
 //        lấy tổng tiền dịch vu
         BigDecimal totalAmenity = orderDetailsService.getOrderDetailsByOrderId(orderId).stream().map(OrderDetail::getUnitPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -176,7 +181,8 @@ public class OrderService {
         BigDecimal totalAmount = totalAmenity.add(totalSurcharge).add(totalRoom).subtract(order.getDeposit());
         orderRepository.updateTotalAmount(orderId, totalAmount);
     }
-    private BookingService bookingService = new  BookingService();
+
+    private BookingService bookingService = new BookingService();
     private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
     public void deleteOrderById(Long id) {
@@ -194,4 +200,86 @@ public class OrderService {
         return orderRepository.findOrdersByRoomIdAndOrderType(roomId, orderTypeId);
 
     }
+
+    public List<InvoiceItem> getInvoiceItems(Order order) {
+
+        List<Booking> bookings = order.getBookings();
+        String unitBookingType = getUnitBookingType(bookings.get(0).getBookingType());
+        List<InvoiceItem> items = new ArrayList<>();
+        int index = 1;
+        int singleRooms = (int) bookings.stream()
+                .filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
+                .count();
+
+        int doubleRooms = (int) bookings.stream()
+                .filter(e -> e.getRoom().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
+                .count();
+
+        if (singleRooms > 0) {
+            double unitPrice = bookings.stream().filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
+                    .findFirst()
+                    .map(e -> bookingService.getPriceFromBooking(e)).orElse(0.0);
+            InvoiceItem singleRoomItem = new InvoiceItem(
+                    index++,
+                    "Phòng đơn",
+                    unitBookingType,
+                    Constants.VND_FORMAT.format(unitPrice),
+                    singleRooms,
+                    Constants.VND_FORMAT.format((unitPrice * singleRooms)));
+            items.add(singleRoomItem);
+        }
+
+        if (doubleRooms > 0) {
+            double unitPrice = bookings.stream().filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
+                    .findFirst()
+                    .map(e -> bookingService.getPriceFromBooking(e)).orElse(0.0);
+            InvoiceItem doubleRoomItem = new InvoiceItem(
+                    index++,
+                    "Phòng đôi",
+                    unitBookingType,
+                    Constants.VND_FORMAT.format(unitPrice),
+                     doubleRooms,
+                    Constants.VND_FORMAT.format((unitPrice * doubleRooms)));
+            items.add(doubleRoomItem);
+        }
+
+        List<OrderDetail> orderDetails = this.orderDetailsService.getOrderDetailsByOrderId(order.getOrderId());
+
+        for (OrderDetail orderDetail : orderDetails) {
+            InvoiceItem amenityItem = new InvoiceItem(
+                    index++,
+                    orderDetail.getAmenity().getNameAmenity(),
+                    "Lần",
+                    Constants.VND_FORMAT.format(orderDetail.getUnitPrice()),
+                    orderDetail.getQuantity(),
+                    Constants.VND_FORMAT.format(orderDetail.getUnitPrice().doubleValue() * orderDetail.getQuantity())
+            );
+            items.add(amenityItem);
+        }
+
+        List<SurchargeDetail> surchargeDetails = this.surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
+        for (SurchargeDetail surchargeDetail : surchargeDetails) {
+            InvoiceItem surchargeItem = new InvoiceItem(
+                    index++,
+                    surchargeDetail.getSurcharge().getName(),
+                    "Lần",
+                    Constants.VND_FORMAT.format(surchargeDetail.getSurcharge().getPrice()),
+                    surchargeDetail.getQuantity(),
+                    Constants.VND_FORMAT.format(surchargeDetail.getSurcharge().getPrice().doubleValue() * surchargeDetail.getQuantity())
+            );
+            items.add(surchargeItem);
+        }
+
+        return items;
+    }
+
+    private String getUnitBookingType(BookingType bookingType) {
+        return switch (bookingType) {
+            case HOURLY -> "Giờ";
+            case DAILY -> "Ngày";
+            case OVERNIGHT -> "Đêm";
+            default -> "";
+        };
+    }
+
 }

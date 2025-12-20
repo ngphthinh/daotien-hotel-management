@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="daotien" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b6885e3d-50d2-4c30-9fb8-7c8582e3d73d">
+	<style name="DefaultFont" isDefault="true" fontName="DejaVu Sans"/>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Dataset1" uuid="a3d33646-de5c-461d-a21b-bbf8d5c91a80">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="count" class="java.lang.Integer"/>
+		<field name="content" class="java.lang.String"/>
+		<field name="unit" class="java.lang.String"/>
+		<field name="unitPrice" class="java.lang.String"/>
+		<field name="quantity" class="java.lang.Integer"/>
+		<field name="totalPrice" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="ITEM_DS" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<parameter name="orderId" class="java.lang.Long"/>
+	<parameter name="customerName" class="java.lang.String"/>
+	<parameter name="phoneCustomer" class="java.lang.String"/>
+	<parameter name="rooms" class="java.lang.String"/>
+	<parameter name="checkInDate" class="java.lang.String"/>
+	<parameter name="checkOutDate" class="java.lang.String"/>
+	<parameter name="bookingType" class="java.lang.String"/>
+	<parameter name="totalPrice" class="java.lang.String"/>
+	<parameter name="deposit" class="java.lang.String"/>
+	<parameter name="provisionalCalc" class="java.lang.String"/>
+	<parameter name="promotion" class="java.lang.String"/>
+	<parameter name="totalPriceStr" class="java.lang.String"/>
+	<parameter name="paymentType" class="java.lang.String"/>
+	<parameter name="totalPricePayment" class="java.lang.String"/>
+	<parameter name="paymentDate" class="java.lang.String"/>
+	<parameter name="totalPaymentStr" class="java.lang.String"/>
+	<parameter name="employeeName" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="212" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="260" height="30" uuid="0165f3c9-d46f-4f2e-9f17-5eb93501ac94"/>
+				<textElement>
+					<font size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[KHÁCH SẠN ĐÀO TIÊN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="330" height="15" uuid="0ed5f804-b6ff-4f84-aad3-6932bd42429f">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Địa chỉ: số 12 Nguyễn Văn Bảo, phường 1, quận Gò Vấp, TP.HCM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="45" width="130" height="15" uuid="ec9440c3-2a73-4e4e-8125-19c12f2e67e7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[Điện thoại : (028) 3829 5678]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="140" y="45" width="200" height="15" uuid="ab01260e-4105-4d70-8f98-fc44987f1a1a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left"/>
+				<text><![CDATA[Email : daotienhotelgroup1@gmail.com]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="67" width="580" height="1" uuid="4813515c-016c-45c2-b029-5dfe1153a44c"/>
+			</line>
+			<staticText>
+				<reportElement x="440" y="5" width="30" height="20" uuid="4bc02224-4936-48cc-bc82-f7e649805de9"/>
+				<textElement>
+					<font size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Số:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="25" width="50" height="20" uuid="fcaed5e6-00ae-4369-9740-b793c5c080dd"/>
+				<textElement>
+					<font size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ngày:]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="490" y="27" width="100" height="20" uuid="04ad21d2-b841-4dd7-9221-263494631c94">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="470" y="6" width="70" height="20" uuid="2cb38e6d-590f-477b-b07c-d73f65ee73b6">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{orderId}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="80" width="570" height="30" uuid="84ae8dc0-233c-49a0-90be-a1a354218e46"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HÓA ĐƠN THANH TOÁN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="110" width="140" height="20" uuid="82a533ab-a3ab-49bf-af25-5f48e351b262"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Họ và tên khách hàng:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="130" width="140" height="20" uuid="b683439c-0d40-491b-9f16-95b460432bfd"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Số điện thoại:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="150" width="140" height="20" uuid="d31644a1-c09f-4137-a91e-96bbf0c533db"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Số phòng:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="170" width="140" height="20" uuid="71fb474d-5d63-410d-bfcd-691afa597894"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ngày đến:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="150" width="100" height="20" uuid="9600a637-463d-4f05-a072-892b1a12703f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Loại đặt phòng:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="170" width="100" height="20" uuid="1cfcab24-d0dd-4a17-b1bb-8aac785c35f3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ngày đi:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="160" y="110" width="380" height="20" uuid="f009f29e-b17c-4cf1-8c2f-799a5a2cb576"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{customerName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="130" width="200" height="19" uuid="df09c8f1-78ce-4010-bb7a-07f21074832c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{phoneCustomer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="151" width="160" height="20" uuid="4acaef2f-50e4-48c4-9211-c410a5359392">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{rooms}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="170" width="160" height="20" uuid="7a6b2258-e035-448e-9bd3-4f527ace6c10">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{checkInDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="170" width="100" height="20" uuid="18b851a4-f864-4d8a-b773-0f649bcad93b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{checkOutDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="151" width="100" height="20" uuid="749b9a3b-ff43-4db2-b233-a110dbd6a680">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{bookingType}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="100" splitType="Stretch">
+			<componentElement>
+				<reportElement x="0" y="40" width="570" height="60" uuid="dbdaf2f1-f6a4-4ab9-a390-b4aac0ecc542">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+					<property name="com.jaspersoft.studio.components.autoresize.proportional" value="true"/>
+					<property name="com.jaspersoft.studio.components.autoresize.next" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset1" uuid="b70544d5-3e89-4acb-81f4-3c5a40c78b06">
+						<dataSourceExpression><![CDATA[$P{ITEM_DS}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="95" uuid="47ffb636-3406-4582-9600-06f65147c38d">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="95" height="30" uuid="b6ee0ab5-e8bd-4b8b-93cc-109828009ed4"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[STT]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="95" height="30" uuid="3e325e1f-24ac-4712-9a1f-897e644cea82">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="95" uuid="895bd9e6-084c-4eac-ac16-c43ba69a8d60">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="95" height="30" uuid="cf5c45bb-f2b5-411a-ab37-c9d42e667eac"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Nội dung]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="95" height="30" uuid="28c1b627-c89e-4342-9070-b157bc4b14a3">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{content}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="95" uuid="f158e084-4cce-4d2c-878f-ebf570057365">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="95" height="30" uuid="4d3d6b34-6eb0-432a-8a83-951240bc72e0"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Đơn vị tính]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="95" height="30" uuid="86503fe1-be91-4648-b411-06cfaae68e2f">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{unit}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="95" uuid="3f6cd11b-b015-448b-b32d-12658e5ebb52">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="95" height="30" uuid="1c6969ad-1ffe-42f5-a00a-68d263842f3a"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Đơn giá]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="95" height="30" uuid="62062982-08bb-4bdc-9aed-c05f8aef0822">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{unitPrice}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="95" uuid="7662f231-43bd-44f1-8d2e-bfcadc21a3b8">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="95" height="30" uuid="65f39fcd-17b0-4fe8-9ea6-b15e8b2b3e1b"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Số lượng]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="95" height="30" uuid="2cb8bc06-811b-47d6-8255-08c575e91566">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="95" uuid="c70b3e63-e00a-427a-b8ca-4caf4f5aab9c">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="95" height="30" uuid="dc8d37b6-d813-4535-90f7-e46e7f1f8ae4"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Thành tiền]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="95" height="30" uuid="511ed561-6254-40c5-baf9-8a91d3be645e">
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{totalPrice}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement x="0" y="-2" width="570" height="30" uuid="ffe9583d-349e-44d2-8395-6b361c565123"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chi tiết dịch vụ sử dụng]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-4" y="28" width="580" height="1" uuid="9c8d5ced-5c7f-4b44-9bb5-d3fa76e0198c"/>
+			</line>
+		</band>
+	</detail>
+	<summary>
+		<band height="409" splitType="Stretch">
+			<textField>
+				<reportElement x="180" y="120" width="290" height="20" uuid="751b6435-848b-45d3-99c9-2d75a41ede35">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{promotion}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="10" width="570" height="30" uuid="157a4e98-5d76-40eb-aa76-b0506f78445d"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Thông tin thanh toán]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-3" y="50" width="580" height="1" uuid="90816a67-015f-4d1c-86f9-5fc7adad101c"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="60" width="140" height="20" uuid="e7160d06-2dff-43ba-b629-2ae0d71e6533"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hình thức thanh toán:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="100" width="140" height="20" uuid="9e96a794-d6e2-4e8d-a5de-c28aeed4ff1f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tiền đặt cọc:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="140" width="140" height="20" uuid="c32eecb9-9eea-4889-a278-dde902ae4379"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tiền phải thanh toán:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="160" width="140" height="20" uuid="ff7804e7-98e7-4caa-892f-91dfb61e842f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Trạng thái:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="180" width="140" height="20" uuid="9e7cdf8a-08f8-4291-af21-4066b940c7f5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ngày thanh toán:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="206" width="80" height="24" uuid="a83d3147-03c9-4038-b139-faa94eea9a68"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Bằng chữ:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="160" width="300" height="20" uuid="00306531-2b56-4cc1-8740-0446996af33a"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Đã thanh toán đầy đủ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="180" y="180" width="300" height="20" uuid="2a6173fb-8c9b-4345-bddf-6643d85783bd"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{paymentDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="140" width="340" height="20" uuid="76d50d98-a7b2-4760-a6f0-6ae732c2604d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{totalPricePayment}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="100" width="340" height="20" uuid="d56217b7-22ce-45b1-b590-2647bb5e572b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{deposit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="180" y="60" width="370" height="20" uuid="b2a2142d-4f37-4ad7-871d-ca7b85d7c709"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{paymentType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="206" width="390" height="24" uuid="4a4f35da-73ff-46a1-ad04-7819cba6cdff">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalPaymentStr}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="310" y="240" width="210" height="30" uuid="d32e60cd-7e50-44e2-baf8-d89df8600a2d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nhân viên thu ngân]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="310" y="270" width="210" height="20" uuid="6a718d3c-af00-4e82-8e48-c4c112830e6d"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[(Ký và ghi rõ họ tên)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="310" y="320" width="210" height="30" uuid="914b4214-3ad4-41a6-bd02-cf539bef48e6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{employeeName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="360" width="570" height="14" uuid="df382144-6d75-48bf-9536-fb5c521532c8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Cảm ơn Quý khách đã sử dụng dịch vụ tại khách sạn Đào Tiên!]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="374" width="570" height="20" uuid="6f79ea8f-a637-4193-a933-c165aecf4c30"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Mọi thắc mắc vui lòng liên hệ :(028) 3829 5678 hoặc daotienhotelgroup1@gmail.com]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="120" width="140" height="20" uuid="b681f708-082b-40c3-8a5d-149a107f8c63"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Khuyến mãi:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="80" width="140" height="20" uuid="668c2aa8-db7c-4a74-8386-42882bc8128c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tổng tiền]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="180" y="80" width="300" height="20" uuid="5aa4cdcd-1deb-4787-b480-e546a1c698cf">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{totalPrice}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

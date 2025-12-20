@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.paymentv2;
 
+import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.service.AmenityService;
 import iuh.fit.se.group1.service.OrderDetailService;
@@ -32,12 +33,24 @@ public class PaymentPagev2 extends javax.swing.JPanel {
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private PaymentMain paymentMain;
 
+    private Employee currentEmployee;
+
+    public Employee getCurrentEmployee() {
+        return currentEmployee;
+    }
+
+    public void setCurrentEmployee(Employee currentEmployee) {
+        this.currentEmployee = currentEmployee;
+        paymentMain.setCurrentEmployee(currentEmployee);
+    }
+
     /**
      * Creates new form PaymentPagev2
      */
     public PaymentPagev2() {
         initComponents();
         paymentMain = new PaymentMain();
+
         Runnable backStep1Action = this::backStep1;
         paymentMain.setStep1(backStep1Action);
         sequencePayment1.setActiveStep(0);

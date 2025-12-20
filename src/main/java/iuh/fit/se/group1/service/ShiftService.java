@@ -64,9 +64,6 @@ public class ShiftService {
 
     // Get all Shifts
     public List<Shift> getAllShifts() {
-        log.info("Fetching all Shifts");
-        List<Shift> shifts = shiftRepository.findAll();
-        log.info("Total Shifts found: {}", shifts.size());
-        return shifts;
+        return shiftRepository.findAll();
     }
 }

@@ -103,7 +103,6 @@ public class DenominationDetailService {
             List<Long> dbDenominations = repository.findAllDistinctDenominations();
 
             if (dbDenominations != null && !dbDenominations.isEmpty()) {
-                log.info("Loaded {} denominations from database", dbDenominations.size());
                 return dbDenominations;
             }
 

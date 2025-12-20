@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -463,14 +465,24 @@ public class Login extends javax.swing.JFrame {
         authenticateService.resetPassword(employee.getAccount().getUsername());
 
         String title = "Đặt lại mật khẩu cho tài khoản của bạn";
-        String html = null;
-        try {
-            html = Files.readString(Paths.get("src/main/resources/static/reset-password.html"));
+        String html;
+
+        try (InputStream is = getClass()
+                .getClassLoader()
+                .getResourceAsStream("info/reset-password.html")) {
+
+            if (is == null) {
+                throw new RuntimeException("Không tìm thấy reset-password.html trong resources");
+            }
+
+            html = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+
             html = html.replace("{{user_name}}", employee.getFullName())
                     .replace("{{user_password}}", PropertiesReader.getInstance().get("daotien.password"))
                     .replace("{{support_email}}", PropertiesReader.getInstance().get("daotien.mail.email"))
                     .replace("{{site_name}}", "Đào Tiên Hotel")
-                    .replace("{{current_year}}", LocalDate.now().getYear() + "");
+                    .replace("{{current_year}}", String.valueOf(LocalDate.now().getYear()));
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

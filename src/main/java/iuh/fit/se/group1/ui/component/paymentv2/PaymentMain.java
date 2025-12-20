@@ -37,9 +37,19 @@ import java.util.stream.Collectors;
  * @author THIS PC
  */
 public class PaymentMain extends javax.swing.JPanel {
-
+    private Employee currentEmployee;
     private OrderService orderService;
     private Order currentOrder = null;
+    private JaspersoftExportService jaspersoftExportService = new JaspersoftExportService();
+    public Employee getCurrentEmployee() {
+        return currentEmployee;
+    }
+
+    public void setCurrentEmployee(Employee currentEmployee) {
+        this.currentEmployee = currentEmployee;
+        log.info("Current employee set to: {}", currentEmployee.getFullName());
+
+    }
 
     private static final String SURCHARGE_CHECKOUT = "Phụ thu trả phòng trễ";
     private SurchargeService surchargeService = new SurchargeService();
@@ -735,8 +745,18 @@ public class PaymentMain extends javax.swing.JPanel {
             currentOrder.setPaymentType(PaymentType.CASH);
             currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())).add(BigDecimal.valueOf(Constants.parseVND(lblDeposit.getText()))));
             currentOrder.setPaymentDate(LocalDate.now());
+            Long order = currentOrder.getOrderId();
+            String totalPricePayment = lblTotalPricePayment.getText();
+            String promotionStr = lblPromotion.getText();
             saveOrder();
             GlassPanePopup.closePopupAll();
+            jaspersoftExportService.exportOrderToPdf(
+                    order,
+                    promotionStr,
+                    PaymentType.CASH.getName(),
+                    totalPricePayment,
+                    currentEmployee.getFullName()
+            );
         });
     }//GEN-LAST:event_btnCashActionPerformed
 
@@ -745,7 +765,6 @@ public class PaymentMain extends javax.swing.JPanel {
         orderService.updateOrderStatusToPaid(currentOrder);
         resetPanel();
         backStep1Action.run();
-
     }
 
     private void resetPanel() {
@@ -850,7 +869,17 @@ public class PaymentMain extends javax.swing.JPanel {
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
                         currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())).add(BigDecimal.valueOf(Constants.parseVND(lblDeposit.getText()))));
+                        Long order = currentOrder.getOrderId();
+                        String totalPricePayment = lblTotalPricePayment.getText();
+                        String promotionStr = lblPromotion.getText();
                         saveOrder();
+                        jaspersoftExportService.exportOrderToPdf(
+                                order,
+                                promotionStr,
+                                PaymentType.E_WALLET.getName(),
+                                totalPricePayment,
+                                currentEmployee.getFullName()
+                        );
                     } else {
                         CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING, 700, 200);
                     }
@@ -1232,7 +1261,7 @@ public class PaymentMain extends javax.swing.JPanel {
             BigDecimal discountPercent = new BigDecimal(promotion.getDiscountPercent().toString());
             BigDecimal discountAmount = totalAmount.multiply(discountPercent)
                     .divide(BigDecimal.valueOf(100));
-            lblPromotion.setText(Constants.VND_FORMAT.format(discountAmount));
+            lblPromotion.setText("- " +Constants.VND_FORMAT.format(discountAmount));
         } else {
             lblPromotionName.setText("Không có khuyến mãi");
             lblPromotion.setText(Constants.VND_FORMAT.format(0));

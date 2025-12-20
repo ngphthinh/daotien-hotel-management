@@ -54,9 +54,6 @@ public class BookingPage extends javax.swing.JPanel {
     private MainFlow4 mainFlow4;
     private MainFlow5 mainFlow5;
 
-
-
-
     private static final String[] bookingType = {"Theo giờ", "Theo ngày", "Qua đêm"};
 
 

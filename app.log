@@ -1,20 +1,40 @@
-Dec 18, 2025 11:26:49 AM iuh.fit.se.group1.config.AppLogger info
-INFO: Order created successfully with order details
-Dec 18, 2025 12:28:44 PM iuh.fit.se.group1.config.AppLogger info
-INFO: Order created successfully with order details
-Dec 18, 2025 1:05:01 PM iuh.fit.se.group1.config.AppLogger info
-INFO: Order created successfully with order details
-Dec 18, 2025 1:05:43 PM iuh.fit.se.group1.config.AppLogger info
-INFO: Order created successfully with order details
-Dec 18, 2025 2:28:45 PM iuh.fit.se.group1.config.AppLogger info
-INFO: Order created successfully with order details
-Dec 18, 2025 2:32:37 PM iuh.fit.se.group1.config.AppLogger info
-INFO: Order created successfully with order details
-Dec 18, 2025 6:27:01 PM iuh.fit.se.group1.config.AppLogger error
-SEVERE: No enum constant for status: Phòng hỏng
-Dec 18, 2025 6:30:11 PM iuh.fit.se.group1.config.AppLogger error
-SEVERE: No enum constant for status: Phòng hỏng
-Dec 18, 2025 6:34:26 PM iuh.fit.se.group1.config.AppLogger error
-SEVERE: No enum constant for status: Phòng hỏng
-Dec 18, 2025 10:39:29 PM iuh.fit.se.group1.config.AppLogger info
-INFO: Order created successfully with order details
+Dec 20, 2025 7:33:14 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Bắt đầu biên dịch mẫu báo cáo JasperReports từ: {}
+Dec 20, 2025 7:33:14 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 1
+Dec 20, 2025 7:35:23 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Bắt đầu biên dịch mẫu báo cáo JasperReports từ: {}
+Dec 20, 2025 7:35:23 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 1
+Dec 20, 2025 7:35:24 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 2
+Dec 20, 2025 7:35:24 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 3
+Dec 20, 2025 7:42:10 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Bắt đầu biên dịch mẫu báo cáo JasperReports từ: {}
+Dec 20, 2025 7:42:10 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 1
+Dec 20, 2025 7:42:11 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 2
+Dec 20, 2025 7:42:11 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 3
+Dec 20, 2025 7:51:39 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Bắt đầu biên dịch mẫu báo cáo JasperReports từ: {}
+Dec 20, 2025 7:51:40 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 1
+Dec 20, 2025 7:51:40 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Jasper class = {}
+Dec 20, 2025 7:51:40 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 3
+Dec 20, 2025 8:22:02 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Dec 20, 2025 8:22:02 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Dec 20, 2025 8:22:02 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Bắt đầu biên dịch mẫu báo cáo JasperReports từ: {}
+Dec 20, 2025 8:22:02 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 1
+Dec 20, 2025 8:22:03 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Jasper class = {}
+Dec 20, 2025 8:22:03 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Log ở đây 3
