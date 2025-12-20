@@ -142,17 +142,7 @@ public class MainLayout extends JPanel {
                                 -> GlassPanePopup.closePopupLast()
                         );
                     } else if (index == 12 && subIndex == 4) {
-
-                        try {
-                            Desktop.getDesktop().browse(new URI("https://ngphthinh.github.io/domdom-store/"));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            JOptionPane.showMessageDialog(null,
-                                    "Không thể mở trang giới thiệu!",
-                                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        }
-
-
+                        handleAboutPanel();
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
@@ -189,6 +179,17 @@ public class MainLayout extends JPanel {
 
         });
 
+    }
+
+    private static void handleAboutPanel() {
+        try {
+            Desktop.getDesktop().browse(new URI("https://vienthieu6925.github.io/about/"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Không thể mở trang giới thiệu!",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void closeShiftHandle() {
