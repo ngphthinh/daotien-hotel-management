@@ -329,6 +329,10 @@ public class AmenityManagement extends javax.swing.JPanel {
         Valid result = getValid(modal);
         if (result.valid()) {
             Amenity entitySave = amenityService.createAmenity(new Amenity(result.name(), result.price()));
+            if (entitySave == null) {
+                Message.showError("Lỗi thêm dịch vụ", "Dịch vụ với tên '" + result.name() + "' đã tồn tại!");
+                return;
+            }
             DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
             model.addRow(new Object[]{entitySave.getAmenityId(), entitySave.getNameAmenity(), Constants.VND_FORMAT.format(entitySave.getPrice())});
             GlassPanePopup.closePopupLast();

@@ -9,6 +9,7 @@ import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.entity.Surcharge;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.enums.RoomStatus;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -67,6 +68,8 @@ public class ImportExcelService {
                 Customer saved = customerService.createCustomer(c);
                 if (saved != null) {
                     customers.add(saved);
+                }else {
+                    CustomDialog.showMessage(null, "Khách hàng đã tồn tại", "Lỗi khi thêm khách hàng", CustomDialog.MessageType.ERROR, 500,200);
                 }
             }
 

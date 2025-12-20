@@ -98,7 +98,7 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
 
     @Override
     public void deleteById(Long id) {
-        String sql = "DELETE FROM Surcharge WHERE surchargeId = ?";
+        String sql = "UPDATE Surcharge SET isDeleted = 1 WHERE surchargeId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             int rowsDeleted = preparedStatement.executeUpdate();
@@ -118,7 +118,7 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
     @Override
     public List<Surcharge> findAll() {
         List<Surcharge> surcharges = new ArrayList<>();
-        String sql = "SELECT * FROM Surcharge";
+        String sql = "SELECT * FROM Surcharge where isDeleted = 0";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql); ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -144,8 +144,8 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
         List<Surcharge> surcharges = new ArrayList<>();
         String sql = """
                 SELECT * FROM Surcharge
-                WHERE name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ?
-                   OR surchargeId LIKE ?
+                WHERE (name COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ?
+                   OR surchargeId LIKE ?) and isDeleted = 0
                 ORDER BY surchargeId ASC, name ASC
                 """;
 
@@ -173,7 +173,7 @@ public class SurchargeRepository implements Repository<Surcharge, Long> {
 
 
     public Surcharge findBySurchargeName(String name) {
-        String sql = "SELECT * FROM Surcharge WHERE name = ?";
+        String sql = "SELECT * FROM Surcharge WHERE name = ? and isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, name);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

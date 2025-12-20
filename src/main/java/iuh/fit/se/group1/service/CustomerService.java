@@ -13,6 +13,9 @@ public class CustomerService {
     }
 
     public Customer createCustomer(Customer customer) {
+        if (getCustomerByCitizenId(customer.getCitizenId()) != null) {
+            return null;
+        }
         return customerRepository.save(customer);
     }
 

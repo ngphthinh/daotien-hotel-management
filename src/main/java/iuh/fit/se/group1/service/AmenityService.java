@@ -14,7 +14,16 @@ public class AmenityService {
     }
 
     public Amenity createAmenity(Amenity amenity) {
+
+        if (getAmenityByName(amenity.getNameAmenity()) != null) {
+            return null;
+        }
+
         return amenityRepository.save(amenity);
+    }
+
+    private Amenity getAmenityByName(String nameAmenity) {
+        return amenityRepository.findByAmenityName(nameAmenity);
     }
 
     public void deleteAmenity(Long amenityId) {

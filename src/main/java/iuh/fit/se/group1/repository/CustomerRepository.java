@@ -60,7 +60,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
 
     @Override
     public Customer findById(Long id) {
-        String sql = "SELECT * FROM Customer WHERE customerId = ?";
+        String sql = "SELECT * FROM Customer WHERE customerId = ? and isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -86,7 +86,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
 
     @Override
     public void deleteById(Long aLong) {
-        String sql = "DELETE FROM Customer WHERE customerId = ?";
+        String sql = "Update Customer set isDeleted = 1 where customerId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, aLong);
             preparedStatement.executeUpdate();
@@ -98,7 +98,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
     @Override
     public List<Customer> findAll() {
         List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT * FROM Customer";
+        String sql = "SELECT * FROM Customer WHERE isDeleted = 0 ORDER BY customerId ASC, fullName ASC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -146,7 +146,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
 
     public List<Customer> findByCustomerNameOrId(String keyword) {
         List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT * FROM Employee WHERE fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR customerId LIKE ? Order BY customerId ASC, fullName ASC";
+        String sql = "SELECT * FROM Employee WHERE (fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR customerId LIKE ?) and isDeleted = 0 Order BY customerId ASC, fullName ASC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             String likeKeyword = "%" + keyword + "%";
             preparedStatement.setString(1, likeKeyword);
@@ -172,7 +172,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
     }
 
     public boolean isCitizenIdExists(String citizenId) {
-        String sql = "SELECT 1 FROM Customer WHERE citizenId = ?";
+        String sql = "SELECT 1 FROM Customer WHERE citizenId = ? AND isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, citizenId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -188,7 +188,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
     }
 
     public Customer findByCitizenId(String citizenId) {
-        String sql = "SELECT * FROM Customer WHERE citizenId = ?";
+        String sql = "SELECT * FROM Customer WHERE citizenId = ? AND isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, citizenId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

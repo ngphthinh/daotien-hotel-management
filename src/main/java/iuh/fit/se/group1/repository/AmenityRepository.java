@@ -145,4 +145,24 @@ public class AmenityRepository implements Repository<Amenity, Long> {
         }
         return amenities;
     }
+
+    public Amenity findByAmenityName(String nameAmenity) {
+        String sql = "SELECT * FROM Amenity WHERE nameAmenity = ? and  isDeleted = 0";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, nameAmenity);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    Amenity amenity = new Amenity();
+                    amenity.setAmenityId(resultSet.getLong("amenityId"));
+                    amenity.setNameAmenity(resultSet.getString("nameAmenity"));
+                    amenity.setPrice(resultSet.getBigDecimal("price"));
+                    amenity.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    return amenity;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }

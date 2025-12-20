@@ -58,7 +58,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
 
     @Override
     public Promotion findById(Long id) {
-        String sql = "Select * from Promotion where promotionId=?;";
+        String sql = "Select * from Promotion where promotionId=? and isDeleted=0;";
         try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             try(ResultSet rs = preparedStatement.executeQuery()){
@@ -84,7 +84,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
 
     @Override
     public void deleteById(Long id) {
-        String sql = "Delete from Promotion where promotionId=?;";
+        String sql = "Update Promotion set isDeleted = 1 where promotionId=?;";
         try(PreparedStatement preparedStatement= connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
@@ -97,7 +97,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
     @Override
     public List<Promotion> findAll() {
         List<Promotion> promotions = new ArrayList<>();
-        String sql = "Select * from Promotion";
+        String sql = "Select * from Promotion where isDeleted=0;";
         try(PreparedStatement preparedStatement= connection.prepareStatement(sql);ResultSet rs = preparedStatement.executeQuery()) {
             while (rs.next()) {
                 Promotion entity = new Promotion();
@@ -147,7 +147,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
     }
     public List<Promotion> findByPromotionIdOrName(String keyword) {
         List<Promotion> promotions = new ArrayList<>();
-        String sql = "SELECT * FROM Promotion WHERE CAST(promotionId AS NVARCHAR) LIKE ? OR promotionName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? ORDER BY promotionId ASC, promotionName ASC";
+        String sql = "SELECT * FROM Promotion WHERE (CAST(promotionId AS NVARCHAR) LIKE ? OR promotionName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ?) and isDeleted = 0 ORDER BY promotionId ASC, promotionName ASC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             String likeKeyword = "%" + keyword + "%";
             preparedStatement.setString(1, likeKeyword);
@@ -173,7 +173,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
     }
 
     public Promotion findAllWithDiscountPriceMax() {
-        String sql = "SELECT TOP 1 * FROM Promotion where endDate > GETDATE() ORDER BY discountPrice DESC";
+        String sql = "SELECT TOP 1 * FROM Promotion where endDate > GETDATE() and isDeleted = 0 ORDER BY discountPrice DESC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -196,7 +196,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
     }
 
     public Promotion findAllWithDiscountPercentMax() {
-        String sql = "SELECT TOP 1 * FROM Promotion where endDate > GETDATE() ORDER BY discountPercent DESC";
+        String sql = "SELECT TOP 1 * FROM Promotion where endDate > GETDATE() and isDeleted = 0 ORDER BY discountPercent DESC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -220,7 +220,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
 
 
     public Promotion findByPrice(BigDecimal price) {
-        String sql = "SELECT * FROM Promotion WHERE endDate > GETDATE() and discountPrice < ? ORDER BY discountPercent DESC";
+        String sql = "SELECT * FROM Promotion WHERE endDate > GETDATE() and discountPrice < ? and isDeleted = 0 ORDER BY discountPercent DESC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setBigDecimal(1, price);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -247,7 +247,7 @@ public class PromotionRepository implements Repository<Promotion, Long>{
     public Promotion findActivePromotion(BigDecimal totalAmount) {
         String sql = """
                 SELECT * FROM Promotion
-                WHERE endDate > GETDATE() AND minOrderAmount <= ?
+                WHERE endDate > GETDATE() AND minOrderAmount <= ? and isDeleted = 0
                 """;
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
