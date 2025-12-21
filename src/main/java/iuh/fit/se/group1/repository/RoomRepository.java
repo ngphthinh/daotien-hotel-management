@@ -365,20 +365,81 @@ public class RoomRepository implements Repository<Room, Long> {
         return false;
     }
 
+    // ==================== Dashboard Methods ====================
+
     /**
-     * Kiểm tra xem phòng có đang được sử dụng trong các hóa đơn đang hoạt động không
+     * Đếm tổng số phòng trong hệ thống
+     */
+    public int countTotalRooms() {
+        String sql = "SELECT COUNT(*) FROM Room WHERE isDeleted = 0";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            log.error("Error counting total rooms: ", e);
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm số phòng theo trạng thái
+     */
+    public int countByStatus(RoomStatus status) {
+        String sql = "SELECT COUNT(*) FROM Room WHERE roomStatus = ? AND isDeleted = 0";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status.name());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error counting rooms by status {}: ", status, e);
+        }
+        return 0;
+    }
+
+    /**
+     * Cập nhật phòng trong booking (dùng khi thay thế phòng)
+     */
+    public void updateBookingRoom(Long bookingId, Long newRoomId) {
+        String sql = "UPDATE Booking SET roomId = ? WHERE bookingId = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, newRoomId);
+            ps.setLong(2, bookingId);
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                log.info("Updated booking {} to use room {}", bookingId, newRoomId);
+            } else {
+                log.warn("No booking found with ID: {}", bookingId);
+            }
+        } catch (SQLException e) {
+            log.error("Error updating booking room: ", e);
+            throw new RuntimeException("Error updating booking room", e);
+        }
+    }
+
+    /**
+     * Kiểm tra xem phòng có đang được sử dụng trong các order đang hoạt động không
      * @param roomId ID phòng cần kiểm tra
      * @return true nếu phòng đang được dùng, false nếu có thể xóa
      */
     public boolean isRoomInUse(Long roomId) {
-        // Kiểm tra xem phòng có trong booking của các order đang hoạt động không
-        // Order type: 1 = Đã hoàn thành (có thể xóa), 2 = Đang xử lí (không thể xóa), 3 = Đặt trước (đã xử lý bởi canDeleteRoom)
+        // Kiểm tra xem phòng có trong booking của các order đang xử lý không
+        // Order type: 2 = Đang xử lý (không thể xóa phòng)
         String sql = """
             SELECT COUNT(*) 
             FROM Booking b
             JOIN Orders o ON b.orderId = o.orderId
-            WHERE b.roomId = ?
-              AND o.orderTypeId IN (2) 
+            WHERE b.roomId = ? 
+              AND o.orderTypeId = 2
             """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -391,32 +452,8 @@ public class RoomRepository implements Repository<Room, Long> {
             }
         } catch (SQLException e) {
             log.error("Error checking if room is in use: ", e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error checking room usage", e);
         }
         return false; // Không tìm thấy -> có thể xóa
     }
-
-    /**
-     * Cập nhật phòng trong booking
-     * @param bookingId ID của booking cần cập nhật
-     * @param newRoomId ID của phòng mới
-     */
-    public void updateBookingRoom(Long bookingId, Long newRoomId) {
-        String sql = "UPDATE Booking SET roomId = ? WHERE bookingId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, newRoomId);
-            ps.setLong(2, bookingId);
-            int affectedRows = ps.executeUpdate();
-            if (affectedRows == 0) {
-                log.warn("No booking found with id: {}", bookingId);
-            } else {
-                log.info("Updated booking {} to use room {}", bookingId, newRoomId);
-            }
-        } catch (SQLException e) {
-            log.error("Error updating booking room: ", e);
-            throw new RuntimeException("Failed to update booking room", e);
-        }
-    }
-
-
 }

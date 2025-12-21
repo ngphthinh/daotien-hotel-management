@@ -4,8 +4,6 @@
  */
 package iuh.fit.se.group1.ui.component.dashboard;
 
-import org.kordamp.ikonli.fontawesome5.FontAwesomeBrands;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -28,31 +26,30 @@ public class PnlListCard extends javax.swing.JPanel {
      */
     public PnlListCard() {
         initComponents();
-        roomOccupancyRateCard.setTitle("Tỷ lệ phòng trống");
+
+        // Card 1: Phòng trống - có vòng tròn
+        roomOccupancyRateCard.setTitle("Phòng trống");
         roomOccupancyRateCard.setBorderColor(ROM_OCCUPANCY_RATE_COLOR);
-        roomOccupancyRateCard.setLblIconRate(FontIcon.of(FontAwesomeSolid.ARROW_UP,20,ROM_OCCUPANCY_RATE_COLOR));
+        roomOccupancyRateCard.setLblIconRate(FontIcon.of(FontAwesomeSolid.DOOR_OPEN,20,ROM_OCCUPANCY_RATE_COLOR));
         roomOccupancyRateCard.setColorCircularProgress(ROM_OCCUPANCY_RATE_COLOR);
-        roomOccupancyRateCard.setLblValue("75%");
-        bookingRateCard.setPercentage(20, 30);
 
-
+        // Card 2: Tỷ lệ đặt phòng - KHÔNG có vòng tròn
         bookingRateCard.setTitle("Tỷ lệ đặt phòng");
         bookingRateCard.setBorderColor(BOOKING_RATE_COLOR);
-        bookingRateCard.setLblIconRate(FontIcon.of(FontAwesomeSolid.ARROW_DOWN,20,BOOKING_RATE_COLOR));
-        bookingRateCard.setLblValue("66.67%");
-        bookingRateCard.setColorCircularProgress(BOOKING_RATE_COLOR);
-        bookingRateCard.setPercentage(20, 30);
+        bookingRateCard.setLblIconRate(FontIcon.of(FontAwesomeSolid.CALENDAR_CHECK,20,BOOKING_RATE_COLOR));
+        bookingRateCard.getCircularProgress1().setVisible(false);
 
+        // Card 3: Doanh thu - KHÔNG có vòng tròn
         revenueCard.setTitle("Doanh thu");
         revenueCard.setBorderColor(REVENUE_COLOR);
         revenueCard.setLblIconRate(FontIcon.of(FontAwesomeSolid.COINS,20,REVENUE_COLOR));
-        revenueCard.setMessage("Tăng 15% so với cùng kì");
+        revenueCard.getCircularProgress1().setVisible(false);
 
+        // Card 4: Số lượt check-in - KHÔNG có vòng tròn
         numberCheckInCard.setTitle("Số lượt check-in");
         numberCheckInCard.setBorderColor(NUMBER_CHECKIN_COLOR);
         numberCheckInCard.setLblIconRate(FontIcon.of(FontAwesomeSolid.MAP_MARKER_ALT,20,NUMBER_CHECKIN_COLOR));
-        numberCheckInCard.setMessage("Tăng 8% so với cùng kì");
-        
+        numberCheckInCard.getCircularProgress1().setVisible(false);
     }
 
     
@@ -77,7 +74,6 @@ public class PnlListCard extends javax.swing.JPanel {
         flowLayout1.setAlignOnBaseline(true);
         setLayout(flowLayout1);
 
-        roomOccupancyRateCard.setLblValue("Tỷ lệ ");
         add(roomOccupancyRateCard);
         add(bookingRateCard);
         add(revenueCard);

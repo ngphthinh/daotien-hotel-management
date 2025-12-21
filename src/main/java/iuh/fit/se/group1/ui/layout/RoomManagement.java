@@ -8,6 +8,7 @@ import iuh.fit.se.group1.service.RoomTypeService;
 import iuh.fit.se.group1.service.PropertiesService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.modal.RoomManagementModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
@@ -68,7 +69,6 @@ public class RoomManagement extends javax.swing.JPanel {
         try {
             setupFixedPrices();
         } catch (IOException e) {
-
             e.printStackTrace();
         }
     }
@@ -160,8 +160,10 @@ public class RoomManagement extends javax.swing.JPanel {
                 };
                 for (JTextField f : fields) {
                     if (f.getText().trim().isEmpty()) {
-                        JOptionPane.showMessageDialog(RoomManagement.this, "Không được để trống giá phòng!", "Lỗi",
-                                JOptionPane.ERROR_MESSAGE);
+                        CustomDialog.showMessage(this,
+                                "Vui lòng điền đầy đủ thông tin giá phòng!", "Lỗi",
+                                CustomDialog.MessageType.ERROR,
+                                600, 200);
                         return;
                     }
                 }
@@ -185,14 +187,18 @@ public class RoomManagement extends javax.swing.JPanel {
                         doubleDay.compareTo(BigDecimal.ZERO) <= 0 ||
                         doubleFirstHour.compareTo(BigDecimal.ZERO) <= 0) {
 
-                    JOptionPane.showMessageDialog(this, "Tất cả giá phòng phải lớn hơn 0!", "Lỗi",
-                            JOptionPane.ERROR_MESSAGE);
+                    CustomDialog.showMessage(this,
+                            "Tất cả giá phòng phải lớn hơn 0!", "Lỗi",
+                            CustomDialog.MessageType.ERROR,
+                            600, 200);
                     return;
                 }
 
                 savePricesToFile();
-                System.out.println("Saved prices ");
-                JOptionPane.showMessageDialog(this, "Cập nhật và lưu giá thành công!");
+                CustomDialog.showMessage(this,
+                        "Cập nhật giá phòng thành công!", "Thành công",
+                        CustomDialog.MessageType.SUCCESS,
+                        600, 200);
 
                 // Khóa lại các field
                 for (JTextField f : fields) {
@@ -201,7 +207,10 @@ public class RoomManagement extends javax.swing.JPanel {
                 btnUpdatePrice.setText("Cập nhật giá");
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Giá phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                CustomDialog.showMessage(this,
+                        "Giá phòng không hợp lệ! Vui lòng nhập số.", "Lỗi",
+                        CustomDialog.MessageType.ERROR,
+                        600, 200);
             }
         });
     }
@@ -225,6 +234,7 @@ public class RoomManagement extends javax.swing.JPanel {
         roomTypeService.updateRoomType(doubleType);
 
     }
+
     private void loadPricesFromFile() {
         var roomType = roomTypeService.getAllRoomTypes();
         RoomType singleType = roomType.stream()
@@ -256,7 +266,7 @@ public class RoomManagement extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
         model.setRowCount(0);
         for (Room room : rooms) {
-            model.addRow(new Object[] {
+            model.addRow(new Object[]{
                     room.getRoomId(),
                     room.getRoomNumber(),
                     room.getRoomType() != null ? room.getRoomType().getName() : "N/A",
@@ -267,16 +277,17 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void setupTableModel() {
-        String[] cols = { "Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng" };
+        String[] cols = {"Mã phòng", "Số phòng", "Loại phòng", "Trạng thái", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                // Chỉ cho phép edit cột "Chức năng" (column 4) để button hoạt động
+                return column == 4;
             }
         };
         tblRoom.getTbl().setModel(model);
 
-        // ===== THÊM PHẦN NÀY: Khởi tạo TableRowSorter =====
+        // Khởi tạo TableRowSorter
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         tblRoom.getTbl().setRowSorter(sorter);
 
@@ -284,7 +295,6 @@ public class RoomManagement extends javax.swing.JPanel {
         for (int i = 0; i < tblRoom.getTbl().getColumnCount(); i++) {
             sorter.setSortable(i, false);
         }
-        // ===== HẾT PHẦN THÊM =====
 
         tblRoom.getTbl().setAutoCreateRowSorter(false);
         tblRoom.getTbl().getTableHeader().setReorderingAllowed(false);
@@ -300,11 +310,13 @@ public class RoomManagement extends javax.swing.JPanel {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
+                System.out.println("Edit row: " + row);
                 handleEditRoom(row);
             }
 
             @Override
             public void onDelete(int row) {
+                System.out.println("Delete row: " + row);
                 handleDeleteRoom(row);
             }
         };
@@ -312,11 +324,33 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void handleEditRoom(int row) {
-        DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
-        Long roomId = (Long) model.getValueAt(row, 0);
-        String number = (String) model.getValueAt(row, 1);
-        String type = (String) model.getValueAt(row, 2);
-        String status = (String) model.getValueAt(row, 3);
+        JTable table = tblRoom.getTbl();
+        int modelRow = table.convertRowIndexToModel(row);
+
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        Object idObj = model.getValueAt(modelRow, 0);
+        Long roomId = idObj instanceof Number ? ((Number) idObj).longValue() : Long.parseLong(String.valueOf(idObj));
+        String number = String.valueOf(model.getValueAt(modelRow, 1));
+        String type = String.valueOf(model.getValueAt(modelRow, 2));
+        String status = String.valueOf(model.getValueAt(modelRow, 3));
+
+        System.out.println("Room data - ID: " + roomId + ", Number: " + number + ", Type: " + type + ", Status: " + status);
+
+        // Kiểm tra phòng có trong hóa đơn loại 2 hoặc 3 không
+        if (!roomService.canDeleteRoom(roomId)) {
+            CustomDialog.showMessage(this,
+                    "<html><div style='width:400px;'>" +
+                            "Không thể chỉnh sửa phòng này!<br><br>" +
+                            "<b>Lý do:</b><br>" +
+                            "- Phòng đang được sử dụng trong hóa đơn loại \"Đang xử lí\" hoặc \"Đặt trước\"<br>" +
+                            "- Vui lòng hoàn thành hoặc hủy hóa đơn trước khi chỉnh sửa phòng" +
+                            "</div></html>",
+                    "Không thể chỉnh sửa",
+                    CustomDialog.MessageType.ERROR,
+                    600, 250);
+            return;
+        }
 
         RoomManagementModal modal = new RoomManagementModal();
         modal.getBtnSave().setText("Cập nhật");
@@ -331,14 +365,30 @@ public class RoomManagement extends javax.swing.JPanel {
                 String typeNew = (String) modal.getCmbTypeRoom().getSelectedItem();
                 String statusNew = (String) modal.getCmbStatus().getSelectedItem();
 
+//                if (roomService.existsByRoomNumber(numberNew)) {
+//                   CustomDialog.showMessage(
+//                           this,
+//                           "Số phòng đã tồn tại!", "Lỗi",
+//                           CustomDialog.MessageType.ERROR,
+//                           500,200);
+//                    return;
+//                }
+
                 Room updatedRoom = roomService.updateRoom(createRoomFromModal(roomId, numberNew, typeNew, statusNew));
                 if (updatedRoom != null) {
                     loadTable(roomService.getAllRooms());
                     GlassPanePopup.closePopupLast();
-                    JOptionPane.showMessageDialog(this, "Cập nhật thành công!", "Thành công",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    CustomDialog.showMessage(
+                            this,
+                            "Cập nhật thành công!", "Thành công",
+                            CustomDialog.MessageType.SUCCESS,
+                            500, 200);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Cập nhật thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    CustomDialog.showMessage(
+                            this,
+                            "Cập nhật thất bại!", "Lỗi",
+                            CustomDialog.MessageType.ERROR,
+                            500, 200);
                 }
             }
         });
@@ -347,14 +397,40 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void handleDeleteRoom(int row) {
-        DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
-        Long roomId = (Long) model.getValueAt(row, 0);
+        JTable table = tblRoom.getTbl();
+        // Convert view row index to model row index
+        int modelRow = table.convertRowIndexToModel(row);
 
-        int confirm = JOptionPane.showConfirmDialog(this, "Xóa phòng này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        System.out.println("Delete - View row: " + row + ", Model row: " + modelRow);
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        // Use modelRow instead of row
+        Object idObj = model.getValueAt(modelRow, 0);
+        Long roomId = idObj instanceof Number ? ((Number) idObj).longValue() : Long.parseLong(String.valueOf(idObj));
+        System.out.println("Deleting room ID: " + roomId);
+
+        int confirm = CustomDialog.showConfirm(this, "Bạn có chắc chắn muốn xóa phòng này?", "Xác nhận xóa",
+                CustomDialog.MessageType.WARNING,
+                600, 200);
         if (confirm == JOptionPane.YES_OPTION) {
+            if (!roomService.canDeleteRoom(roomId)) {
+                CustomDialog.showMessage(this,
+                        "<html><div style='width:400px;'>" +
+                                "Không thể xóa phòng này!<br><br>" +
+                                "<b>Lý do:</b><br>" +
+                                "- Phòng đang được sử dụng trong hóa đơn hiện tại, HOẶC<br>" +
+                                "- Phòng được đặt trước nhưng không tìm thấy phòng thay thế cùng loại" +
+                                "</div></html>",
+                        "Không thể xóa",
+                        CustomDialog.MessageType.ERROR,
+                        600, 250);
+                return;
+            }
             roomService.deleteRoom(roomId);
             loadTable(roomService.getAllRooms());
-            JOptionPane.showMessageDialog(this, "Xóa thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            CustomDialog.showMessage(this, "Xóa phòng thành công!", "Thành công",
+                    CustomDialog.MessageType.SUCCESS,
+                    500, 200);
         }
     }
 
@@ -392,7 +468,7 @@ public class RoomManagement extends javax.swing.JPanel {
         }
 
         Combobox<String> cmbType = new Combobox<>(typeItems);
-        Combobox<String> cmbStatus = new Combobox<>(new String[] { "Tất cả", RoomStatus.AVAILABLE.toString(), RoomStatus.OCCUPIED.toString() , RoomStatus.OUT_OF_ORDER.toString() });
+        Combobox<String> cmbStatus = new Combobox<>(new String[]{"Tất cả", RoomStatus.AVAILABLE.toString(), RoomStatus.OCCUPIED.toString(), RoomStatus.OUT_OF_ORDER.toString()});
 
         // ===== SỬA PHẦN NÀY: Dùng defaultRenderer thay vì custom renderer =====
         TableCellRenderer defaultRenderer = header.getDefaultRenderer();
@@ -551,42 +627,17 @@ public class RoomManagement extends javax.swing.JPanel {
         room.setRoomId(roomId != null ? roomId : 0);
         room.setRoomNumber(number);
 
-        List<RoomType> allTypes = roomTypeService.getAllRoomTypes();
 
-        System.out.println("=== DEBUG: Tìm loại phòng ===");
-        System.out.println("Tên cần tìm: [" + typeName + "] (length: " + typeName.length() + ")");
-        allTypes.forEach(rt -> {
-            System.out.println("- DB có: [" + rt.getName() + "] (length: " + rt.getName().length() + ")");
-        });
-
-        RoomType type = allTypes.stream()
-                .filter(rt -> rt.getName() != null && rt.getName().trim().equalsIgnoreCase(typeName.trim()))
-                .findFirst()
-                .orElse(null);
-
-        if (type == null) {
-            type = allTypes.stream()
-                    .filter(rt -> rt.getRoomTypeId() != null && rt.getRoomTypeId().equals(typeName))
-                    .findFirst()
-                    .orElse(null);
+        if (typeName.equals("Phòng đôi")){
+            room.setRoomType(new RoomType("DOUBLE"));
+        }else {
+            room.setRoomType(new RoomType("SINGLE"));
         }
-
-        if (type == null) {
-            String availableTypes = allTypes.stream()
-                    .map(rt -> "'" + rt.getName() + "'")
-                    .reduce((a, b) -> a + ", " + b)
-                    .orElse("(không có)");
-
-            throw new IllegalArgumentException(
-                    "Không tìm thấy loại phòng: '" + typeName + "'\n" +
-                            "Các loại có sẵn: " + availableTypes);
-        }
-
-        room.setRoomType(type);
 
         try {
-            room.setRoomStatus(RoomStatus.valueOf(statusStr.toUpperCase()));
+            room.setRoomStatus(RoomStatus.fromDisplayName(statusStr));
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             room.setRoomStatus(RoomStatus.AVAILABLE);
         }
 
@@ -731,7 +782,7 @@ public class RoomManagement extends javax.swing.JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(headerCustom, javax.swing.GroupLayout.PREFERRED_SIZE,
                                         javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)
+                                .addGap(30, 30, 30)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(btnAddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -746,16 +797,13 @@ public class RoomManagement extends javax.swing.JPanel {
                                 .addGap(10, 10, 10)
                                 .addComponent(pricePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)
+                                .addGap(15, 15, 15)
                                 .addComponent(tblRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 615,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(8, Short.MAX_VALUE)));
     }
 
-    private void exportTableToExcel(RoomManagement roomManagement, JTable tbl, String string, String string2,
-                                    boolean b) {
-        throw new UnsupportedOperationException("Unimplemented method 'exportTableToExcel'");
-    }
+
     // CHẮC CHẮN ĐẢM BẢO NHU CẦU TỐI ĐA THEO HỆ HÀNG HÓA TỔNG SỐ ĐIỀU TRA TÊN THANH LÝ HÀNG HÓA NỘI ĐỊA NÓI CHUNG VÀ KHU VỰC NÓI RIÊNG, ĐẢM BẢO TÍNH SẴN DÙNG VÀ NHIỀU YẾU TỐ KHÁC
     private void btnAddRoomActionPerformed(java.awt.event.ActionEvent evt) {
         RoomManagementModal modal = new RoomManagementModal();
@@ -771,10 +819,13 @@ public class RoomManagement extends javax.swing.JPanel {
                 if (saved != null) {
                     loadTable(roomService.getAllRooms());
                     GlassPanePopup.closePopupLast();
-                    JOptionPane.showMessageDialog(this, "Thêm phòng thành công!", "Thành công",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    CustomDialog.showMessage(this, "Thêm phòng thành công!", "Thành công",
+                            CustomDialog.MessageType.SUCCESS,
+                            500, 200);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Thêm phòng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    CustomDialog.showMessage(this, "Thêm phòng thất bại!", "Lỗi",
+                            CustomDialog.MessageType.ERROR,
+                            500, 200);
                 }
             }
         });
@@ -787,6 +838,7 @@ public class RoomManagement extends javax.swing.JPanel {
         // TODO Auto-generated method stub
         // throw new UnsupportedOperationException("Unimplemented method 'loadData'");
     }
+
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("Import Excel clicked");
     }

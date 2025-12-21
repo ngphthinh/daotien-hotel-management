@@ -203,4 +203,120 @@ public class BookingRepository implements Repository<Booking, Long>{
             throw new RuntimeException(e);
         }
     }
+    /**
+     * Đếm số phòng sắp hết hạn (checkout trong khoảng thời gian)
+     */
+    public int countRoomsNearExpiry(LocalDateTime fromTime, LocalDateTime toTime) {
+        String sql = "SELECT COUNT(DISTINCT b.roomId) " +
+                     "FROM Booking b " +
+                     "WHERE b.checkOutDate BETWEEN ? AND ? " +
+                     "AND b.checkOutDate IS NOT NULL";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(fromTime));
+            ps.setTimestamp(2, Timestamp.valueOf(toTime));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error counting rooms near expiry: ", e);
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm số lượt check-in trong khoảng thời gian
+     */
+    public int countCheckIns(LocalDateTime startDate, LocalDateTime endDate) {
+        String sql = "SELECT COUNT(*) FROM Booking " +
+                     "WHERE checkInDate BETWEEN ? AND ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(startDate));
+            ps.setTimestamp(2, Timestamp.valueOf(endDate));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error counting check-ins: ", e);
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm số lượt check-out trong khoảng thời gian
+     */
+    public int countCheckOuts(LocalDateTime startDate, LocalDateTime endDate) {
+        String sql = "SELECT COUNT(*) FROM Booking " +
+                     "WHERE checkOutDate BETWEEN ? AND ? " +
+                     "AND checkOutDate IS NOT NULL";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(startDate));
+            ps.setTimestamp(2, Timestamp.valueOf(endDate));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error counting check-outs: ", e);
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm phòng đã checkout trong khoảng thời gian
+     */
+    public int countCheckedOutRooms(LocalDateTime startDate, LocalDateTime endDate) {
+        String sql = "SELECT COUNT(*) FROM Booking " +
+                     "WHERE checkOutDate BETWEEN ? AND ? " +
+                     "AND checkOutDate IS NOT NULL";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(startDate));
+            ps.setTimestamp(2, Timestamp.valueOf(endDate));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error counting checked out rooms: ", e);
+        }
+        return 0;
+    }
+
+    /**
+     * Đếm phòng trả trễ (checkout quá giờ quy định)
+     */
+    public int countLateCheckOuts(LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime) {
+        String sql = "SELECT COUNT(*) FROM Booking " +
+                     "WHERE checkOutDate BETWEEN ? AND ? " +
+                     "AND checkOutDate < ? " +
+                     "AND checkOutDate IS NOT NULL";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(startDate));
+            ps.setTimestamp(2, Timestamp.valueOf(endDate));
+            ps.setTimestamp(3, Timestamp.valueOf(deadlineTime));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error counting late checkouts: ", e);
+        }
+        return 0;
+    }
 }

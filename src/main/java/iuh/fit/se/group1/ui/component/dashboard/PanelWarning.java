@@ -4,7 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.dashboard;
 
-import iuh.fit.se.group1.ui.component.custom.CircularProgress;
+import iuh.fit.se.group1.dto.WarningDto;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
@@ -136,4 +136,22 @@ public class PanelWarning extends javax.swing.JPanel {
     private javax.swing.JLabel lblImportant;
     private javax.swing.JLabel lblTitle;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Cập nhật dữ liệu cảnh báo từ service
+     */
+    public void updateData(WarningDto warningDto) {
+        // Cập nhật khách trả trễ
+        cardMessage1.getLblSubTitle().setText(warningDto.getLateCheckOutCount() + " Phòng");
+
+        // Cập nhật phòng hỏng
+        cardMessage2.getLblSubTitle().setText(warningDto.getBrokenRoomsCount() + " Phòng");
+
+        // Cập nhật phiên bản mới
+        if (warningDto.isHasNewVersion()) {
+            cardMessage3.getLblSubTitle().setText("Có bản cập nhật");
+        } else {
+            cardMessage3.getLblSubTitle().setText("Hiện chưa có");
+        }
+    }
 }

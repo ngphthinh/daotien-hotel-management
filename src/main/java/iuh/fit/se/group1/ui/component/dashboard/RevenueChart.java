@@ -4,6 +4,7 @@
      */
     package iuh.fit.se.group1.ui.component.dashboard;
 
+    import iuh.fit.se.group1.dto.RevenueSourceDto;
     import iuh.fit.se.group1.util.ChartUtils;
     import raven.chart.data.pie.DefaultPieDataset;
     import raven.chart.pie.PieChart;
@@ -11,6 +12,7 @@
     import javax.swing.*;
     import java.awt.*;
     import java.awt.geom.RoundRectangle2D;
+    import java.util.List;
 
     /**
      * @author ngphthinh
@@ -124,5 +126,24 @@
             dataset.setValue("Dịch vụ", 30);
             dataset.setValue("Phụ phí", 30);
             return dataset;
+        }
+
+        /**
+         * Cập nhật dữ liệu chart từ service
+         */
+        public void updateData(List<RevenueSourceDto> revenueSources) {
+            DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+
+            if (revenueSources == null || revenueSources.isEmpty()) {
+                dataset.setValue("Chưa có dữ liệu", 1);
+            } else {
+                for (RevenueSourceDto source : revenueSources) {
+                    String label = source.getSource() != null ? source.getSource() : "Khác";
+                    dataset.setValue(label, source.getPercentage());
+                }
+            }
+
+            pieChart.setDataset(dataset);
+            pieChart.repaint();
         }
     }

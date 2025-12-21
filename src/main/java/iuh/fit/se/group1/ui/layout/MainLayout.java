@@ -152,6 +152,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
+                        paymentPage.setOnPayment();
                         setMainContent(paymentPage);
 
                     } else if (index == 3) {
@@ -371,6 +372,14 @@ public class MainLayout extends JPanel {
         pnlContent.add(panel, BorderLayout.CENTER);
         pnlContent.revalidate();
         pnlContent.repaint();
+
+        // Auto-refresh Dashboard khi chuyển vào
+        if (panel instanceof Dashboard) {
+            ((Dashboard) panel).refreshData();
+        } else if (panel instanceof DashboardEmployee) {
+            // Nếu có method refresh trong DashboardEmployee, gọi ở đây
+            // ((DashboardEmployee) panel).refreshData();
+        }
     }
 
     public JButton getBtnSignOut() {
