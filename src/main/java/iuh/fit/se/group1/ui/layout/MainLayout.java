@@ -124,7 +124,7 @@ public class MainLayout extends JPanel {
                     } else if (index == 10) {
                         setMainContent(surchargeManagement);
                     } else if (index == 11 && subIndex == 1) {
-                        setMainContent(revenueStatistics);
+                        handleGuidePanel();
                     } else if (index == 11 && subIndex == 2) {
                         setMainContent(new BookingTrend());
                     } else if (index == 12 && subIndex == 2) {
@@ -158,7 +158,7 @@ public class MainLayout extends JPanel {
                         closeShiftHandle();
                     } else if (index == 6) {
                         if (subIndex == 1) {
-                            setMainContent(revenueStatistics);
+                            handleGuidePanel();
                         } else if (subIndex == 2) {
                             setMainContent(new Regulation());
                         } else if (subIndex == 3) {
@@ -190,6 +190,17 @@ public class MainLayout extends JPanel {
 
         });
 
+    }
+
+    private void handleGuidePanel() {
+        try {
+            Desktop.getDesktop().browse(new URI("https://vienthieu6925.github.io/user/"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Không thể mở trang hướng dẫn!",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private static void handleAboutPanel() {
