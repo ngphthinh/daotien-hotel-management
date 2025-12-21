@@ -132,8 +132,6 @@ public class MainLayout extends JPanel {
                         setMainContent(revenueStatistics);
                     } else if (index == 11 && subIndex == 2) {
                         setMainContent(new BookingTrend());
-                    } else if (index == 11 && subIndex == 3) {
-                        setMainContent(new StatisticsDetail());
                     } else if (index == 12 && subIndex == 2) {
                         setMainContent(new Regulation());
                     } else if (index == 12 && subIndex == 3) {
