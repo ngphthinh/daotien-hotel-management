@@ -72,6 +72,44 @@ public class ChartUtils {
         }
     }
 
+    /**
+     * Set integer format (không có $ và .00) cho HorizontalBarChart
+     */
+    public static void setHorizontalBarIntegerFormat(HorizontalBarChart chart) {
+        try {
+            // Thử tìm và set DecimalFormat vào chart
+            Field[] fields = HorizontalBarChart.class.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object value = field.get(chart);
+
+                // Tìm DecimalFormat hoặc NumberFormat
+                if (value instanceof java.text.DecimalFormat) {
+                    java.text.DecimalFormat df = (java.text.DecimalFormat) value;
+                    df.applyPattern("#,##0");  // Pattern số nguyên
+                    log.info("Set DecimalFormat to integer pattern for field: {}", field.getName());
+                } else if (value instanceof java.text.NumberFormat) {
+                    // Thay thế bằng DecimalFormat mới
+                    java.text.DecimalFormat newFormat = new java.text.DecimalFormat("#,##0");
+                    field.set(chart, newFormat);
+                    log.info("Replaced NumberFormat with DecimalFormat for field: {}", field.getName());
+                }
+            }
+
+            // Thử gọi method nếu có
+            try {
+                java.lang.reflect.Method method = chart.getClass().getMethod("setLabelFormat", java.text.DecimalFormat.class);
+                method.invoke(chart, new java.text.DecimalFormat("#,##0"));
+                log.info("Called setLabelFormat(DecimalFormat) successfully");
+            } catch (NoSuchMethodException e) {
+                // Method không tồn tại, bỏ qua
+            }
+
+        } catch (Exception e) {
+            log.warn("Could not set integer format for HorizontalBarChart: {}", e.getMessage());
+        }
+    }
+
 
     public static void clearDataColumnChart(Chart chart) {
         try {

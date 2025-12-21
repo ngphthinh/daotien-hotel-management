@@ -23,10 +23,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" pref="169" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel2" min="-2" pref="141" max="-2" attributes="0"/>
-              <EmptySpace pref="45" max="32767" attributes="0"/>
+              <Component id="jLabel1" min="-2" pref="328" max="-2" attributes="0"/>
+              <EmptySpace pref="33" max="32767" attributes="0"/>
               <Component id="txtFromDate" min="-2" pref="128" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
@@ -42,7 +40,6 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="103" alignment="0" groupAlignment="3" attributes="0">
               <Component id="jLabel1" alignment="3" pref="75" max="32767" attributes="0"/>
-              <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
               <Component id="btnView" alignment="3" min="-2" max="-2" attributes="0"/>
               <Component id="txtFromDate" alignment="3" min="-2" max="-2" attributes="0"/>
               <Component id="txtToDate" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -61,14 +58,6 @@
           <Color blue="f6" green="f6" red="f6" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Qu&#x1ea3;n l&#xed; th&#x1ed1;ng k&#xea;"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Segoe UI" size="18" style="1"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="&gt;Doanh thu"/>
       </Properties>
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.custom.Button" name="btnView">

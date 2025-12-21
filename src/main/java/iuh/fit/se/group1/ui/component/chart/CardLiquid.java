@@ -174,4 +174,51 @@ public class CardLiquid extends JPanel {
     private javax.swing.JSeparator jSeparator1;
     private iuh.fit.se.group1.ui.component.chart.LiquidProgress liquidProgress1;
     // End of variables declaration//GEN-END:variables
+
+    // ==================== Public API Methods ====================
+
+    /**
+     * Set tiêu đề cho card
+     */
+    public void setTitle(String title) {
+        jLabel1.setText(title);
+    }
+
+    /**
+     * Set mô tả cho card
+     */
+    public void setDescription(String description) {
+        jLabel2.setText(description);
+    }
+
+    /**
+     * Set giá trị % cho liquid progress
+     * @param percentage Phần trăm (có thể vượt 100, ví dụ: 150%, 200%...)
+     */
+    public void setValues(int percentage) {
+        // LiquidProgress luôn dùng maximum = 100 để render đúng
+        liquidProgress1.setMaximum(100);
+
+        // Nếu % > 100, fill đầy thanh (100%)
+        // Nếu % <= 100, fill theo % thực tế
+        int displayValue = Math.min(percentage, 100);
+        liquidProgress1.setValue(displayValue);
+
+        // Hiển thị text % thực tế (có thể >100)
+        liquidProgress1.setString(percentage + "%");
+    }
+
+    /**
+     * Get tiêu đề hiện tại
+     */
+    public String getTitle() {
+        return jLabel1.getText();
+    }
+
+    /**
+     * Get mô tả hiện tại
+     */
+    public String getDescription() {
+        return jLabel2.getText();
+    }
 }

@@ -4,17 +4,58 @@
  */
 package iuh.fit.se.group1.ui.component.dashboard;
 
+import iuh.fit.se.group1.dto.ShiftNoteDto;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 /**
  *
  * @author THIS PC
  */
 public class CardNote extends javax.swing.JPanel {
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     /**
      * Creates new form CardNote
      */
     public CardNote() {
         initComponents();
+        jTextArea1.setEditable(false);
+    }
+
+    /**
+     * Cập nhật nội dung ghi chú từ danh sách ShiftNoteDto
+     * @param notes Danh sách ghi chú (tối đa 2 ca gần nhất)
+     */
+    public void updateData(List<ShiftNoteDto> notes) {
+        if (notes == null || notes.isEmpty()) {
+            jTextArea1.setText("Chưa có ghi chú từ ca làm việc trước.");
+            return;
+        }
+
+        StringBuilder content = new StringBuilder();
+
+        for (int i = 0; i < notes.size(); i++) {
+            ShiftNoteDto note = notes.get(i);
+
+            if (i > 0) {
+                content.append("\n\n---\n\n");
+            }
+
+            content.append("Ca: ").append(note.getShiftName()).append("\n");
+
+            if (note.getShiftDate() != null) {
+                content.append("Ngày: ").append(note.getShiftDate().format(DATE_FORMATTER)).append("\n");
+            }
+
+            content.append("Nhân viên: ").append(note.getEmployeeName()).append("\n");
+            content.append("Ghi chú: ").append(note.getNote());
+        }
+
+        jTextArea1.setText(content.toString());
+        jTextArea1.setCaretPosition(0); // Scroll to top
     }
 
     /**

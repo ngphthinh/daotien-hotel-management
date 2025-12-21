@@ -8,6 +8,7 @@ import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 
+import javax.swing.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -16,6 +17,15 @@ import java.time.format.DateTimeFormatter;
  * @author THIS PC
  */
 public class HeaderChart extends javax.swing.JPanel {
+    public JLabel getjLabel1() {
+        return jLabel1;
+    }
+
+    public void setjLabel1(JLabel jLabel1) {
+        this.jLabel1 = jLabel1;
+    }
+
+
 
     public TextField getTxtFromDate() {
         return txtFromDate;
@@ -76,7 +86,6 @@ public class HeaderChart extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         btnView = new iuh.fit.se.group1.ui.component.custom.Button();
         txtFromDate = new iuh.fit.se.group1.ui.component.custom.TextField();
         txtToDate = new iuh.fit.se.group1.ui.component.custom.TextField();
@@ -87,9 +96,6 @@ public class HeaderChart extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(246, 246, 246));
         jLabel1.setText("Quản lí thống kê");
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel2.setText(">Doanh thu");
 
         btnView.setBackground(new java.awt.Color(255, 108, 3));
         btnView.setForeground(new java.awt.Color(255, 255, 255));
@@ -119,10 +125,8 @@ public class HeaderChart extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(50, 50, 50)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
@@ -136,7 +140,6 @@ public class HeaderChart extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
-                .addComponent(jLabel2)
                 .addComponent(btnView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(txtFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(txtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -148,7 +151,6 @@ public class HeaderChart extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnView;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private iuh.fit.se.group1.ui.component.custom.TextField txtFromDate;
     private iuh.fit.se.group1.ui.component.custom.TextField txtToDate;

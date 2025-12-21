@@ -4,15 +4,27 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.DashboardSummaryDto;
+import iuh.fit.se.group1.dto.PeakHourDto;
+import iuh.fit.se.group1.dto.RevenueSourceDto;
+import iuh.fit.se.group1.dto.RoomStatusDto;
+import iuh.fit.se.group1.dto.ShiftNoteDto;
+import iuh.fit.se.group1.dto.WarningDto;
 import iuh.fit.se.group1.enums.TimeType;
+import iuh.fit.se.group1.service.DashboardService;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.material.Material;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import javax.swing.*;
 import java.awt.*;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
 
 /**
- *
+ * Dashboard nhân viên với dữ liệu thật từ database
  * @author THIS PC
  */
 public class DashboardEmployee extends javax.swing.JPanel {
@@ -20,54 +32,204 @@ public class DashboardEmployee extends javax.swing.JPanel {
     private static final Color ALMOST_OUT_OF_TIME = new Color(50, 145, 255);
     private static final Color NUMBER_CHECKIN = new Color(255, 108, 3);
     private static final Color NUMBER_CHECKOUT = new Color(239, 180, 46);
-    private static final Color MONEY_OPEN_SHIFT = new Color(13,200, 7);
+    private static final Color MONEY_OPEN_SHIFT = new Color(13, 200, 7);
+
+    private final DashboardService dashboardService;
+    private final NumberFormat currencyFormat;
+
     /**
      * Creates new form DashboardEmployee
      */
     public DashboardEmployee() {
+        this.dashboardService = new DashboardService();
+        this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
         initComponents();
+        setupCardIcons();
         addActionTimeType();
-        pnlListCard1.getRoomOccupancyRateCard().setLblIconRate(FontIcon.of(FontAwesomeSolid.CLOCK, 24, ALMOST_OUT_OF_TIME));
-        pnlListCard1.getRoomOccupancyRateCard().setTitle("SỐ PHÒNG SẮP HẾT HẠN");
-        pnlListCard1.getRoomOccupancyRateCard().setMessage("12/30 phòng");
-        pnlListCard1.getRoomOccupancyRateCard().setLblValue("12 PHÒNG");
 
-        pnlListCard1.getNumberCheckInCard().setLblIconRate(FontIcon.of(FontAwesomeSolid.MAP_MARKER_ALT, 24, NUMBER_CHECKIN));
-        pnlListCard1.getNumberCheckInCard().setTitle("LƯỢT KHÁCH CHECKIN");
-        pnlListCard1.getNumberCheckInCard().setMessage("Tắng 8% so với cùng kì");
-        pnlListCard1.getNumberCheckInCard().setLblValue("72 LƯỢT");
-
-        pnlListCard1.getRevenueCard().setLblIconRate(FontIcon.of(FontAwesomeSolid.KEY, 24, ALMOST_OUT_OF_TIME));
-        pnlListCard1.getRevenueCard().setTitle("LƯỢT KHÁCH CHECKOUT");
-        pnlListCard1.getRevenueCard().setMessage("20/30 phòng");
-        pnlListCard1.getRevenueCard().setLblValue("12 LƯỢT");
-
-        pnlListCard1.getBookingRateCard().setLblIconRate(FontIcon.of(FontAwesomeSolid.MONEY_CHECK, 24, ALMOST_OUT_OF_TIME));
-        pnlListCard1.getBookingRateCard().setTitle("TIỀN KHI MỞ CA");
-        pnlListCard1.getBookingRateCard().setMessage("đá");
-        pnlListCard1.getBookingRateCard().getLblRoomCount().setForeground(Color.white);
-        pnlListCard1.getBookingRateCard().setLblValue("200000000");
+        // Load dữ liệu ban đầu (Hôm nay)
+        loadDashboardData(TimeType.TODAY);
     }
 
+    /**
+     * Setup icons và màu sắc cho các card
+     */
+    private void setupCardIcons() {
+        // Card 1: Phòng sắp hết hạn
+        pnlListCard1.getRoomOccupancyRateCard().setLblIconRate(
+            FontIcon.of(FontAwesomeSolid.CLOCK, 24, ALMOST_OUT_OF_TIME));
+        pnlListCard1.getRoomOccupancyRateCard().setTitle("SỐ PHÒNG SẮP HẾT HẠN");
+
+        // Card 2: Check-in
+        pnlListCard1.getNumberCheckInCard().setLblIconRate(
+            FontIcon.of(FontAwesomeSolid.MAP_MARKER_ALT, 24, NUMBER_CHECKIN));
+        pnlListCard1.getNumberCheckInCard().setTitle("LƯỢT KHÁCH CHECKIN");
+
+        // Card 3: Check-out
+        pnlListCard1.getRevenueCard().setLblIconRate(
+            FontIcon.of(FontAwesomeSolid.KEY, 24, NUMBER_CHECKOUT));
+        pnlListCard1.getRevenueCard().setTitle("LƯỢT KHÁCH CHECKOUT");
+
+        // Card 4: Tiền mở ca
+        pnlListCard1.getBookingRateCard().setLblIconRate(
+            FontIcon.of(FontAwesomeSolid.MONEY_CHECK, 24, MONEY_OPEN_SHIFT));
+        pnlListCard1.getBookingRateCard().setTitle("TIỀN KHI MỞ CA");
+        pnlListCard1.getBookingRateCard().getLblRoomCount().setForeground(Color.white);
+    }
+
+    /**
+     * Load dữ liệu dashboard theo loại thời gian
+     */
+    private void loadDashboardData(TimeType timeType) {
+        // Chạy task nền để không block UI
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            private DashboardSummaryDto summaryData;
+            private List<RevenueSourceDto> revenueSources;
+            private List<PeakHourDto> peakHours;
+            private RoomStatusDto roomStatus;
+            private WarningDto warnings;
+            private List<ShiftNoteDto> shiftNotes;
+
+            @Override
+            protected Void doInBackground() {
+                try {
+                    // Lấy summary data
+                    summaryData = dashboardService.getDashboardData(timeType);
+
+                    // Lấy nguồn doanh thu
+                    LocalDateTime startDate = getStartDateForTimeType(timeType);
+                    LocalDateTime endDate = LocalDateTime.now();
+                    revenueSources = dashboardService.getRevenueSources(startDate, endDate);
+
+                    // Lấy khung giờ cao điểm
+                    peakHours = dashboardService.getPeakHours(startDate, endDate);
+
+                    // Lấy trạng thái phòng
+                    roomStatus = dashboardService.getRoomStatus();
+
+                    // Lấy cảnh báo
+                    warnings = dashboardService.getWarnings();
+
+                    // Lấy ghi chú ca gần nhất
+                    shiftNotes = dashboardService.getRecentShiftNotes();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    // Cập nhật các card tổng quan
+                    if (summaryData != null) {
+                        updateDashboardUI(summaryData);
+                    }
+
+                    // Cập nhật nguồn doanh thu
+                    if (revenueSources != null) {
+                        revenueChart.updateData(revenueSources);
+                    }
+
+                    // Cập nhật khung giờ cao điểm
+                    if (peakHours != null) {
+                        lineChartPanel.updateData(peakHours);
+                    }
+
+                    // Cập nhật trạng thái phòng
+                    if (roomStatus != null) {
+                        statusRoomCard.updateData(roomStatus);
+                    }
+
+                    // Cập nhật cảnh báo
+                    if (warnings != null) {
+                        panelWarning.updateData(warnings);
+                    }
+
+                    // Cập nhật ghi chú ca
+                    if (shiftNotes != null) {
+                        cardNote.updateData(shiftNotes);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                        DashboardEmployee.this,
+                        "Lỗi khi tải dữ liệu dashboard: " + e.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+
+            private LocalDateTime getStartDateForTimeType(TimeType type) {
+                switch (type) {
+                    case TODAY:
+                        return LocalDate.now().atStartOfDay();
+                    case DAYS_7:
+                        return LocalDate.now().minusDays(7).atStartOfDay();
+                    case DAYS_30:
+                        return LocalDate.now().minusDays(30).atStartOfDay();
+                    case DAYS_90:
+                        return LocalDate.now().minusDays(90).atStartOfDay();
+                    default:
+                        return LocalDate.now().atStartOfDay();
+                }
+            }
+        };
+        worker.execute();
+    }
+
+    /**
+     * Cập nhật UI với dữ liệu mới
+     */
+    private void updateDashboardUI(DashboardSummaryDto data) {
+        // Card 1: Phòng sắp hết hạn
+        pnlListCard1.getRoomOccupancyRateCard().setMessage(
+            data.getRoomsNearExpiry() + "/" + data.getTotalRooms() + " phòng");
+        pnlListCard1.getRoomOccupancyRateCard().setLblValue(
+            data.getRoomsNearExpiry() + " PHÒNG");
+
+        // Card 2: Check-in
+        pnlListCard1.getNumberCheckInCard().setMessage("Lượt checkin");
+        pnlListCard1.getNumberCheckInCard().setLblValue(
+            data.getCheckInCount() + " LƯỢT");
+
+        // Card 3: Check-out
+        pnlListCard1.getRevenueCard().setMessage("Lượt checkout");
+        pnlListCard1.getRevenueCard().setLblValue(
+            data.getCheckOutCount() + " LƯỢT");
+
+        // Card 4: Tiền mở ca
+        pnlListCard1.getBookingRateCard().setMessage("Ca gần nhất");
+        pnlListCard1.getBookingRateCard().setLblValue(
+            currencyFormat.format(data.getOpenShiftCash()));
+    }
+
+    /**
+     * Thêm action cho các button time filter
+     */
     private void addActionTimeType() {
         headerDashboard.getBtnToday().addActionListener(e -> {
             headerDashboard.setActiveButton(TimeType.TODAY);
-            // TODO: Update chart and data for Today
+            loadDashboardData(TimeType.TODAY);
         });
 
         headerDashboard.getBtn7Days().addActionListener(e -> {
             headerDashboard.setActiveButton(TimeType.DAYS_7);
-            // TODO: Update chart and data for 7 Days
+            loadDashboardData(TimeType.DAYS_7);
         });
 
         headerDashboard.getBtn30Days().addActionListener(e -> {
             headerDashboard.setActiveButton(TimeType.DAYS_30);
-            // TODO: Update chart and data for 30 Days
+            loadDashboardData(TimeType.DAYS_30);
         });
 
         headerDashboard.getBtn90Days().addActionListener(e -> {
             headerDashboard.setActiveButton(TimeType.DAYS_90);
-            // TODO: Update chart and data for 90 Days
+            loadDashboardData(TimeType.DAYS_90);
         });
 
     }

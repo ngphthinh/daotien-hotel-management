@@ -4,16 +4,19 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.enums.TimeType;
+import iuh.fit.se.group1.service.DashboardService;
 import iuh.fit.se.group1.service.OrderService;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import javax.swing.*;
 import java.awt.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,17 +26,25 @@ import java.util.Map;
 public class BookingTrend extends javax.swing.JPanel {
 
     private final OrderService orderService;
+    private final DashboardService dashboardService;
 
     /**
      * Creates new form BookingTrend
      */
     public BookingTrend() {
         this.orderService = new OrderService();
+        this.dashboardService = new DashboardService();
         initComponents();
+        headerChart1.getjLabel1().setText(
+                "<html><span style='color:white;'>Quản lý thống kê</span>"
+
+                        + "<span style='color:rgb(204,204,204);'> &gt; Doanh thu</span></html>");
+
 
         setActionButtonRange();
         // Load data mặc định cho 7 ngày
         updateCardData(7);
+        loadLineChartData(7);
     }
 
     private void setActionButtonRange() {
@@ -44,18 +55,21 @@ public class BookingTrend extends javax.swing.JPanel {
             rangeDateButton1.setActiveButton(TimeType.DAYS_7);
             lineBookingTrendChart1.createLineChartData(7);
             updateCardData(7);
+            loadLineChartData(7);
         });
 
         rangeDateButton1.getBtn30Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_30);
             lineBookingTrendChart1.createLineChartData(30);
             updateCardData(30);
+            loadLineChartData(30);
         });
 
         rangeDateButton1.getBtn90Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_90);
             lineBookingTrendChart1.createLineChartData(90);
             updateCardData(90);
+            loadLineChartData(90);
         });
 
         headerChart1.getBtnView().addActionListener(l->{
@@ -66,6 +80,7 @@ public class BookingTrend extends javax.swing.JPanel {
 
             lineBookingTrendChart1.createLineChartData(start, end);
             updateCardData(start, end);
+            loadLineChartData(start.atStartOfDay(), end.atTime(23, 59, 59));
         });
     }
 
@@ -95,6 +110,51 @@ public class BookingTrend extends javax.swing.JPanel {
         card1.setValue(totalBookings + " Lượt");
 
         System.out.println("Card updated: " + totalBookings + " bookings from " + start + " to " + end);
+    }
+
+    /**
+     * Load dữ liệu khung giờ cao điểm cho LineChartPanel2 theo số ngày
+     */
+    private void loadLineChartData(int days) {
+        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime start = end.minusDays(days);
+        loadLineChartData(start, end);
+    }
+
+    /**
+     * Load dữ liệu khung giờ cao điểm cho LineChartPanel2 theo khoảng thời gian cụ thể
+     * Sử dụng SwingWorker để tránh block UI thread
+     */
+    private void loadLineChartData(LocalDateTime start, LocalDateTime end) {
+        SwingWorker<List<PeakHourDto>, Void> worker = new SwingWorker<>() {
+            private List<PeakHourDto> peakHours;
+
+            @Override
+            protected List<PeakHourDto> doInBackground() {
+                try {
+                    peakHours = dashboardService.getPeakHours(start, end);
+                } catch (Exception e) {
+                    System.err.println("Error loading peak hours data: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                return peakHours;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<PeakHourDto> result = get();
+                    if (result != null) {
+                        lineChartPanel2.updateData(result);
+                        System.out.println("LineChartPanel2 updated with " + result.size() + " peak hour data points");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error updating LineChartPanel2: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.execute();
     }
 
     /**

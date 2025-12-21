@@ -1,6 +1,7 @@
     package iuh.fit.se.group1.ui.component.dashboard;
 
     import com.formdev.flatlaf.FlatClientProperties;
+    import iuh.fit.se.group1.dto.RoomStatusDto;
     import iuh.fit.se.group1.util.ChartUtils;
     import raven.chart.bar.HorizontalBarChart;
     import raven.chart.data.pie.DefaultPieDataset;
@@ -15,6 +16,8 @@
         public StatusRoomCard() {
             initComponents();
             ChartUtils.setHorizontalBar(roomStatusChart, Color.white);
+            // Tắt currency format - hiển thị số nguyên
+            ChartUtils.setHorizontalBarIntegerFormat(roomStatusChart);
         }
 
 
@@ -31,6 +34,7 @@
             roomStatusChart.setHeader(header2);
             roomStatusChart.setBarColor(Color.decode("#10b981"));
             roomStatusChart.setDataset(createData());
+
             JPanel panel2 = new JPanel(new BorderLayout());
             panel2.putClientProperty(FlatClientProperties.STYLE, ""
                     + "border:5,5,5,5,$Component.borderColor,,20");
@@ -46,5 +50,19 @@
             dataset.addValue("Trả phòng", random.nextInt(20));
             dataset.addValue("Hủy phòng", random.nextInt(20));
             return dataset;
+        }
+
+        /**
+         * Cập nhật dữ liệu trạng thái phòng từ service
+         */
+        public void updateData(RoomStatusDto statusDto) {
+            DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+            dataset.addValue("Phòng đã đặt", statusDto.getOccupiedRooms());
+            dataset.addValue("Phòng trống", statusDto.getAvailableRooms());
+            dataset.addValue("Trả phòng", statusDto.getCheckedOutRooms());
+            dataset.addValue("Hủy phòng", statusDto.getCancelledBookings());
+
+            roomStatusChart.setDataset(dataset);
+            roomStatusChart.repaint();
         }
     }

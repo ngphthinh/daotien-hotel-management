@@ -5,11 +5,11 @@
 package iuh.fit.se.group1.ui.component.dashboard;
 
 
+import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.ui.component.raven.chart.CurveLineChart;
 import iuh.fit.se.group1.ui.component.raven.chart.ModelChart;
 import iuh.fit.se.group1.ui.component.raven.panel.PanelShadow;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +77,37 @@ public class LineChartPanel extends PanelShadow {
         chart.addData(new ModelChart("20:00", new double[]{20}));
         chart.addData(new ModelChart("4:00", new double[]{48}));
         chart.addData(new ModelChart("10:00", new double[]{35}));
+        chart.start();
+    }
+
+    /**
+     * Cập nhật dữ liệu khung giờ cao điểm từ service
+     */
+    public void updateData(List<PeakHourDto> peakHours) {
+        chart.clear();
+
+        if (peakHours == null || peakHours.isEmpty()) {
+            // Thêm dữ liệu mặc định (cần ít nhất 4 điểm cho spline)
+            chart.addData(new ModelChart("00:00", new double[]{0}));
+            chart.addData(new ModelChart("06:00", new double[]{0}));
+            chart.addData(new ModelChart("12:00", new double[]{0}));
+            chart.addData(new ModelChart("18:00", new double[]{0}));
+        } else {
+            // Thêm dữ liệu thật
+            for (PeakHourDto peak : peakHours) {
+                chart.addData(new ModelChart(peak.getHour(), new double[]{peak.getBookingCount()}));
+            }
+
+            // Đảm bảo có ít nhất 4 điểm cho spline interpolation
+            int dataSize = peakHours.size();
+            if (dataSize < 4) {
+                // Thêm các điểm padding với giá trị 0
+                for (int i = dataSize; i < 4; i++) {
+                    chart.addData(new ModelChart("--:--", new double[]{0}));
+                }
+            }
+        }
+
         chart.start();
     }
 

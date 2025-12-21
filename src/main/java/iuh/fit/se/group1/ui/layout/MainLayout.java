@@ -132,9 +132,7 @@ public class MainLayout extends JPanel {
                         setMainContent(revenueStatistics);
                     } else if (index == 11 && subIndex == 2) {
                         setMainContent(new BookingTrend());
-                    } else if (index == 11 && subIndex == 3) {
-                        setMainContent(new StatisticsDetail());
-                    } else if (index == 12 && subIndex == 2) {
+                    }  else if (index == 12 && subIndex == 2) {
                         setMainContent(new Regulation());
                     } else if (index == 12 && subIndex == 3) {
                         GlassPanePopup.showPopup(checkForVersionPanel);
@@ -388,6 +386,14 @@ public class MainLayout extends JPanel {
         pnlContent.add(panel, BorderLayout.CENTER);
         pnlContent.revalidate();
         pnlContent.repaint();
+
+        // Auto-refresh Dashboard khi chuyển vào
+        if (panel instanceof Dashboard) {
+            ((Dashboard) panel).refreshData();
+        } else if (panel instanceof DashboardEmployee) {
+            // Nếu có method refresh trong DashboardEmployee, gọi ở đây
+            // ((DashboardEmployee) panel).refreshData();
+        }
     }
 
     public JButton getBtnSignOut() {

@@ -23,13 +23,13 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
 
     public CheckForVersionPanel() {
         initComponents();
-        lblInfo4.setText("<html>Liên hệ: <a href='' style='color:#3291FF;'>vienthieu692005@gmail.com</a> | 1900-XXXX</html>");
+        lblInfo4.setText("<html>Liên hệ: <a href='' style='color:#3291FF;'>daotienhotelgroup1@gmail.com</a> | 033 8687106</html>");
 
         lblInfo4.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    Desktop.getDesktop().mail(new URI("mailto:vienthieu692005@gmail.com"));
+                    Desktop.getDesktop().mail(new URI("mailto:daotienhotelgroup1@gmail.com"));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -114,18 +114,18 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
         lblTitle.setText("Hệ thống quản lí khách sạn Đào Tiên");
 
         lblTitleHMS.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblTitleHMS.setText("Hệ thống quản lí khách sạn đào tiên( Đào Tiên HMS)");
+        lblTitleHMS.setText("Hệ thống quản lí khách sạn đào tiên (Đào Tiên)");
 
-        lblInfo1.setText("Phiên bản: 2025.1.0.0 (Build DT-2025.1.0.0-4567, ra mắt 15/06/2025).");
+        lblInfo1.setText("Phiên bản: 1.0.0, ra mắt 01/01/2026.");
 
-        lblInfo2.setText("Yêu cầu: Java 21+, RAM 4GB+, MySQL/PostgreSQL.");
+        lblInfo2.setText("Yêu cầu: Java 21+, RAM 8GB+, SQL Server 21.");
 
-        lblInfo3.setText("Tính năng chính: dashboard KPI (occupancy, RevPAR), khuyến mãi QR, tích hợp Momo. Changelog mới: ");
+        lblInfo3.setText("Tính năng chính: Đặt phòng, quản lí hệ thống thích hợp, tích hợp Momo thanh toán. Changelog mới: ");
 
-        lblInfo4.setText("Liên hệ: support@daotienhms.vn | 1900-XXXX");
+        lblInfo4.setText("Liên hệ: daotienhotelgroup1@gmail.com | 0338687106");
 
         lblInfo5.setBackground(new java.awt.Color(255, 255, 255));
-        lblInfo5.setText("Powered by open-source. © 2020-2025 Đào Tiên Software.");
+        lblInfo5.setText("Powered by open-source. © 2025 Đào Tiên Software.");
 
         btnCheckForUpdate.setBackground(new java.awt.Color(50, 145, 255));
         btnCheckForUpdate.setForeground(new java.awt.Color(255, 255, 255));

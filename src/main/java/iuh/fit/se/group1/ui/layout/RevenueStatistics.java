@@ -29,6 +29,13 @@ public class RevenueStatistics extends javax.swing.JPanel {
      */
     public RevenueStatistics() {
         initComponents();
+        headerChart1.getjLabel1().setText(
+                "<html><span style='color:white;'>Quản lý thống kê</span>"
+
+                        + "<span style='color:rgb(204,204,204);'> &gt; Doanh thu</span></html>");
+
+
+
         setActionButtonRange();
 
         loadDataTo7Day();

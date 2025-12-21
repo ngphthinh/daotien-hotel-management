@@ -5,6 +5,8 @@
 package iuh.fit.se.group1.ui.component.dashboard;
 
 
+import iuh.fit.se.group1.ui.component.custom.CircularProgress;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -68,6 +70,14 @@ public class CardReport extends javax.swing.JPanel {
         circularProgress1.setProgress(percentage);
     }
 
+    public CircularProgress getCircularProgress1() {
+        return circularProgress1;
+    }
+
+    public void setCircularProgress1(CircularProgress circularProgress1) {
+        this.circularProgress1 = circularProgress1;
+    }
+
     public void setColorCircularProgress(Color color) {
         circularProgress1.setProgressColor(color);
     }
@@ -79,8 +89,15 @@ public class CardReport extends javax.swing.JPanel {
     public void setMessage(String message){
         circularProgress1.setVisible(false);
         lblRoomCount.setText(message);
+    }
 
-    } 
+    /**
+     * Set message without hiding circular progress
+     * @param message
+     */
+    public void setMessageWithoutHidingProgress(String message){
+        lblRoomCount.setText(message);
+    }
 
 
 
