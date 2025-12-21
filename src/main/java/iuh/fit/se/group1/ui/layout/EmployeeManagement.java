@@ -202,31 +202,27 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 modal.saveData(ae -> {
+                    var result = getValid(modal, employeeId); // ✅ Truyền thêm employeeId
+                    if (!result.valid) {
+                        return;
+                    }
                     String title = "Xác nhận cập nhật nhân viên";
                     String message = "Bạn có chắc chắn muốn cập nhật nhân viên này không?";
                     Message.showConfirm(title, message, () -> {
-                        var result = getValid(modal);
-                        if (!result.valid) {
-                            return;
-                        }
-
-                        // Lấy giá trị mới từ modal
                         String genderSelected = (String) modal.getCmbGender().getSelectedItem();
-                        boolean gender = "Nữ".equals(genderSelected); // true nếu là Nữ
+                        boolean gender = "Nữ".equals(genderSelected);
 
                         String roleSelected = (String) modal.getCmbPosition().getSelectedItem();
                         String roleId = roleSelected.equalsIgnoreCase("Nhân viên quản lý")
                                 ? Role.MANAGER.toString()
                                 : Role.RECEPTIONIST.toString();
 
-                        // Lấy Role entity từ database
                         iuh.fit.se.group1.entity.Role newRole = roleService.getRoleById(roleId);
                         if (newRole == null) {
                             Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
                             return;
                         }
 
-                        // Tạo đối tượng Employee mới để cập nhật
                         Employee employeeUpdate = new Employee();
                         employeeUpdate.setEmployeeId(employeeId);
                         employeeUpdate.setFullName(result.fullName);
@@ -234,19 +230,17 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         employeeUpdate.setEmail(result.email);
                         employeeUpdate.setCitizenId(result.citizenId);
                         employeeUpdate.setHireDate(result.hireDate);
-                        employeeUpdate.setGender(gender); // Gán giới tính mới
+                        employeeUpdate.setGender(gender);
 
-                        // Cập nhật role cho account
                         if (employee.getAccount() != null) {
                             Account accountToUpdate = employee.getAccount();
-                            accountToUpdate.setRole(newRole); // Gán toàn bộ đối tượng Role mới
+                            accountToUpdate.setRole(newRole);
                             employeeUpdate.setAccount(accountToUpdate);
                         } else {
                             Message.showMessage("Lỗi", "Nhân viên không có tài khoản!");
                             return;
                         }
 
-                        // Avatar mới
                         AvatarLabel avt = modal.getAvatarLabel();
                         if (avt != null) {
                             byte[] avtBytes = avt.getImageAsBytes("jpg");
@@ -254,18 +248,14 @@ public class EmployeeManagement extends javax.swing.JPanel {
                                 employeeUpdate.setAvt(avtBytes);
                                 log.info("Avatar updated for employee: {}", employeeId);
                             } else {
-                                // Giữ nguyên avatar cũ nếu không có avatar mới
                                 employeeUpdate.setAvt(employee.getAvt());
                             }
                         } else {
-                            // Giữ nguyên avatar cũ nếu avatarLabel null
                             employeeUpdate.setAvt(employee.getAvt());
                         }
 
-                        // Gọi service update xuống database
                         Employee entitySave = employeeService.updateEmployee(employeeUpdate);
 
-                        // Cập nhật lại table
                         String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
                         String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
                                 ? entitySave.getAccount().getRole().getRoleName()
@@ -277,6 +267,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         model.setValueAt(entitySave.getPhone(), row, 4);
 
                         Message.showMessage("Thành công", "Cập nhật nhân viên thành công!");
+                        loadTable(employeeService.getAllEmployees());
                         GlassPanePopup.closePopupLast();
                     });
                 });
@@ -288,11 +279,9 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
             @Override
             public void onDelete(int row) {
-                // SỬA: Đổi message
                 String title = "Xác nhận xóa nhân viên";
                 String message = "Bạn có chắc chắn muốn xóa nhân viên này không?";
                 Message.showConfirm(title, message, () -> {
-                    // SỬA: Đổi từ tblPromotion sang tblEmployee
                     JTable table = tblEmployee.getTbl();
 
                     if (table.isEditing()) {
@@ -305,7 +294,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     if (rowDelete >= 0) {
                         Long id = (Long) model.getValueAt(rowDelete, 0);
                         model.removeRow(rowDelete);
-                        // SỬA: Gọi employeeService
                         employeeService.deleteEmployee(id);
                         if (shiftList != null) {
                             shiftList.reloadEmployees();
@@ -315,7 +303,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 });
             }
 
-            // SỬA: Thêm onView cho Employee
             @Override
             public void onView(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
@@ -349,7 +336,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 modal.getCmbPosition().setSelectedItem(roleName);
 
                 // Hiển thị avatar từ database
-                AvatarLabel avatarLabel = modal.getAvatarLabel(); // Cần thêm getter cho AvatarLabel trong
+                AvatarLabel avatarLabel = modal.getAvatarLabel();
                 // InfoEmployeeModal
                 if (avatarLabel != null) {
                     if (employee.getAvt() != null && employee.getAvt().length > 0) {
@@ -363,7 +350,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
 //                                log.warn("Failed to read image from byte array for employee: {}", employeeId);
 //                            }
                             avatarLabel.setImageFromBytes(employee.getAvt());
-                            // QUAN TRỌNG: View mode - không cho phép thay đổi
                             avatarLabel.setImageChanged(false);
                         } catch (Exception e) {
                             log.error("Error loading avatar image: ", e);
@@ -880,11 +866,11 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
 
     private boolean saveData(InfoEmployeeModal modal) {
-        Valid result = getValid(modal);
-
+        Valid result = getValid(modal, null);
         if (!result.valid) {
             return false;
         }
+
 
         try {
             int position = modal.getCmbPosition().getSelectedIndex();
@@ -992,7 +978,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
     }
 
-    private static Valid getValid(InfoEmployeeModal modal) {
+    private static Valid getValid(InfoEmployeeModal modal, Long currentEmployeeId) {
         String name = modal.getTxtName().getText().trim();
         String phone = modal.getTxtPhone().getText().trim();
         String citizenId = modal.getTxtCitizen().getText().trim();
@@ -1011,10 +997,13 @@ public class EmployeeManagement extends javax.swing.JPanel {
         boolean valid = true;
         Color red = Color.RED;
 
-        // Kiểm tra Avatar
         AvatarLabel avatarLabel = modal.getAvatarLabel();
-        if (avatarLabel == null || !avatarLabel.isImageChanged()) {
-            valid = false;
+        if (modal.getBtnSave().getText().equals("Lưu")) {
+            if (avatarLabel == null || !avatarLabel.isImageChanged()) {
+                modal.getLblStatus().setText("Vui lòng chọn avatar!");
+                modal.getLblStatus().setForeground(red);
+                valid = false;
+            }
         }
 
         // Tên
@@ -1022,10 +1011,17 @@ public class EmployeeManagement extends javax.swing.JPanel {
             modal.getLblErrolName().setText("Họ tên không được để trống!");
             modal.getLblErrolName().setForeground(red);
             valid = false;
-        } else if (name.length() < 2) {
-            modal.getLblErrolName().setText("Họ tên quá ngắn!");
+        } else if (name.matches(".*\\d.*")) {
+            modal.getLblErrolName().setText("Họ tên không được chứa số!");
             modal.getLblErrolName().setForeground(red);
             valid = false;
+        } else {
+            String[] words = name.trim().split("\\s+");
+            if (words.length < 2) {
+                modal.getLblErrolName().setText("Họ tên phải có ít nhất 2 từ!");
+                modal.getLblErrolName().setForeground(red);
+                valid = false;
+            }
         }
 
         // Số điện thoại
@@ -1048,12 +1044,24 @@ public class EmployeeManagement extends javax.swing.JPanel {
             modal.getLblErrolCitizen().setText("CCCD phải có 12 chữ số!");
             modal.getLblErrolCitizen().setForeground(red);
             valid = false;
-        } else if (service.existsByCitizenId(citizenId) != null) {
-            modal.getLblErrolCitizen().setText("CCCD đã tồn tại!");
-            modal.getLblErrolCitizen().setForeground(red);
-            valid = false;
+        } else {
+            // Kiểm tra CCCD có tồn tại không
+            Employee existingEmployee = service.existsByCitizenId(citizenId);
+            if (existingEmployee != null) {
+                if (currentEmployeeId != null) {
+                    if (!existingEmployee.getEmployeeId().equals(currentEmployeeId)) {
+                        modal.getLblErrolCitizen().setText("CCCD đã tồn tại!");
+                        modal.getLblErrolCitizen().setForeground(red);
+                        valid = false;
+                    }
+                } else {
+                    // Đang thêm mới -> luôn báo lỗi nếu CCCD đã tồn tại
+                    modal.getLblErrolCitizen().setText("CCCD đã tồn tại!");
+                    modal.getLblErrolCitizen().setForeground(red);
+                    valid = false;
+                }
+            }
         }
-
         // Email
         if (email.isEmpty()) {
             modal.getLblErrolEmail().setText("Email không được để trống!");
@@ -1081,6 +1089,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         }
         return new Valid(name, valid, gender, phone, citizenId, email, hireDate);
     }
+
     private record Valid(
             String fullName,
             boolean valid,

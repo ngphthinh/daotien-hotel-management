@@ -29,7 +29,6 @@ public class EmployeeRepository implements Repository<Employee, Long> {
     }
 
 
-
     @Override
     public Employee save(Employee entity) {
         String sql = "INSERT INTO Employee (fullName, phone,email,hireDate,citizenId,gender,accountId,avt,createdAt) VALUES (?, ?, ?,?,?,?,?,?,?)";
@@ -74,36 +73,59 @@ public class EmployeeRepository implements Repository<Employee, Long> {
 
     @Override
     public Employee findById(Long id) {
-        String sql = "SELECT * FROM Employee WHERE employeeId = ?";
+        String sql = """
+                SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
+                       e.accountId, e.avt, e.createdAt,
+                       a.username, a.password,
+                       r.roleId, r.roleName
+                FROM Employee e
+                LEFT JOIN Account a ON e.accountId = a.accountId
+                LEFT JOIN Role r ON a.roleId = r.roleId
+                WHERE e.employeeId = ?
+                """;
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
                     Employee employee = new Employee();
-                    employee.setEmployeeId(resultSet.getLong("employeeId"));
-                    employee.setFullName(resultSet.getString("fullName"));
-                    employee.setPhone(resultSet.getString("phone"));
-                    employee.setEmail(resultSet.getString("email"));
-                    employee.setHireDate(resultSet.getDate("hireDate").toLocalDate());
-                    employee.setCitizenId(resultSet.getString("citizenId"));
-                    employee.setGender(resultSet.getBoolean("gender"));
-                    Long accountId = resultSet.getLong("accountId");
-                    if (accountId != null && accountId > 0) {
-                        Account account = new Account();
-                        account.setAccountId(accountId);
-                        employee.setAccount(account);
-                    }
-                    String base64String = resultSet.getString("avt");
+                    employee.setEmployeeId(rs.getLong("employeeId"));
+                    employee.setFullName(rs.getString("fullName"));
+                    employee.setPhone(rs.getString("phone"));
+                    employee.setEmail(rs.getString("email"));
+                    employee.setHireDate(rs.getDate("hireDate").toLocalDate());
+                    employee.setCitizenId(rs.getString("citizenId"));
+                    employee.setGender(rs.getBoolean("gender"));
+
+                    // Avatar
+                    String base64String = rs.getString("avt");
                     if (base64String != null && !base64String.isEmpty()) {
                         byte[] originalBytes = Base64.getDecoder().decode(base64String);
                         employee.setAvt(originalBytes);
                     }
-                    employee.setCreatedAt(resultSet.getDate("createdAt").toLocalDate());
+                    employee.setCreatedAt(rs.getDate("createdAt").toLocalDate());
+                    Long accountId = rs.getLong("accountId");
+                    if (accountId != null && accountId > 0) {
+                        Account account = new Account();
+                        account.setAccountId(accountId);
+                        account.setUsername(rs.getString("username"));
+                        account.setPassword(rs.getString("password"));
+
+                        // Role
+                        String roleId = rs.getString("roleId");
+                        if (roleId != null) {
+                            Role role = new Role();
+                            role.setRoleId(roleId);
+                            role.setRoleName(rs.getString("roleName"));
+                            account.setRole(role);
+                        }
+
+                        employee.setAccount(account);
+                    }
 
                     return employee;
                 }
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -371,7 +393,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         List<Employee> employees = new ArrayList<>();
         String sql = """
                 SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
-                       e.accountId, a.username, a.password,
+                       e.accountId, a.username, a.password,e.avt,
                        r.roleId, r.roleName
                 FROM Employee e
                 JOIN Account a ON e.accountId = a.accountId
