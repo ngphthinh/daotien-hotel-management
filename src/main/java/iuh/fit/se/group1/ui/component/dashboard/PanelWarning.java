@@ -37,13 +37,6 @@ public class PanelWarning extends javax.swing.JPanel {
         cardMessage2.getLblIcon().setIcon(FontIcon.of(FontAwesomeSolid.BAN,16,Color.WHITE));
         cardMessage2.getLblIcon().setText("");
 
-        cardMessage3.getLblTitle().setText("Phiên bản mới");
-        cardMessage3.getLblTitle().setForeground(Color.white);
-        cardMessage3.getLblSubTitle().setForeground(Color.white);
-        cardMessage3.setBackground(new Color(157,157,157));
-        cardMessage3.getLblIcon().setIcon(FontIcon.of(FontAwesomeSolid.INFO_CIRCLE,16,Color.WHITE));
-        cardMessage3.getLblIcon().setText("");
-        cardMessage3.getLblSubTitle().setText("Hiện chưa có");
 
         lblExigent.setIcon(FontIcon.of(Material.FIBER_MANUAL_RECORD,10,new Color(212,110,110)));
         lblImportant.setIcon(FontIcon.of(Material.FIBER_MANUAL_RECORD,10,new Color(157,157,157)));
@@ -66,7 +59,6 @@ public class PanelWarning extends javax.swing.JPanel {
         lblImportant = new javax.swing.JLabel();
         cardMessage1 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
         cardMessage2 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
-        cardMessage3 = new iuh.fit.se.group1.ui.component.dashboard.CardMessage();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(new java.awt.Color(0, 0, 0));
@@ -101,8 +93,7 @@ public class PanelWarning extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(lblImportant, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(cardMessage1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cardMessage2, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cardMessage3, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(cardMessage2, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -120,9 +111,7 @@ public class PanelWarning extends javax.swing.JPanel {
                 .addComponent(cardMessage1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cardMessage2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cardMessage3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addContainerGap(61, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -130,7 +119,6 @@ public class PanelWarning extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.dashboard.CardMessage cardMessage1;
     private iuh.fit.se.group1.ui.component.dashboard.CardMessage cardMessage2;
-    private iuh.fit.se.group1.ui.component.dashboard.CardMessage cardMessage3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lblExigent;
     private javax.swing.JLabel lblImportant;
@@ -147,11 +135,6 @@ public class PanelWarning extends javax.swing.JPanel {
         // Cập nhật phòng hỏng
         cardMessage2.getLblSubTitle().setText(warningDto.getBrokenRoomsCount() + " Phòng");
 
-        // Cập nhật phiên bản mới
-        if (warningDto.isHasNewVersion()) {
-            cardMessage3.getLblSubTitle().setText("Có bản cập nhật");
-        } else {
-            cardMessage3.getLblSubTitle().setText("Hiện chưa có");
-        }
+
     }
 }

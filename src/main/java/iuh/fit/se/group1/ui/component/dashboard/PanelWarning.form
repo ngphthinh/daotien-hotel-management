@@ -44,7 +44,6 @@
                           </Group>
                           <Component id="cardMessage1" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
                           <Component id="cardMessage2" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
-                          <Component id="cardMessage3" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -68,9 +67,7 @@
               <Component id="cardMessage1" min="-2" pref="45" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="cardMessage2" min="-2" pref="45" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="cardMessage3" min="-2" pref="45" max="-2" attributes="0"/>
-              <EmptySpace pref="10" max="32767" attributes="0"/>
+              <EmptySpace pref="61" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -108,8 +105,6 @@
     <Component class="iuh.fit.se.group1.ui.component.dashboard.CardMessage" name="cardMessage1">
     </Component>
     <Component class="iuh.fit.se.group1.ui.component.dashboard.CardMessage" name="cardMessage2">
-    </Component>
-    <Component class="iuh.fit.se.group1.ui.component.dashboard.CardMessage" name="cardMessage3">
     </Component>
   </SubComponents>
 </Form>

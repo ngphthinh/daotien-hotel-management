@@ -289,7 +289,6 @@ public class DashboardService {
             log.error("Error counting broken rooms: ", e);
         }
 
-        // Phiên bản mới - hardcode false
         dto.setHasNewVersion(false);
 
         return dto;

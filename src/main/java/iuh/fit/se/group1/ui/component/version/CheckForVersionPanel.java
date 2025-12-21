@@ -5,6 +5,8 @@
 package iuh.fit.se.group1.ui.component.version;
 
 import iuh.fit.se.group1.ui.component.custom.Button;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+import raven.glasspanepopup.GlassPanePopup;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -12,7 +14,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -204,7 +205,7 @@ public class CheckForVersionPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCheckForUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckForUpdateActionPerformed
-        // TODO add your handling code here:
+            CustomDialog.showMessage(this, "Đây là phiên bản mới nhất", "Thông báo", CustomDialog.MessageType.INFO, 500,200);
     }//GEN-LAST:event_btnCheckForUpdateActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed

@@ -1,6 +1,5 @@
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.config.VersionChecker;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.service.EmployeeShiftService;
@@ -18,11 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -124,7 +119,6 @@ public class MainLayout extends JPanel {
                         roomToolsManagement.loadData();
                         setMainContent(roomToolsManagement);
                     } else if (index == 9) {
-
                         setMainContent(orderManagement);
                         orderManagement.loadData();
                     } else if (index == 10) {
@@ -136,25 +130,10 @@ public class MainLayout extends JPanel {
                     } else if (index == 12 && subIndex == 2) {
                         setMainContent(new Regulation());
                     } else if (index == 12 && subIndex == 3) {
-                        if (VersionChecker.isUpdateAvailable()) {
-                            int confirm = JOptionPane.showConfirmDialog(
-                                    null,
-                                    "Có phiên bản mới. Cập nhật ngay?",
-                                    "Update",
-                                    JOptionPane.YES_NO_OPTION
-                            );
-
-                            if (confirm == JOptionPane.YES_OPTION) {
-                                VersionChecker.updateToLatestVersion();
-                            }
-
-                        } else {
-
-                            GlassPanePopup.showPopup(checkForVersionPanel);
-                            checkForVersionPanel.getBtnClose().addActionListener(e
-                                    -> GlassPanePopup.closePopupLast()
-                            );
-                        }
+                        GlassPanePopup.showPopup(checkForVersionPanel);
+                        checkForVersionPanel.getBtnClose().addActionListener(e
+                                -> GlassPanePopup.closePopupLast()
+                        );
                     } else if (index == 12 && subIndex == 4) {
                         handleAboutPanel();
                     } else {
@@ -184,25 +163,10 @@ public class MainLayout extends JPanel {
                             setMainContent(new Regulation());
                         } else if (subIndex == 3) {
 
-                            if (VersionChecker.isUpdateAvailable()) {
-                                int confirm = JOptionPane.showConfirmDialog(
-                                        null,
-                                        "Có phiên bản mới. Cập nhật ngay?",
-                                        "Update",
-                                        JOptionPane.YES_NO_OPTION
-                                );
-
-                                if (confirm == JOptionPane.YES_OPTION) {
-                                    VersionChecker.updateToLatestVersion();
-                                }
-
-                            } else {
-
-                                GlassPanePopup.showPopup(checkForVersionPanel);
-                                checkForVersionPanel.getBtnClose().addActionListener(e
-                                        -> GlassPanePopup.closePopupLast()
-                                );
-                            }
+                            GlassPanePopup.showPopup(checkForVersionPanel);
+                            checkForVersionPanel.getBtnClose().addActionListener(e
+                                    -> GlassPanePopup.closePopupLast()
+                            );
                         } else if (subIndex == 4) {
                             handleAboutPanel();
                         }

@@ -1,6 +1,5 @@
 package iuh.fit.se.group1;
 
-import iuh.fit.se.group1.config.AppInfo;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.EmployeeService;
@@ -17,7 +16,6 @@ import java.util.concurrent.CountDownLatch;
 public class Main {
     public static void main(String[] args) {
         Locale.setDefault(Locale.US);
-        AppInfo.getVersion();
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
