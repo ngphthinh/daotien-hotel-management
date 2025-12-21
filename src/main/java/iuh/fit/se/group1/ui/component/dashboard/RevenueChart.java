@@ -128,22 +128,63 @@
             return dataset;
         }
 
-        /**
-         * Cập nhật dữ liệu chart từ service
-         */
-        public void updateData(List<RevenueSourceDto> revenueSources) {
-            DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+    /**
+     * Cập nhật dữ liệu chart từ service
+     */
+    public void updateData(List<RevenueSourceDto> revenueSources) {
 
-            if (revenueSources == null || revenueSources.isEmpty()) {
-                dataset.setValue("Chưa có dữ liệu", 1);
-            } else {
-                for (RevenueSourceDto source : revenueSources) {
-                    String label = source.getSource() != null ? source.getSource() : "Khác";
-                    dataset.setValue(label, source.getPercentage());
+        // Tạo dataset mới
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+
+        if (revenueSources == null || revenueSources.isEmpty()) {
+            dataset.setValue("Chưa có dữ liệu", 1);
+        } else {
+            for (RevenueSourceDto source : revenueSources) {
+                String label = source.getSource() != null ? source.getSource() : "Khác";
+                double amount = source.getAmount() != null ? source.getAmount().doubleValue() : 0.0;
+
+                // Chỉ thêm các nguồn có doanh thu > 0
+                if (amount > 0) {
+                    dataset.setValue(label, amount);
                 }
             }
-
-            pieChart.setDataset(dataset);
-            pieChart.repaint();
         }
+
+        // Đảm bảo update trên EDT thread
+        if (SwingUtilities.isEventDispatchThread()) {
+            // Đã ở trên EDT, update trực tiếp
+            updateChartDataset(dataset);
+        } else {
+            // Chưa ở trên EDT, invoke later
+            SwingUtilities.invokeLater(() -> updateChartDataset(dataset));
+        }
+    }
+
+    /**
+     * Helper method để update dataset của chart
+     */
+    private void updateChartDataset(DefaultPieDataset<String> dataset) {
+
+        // Clear dataset cũ trước
+        pieChart.setDataset(new DefaultPieDataset<>());
+        pieChart.repaint();
+
+        // Sử dụng Timer để delay một chút trước khi set dataset mới
+        Timer timer = new Timer(100, e -> {
+            // Set dataset mới
+            pieChart.setDataset(dataset);
+
+            // Force repaint toàn bộ component tree
+            pieChart.invalidate();
+            RevenueChart.this.invalidate();
+            RevenueChart.this.revalidate();
+            RevenueChart.this.repaint();
+            pieChart.repaint();
+
+            // Trigger animation
+            pieChart.startAnimation();
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
     }

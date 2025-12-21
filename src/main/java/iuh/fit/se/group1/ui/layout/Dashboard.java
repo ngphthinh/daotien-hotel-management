@@ -265,33 +265,50 @@ public class Dashboard extends javax.swing.JPanel {
             changePercentage = 100; // Tăng 100% nếu trước đó = 0
         }
 
-        // Làm tròn % (nếu > 100% thì giữ nguyên giá trị)
-        int displayPercentage = (int) Math.round(Math.abs(changePercentage));
+        // Làm tròn % - GIỮ NGUYÊN DẤU, KHÔNG giới hạn
+        // VD: 10 hóa đơn hôm nay, 1 hóa đơn tuần trước = 900%
+        int displayPercentage = (int) Math.round(changePercentage);
 
         // Hiển thị
         cardLiquid2.setTitle("HÓA ĐƠN");
 
-        // Mô tả theo time type
+        // Mô tả theo time type với thông tin so sánh CHI TIẾT
         String description = "";
+        String comparisonInfo = "";
+        String comparisonDetail = "";  // Thêm thông tin chi tiết so sánh
+
+        // Tạo chuỗi so sánh với số hóa đơn cụ thể
+        if (changePercentage > 0) {
+            comparisonInfo = " (↑" + displayPercentage + "%)";
+        } else if (changePercentage < 0) {
+            comparisonInfo = " (↓" + Math.abs(displayPercentage) + "%)";
+        }
+
+        // Tạo mô tả chi tiết về mốc thời gian so sánh
         switch (currentTimeType) {
             case TODAY:
-                description = "Hôm nay: " + todayOrders + " hóa đơn";
+                description = "Hôm nay: " + todayOrders  + comparisonInfo;
+                comparisonDetail = "-" + previousOrders + " hóa đơn  (cùng ngày tuần trước)";
                 break;
             case DAYS_7:
-                description = "7 ngày: " + todayOrders + " hóa đơn";
+                description = "7 ngày: " + todayOrders  + comparisonInfo;
+                comparisonDetail = "- " + previousOrders + " hóa đơn (7 ngày trước đó)";
                 break;
             case DAYS_30:
-                description = "30 ngày: " + todayOrders + " hóa đơn";
+                description = "30 ngày: " + todayOrders +  comparisonInfo;
+                comparisonDetail = "- " + previousOrders + " hóa đơn (30 ngày trước đó)";
                 break;
             case DAYS_90:
-                description = "90 ngày: " + todayOrders + " hóa đơn";
+                description = "90 ngày: " + todayOrders  + comparisonInfo;
+                comparisonDetail = "- " + previousOrders + " hóa đơn (90 ngày trước đó)";
                 break;
         }
 
-        cardLiquid2.setDescription(description);
+        // Gộp cả hai dòng: dòng chính + dòng so sánh
+        cardLiquid2.setDescription(description + "\n" + comparisonDetail);
 
-        // Hiển thị % thay đổi
-        cardLiquid2.setValues(displayPercentage);
+        // Hiển thị % thay đổi (giá trị tuyệt đối cho vòng tròn)
+        cardLiquid2.setValues(Math.abs(displayPercentage));
     }
 
 
