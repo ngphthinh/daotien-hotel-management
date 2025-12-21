@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.config.VersionChecker;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.service.EmployeeShiftService;
@@ -132,13 +133,28 @@ public class MainLayout extends JPanel {
                         setMainContent(revenueStatistics);
                     } else if (index == 11 && subIndex == 2) {
                         setMainContent(new BookingTrend());
-                    }  else if (index == 12 && subIndex == 2) {
+                    } else if (index == 12 && subIndex == 2) {
                         setMainContent(new Regulation());
                     } else if (index == 12 && subIndex == 3) {
-                        GlassPanePopup.showPopup(checkForVersionPanel);
-                        checkForVersionPanel.getBtnClose().addActionListener(e
-                                -> GlassPanePopup.closePopupLast()
-                        );
+                        if (VersionChecker.isUpdateAvailable()) {
+                            int confirm = JOptionPane.showConfirmDialog(
+                                    null,
+                                    "Có phiên bản mới. Cập nhật ngay?",
+                                    "Update",
+                                    JOptionPane.YES_NO_OPTION
+                            );
+
+                            if (confirm == JOptionPane.YES_OPTION) {
+                                VersionChecker.updateToLatestVersion();
+                            }
+
+                        } else {
+
+                            GlassPanePopup.showPopup(checkForVersionPanel);
+                            checkForVersionPanel.getBtnClose().addActionListener(e
+                                    -> GlassPanePopup.closePopupLast()
+                            );
+                        }
                     } else if (index == 12 && subIndex == 4) {
                         handleAboutPanel();
                     } else {
@@ -155,11 +171,11 @@ public class MainLayout extends JPanel {
                     } else if (index == 3) {
                         roomToolsManagement.loadData();
                         setMainContent(roomToolsManagement);
-                    } if (index == 4) {
+                    }
+                    if (index == 4) {
                         setMainContent(orderManagement);
                         orderManagement.loadData();
-                    }
-                    else if (index == 5) {
+                    } else if (index == 5) {
                         closeShiftHandle();
                     } else if (index == 6) {
                         if (subIndex == 1) {
@@ -167,11 +183,27 @@ public class MainLayout extends JPanel {
                         } else if (subIndex == 2) {
                             setMainContent(new Regulation());
                         } else if (subIndex == 3) {
-                            GlassPanePopup.showPopup(checkForVersionPanel);
-                            checkForVersionPanel.getBtnClose().addActionListener(e
-                                    -> GlassPanePopup.closePopupLast()
-                            );
-                        }else if (subIndex == 4) {
+
+                            if (VersionChecker.isUpdateAvailable()) {
+                                int confirm = JOptionPane.showConfirmDialog(
+                                        null,
+                                        "Có phiên bản mới. Cập nhật ngay?",
+                                        "Update",
+                                        JOptionPane.YES_NO_OPTION
+                                );
+
+                                if (confirm == JOptionPane.YES_OPTION) {
+                                    VersionChecker.updateToLatestVersion();
+                                }
+
+                            } else {
+
+                                GlassPanePopup.showPopup(checkForVersionPanel);
+                                checkForVersionPanel.getBtnClose().addActionListener(e
+                                        -> GlassPanePopup.closePopupLast()
+                                );
+                            }
+                        } else if (subIndex == 4) {
                             handleAboutPanel();
                         }
                     } else {
