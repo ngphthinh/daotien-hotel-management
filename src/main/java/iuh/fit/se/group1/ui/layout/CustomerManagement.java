@@ -54,7 +54,6 @@ import raven.glasspanepopup.GlassPanePopup;
  */
 public class CustomerManagement extends javax.swing.JPanel {
 
-    private int customerCounter = 0;
     private CustomerService customerService;
 
     public CustomerManagement() {
@@ -501,11 +500,13 @@ public class CustomerManagement extends javax.swing.JPanel {
             isValid = false;
         }
 
+            String regexPassport = "^[A-Za-z][0-9]{7,8}$";
         if (citizen.isEmpty()) {
             modal.getLblErrolCitizen().setText("Vui lòng nhập số CCCD/CMND!");
             isValid = false;
-        } else if (!citizen.matches("^[0-9]{12}$")) {
-            modal.getLblErrolCitizen().setText("CCCD/CMND phải gồm 12 chữ số!");
+
+        } else if (!citizen.matches("^[0-9]{12}$") || !citizen.matches(regexPassport)) {
+            modal.getLblErrolCitizen().setText("Số CCCD hoặc passport không hợp lệ!");
             isValid = false;
         }
         LocalDate dob = null;
