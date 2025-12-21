@@ -675,6 +675,7 @@ Dec 21, 2025 5:03:23 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Registered DejaVu Sans Regular font
 Dec 21, 2025 5:03:23 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Registered DejaVu Sans Bold font
+<<<<<<< HEAD
 Dec 21, 2025 7:01:12 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Registered DejaVu Sans Regular font
 Dec 21, 2025 7:01:12 PM iuh.fit.se.group1.config.AppLogger info
@@ -682,4 +683,23 @@ INFO: Registered DejaVu Sans Bold font
 Dec 21, 2025 7:02:08 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Registered DejaVu Sans Regular font
 Dec 21, 2025 7:02:08 PM iuh.fit.se.group1.config.AppLogger info
+=======
+Dec 21, 2025 6:49:55 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Dec 21, 2025 6:49:55 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Registered DejaVu Sans Bold font
+Dec 21, 2025 7:02:16 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Dec 21, 2025 7:02:16 PM iuh.fit.se.group1.config.AppLogger info
+>>>>>>> 9b98d0fe68479e44b1127c16a6e14b91f3188dba
+INFO: Registered DejaVu Sans Bold font
+Dec 21, 2025 7:04:58 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Dec 21, 2025 7:04:58 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Dec 21, 2025 7:07:08 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Dec 21, 2025 7:07:08 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Dec 21, 2025 7:09:14 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Order created successfully with order details
