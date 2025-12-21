@@ -233,50 +233,86 @@ public class MainLayout extends JPanel {
 
         java.time.LocalTime currentTime = java.time.LocalTime.now();
 
-        // TÌM CA CÓ THỂ ĐÓNG (ĐANG MỞ HOẶC VỪA KẾT THÚC TRONG VÒNG 10 PHÚT)
+        // TÌM CA CÓ THỂ ĐÓNG
+        // CHỈ CHO PHÉP ĐÓNG CA ĐANG TRONG GIỜ LÀM VIỆC HOẶC BUFFER TIME
         EmployeeShift shiftToClose = null;
+        EmployeeShift overdueShift = null;
 
         for (EmployeeShift shift : openShifts) {
             try {
-                // PARSE STRING SANG LOCALTIME
                 java.time.LocalTime startTime = java.time.LocalTime.parse(shift.getShift().getStartTime());
                 java.time.LocalTime endTime = java.time.LocalTime.parse(shift.getShift().getEndTime());
-                java.time.LocalTime endTimeWithBuffer = endTime.plusMinutes(BUFFER_MINUTES);
 
-                // KIỂM TRA XEM CA NÀY CÓ ĐANG TRONG THỜI GIAN CHO PHÉP ĐÓNG KHÔNG
-                boolean isAfterStart = currentTime.isAfter(startTime) || currentTime.equals(startTime);
-                boolean isBeforeBufferEnd = currentTime.isBefore(endTimeWithBuffer) || currentTime.equals(endTimeWithBuffer);
+                boolean isNightShift = endTime.isAfter(java.time.LocalTime.of(18, 0));
+                boolean isAfterStart;
+                boolean isBeforeBufferEnd;
+                boolean isOverdue;
 
-                if (isAfterStart && isBeforeBufferEnd) {
+                if (isNightShift) {
+                    isAfterStart = currentTime.isAfter(startTime) || currentTime.equals(startTime);
+                    if (endTime.isAfter(java.time.LocalTime.of(23, 0))) {
+                        // Ca kết thúc sau 23h -> có thể đóng đến 23:59:59
+                        isBeforeBufferEnd = true; // Luôn cho phép trong ngày
+                        isOverdue = false;
+                    } else {
+                        java.time.LocalTime endTimeWithBuffer = endTime.plusMinutes(BUFFER_MINUTES);
+                        isBeforeBufferEnd = currentTime.isBefore(endTimeWithBuffer) || currentTime.equals(endTimeWithBuffer);
+                        isOverdue = currentTime.isAfter(endTimeWithBuffer);
+                    }
+                } else {
+                    // Ca ngày: logic bình thường
+                    java.time.LocalTime endTimeWithBuffer = endTime.plusMinutes(BUFFER_MINUTES);
+                    isAfterStart = currentTime.isAfter(startTime) || currentTime.equals(startTime);
+                    isBeforeBufferEnd = currentTime.isBefore(endTimeWithBuffer) || currentTime.equals(endTimeWithBuffer);
+                    isOverdue = currentTime.isAfter(endTimeWithBuffer);
+                }
+
+                // Debug log
+                System.out.println("=== Kiểm tra ca: " + shift.getShift().getName() + " ===");
+                System.out.println("Giờ bắt đầu: " + startTime);
+                System.out.println("Giờ kết thúc: " + endTime);
+                System.out.println("Giờ hiện tại: " + currentTime);
+                System.out.println("Ca đêm: " + isNightShift);
+                System.out.println("Sau giờ bắt đầu: " + isAfterStart);
+                System.out.println("Trước giờ kết thúc + buffer: " + isBeforeBufferEnd);
+                System.out.println("Quá hạn: " + isOverdue);
+
+                // CHỈ LẤY CA ĐANG TRONG THỜI GIAN HỢP LỆ (không lấy ca quá hạn)
+                if (isAfterStart && isBeforeBufferEnd && shiftToClose == null) {
                     shiftToClose = shift;
-                    break;
+                    System.out.println(">>> Chọn ca để đóng: " + shift.getShift().getName());
+                }
+
+                // Lưu ca quá hạn để CẢNH BÁO (nhưng không cho đóng trực tiếp)
+                if (isAfterStart && isOverdue && overdueShift == null) {
+                    overdueShift = shift;
+                    System.out.println(">>> Ca quá hạn: " + shift.getShift().getName());
                 }
             } catch (Exception e) {
                 System.err.println("Lỗi parse time cho ca: " + shift.getShift().getName() + " - " + e.getMessage());
             }
         }
 
-        if (shiftToClose != null) {
-            // Kiểm tra xem có ca cũ hơn chưa đóng không
-            EmployeeShift oldestOpenShift = openShifts.get(0);
-            boolean hasOlderUnclosedShift = !oldestOpenShift.getEmployeeShiftId()
-                    .equals(shiftToClose.getEmployeeShiftId());
 
-            if (hasOlderUnclosedShift) {
-                // CÓ CA CŨ HƠN CHƯA ĐÓNG → CẢNH BÁO
-                String oldShiftName = oldestOpenShift.getShift().getName();
-                String oldShiftTime = oldestOpenShift.getShift().getStartTime() + " - " +
-                        oldestOpenShift.getShift().getEndTime();
+        if (shiftToClose != null) {
+            // Kiểm tra xem có ca quá hạn không
+            if (overdueShift != null) {
+                // CÓ CA QUÁ HẠN → HIỂN THỊ MODAL CHO PHÉP CHỌN CA ĐÓNG
+                String overdueShiftName = overdueShift.getShift().getName();
+                String overdueShiftTime = overdueShift.getShift().getStartTime() + " - " +
+                        overdueShift.getShift().getEndTime();
                 String currentShiftName = shiftToClose.getShift().getName();
                 String currentShiftTime = shiftToClose.getShift().getStartTime() + " - " +
                         shiftToClose.getShift().getEndTime();
 
                 int choice = JOptionPane.showOptionDialog(
                         null,
-                        "<html><b style='color:red;'>CẢNH BÁO: Bạn có ca cũ chưa đóng!</b><br><br>" +
-                                "Ca chưa đóng: <b>" + oldShiftName + "</b> (" + oldShiftTime + ")<br>" +
-                                "Ca hiện tại: <b>" + currentShiftName + "</b> (" + currentShiftTime + ")<br><br>" +
-                                "Bạn muốn đóng ca nào?</html>",
+                        "<html><b style='color:red;'>CẢNH BÁO: Có ca làm việc chưa đóng!</b><br><br>" +
+                                "Ca chưa đóng: <b>" + overdueShiftName + "</b> (" + overdueShiftTime + ")<br>" +
+                                "Thời gian đóng ca đã hết từ: " +
+                                java.time.LocalTime.parse(overdueShift.getShift().getEndTime()).plusMinutes(BUFFER_MINUTES) + "<br><br>" +
+                                "Ca hiện tại có thể đóng: <b>" + currentShiftName + "</b> (" + currentShiftTime + ")<br><br>" +
+                                "<b>Bạn muốn đóng ca nào?</b></html>",
                         "Cảnh báo",
                         JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.WARNING_MESSAGE,
@@ -286,14 +322,16 @@ public class MainLayout extends JPanel {
                 );
 
                 if (choice == JOptionPane.YES_OPTION) {
-                    openCloseShiftPanel(oldestOpenShift);
+                    // Đóng ca cũ (ca quá hạn)
+                    openCloseShiftPanel(overdueShift);
                 } else if (choice == JOptionPane.NO_OPTION) {
+                    // Đóng ca hiện tại
                     openCloseShiftPanel(shiftToClose);
                 }
                 // Cancel → không làm gì
 
             } else {
-                // KHÔNG CÓ CA CŨ CHƯA ĐÓNG → ĐÓNG CA HIỆN TẠI
+                // KHÔNG CÓ CA QUÁ HẠN → ĐÓNG CA HIỆN TẠI BÌNH THƯỜNG
                 try {
                     java.time.LocalTime endTime = java.time.LocalTime.parse(shiftToClose.getShift().getEndTime());
                     boolean isInBufferTime = currentTime.isAfter(endTime);
