@@ -222,10 +222,21 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
         SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue
         FROM Orders O
         INNER JOIN EmployeeShift ES ON O.employeeId = ES.employeeId
+        INNER JOIN Shift S ON ES.shiftId = S.shiftId
         WHERE ES.employeeShiftId = ?
         AND CAST(O.orderDate AS DATE) = ES.shiftDate
         AND O.orderTypeId = 1
         AND O.paymentType = 'CASH'
+        AND (
+            -- Xử lý ca bình thường (không qua đêm)
+            (S.startTime < S.endTime 
+                AND CAST(O.orderDate AS TIME) >= CAST(S.startTime AS TIME)
+                AND CAST(O.orderDate AS TIME) <= CAST(S.endTime AS TIME))
+            OR
+            -- Xử lý ca qua đêm (startTime > endTime, ví dụ: 18:00 - 23:59:59)
+            (S.startTime >= S.endTime
+                AND CAST(O.orderDate AS TIME) >= CAST(S.startTime AS TIME))
+        )
     """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
