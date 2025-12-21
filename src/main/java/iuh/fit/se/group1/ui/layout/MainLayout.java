@@ -124,9 +124,11 @@ public class MainLayout extends JPanel {
                     } else if (index == 10) {
                         setMainContent(surchargeManagement);
                     } else if (index == 11 && subIndex == 1) {
-                        handleGuidePanel();
+                        setMainContent(new RevenueStatistics());
                     } else if (index == 11 && subIndex == 2) {
                         setMainContent(new BookingTrend());
+                    } else if (index == 12 && subIndex == 1) {
+                        handleGuidePanel();
                     } else if (index == 12 && subIndex == 2) {
                         setMainContent(new Regulation());
                     } else if (index == 12 && subIndex == 3) {
@@ -193,6 +195,7 @@ public class MainLayout extends JPanel {
     }
 
     private void handleGuidePanel() {
+        System.out.println("Guide Panel");
         try {
             Desktop.getDesktop().browse(new URI("https://vienthieu6925.github.io/user/"));
         } catch (Exception e) {
@@ -432,13 +435,6 @@ public class MainLayout extends JPanel {
         pnlContent.revalidate();
         pnlContent.repaint();
 
-        // Auto-refresh Dashboard khi chuyển vào
-        if (panel instanceof Dashboard) {
-            ((Dashboard) panel).refreshData();
-        } else if (panel instanceof DashboardEmployee) {
-            // Nếu có method refresh trong DashboardEmployee, gọi ở đây
-            // ((DashboardEmployee) panel).refreshData();
-        }
     }
 
     public JButton getBtnSignOut() {

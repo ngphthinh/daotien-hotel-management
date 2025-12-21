@@ -160,6 +160,7 @@ create table Orders (
                         orderDate datetime not null,
                         totalAmount Decimal(18,2) not null default 0,
                         employeeId bigint not null,
+                        employeePaymentId bigint not null,
                         orderTypeId bigint not null,
                         customerId bigint not null,
                         promotionId bigint,
@@ -168,7 +169,7 @@ create table Orders (
                         createdAt Date default getDate(),
                         paymentDate date,
                         foreign key (employeeId) references Employee(employeeId),
-                        foreign key (orderTypeId) references OrderType(orderTypeId),
+                        foreign key (employeePaymentId) references OrderType(orderTypeId),
                         foreign key (promotionId) references Promotion(promotionId),
                         foreign key (customerId) references Customer(customerId),
 )
