@@ -137,7 +137,8 @@ public class SurchargeManagement extends javax.swing.JPanel {
                     .addComponent(btnImport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(tblSurchage, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+                .addGap(120, 120, 120)
+            );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddSurchageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddSurchageActionPerformed

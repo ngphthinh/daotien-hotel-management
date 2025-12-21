@@ -435,6 +435,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                                 .addGap(15, 15, 15)
                                 .addComponent(tblCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 663,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(20, 20, 20)
                                 .addContainerGap()));
     }// </editor-fold>
 
