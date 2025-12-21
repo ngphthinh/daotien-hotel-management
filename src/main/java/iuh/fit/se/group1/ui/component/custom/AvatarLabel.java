@@ -25,7 +25,6 @@ public class AvatarLabel extends JPanel {
     private BufferedImage image;
     private BufferedImage scaled;
     private BufferedImage defaultImage;
-    private boolean imageChanged = false;
 
     public AvatarLabel() {
         this(true);
@@ -33,13 +32,6 @@ public class AvatarLabel extends JPanel {
     public AvatarLabel(boolean loadDefaultImage) {
         setPreferredSize(new Dimension(60, 60));
         setOpaque(false);
-        this.imageChanged = false;
-        if (loadDefaultImage) {
-            loadDefaultImage();
-            if (defaultImage != null) {
-                this.image = defaultImage;
-            }
-        }
     }
     private void loadDefaultImage() {
         try {
@@ -61,7 +53,6 @@ public class AvatarLabel extends JPanel {
         if (defaultImage != null) {
             this.image = defaultImage;
             this.scaled = null;
-            this.imageChanged = false;
             repaint();
             log.info("Avatar reset to default image");
         } else {
@@ -80,9 +71,7 @@ public class AvatarLabel extends JPanel {
         }
         this.image = image;
         this.scaled = null;
-        this.imageChanged = true;
         repaint();
-        log.info("Avatar image updated successfully");
     }
     public byte[] getImageAsBytes(String format) {
         if (image == null) {
@@ -114,7 +103,6 @@ public class AvatarLabel extends JPanel {
             if (loadedImage != null) {
                 this.image = loadedImage;
                 this.scaled = null;
-                this.imageChanged = true;
                 log.info("Image loaded from bytes successfully");
                 return true;
             } else {
@@ -127,13 +115,6 @@ public class AvatarLabel extends JPanel {
             resetToDefault();
             return false;
         }
-    }
-    public boolean isImageChanged() {
-        return imageChanged;
-    }
-    public void setImageChanged(boolean changed) {
-        this.imageChanged = changed;
-        log.info("imageChanged manually set to: {}", changed);
     }
     @Override
     protected void paintComponent(Graphics g) {

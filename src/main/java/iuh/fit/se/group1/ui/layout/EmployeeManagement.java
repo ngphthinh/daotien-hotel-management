@@ -197,7 +197,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 AvatarLabel avatarLabel = modal.getAvatarLabel();
                 if (avatarLabel != null && employee.getAvt() != null && employee.getAvt().length > 0) {
                     avatarLabel.setImageFromBytes(employee.getAvt());
-                    avatarLabel.setImageChanged(false);
                 }
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
@@ -350,7 +349,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
 //                                log.warn("Failed to read image from byte array for employee: {}", employeeId);
 //                            }
                             avatarLabel.setImageFromBytes(employee.getAvt());
-                            avatarLabel.setImageChanged(false);
                         } catch (Exception e) {
                             log.error("Error loading avatar image: ", e);
                         }
@@ -763,8 +761,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         modal.getLblStatus().setForeground(Color.red);
         if (modal.getAvatarLabel() != null) {
             modal.getAvatarLabel().resetToDefault();
-            modal.getAvatarLabel().setImageChanged(false);
-            log.info("New employee modal: avatar reset to default, imageChanged = false");
         }
         modal.closeModel(new ActionListener() {
             @Override
@@ -996,15 +992,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
         boolean valid = true;
         Color red = Color.RED;
-
-        AvatarLabel avatarLabel = modal.getAvatarLabel();
-        if (modal.getBtnSave().getText().equals("Lưu")) {
-            if (avatarLabel == null || !avatarLabel.isImageChanged()) {
-                modal.getLblStatus().setText("Vui lòng chọn avatar!");
-                modal.getLblStatus().setForeground(red);
-                valid = false;
-            }
-        }
 
         // Tên
         if (name.isEmpty()) {
