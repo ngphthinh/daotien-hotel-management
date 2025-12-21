@@ -128,7 +128,7 @@ public class OrderRepository implements Repository<Order, Long> {
                         order.setCustomer(customer);
                         order.setPaymentDate(rs.getDate("paymentDate") != null ? rs.getDate("paymentDate").toLocalDate() : null);
                         order.setPromotion(promotion);
-                        order.setPaymentType(rs.getString("paymentType") !=null? PaymentType.valueOf(rs.getString("paymentType")): null);
+                        order.setPaymentType(rs.getString("paymentType") != null ? PaymentType.valueOf(rs.getString("paymentType")) : null);
 
 
                         Employee employee = new Employee();
@@ -205,7 +205,7 @@ public class OrderRepository implements Repository<Order, Long> {
         List<Order> orders = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             ResultSet rs = ps.executeQuery()) {
 
             Map<Long, Order> orderMap = new HashMap<>();
 
@@ -280,7 +280,7 @@ public class OrderRepository implements Repository<Order, Long> {
         List<BookingDisplayDTO> list = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Long bookingId = rs.getLong("bookingId");
@@ -355,7 +355,7 @@ public class OrderRepository implements Repository<Order, Long> {
         List<Order> orders = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             ResultSet rs = ps.executeQuery()) {
 
             Map<Long, Order> orderMap = new HashMap<>();
 
@@ -501,7 +501,7 @@ public class OrderRepository implements Repository<Order, Long> {
         List<Order> orders = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             ResultSet rs = ps.executeQuery()) {
 
             Map<Long, Order> orderMap = new HashMap<>();
 

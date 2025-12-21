@@ -4,6 +4,8 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import com.raven.datechooser.DateChooser;
+import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.service.OrderService;
@@ -12,10 +14,16 @@ import iuh.fit.se.group1.ui.component.custom.InvoicePanel;
 import iuh.fit.se.group1.ui.component.custom.OrderEditDialog;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import iuh.fit.se.group1.util.Constants;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -34,6 +42,8 @@ public class OrderManagement extends javax.swing.JPanel {
 
     private final OrderService orderService;
     private String currentTypeFilter = "Tất cả";
+    private DateChooser dateChooser;
+    private LocalDate selectedDate;
 
     /**
      * Creates new form OrderManagement
@@ -42,6 +52,7 @@ public class OrderManagement extends javax.swing.JPanel {
         initComponents();
         custom();
         orderService = new OrderService();
+        selectedDate = LocalDate.now(); // Default to today
         loadData();
     }
 
@@ -53,6 +64,58 @@ public class OrderManagement extends javax.swing.JPanel {
 
             if (!order.getBookings().isEmpty() && order.getBookings() != null) {
 
+                String rooms = order.getBookings().stream()
+                        .map(booking -> booking.getRoom().getRoomNumber())
+                        .collect(Collectors.joining(", "));
+
+                String checkIn = null;
+                String checkOut = null;
+                try {
+                    checkIn = order.getBookings().get(0).getCheckInDate().format(Constants.DATE_FORMATTER);
+
+                    checkOut = order.getBookings().get(0).getCheckOutDate().format(Constants.DATE_FORMATTER);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                model.addRow(new Object[]{
+                        order.getOrderId(),
+                        order.getCustomer().getFullName(),
+                        order.getCustomer().getCitizenId(),
+                        Constants.VND_FORMAT.format(order.getTotalAmount()),
+                        order.getOrderType().getName(),
+                        rooms,
+                        checkIn,
+                        checkOut
+                });
+            } else {
+                model.addRow(new Object[]{
+                        order.getOrderId(),
+                        order.getCustomer().getFullName(),
+                        order.getCustomer().getCitizenId(),
+                        Constants.VND_FORMAT.format(order.getTotalAmount()),
+                        order.getOrderType().getName(),
+                        "",
+                        "",
+                        ""
+                });
+            }
+        }
+    }
+
+    public void loadOrdersByDate(LocalDate date) {
+        DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
+        model.setRowCount(0);
+
+        for (Order order : orderService.getAllOrders()) {
+            // Lọc theo orderDate (ngày tạo đơn)
+            LocalDate orderDate = order.getOrderDate().toLocalDate();
+
+            if (!orderDate.equals(date)) {
+                continue;
+            }
+
+            if (!order.getBookings().isEmpty() && order.getBookings() != null) {
                 String rooms = order.getBookings().stream()
                         .map(booking -> booking.getRoom().getRoomNumber())
                         .collect(Collectors.joining(", "));
@@ -235,6 +298,7 @@ public class OrderManagement extends javax.swing.JPanel {
         };
 
         setupHeaderFilters();
+        setupDateChooser();
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -267,6 +331,42 @@ public class OrderManagement extends javax.swing.JPanel {
             }
         });
         setupOrderTableColumnAlignment(tblOrder.getTbl());
+    }
+
+    private void setupDateChooser() {
+        txtDate.setEditable(false);
+        txtDate.setFocusable(false);
+        txtDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        iconDate.setIcon(FontIcon.of(FontAwesomeSolid.CALENDAR_ALT, 20, Constants.COLOR_ICON_MENU));
+        iconDate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
+        dateChooser = new DateChooser();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        txtDate.setText(sdf.format(new Date()));
+        dateChooser.setDateFormat("dd-MM-yyyy");
+        dateChooser.toDay();
+        dateChooser.setForeground(Constants.COLOR_ICON_MENU);
+        dateChooser.addEventDateChooser((action, date) -> {
+            if (action.getAction() == SelectedAction.DAY_SELECTED) {
+                dateChooser.hidePopup();
+                selectedDate = LocalDate.of(
+                        date.getYear(),
+                        date.getMonth(),
+                        date.getDay()
+                );
+
+                // Load orders theo ngày đã chọn
+                loadOrdersByDate(selectedDate);
+            }
+        });
+        dateChooser.setTextRefernce(txtDate);
+        iconDate.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                dateChooser.showPopup(txtDate, 0, txtDate.getHeight());
+            }
+        });
     }
 
     private void handleSearch(String searchText) {
@@ -420,6 +520,9 @@ public class OrderManagement extends javax.swing.JPanel {
         headerCustom1 = new iuh.fit.se.group1.ui.component.HeaderCustom();
         tblOrder = new iuh.fit.se.group1.ui.component.table.Table();
         jLabel1 = new javax.swing.JLabel();
+        txtDate = new javax.swing.JTextField();
+        iconDate = new javax.swing.JLabel();
+        btnReset = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(241, 241, 241));
 
@@ -428,6 +531,23 @@ public class OrderManagement extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 30)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(102, 102, 102));
         jLabel1.setText("Danh sách hóa đơn");
+
+        txtDate.setFont(new java.awt.Font("Segoe UI", 0, 14));
+        txtDate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        iconDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
+        btnReset.setIcon(FontIcon.of(FontAwesomeSolid.SYNC_ALT, 18, Constants.COLOR_ICON_MENU));
+        btnReset.setBorderPainted(false);
+        btnReset.setContentAreaFilled(false);
+        btnReset.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnReset.setFocusPainted(false);
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
+
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -439,7 +559,11 @@ public class OrderManagement extends javax.swing.JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(32, 32, 32)
                                 .addComponent(jLabel1)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(iconDate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(32, 32, 32)));
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
@@ -447,16 +571,32 @@ public class OrderManagement extends javax.swing.JPanel {
                                         javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15,
                                         Short.MAX_VALUE)
-                                .addComponent(jLabel1)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                        .addComponent(jLabel1)
+                                        .addComponent(txtDate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(iconDate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(15, 15, 15)
                                 .addComponent(tblOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 637,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)));
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
+        // Reset về ngày hiện tại
+        selectedDate = LocalDate.now();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        txtDate.setText(sdf.format(new Date()));
+
+        // Load lại toàn bộ dữ liệu
+        loadData();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnReset;
     private iuh.fit.se.group1.ui.component.HeaderCustom headerCustom1;
+    private javax.swing.JLabel iconDate;
     private javax.swing.JLabel jLabel1;
     private iuh.fit.se.group1.ui.component.table.Table tblOrder;
+    private javax.swing.JTextField txtDate;
     // End of variables declaration//GEN-END:variables
 }
