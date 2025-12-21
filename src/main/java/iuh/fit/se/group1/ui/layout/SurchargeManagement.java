@@ -20,8 +20,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
@@ -194,6 +199,14 @@ public class SurchargeManagement extends javax.swing.JPanel {
         btnExport.setBackground(new Color(13, 200, 7));
         btnExport.setForeground(Color.WHITE);
         btnExport.setBorderRadius(10);
+        btnExport.addActionListener(e -> {
+            ExportExcelService.exportTableToExcel(
+                    this,
+                    tblSurchage.getTbl(),
+                    "Danh sách phụ phí",
+                    "DanhSachPhuPhi"
+            );
+        });
 
         btnImport.setBackground(new Color(255, 108, 3));
         btnImport.setForeground(Color.WHITE);
@@ -220,7 +233,19 @@ public class SurchargeManagement extends javax.swing.JPanel {
 
         String cols[] = {"Mã phụ phí", "Tên phụ phí", "Giá phụ phí", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
+        
+        // Khởi tạo TableRowSorter cho chức năng tìm kiếm
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        tblSurchage.getTbl().setRowSorter(sorter);
+        tblSurchage.getTbl().setAutoCreateRowSorter(false);
+        
+        // Tắt sorting cho tất cả các cột
+        for (int i = 0; i < cols.length; i++) {
+            sorter.setSortable(i, false);
+        }
+        
         tblSurchage.getTbl().setModel(model);
+        
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -301,6 +326,50 @@ public class SurchargeManagement extends javax.swing.JPanel {
                 }
             }
         });
+
+        headerCustom1.handleSearch(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterTable();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterTable();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterTable();
+            }
+
+            private void filterTable() {
+                String keyword = headerCustom1.getSearchText().trim();
+                TableRowSorter<DefaultTableModel> sorter = (TableRowSorter<DefaultTableModel>) tblSurchage.getTbl().getRowSorter();
+                if (keyword.isEmpty()) {
+                    sorter.setRowFilter(null);
+                } else {
+                    sorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                        @Override
+                        public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                            // Tìm kiếm theo mã phụ phí (cột 0) hoặc tên phụ phí (cột 1)
+                            Object idValue = entry.getValue(0);
+                            Object nameValue = entry.getValue(1);
+                            
+                            if (idValue != null && idValue.toString().contains(keyword)) {
+                                return true;
+                            }
+                            if (nameValue != null && nameValue.toString().toLowerCase().contains(keyword.toLowerCase())) {
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                }
+            }
+
+        });
+        
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -341,7 +410,7 @@ public class SurchargeManagement extends javax.swing.JPanel {
         } else {
             try {
                 priceI = new BigDecimal(
-                        price.replaceAll("[^\\d.]", "").trim()
+                         price.replaceAll("[^\\d.-]", "").trim()
                 );
                 if (priceI.compareTo(BigDecimal.ZERO) <= 0) {
                     modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");

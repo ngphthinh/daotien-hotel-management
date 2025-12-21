@@ -424,7 +424,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE,
                                         javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(30, 30, 30)
+                                .addGap(15, 15, 15)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(lblTitleCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 58,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -432,7 +432,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 43,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(25, 25, 25)
+                                .addGap(15, 15, 15)
                                 .addComponent(tblCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 663,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap()));
