@@ -8,6 +8,7 @@ import iuh.fit.se.group1.dto.DashboardSummaryDto;
 import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.dto.RevenueSourceDto;
 import iuh.fit.se.group1.dto.RoomStatusDto;
+import iuh.fit.se.group1.dto.ShiftNoteDto;
 import iuh.fit.se.group1.dto.WarningDto;
 import iuh.fit.se.group1.enums.TimeType;
 import iuh.fit.se.group1.service.DashboardService;
@@ -88,6 +89,7 @@ public class DashboardEmployee extends javax.swing.JPanel {
             private List<PeakHourDto> peakHours;
             private RoomStatusDto roomStatus;
             private WarningDto warnings;
+            private List<ShiftNoteDto> shiftNotes;
 
             @Override
             protected Void doInBackground() {
@@ -108,6 +110,9 @@ public class DashboardEmployee extends javax.swing.JPanel {
 
                     // Lấy cảnh báo
                     warnings = dashboardService.getWarnings();
+
+                    // Lấy ghi chú ca gần nhất
+                    shiftNotes = dashboardService.getRecentShiftNotes();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -141,6 +146,11 @@ public class DashboardEmployee extends javax.swing.JPanel {
                     // Cập nhật cảnh báo
                     if (warnings != null) {
                         panelWarning.updateData(warnings);
+                    }
+
+                    // Cập nhật ghi chú ca
+                    if (shiftNotes != null) {
+                        cardNote.updateData(shiftNotes);
                     }
 
                 } catch (Exception e) {
@@ -183,12 +193,12 @@ public class DashboardEmployee extends javax.swing.JPanel {
             data.getRoomsNearExpiry() + " PHÒNG");
 
         // Card 2: Check-in
-        pnlListCard1.getNumberCheckInCard().setMessage("Trong kỳ được chọn");
+        pnlListCard1.getNumberCheckInCard().setMessage("Lượt checkin");
         pnlListCard1.getNumberCheckInCard().setLblValue(
             data.getCheckInCount() + " LƯỢT");
 
         // Card 3: Check-out
-        pnlListCard1.getRevenueCard().setMessage("Trong kỳ được chọn");
+        pnlListCard1.getRevenueCard().setMessage("Lượt checkout");
         pnlListCard1.getRevenueCard().setLblValue(
             data.getCheckOutCount() + " LƯỢT");
 

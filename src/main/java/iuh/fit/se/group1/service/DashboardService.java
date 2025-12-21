@@ -599,6 +599,53 @@ public class DashboardService {
     }
 
     /**
+     * Lấy tối đa 2 ghi chú ca làm việc gần nhất từ ShiftClose
+     * @return Danh sách ghi chú ca làm việc (tối đa 2 ca)
+     */
+    public List<ShiftNoteDto> getRecentShiftNotes() {
+        List<ShiftNoteDto> notes = new ArrayList<>();
+
+        String sql = "SELECT TOP 2 " +
+                     "    e.fullName, " +
+                     "    s.name as shiftName, " +
+                     "    es.shiftDate, " +
+                     "    sc.note, " +
+                     "    sc.createdAt " +
+                     "FROM ShiftClose sc " +
+                     "JOIN EmployeeShift es ON sc.employeeShiftId = es.employeeShiftId " +
+                     "JOIN Employee e ON es.employeeId = e.employeeId " +
+                     "JOIN Shift s ON es.shiftId = s.shiftId " +
+                     "WHERE sc.note IS NOT NULL AND sc.note != '' " +
+                     "ORDER BY sc.createdAt DESC";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ShiftNoteDto dto = new ShiftNoteDto();
+                dto.setEmployeeName(rs.getString("fullName"));
+                dto.setShiftName(rs.getString("shiftName"));
+
+                // Convert Date to LocalDateTime
+                java.sql.Date sqlDate = rs.getDate("shiftDate");
+                if (sqlDate != null) {
+                    dto.setShiftDate(sqlDate.toLocalDate().atStartOfDay());
+                }
+
+                dto.setNote(rs.getString("note"));
+                notes.add(dto);
+            }
+
+            log.info("Retrieved {} recent shift notes", notes.size());
+
+        } catch (SQLException e) {
+            log.error("Error getting recent shift notes: ", e);
+        }
+
+        return notes;
+    }
+
+    /**
      * Lấy tổng doanh thu từ PHÒNG hôm nay
      */
     public BigDecimal getTotalRoomRevenue() {
