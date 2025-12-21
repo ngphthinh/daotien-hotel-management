@@ -6,12 +6,15 @@ package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.enums.TimeType;
 import iuh.fit.se.group1.service.OrderService;
-import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
+import iuh.fit.se.group1.util.Constants;
 
+import javax.swing.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  *
@@ -19,7 +22,7 @@ import java.util.List;
  */
 public class RevenueStatistics extends javax.swing.JPanel {
 
-    private OrderService orderService = new OrderService();
+    private final OrderService orderService = new OrderService();
 
     /**
      * Creates new form RevenueStatistics
@@ -27,6 +30,8 @@ public class RevenueStatistics extends javax.swing.JPanel {
     public RevenueStatistics() {
         initComponents();
         setActionButtonRange();
+
+        loadDataTo7Day();
 
         headerChart1.getBtnView().addActionListener(e -> {
             String fromDate = headerChart1.getTxtFromDate().getText();
@@ -39,57 +44,265 @@ public class RevenueStatistics extends javax.swing.JPanel {
         });
     }
 
+    private void loadDataTo7Day () {
+        LocalDate today = LocalDate.now();
+        LocalDate from = today.minusDays(6); // 7 days including today
+        loadData(from, today);
+    }
+
+
+
     private void loadData(LocalDate from, LocalDate to) {
+
         // Lấy tổng doanh thu
         BigDecimal totalRevenue = orderService.getTotalRevenueBetweenDates(from, to);
 
-        card1.setValue(totalRevenue);
+        // Tính phần trăm tăng trưởng so với kỳ trước
+        long days = ChronoUnit.DAYS.between(from, to) + 1;
+        LocalDate prevFrom = from.minusDays(days);
+        LocalDate prevTo = from.minusDays(1);
+        BigDecimal prevRevenue = orderService.getTotalRevenueBetweenDates(prevFrom, prevTo);
 
-//        // Calculate total revenue
-//        double totalRevenue = revenueData.stream()
-//                .mapToDouble(data -> ((Number) data[1]).doubleValue())
-//                .sum();
-//
-//        card1.setValue(String.format("%.2f", totalRevenue));
+        double growthPercent = 0;
+        if (prevRevenue.compareTo(BigDecimal.ZERO) > 0) {
+            growthPercent = totalRevenue.subtract(prevRevenue)
+                .divide(prevRevenue, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                .doubleValue();
+        }
+
+        String growthText = String.format("%s%.1f%%",
+            growthPercent >= 0 ? "+" : "", growthPercent);
+
+        // Set value for card with growth rate
+        card1.setValue(Constants.VND_FORMAT.format(totalRevenue));
+
+
+        loadRevenueColumnChart(from, to);
     }
+
+    /**
+     * Load dữ liệu biểu đồ cột doanh thu theo loại phòng và ngày
+     * Tối ưu số lượng cột hiển thị để tránh biểu đồ quá dày
+     *
+     * Logic phân chia (tối đa 10 cột):
+     * - 1-10 ngày: Hiển thị theo ngày (tối đa 10 cột)
+     * - 11-70 ngày: Nhóm theo tuần (tối đa 10 tuần)
+     * - >70 ngày: Nhóm tùy chỉnh để đảm bảo tối đa 10 cột
+     */
+    private void loadRevenueColumnChart(LocalDate from, LocalDate to) {
+
+        long days = ChronoUnit.DAYS.between(from, to) + 1;
+
+        List<String> labels = new ArrayList<>();
+        List<double[]> values = new ArrayList<>();
+
+        if (days <= 10) {
+            loadDailyData(from, to, labels, values);
+        } else if (days <= 70) {
+            loadWeeklyData(from, to, labels, values);
+        } else {
+            loadAdaptiveGroupData(from, to, labels, values, 10);
+        }
+
+
+
+        // Validate data
+        if (labels.isEmpty() || values.isEmpty()) {
+
+            values.add(new double[]{0, 0});
+        } else {
+            // Check if all values are zero
+            boolean hasData = false;
+            for (double[] val : values) {
+                if (val[0] > 0 || val[1] > 0) {
+                    hasData = true;
+                    break;
+                }
+            }
+
+            if (!hasData) {
+                System.out.println("WARNING: All revenue values are ZERO!");
+            } else {
+                // Print some sample data
+                for (int i = 0; i < Math.min(3, labels.size()); i++) {
+                    System.out.println(String.format("  %s: Single=%.0f, Double=%.0f",
+                        labels.get(i), values.get(i)[0], values.get(i)[1]));
+                }
+            }
+        }
+
+//        revenueColumnChart1.
+        revenueColumnChart1.setData(labels, values);
+        System.out.println("Chart update completed!");
+    }
+
+
+    /**
+     * Load dữ liệu theo ngày (cho khoảng <= 7 ngày)
+     */
+    private void loadDailyData(LocalDate from, LocalDate to, List<String> labels, List<double[]> values) {
+        LocalDate current = from;
+        while (!current.isAfter(to)) {
+            // Format: dd/MM (ví dụ: 21/12)
+            String label = current.format(DateTimeFormatter.ofPattern("dd/MM"));
+            labels.add(label);
+
+            Map<String, BigDecimal> revenueMap = orderService.getRevenueByRoomType(current, current);
+            double singleRevenue = revenueMap.getOrDefault("Phòng đơn", BigDecimal.ZERO).doubleValue();
+            double doubleRevenue = revenueMap.getOrDefault("Phòng đôi", BigDecimal.ZERO).doubleValue();
+
+            values.add(new double[]{singleRevenue, doubleRevenue});
+            current = current.plusDays(1);
+        }
+    }
+
+
+    /**
+     * Load dữ liệu theo tuần (cho khoảng 11-70 ngày)
+     * Mỗi tuần = 7 ngày, tuần cuối có thể ít hơn
+     */
+    private void loadWeeklyData(LocalDate from, LocalDate to, List<String> labels, List<double[]> values) {
+        LocalDate current = from;
+        int weekNum = 1;
+
+        while (!current.isAfter(to)) {
+            LocalDate weekEnd = current.plusDays(6);
+            if (weekEnd.isAfter(to)) {
+                weekEnd = to;
+            }
+
+            // Format: "Tuần 1: 01/12-07/12"
+            String label = String.format("%s-%s",
+                current.format(DateTimeFormatter.ofPattern("dd/MM")),
+                weekEnd.format(DateTimeFormatter.ofPattern("dd/MM"))
+            );
+            labels.add(label);
+
+            // Tổng doanh thu trong tuần
+            double totalSingle = 0;
+            double totalDouble = 0;
+
+            LocalDate day = current;
+            while (!day.isAfter(weekEnd)) {
+                Map<String, BigDecimal> revenueMap = orderService.getRevenueByRoomType(day, day);
+                totalSingle += revenueMap.getOrDefault("Phòng đơn", BigDecimal.ZERO).doubleValue();
+                totalDouble += revenueMap.getOrDefault("Phòng đôi", BigDecimal.ZERO).doubleValue();
+                day = day.plusDays(1);
+            }
+
+            values.add(new double[]{totalSingle, totalDouble});
+
+            current = weekEnd.plusDays(1);
+            weekNum++;
+        }
+    }
+
+    /**
+     * Load dữ liệu nhóm tự động để đảm bảo tối đa số cột mong muốn
+     * Sử dụng cho khoảng thời gian dài > 70 ngày
+     * @param maxColumns Số cột tối đa (mặc định 10)
+     */
+    private void loadAdaptiveGroupData(LocalDate from, LocalDate to, List<String> labels, List<double[]> values, int maxColumns) {
+        long totalDays = ChronoUnit.DAYS.between(from, to) + 1;
+
+        // Tính số ngày mỗi nhóm để có đúng số cột mong muốn
+        int groupSize = (int) Math.ceil((double) totalDays / maxColumns);
+
+        LocalDate current = from;
+        int groupNum = 1;
+
+        while (!current.isAfter(to) && labels.size() < maxColumns) {
+            LocalDate groupEnd = current.plusDays(groupSize - 1);
+            if (groupEnd.isAfter(to)) {
+                groupEnd = to;
+            }
+
+            // Format label tùy theo độ dài khoảng thời gian
+            String label;
+            if (groupSize <= 7) {
+                // Nếu nhóm ngắn, hiển thị ngày đầu-cuối
+                label = String.format("%s-%s",
+                    current.format(DateTimeFormatter.ofPattern("dd/MM")),
+                    groupEnd.format(DateTimeFormatter.ofPattern("dd/MM"))
+                );
+            } else if (groupSize <= 31) {
+                // Nếu nhóm ~1 tháng, hiển thị tuần hoặc khoảng ngày
+                label = String.format("%s-%s",
+                    current.format(DateTimeFormatter.ofPattern("dd/MM")),
+                    groupEnd.format(DateTimeFormatter.ofPattern("dd/MM"))
+                );
+            } else {
+                // Nếu nhóm dài, chỉ hiển thị tháng/năm
+                if (current.getMonthValue() == groupEnd.getMonthValue()) {
+                    label = current.format(DateTimeFormatter.ofPattern("MM/yyyy"));
+                } else {
+                    label = String.format("%s-%s",
+                        current.format(DateTimeFormatter.ofPattern("MM/yy")),
+                        groupEnd.format(DateTimeFormatter.ofPattern("MM/yy"))
+                    );
+                }
+            }
+            labels.add(label);
+
+            // Tổng doanh thu trong nhóm
+            double totalSingle = 0;
+            double totalDouble = 0;
+
+            LocalDate day = current;
+            while (!day.isAfter(groupEnd)) {
+                Map<String, BigDecimal> revenueMap = orderService.getRevenueByRoomType(day, day);
+                totalSingle += revenueMap.getOrDefault("Phòng đơn", BigDecimal.ZERO).doubleValue();
+                totalDouble += revenueMap.getOrDefault("Phòng đôi", BigDecimal.ZERO).doubleValue();
+                day = day.plusDays(1);
+            }
+
+            values.add(new double[]{totalSingle, totalDouble});
+
+            current = groupEnd.plusDays(1);
+            groupNum++;
+        }
+    }
+
 
     public LocalDate parseDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return LocalDate.parse(date, formatter);
     }
 
-
-
     private void setActionButtonRange() {
         rangeDateButton1.getBtn7Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_7);
 
             LocalDate to = LocalDate.now();
-            LocalDate from = to.minusDays(7);
+            LocalDate from = to.minusDays(6); // 7 days including today
             headerChart1.getTxtFromDate().setText(from.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             headerChart1.getTxtToDate().setText(to.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
-            loadData(from,to);
-
+            loadData(from, to);
         });
+
         rangeDateButton1.getBtn30Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_30);
 
             LocalDate to = LocalDate.now();
-            LocalDate from = to.minusDays(30);
+            LocalDate from = to.minusDays(29); // 30 days including today
 
             headerChart1.getTxtFromDate().setText(from.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             headerChart1.getTxtToDate().setText(to.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
-            loadData(from,to);
+            loadData(from, to);
         });
+
         rangeDateButton1.getBtn90Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_90);
+
             LocalDate to = LocalDate.now();
-            LocalDate from = to.minusDays(90);
+            LocalDate from = to.minusDays(89); // 90 days including today
             headerChart1.getTxtFromDate().setText(from.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             headerChart1.getTxtToDate().setText(to.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            loadData(from,to);
+
+            loadData(from, to);
         });
     }
 
@@ -138,7 +351,13 @@ public class RevenueStatistics extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Revenue Statistics Test");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1200, 800);
+        frame.add(new RevenueStatistics());
+        frame.setVisible(true);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.chart.Card card1;

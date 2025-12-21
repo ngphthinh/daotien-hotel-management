@@ -21,11 +21,11 @@ import raven.glasspanepopup.GlassPanePopup;
  */
 public class Message extends javax.swing.JPanel {
 
-    public static void showInfo(String thành_công, String string) {
+    public static void showInfo(String title, String message) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    public static void showError(String lỗi_import, String không_có_dữ_liệu_hợp_lệ_trong_file_Excel) {
+    public static void showError(String title, String message) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

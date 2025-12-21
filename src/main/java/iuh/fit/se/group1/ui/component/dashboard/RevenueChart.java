@@ -65,8 +65,6 @@
             JLabel header3 = new JLabel("Nguồn doanh thu");
             header3.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
-
-
             pieChart.setHeader(header3);
 
 

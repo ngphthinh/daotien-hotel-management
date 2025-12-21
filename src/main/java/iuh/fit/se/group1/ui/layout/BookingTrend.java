@@ -5,6 +5,16 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.enums.TimeType;
+import iuh.fit.se.group1.service.OrderService;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
+
+import javax.swing.*;
+import java.awt.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  *
@@ -12,33 +22,79 @@ import iuh.fit.se.group1.enums.TimeType;
  */
 public class BookingTrend extends javax.swing.JPanel {
 
+    private final OrderService orderService;
+
     /**
      * Creates new form BookingTrend
      */
     public BookingTrend() {
+        this.orderService = new OrderService();
         initComponents();
 
         setActionButtonRange();
+        // Load data mặc định cho 7 ngày
+        updateCardData(7);
     }
 
     private void setActionButtonRange() {
+
+        card1.setLabel("Số lượng đặt phòng", Color.RED, FontIcon.of(FontAwesomeSolid.BED, 25, Color.WHITE));
+
         rangeDateButton1.getBtn7Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_7);
             lineBookingTrendChart1.createLineChartData(7);
-            // todo: update chart here
+            updateCardData(7);
         });
+
         rangeDateButton1.getBtn30Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_30);
-            System.out.println("click 30");
             lineBookingTrendChart1.createLineChartData(30);
-            // todo: update chart here
+            updateCardData(30);
         });
+
         rangeDateButton1.getBtn90Days().addActionListener(e -> {
             rangeDateButton1.setActiveButton(TimeType.DAYS_90);
-            System.out.println("click 90");
             lineBookingTrendChart1.createLineChartData(90);
-            // todo: update chart here
+            updateCardData(90);
         });
+
+        headerChart1.getBtnView().addActionListener(l->{
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            LocalDate start = LocalDate.parse(headerChart1.getTxtFromDate().getText(), formatter);
+            LocalDate end = LocalDate.parse(headerChart1.getTxtToDate().getText(), formatter);
+
+            lineBookingTrendChart1.createLineChartData(start, end);
+            updateCardData(start, end);
+        });
+    }
+
+    /**
+     * Load dữ liệu cho Card theo số ngày (7, 30, 90)
+     */
+    private void updateCardData(int days) {
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(days - 1);
+        updateCardData(start, end);
+    }
+
+    /**
+     * Load dữ liệu cho Card theo khoảng thời gian cụ thể
+     */
+    private void updateCardData(LocalDate start, LocalDate end) {
+        // Tính tổng số booking trong khoảng thời gian
+        int totalBookings = 0;
+        LocalDate currentDate = start;
+        while (!currentDate.isAfter(end)) {
+            Map<String, Integer> bookingCount = orderService.getBookingCountByRoomTypeAndDate(currentDate);
+            totalBookings += bookingCount.values().stream().mapToInt(Integer::intValue).sum();
+            currentDate = currentDate.plusDays(1);
+        }
+
+        // Hiển thị lên card
+        card1.setValue(totalBookings + " Lượt");
+
+        System.out.println("Card updated: " + totalBookings + " bookings from " + start + " to " + end);
     }
 
     /**

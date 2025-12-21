@@ -32,7 +32,7 @@ public class LineChartCustom extends LineChart {
 
         // đổi format tiền tệ sang ₫
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("vi", "VN"));
-        valuesFormat = new DecimalFormat("#,##0.## '₫'", symbols);
+        valuesFormat = new DecimalFormat("#,##0.##", symbols);
 
 
         super.layeredPane.setBackground(Color.white);

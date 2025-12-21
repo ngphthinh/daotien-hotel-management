@@ -152,13 +152,30 @@ public class MainLayout extends JPanel {
                     } else if (index == 1) {
                         setMainContent(bookingPage);
                     } else if (index == 2) {
+                        paymentPage.setOnPayment();
                         setMainContent(paymentPage);
-
                     } else if (index == 3) {
                         roomToolsManagement.loadData();
                         setMainContent(roomToolsManagement);
-                    } else if (index == 4) {
+                    } if (index == 4) {
+                        setMainContent(orderManagement);
+                        orderManagement.loadData();
+                    }
+                    else if (index == 5) {
                         closeShiftHandle();
+                    } else if (index == 6) {
+                        if (subIndex == 1) {
+                            setMainContent(revenueStatistics);
+                        } else if (subIndex == 2) {
+                            setMainContent(new Regulation());
+                        } else if (subIndex == 3) {
+                            GlassPanePopup.showPopup(checkForVersionPanel);
+                            checkForVersionPanel.getBtnClose().addActionListener(e
+                                    -> GlassPanePopup.closePopupLast()
+                            );
+                        }else if (subIndex == 4) {
+                            handleAboutPanel();
+                        }
                     } else {
                         System.out.println("Selected Menu Item: " + index + ", SubItem: " + subIndex + " from MenuIcon");
                     }
@@ -410,6 +427,7 @@ public class MainLayout extends JPanel {
         } else {
             dashboardEmployee = new DashboardEmployee();
             bookingPage = new BookingPage();
+            bookingPage.setCurrentEmployee(currentEmployee);
             paymentPage = new PaymentPagev2();
             paymentPage.setCurrentEmployee(currentEmployee);
             roomToolsManagement = new RoomToolsManagement();

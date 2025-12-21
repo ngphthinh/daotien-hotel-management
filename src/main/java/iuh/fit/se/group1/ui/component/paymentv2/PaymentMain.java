@@ -761,6 +761,7 @@ public class PaymentMain extends javax.swing.JPanel {
     }//GEN-LAST:event_btnCashActionPerformed
 
     private void saveOrder() {
+        currentOrder.setEmployeePayment(currentEmployee);
         saveSurchargesByOrderId(currentOrder.getOrderId());
         orderService.updateOrderStatusToPaid(currentOrder);
         resetPanel();
@@ -872,6 +873,7 @@ public class PaymentMain extends javax.swing.JPanel {
                         Long order = currentOrder.getOrderId();
                         String totalPricePayment = lblTotalPricePayment.getText();
                         String promotionStr = lblPromotion.getText();
+                        currentOrder.setEmployeePayment(currentEmployee);
                         saveOrder();
                         jaspersoftExportService.exportOrderToPdf(
                                 order,

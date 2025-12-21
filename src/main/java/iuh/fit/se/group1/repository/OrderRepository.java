@@ -76,8 +76,8 @@ public class OrderRepository implements Repository<Order, Long> {
     public Order findById(Long aLong) {
         String sql = """
                 SELECT
-                    O.orderId, O.orderDate, O.totalAmount, O.employeeId,
-                    O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt AS orderCreatedAt,
+                    O.orderId, O.orderDate, O.totalAmount, O.employeeId, employeePaymentId,
+                    O.orderTypeId, O.customerId, O.promotionId, O.deposit, O.createdAt  AS orderCreatedAt,
                     B.bookingId, B.checkInDate, B.checkOutDate,B.bookingType,
                     B.orderId AS bookingOrderId, B.roomId, B.bookingType, B.createdAt AS bookingCreatedAt,
                     OT.orderTypeId AS otId, OT.name AS otName, OT.createdAt AS otCreatedAt,email, fullName, gender,phone,dateOfBirth,citizenId, rt.name as rtName, rt.roomTypeId,
@@ -134,6 +134,10 @@ public class OrderRepository implements Repository<Order, Long> {
                         Employee employee = new Employee();
                         employee.setEmployeeId(rs.getLong("employeeId"));
                         order.setEmployee(employee);
+
+                        Employee employeePayment = new Employee();
+                        employeePayment.setEmployeeId(rs.getLong("employeePaymentId"));
+                        order.setEmployeePayment(employeePayment);
                     }
 
                     // 🔹 Map Booking
@@ -339,7 +343,6 @@ public class OrderRepository implements Repository<Order, Long> {
 
     public List<Order> findAllByOrderUnPaid() {
         String sql = """
-
                 SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount, C.phone, C.fullName, R.roomNumber
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
@@ -397,7 +400,7 @@ public class OrderRepository implements Repository<Order, Long> {
     }
 
     public void updateOrderStatusToPaid(Order order) {
-        String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ?, paymentDate = ? WHERE orderId = ?";
+        String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ?, paymentDate = ?, employeePaymentId = ?  WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setBigDecimal(1, order.getTotalAmount());
             preparedStatement.setString(2, order.getPaymentType().name());
@@ -407,7 +410,8 @@ public class OrderRepository implements Repository<Order, Long> {
                 preparedStatement.setNull(3, java.sql.Types.BIGINT);
             }
             preparedStatement.setDate(4, Date.valueOf(order.getPaymentDate()));
-            preparedStatement.setLong(5, order.getOrderId());
+            preparedStatement.setLong(5, order.getEmployeePayment().getEmployeeId());
+            preparedStatement.setLong(6, order.getOrderId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("Error updating order status to paid for Order ID {}: ", order.getOrderId(), e);
@@ -814,5 +818,74 @@ public class OrderRepository implements Repository<Order, Long> {
             log.error("Error retrieving Orders by Room ID and Order Type: ", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public Map<String, BigDecimal> getRevenueByRoomType(LocalDate from, LocalDate to) {
+        String sql = """
+                SELECT RT.name AS roomTypeName, SUM(O.totalAmount) AS totalRevenue
+                FROM Orders O
+                JOIN Booking B ON O.orderId = B.orderId
+                JOIN Room R ON B.roomId = R.roomId
+                JOIN RoomType RT ON R.roomTypeId = RT.roomTypeId
+                WHERE O.orderTypeId = 1 AND O.paymentDate BETWEEN ? AND ?
+                GROUP BY RT.name
+                """;
+
+        Map<String, BigDecimal> revenueByRoomType = new HashMap<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setDate(1, Date.valueOf(from));
+            preparedStatement.setDate(2, Date.valueOf(to));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String roomTypeName = resultSet.getString("roomTypeName");
+                    BigDecimal totalRevenue = resultSet.getBigDecimal("totalRevenue");
+                    revenueByRoomType.put(roomTypeName, totalRevenue);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error retrieving revenue by room type: ", e);
+            throw new RuntimeException(e);
+        }
+
+        return revenueByRoomType;
+    }
+
+    /**
+     * Lấy số lượng booking theo loại phòng và ngày cụ thể
+     * @param date Ngày cần lấy dữ liệu
+     * @return Map với key là tên loại phòng, value là số lượng booking
+     */
+    public Map<String, Integer> getBookingCountByRoomTypeAndDate(LocalDate date) {
+        String sql = """
+                SELECT RT.name AS roomTypeName, COUNT(B.bookingId) AS bookingCount
+                                FROM Booking B
+                                JOIN Room R ON B.roomId = R.roomId
+                                JOIN RoomType RT ON R.roomTypeId = RT.roomTypeId
+                                JOIN Orders O ON B.orderId = O.orderId
+                                WHERE O.orderTypeId IN (1, 2, 3)
+                                AND paymentDate = ?
+                                GROUP BY RT.name
+                """;
+
+        Map<String, Integer> bookingCountByRoomType = new HashMap<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setDate(1, Date.valueOf(date));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String roomTypeName = resultSet.getString("roomTypeName");
+                    int bookingCount = resultSet.getInt("bookingCount");
+                    bookingCountByRoomType.put(roomTypeName, bookingCount);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error retrieving booking count by room type: ", e);
+            throw new RuntimeException(e);
+        }
+
+        return bookingCountByRoomType;
     }
 }

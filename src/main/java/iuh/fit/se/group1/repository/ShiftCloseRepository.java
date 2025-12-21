@@ -221,10 +221,10 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
         String sql = """
         SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue
         FROM Orders O
-        INNER JOIN EmployeeShift ES ON O.employeeId = ES.employeeId
+        INNER JOIN EmployeeShift ES ON O.[employeePaymentId] = ES.employeeId
         WHERE ES.employeeShiftId = ?
         AND CAST(O.orderDate AS DATE) = ES.shiftDate
-        AND O.orderTypeId = 1
+        AND O.orderTypeId = 1 
         AND O.paymentType = 'CASH'
     """;
 

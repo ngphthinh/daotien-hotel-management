@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import javax.swing.*;
+
 /**
  *
  * @author hoxuy
@@ -156,9 +158,14 @@ public class Card extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    public void setLabel (String title , Color color, Icon icon) {
+        criclePanel2.setBackground(color);
+        lbl5.setIcon(icon);
+        lbl1.setText(title);
+    }
 
-    public void setValue(BigDecimal totalRevenue) {
-        lblTotalRevenue.setText(Constants.VND_FORMAT.format(totalRevenue));
+    public void setValue(String totalRevenue) {
+        lblTotalRevenue.setText(totalRevenue);
         lbl3.setText("");
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

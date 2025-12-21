@@ -21,6 +21,7 @@ public class Order {
     private LocalDate createdAt;
     private List<Booking> bookings;
     private LocalDate paymentDate;
+    private Employee employeePayment;
 
     public LocalDate getPaymentDate() {
         return paymentDate;
@@ -39,7 +40,7 @@ public class Order {
         bookings = new java.util.ArrayList<>();
     }
 
-    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Customer customer, Promotion promotion, BigDecimal deposit, LocalDate createdAt, List<Booking> bookings) {
+    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Customer customer, Promotion promotion, BigDecimal deposit, LocalDate createdAt, List<Booking> bookings, Employee employeePayment) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
@@ -50,6 +51,15 @@ public class Order {
         this.deposit = deposit;
         this.createdAt = createdAt;
         this.bookings = bookings;
+        this.employeePayment = employeePayment;
+    }
+
+    public Employee getEmployeePayment() {
+        return employeePayment;
+    }
+
+    public void setEmployeePayment(Employee employeePayment) {
+        this.employeePayment = employeePayment;
     }
 
     public Customer getCustomer() {

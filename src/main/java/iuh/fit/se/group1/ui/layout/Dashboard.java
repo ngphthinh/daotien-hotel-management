@@ -7,6 +7,7 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.enums.TimeType;
 
 /**
+import iuh.fit.se.group1.ui.component.raven.chart.ModelChart;
  *
  * @author THIS PC
  */
@@ -17,17 +18,13 @@ public class Dashboard extends javax.swing.JPanel {
      */
     public Dashboard() {
         initComponents();
-        // todo: hard code card
         fetchData();
         addActionTimeType();
-
-
     }
 
     private void addActionTimeType() {
         headerDashboard1.getBtnToday().addActionListener(e -> {
             headerDashboard1.setActiveButton(TimeType.TODAY);
-//            System.out.println(lineChartPanel1.getWidth() + " " + lineChartPanel1.getHeight());
             // TODO: Update chart and data for Today
         });
 

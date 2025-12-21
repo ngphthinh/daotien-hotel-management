@@ -105,7 +105,7 @@ public class ImportExcelService {
 
                 String amenityIdStr = getCellValue(row.getCell(startColumn));
                 String amenityName = getCellValue(row.getCell(startColumn + 1));
-                String priceStr = getCellValue(row.getCell(startColumn + 2));
+                String priceStr = cleanNumberString(getCellValue(row.getCell(startColumn + 2)));
 
                 if (amenityName.isEmpty()) {
                     continue;
@@ -523,7 +523,7 @@ public class ImportExcelService {
 
                 String surchargeIdStr = getCellValue(row.getCell(startColumn));
                 String surchargeName = getCellValue(row.getCell(startColumn + 1));
-                String priceStr = getCellValue(row.getCell(startColumn + 2));
+                String priceStr = cleanNumberString(getCellValue(row.getCell(startColumn + 2)));
 
                 if (surchargeName.isEmpty()) {
                     continue;

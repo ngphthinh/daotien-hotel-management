@@ -1,10 +1,7 @@
 package iuh.fit.se.group1.ui.component.custom;
 
 import iuh.fit.se.group1.entity.*;
-import iuh.fit.se.group1.service.BookingService;
-import iuh.fit.se.group1.service.OrderDetailService;
-import iuh.fit.se.group1.service.PromotionService;
-import iuh.fit.se.group1.service.SurchargeDetailService;
+import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
 
@@ -86,6 +83,8 @@ public class InvoicePanel extends JPanel {
     private static final Color PALETTE_ROW_ALT = new Color(249, 250, 251);
     private static final Color PALETTE_SELECTION = new Color(183, 225, 250);
     private static final Color PALETTE_EDIT_HIGHLIGHT = new Color(229, 247, 255);
+    private JLabel lblEmployeePayment;
+    private EmployeeService employeeService = new EmployeeService();
 
     public InvoicePanel() {
         initComponents();
@@ -116,7 +115,7 @@ public class InvoicePanel extends JPanel {
 
         // Employee
         lblEmployeeName = createLabel("", 13);
-
+        lblEmployeePayment = createLabel("", 13);
         // Tables
         setupRoomBookingTable();
         setupAmenityTable();
@@ -207,8 +206,8 @@ public class InvoicePanel extends JPanel {
 
         // Employee info
         JPanel employeePanel = createInfoPanel("NHÂN VIÊN XỬ LÝ",
-                new String[] { "Họ tên:" },
-                new JLabel[] { lblEmployeeName });
+                new String[] { "Họ tên:", "Nhân viên thanh toán" },
+                new JLabel[] { lblEmployeeName, lblEmployeePayment });
 
         panel.add(customerPanel);
         panel.add(employeePanel);
@@ -563,6 +562,10 @@ public class InvoicePanel extends JPanel {
         Employee employee = order.getEmployee();
         if (employee != null) {
             lblEmployeeName.setText(employee.getFullName());
+        }
+        Employee employeePayment = employeeService.getEmployeeById(order.getEmployeePayment().getEmployeeId());
+        if (employeePayment != null) {
+            lblEmployeePayment.setText(employeePayment.getFullName());
         }
 
         // Room bookings

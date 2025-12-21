@@ -46,8 +46,9 @@ public class Menu extends JComponent {
             {"Đặt phòng"},
             {"Thanh toán"},
             {"Tiện ích phòng"},
+            {"Quản lý hóa đơn"},
             {"Đóng ca"},
-            {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản"}
+            {"Hỗ trợ", "Hướng dẫn sử dụng", "Quy định", "Phiên bản", "Về chúng tôi"}
     };
 
     public Menu() {

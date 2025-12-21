@@ -156,6 +156,26 @@ public class OrderService {
         return orderRepository.calculateTotalRevenueBetweenDates(from, to);
     }
 
+    /**
+     * Get revenue by room type for a date range
+     *
+     * @param from Start date
+     * @param to   End date
+     * @return Map with room type name as key and revenue as value
+     */
+    public Map<String, BigDecimal> getRevenueByRoomType(LocalDate from, LocalDate to) {
+        return orderRepository.getRevenueByRoomType(from, to);
+    }
+
+    /**
+     * Lấy số lượng booking theo loại phòng cho một ngày cụ thể
+     * @param date Ngày cần lấy dữ liệu
+     * @return Map với key là tên loại phòng, value là số lượng booking
+     */
+    public Map<String, Integer> getBookingCountByRoomTypeAndDate(LocalDate date) {
+        return orderRepository.getBookingCountByRoomTypeAndDate(date);
+    }
+
     public void removeBookingsFromOrder(Order currentOrder, List<Booking> result) {
         bookingRepository.removeBookingsFromOrder(currentOrder, result);
     }
