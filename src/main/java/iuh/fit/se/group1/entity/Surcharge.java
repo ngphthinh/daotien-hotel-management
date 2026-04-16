@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
+@ToString(exclude = {"surchargeDetails"})
 @Entity
 public class Surcharge {
     @Id
@@ -27,7 +27,6 @@ public class Surcharge {
 
     @OneToMany(mappedBy = "Surcharge")
     private Set<SurchargeDetail> surchargeDetails;
-
 
 
     public Surcharge(String name, BigDecimal price) {

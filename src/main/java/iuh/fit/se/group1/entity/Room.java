@@ -17,7 +17,6 @@ public class Room {
     private Long roomId;
     private String roomNumber;
 
-
     @ManyToOne
     @JoinColumn(name = "roomTypeId")
     private RoomType roomType;

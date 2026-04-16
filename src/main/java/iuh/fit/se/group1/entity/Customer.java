@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"orders"})
 @EqualsAndHashCode(of = "customerId")
 @Entity
 public class Customer {
@@ -23,7 +23,7 @@ public class Customer {
     private String phone;
     private String email;
     private String citizenId;
-    private boolean gender; 
+    private boolean gender;
     private LocalDate dateOfBirth;
     private LocalDate createdAt;
     @OneToMany(mappedBy = "customer")

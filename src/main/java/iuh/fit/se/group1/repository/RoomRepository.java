@@ -41,10 +41,10 @@ public class RoomRepository implements Repository<Room, Long> {
                 throw new SQLException("RoomTypeId cannot be null!");
             }
 
-            if (room.getCreateAt() == null) {
+            if (room.getCreatedAt() == null) {
                 room.setCreatedAt(LocalDate.now());
             }
-            ps.setDate(3, Date.valueOf(room.getCreateAt()));
+            ps.setDate(3, Date.valueOf(room.getCreatedAt()));
             ps.setString(4, room.getRoomStatus().name());
             ps.setBoolean(5, false);
 
@@ -109,7 +109,7 @@ public class RoomRepository implements Repository<Room, Long> {
                         room.setRoomType(roomTypeRepository.findById(typeId));
                     }
 
-                    room.setCreateAt(resultSet.getDate("createdAt") != null ? resultSet.getDate("createdAt").toLocalDate() : null);  // Null-safe
+                    room.setCreatedAt(resultSet.getDate("createdAt") != null ? resultSet.getDate("createdAt").toLocalDate() : null);  // Null-safe
                     room.setRoomStatus(RoomStatus.fromString(resultSet.getString("roomStatus")));
                     return room;
                 }
@@ -176,7 +176,7 @@ public class RoomRepository implements Repository<Room, Long> {
                 room.setRoomStatus(RoomStatus.valueOf(rs.getString("roomStatus")));
 
                 Date roomCreatedAt = rs.getDate("roomCreatedAt");
-                room.setCreateAt(roomCreatedAt != null ? roomCreatedAt.toLocalDate() : null);
+                room.setCreatedAt(roomCreatedAt != null ? roomCreatedAt.toLocalDate() : null);
 
                 // ===== ROOM TYPE =====
                 RoomType roomType = new RoomType();
@@ -228,7 +228,7 @@ public class RoomRepository implements Repository<Room, Long> {
                         room.setRoomType(roomTypeRepository.findById(typeId));
                     }
 
-                    room.setCreateAt(resultSet.getDate("createdAt") != null
+                    room.setCreatedAt(resultSet.getDate("createdAt") != null
                             ? resultSet.getDate("createdAt").toLocalDate()
                             : null);
                     rooms.add(room);

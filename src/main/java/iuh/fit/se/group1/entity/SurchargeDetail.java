@@ -1,11 +1,9 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -14,12 +12,13 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
+@IdClass(SurchargeDetail.SurchargeDetailID.class)
 public class SurchargeDetail {
 
 
     @Id
     @ManyToOne
-    @JoinColumn(name="orderId")
+    @JoinColumn(name = "orderId")
     private Order order;
 
     @Id
@@ -39,6 +38,18 @@ public class SurchargeDetail {
     public SurchargeDetail(Surcharge surcharge, int quantity) {
         this.surcharge = surcharge;
         this.quantity = quantity;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @EqualsAndHashCode
+    @Getter
+    @Setter
+    @ToString
+    @Builder
+    public static class SurchargeDetailID implements Serializable {
+        private Long order;
+        private Long surcharge;
     }
 
 

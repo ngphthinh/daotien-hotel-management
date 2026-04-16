@@ -1,9 +1,11 @@
 package iuh.fit.se.group1.entity;
 
 import iuh.fit.se.group1.enums.DenominationLabel;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Objects;
+
 
 public class DenominationDetail {
     private	Long denominationDetailId;
