@@ -1,20 +1,37 @@
 package iuh.fit.se.group1.entity;
 
 
-import iuh.fit.se.group1.enums.PaymentType;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.engine.internal.Cascade;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(of = "orderId")
+@Entity
 public class Order {
+    @Id
     private Long orderId;
     private LocalDateTime orderDate;
     private BigDecimal totalAmount;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "employeeId")
     private Employee employee;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "orderTypeId")
     private OrderType orderType;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "customerId")
     private Customer customer;
     private Promotion promotion;
     private BigDecimal deposit;
@@ -22,159 +39,7 @@ public class Order {
     private List<Booking> bookings;
     private LocalDate paymentDate;
     private Employee employeePayment;
-
-    public LocalDate getPaymentDate() {
-        return paymentDate;
-    }
-
-    public PaymentType getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(PaymentType paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    private PaymentType paymentType;
-    public Order() {
-        bookings = new java.util.ArrayList<>();
-    }
-
-    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Customer customer, Promotion promotion, BigDecimal deposit, LocalDate createdAt, List<Booking> bookings, Employee employeePayment) {
-        this.orderId = orderId;
-        this.orderDate = orderDate;
-        this.totalAmount = totalAmount;
-        this.employee = employee;
-        this.orderType = orderType;
-        this.customer = customer;
-        this.promotion = promotion;
-        this.deposit = deposit;
-        this.createdAt = createdAt;
-        this.bookings = bookings;
-        this.employeePayment = employeePayment;
-    }
-
-    public Employee getEmployeePayment() {
-        return employeePayment;
-    }
-
-    public void setEmployeePayment(Employee employeePayment) {
-        this.employeePayment = employeePayment;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public BigDecimal getDeposit() {
-        return deposit;
-    }
-
-    public void setDeposit(BigDecimal deposit) {
-        this.deposit = deposit;
-    }
-
-    public List<Booking> getBookings() {
-        return bookings;
-    }
-
-    public void setBookings(List<Booking> bookings) {
-        this.bookings = bookings;
-    }
+    private boolean isDelete;
 
 
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
-
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public OrderType getOrderType() {
-        return orderType;
-    }
-
-    public void setOrderType(OrderType orderType) {
-        this.orderType = orderType;
-    }
-
-    public Promotion getPromotion() {
-        return promotion;
-    }
-
-    public void setPromotion(Promotion promotion) {
-        this.promotion = promotion;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "orderId=" + orderId +
-                ", orderDate=" + orderDate +
-                ", totalAmount=" + totalAmount +
-                ", orderType=" + orderType.getOrderTypeId() +
-                ", customer=" + customer.getCustomerId() +
-                ", promotion=" + promotion +
-                ", deposit=" + deposit +
-                ", createdAt=" + createdAt +
-                ", bookings=" + bookings +
-                '}';
-    }
-
-    public void addBooking(Booking booking) {
-        booking.setOrder(this);
-        this.bookings.add(booking);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Order order)) return false;
-        return Objects.equals(orderId, order.orderId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(orderId);
-    }
-
-    public void setPaymentDate(LocalDate paymentDate) {
-        this.paymentDate = paymentDate;
-    }
 }
