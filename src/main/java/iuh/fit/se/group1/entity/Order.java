@@ -2,6 +2,7 @@ package iuh.fit.se.group1.entity;
 
 
 
+import iuh.fit.se.group1.enums.PaymentType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -15,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -38,13 +38,37 @@ public class Order {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customerId")
     private Customer customer;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "promotionId")
     private Promotion promotion;
+
     private BigDecimal deposit;
     private LocalDate createdAt;
     private List<Booking> bookings;
     private LocalDate paymentDate;
+    private PaymentType paymentType;
+
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "employeePaymentId")
     private Employee employeePayment;
     private boolean isDelete;
 
-
+    public Order() {
+        bookings = new java.util.ArrayList<>();
+    }
+    public Order(Long orderId, LocalDateTime orderDate, BigDecimal totalAmount, Employee employee, OrderType orderType, Customer customer, Promotion promotion, BigDecimal deposit, LocalDate createdAt, List<Booking> bookings, Employee employeePayment) {
+        this.orderId = orderId;
+        this.orderDate = orderDate;
+        this.totalAmount = totalAmount;
+        this.employee = employee;
+        this.orderType = orderType;
+        this.customer = customer;
+        this.promotion = promotion;
+        this.deposit = deposit;
+        this.createdAt = createdAt;
+        this.bookings = bookings;
+        this.employeePayment = employeePayment;
+    }
 }

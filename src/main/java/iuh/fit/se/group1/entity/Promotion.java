@@ -2,12 +2,15 @@ package iuh.fit.se.group1.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -24,7 +27,8 @@ public class Promotion {
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalDate createdAt;
-
+    @OneToMany(mappedBy = "promotion")
+    private Set<Order> orders;
     public Promotion(String promotionName, String description, Float discountPercent, BigDecimal minOrderAmount, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
         this.promotionName = promotionName;
         this.description = description;

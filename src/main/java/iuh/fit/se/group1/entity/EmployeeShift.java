@@ -1,135 +1,44 @@
 package iuh.fit.se.group1.entity;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
+@AllArgsConstructor
+@Getter
+@NoArgsConstructor
+@Setter
+@ToString
+@EqualsAndHashCode(of = "employeeShiftId")
+@Entity
 public class EmployeeShift {
+    @Id
     private	Long employeeShiftId;
+    @ManyToOne
+    @JoinColumn(name = "employeeId")
     private	Employee employee;
+
+    @ManyToOne
+    @JoinColumn(name = "shiftId")
     private	Shift shift;
-    private ShiftClose shiftClose;
+    @OneToMany(mappedBy = "shiftCloseId")
+    private Set<ShiftClose> shiftClose;
     private BigDecimal systemAmount;
     private	BigDecimal actualAmount;
     private	BigDecimal difference;
     private LocalDate shiftDate;
     private LocalDate createdAt;
 
-    public EmployeeShift() {
-    }
-
-    public EmployeeShift(Long employeeShiftId, Employee employee, Shift shift, ShiftClose shiftClose, BigDecimal systemAmount, BigDecimal actualAmount, BigDecimal difference, LocalDate shiftDate, LocalDate createdAt) {
-        this.employeeShiftId = employeeShiftId;
-        this.employee = employee;
-        this.shift = shift;
-        this.shiftClose = shiftClose;
-        this.systemAmount = systemAmount;
-        this.actualAmount = actualAmount;
-        this.difference = difference;
-        this.shiftDate = shiftDate;
-        this.createdAt = createdAt;
-    }
+    @OneToMany(mappedBy = "employeeShift")
+    private Set<DenominationDetail> denominationDetails;
 
     public EmployeeShift(Employee employee, Shift shift) {
         this.employee = employee;
         this.shift = shift;
-    }
-
-    public ShiftClose getShiftClose() {
-        return shiftClose;
-    }
-
-    public void setShiftClose(ShiftClose shiftClose) {
-        this.shiftClose = shiftClose;
-    }
-
-    public Long getEmployeeShiftId() {
-        return employeeShiftId;
-    }
-
-    public void setEmployeeShiftId(Long employeeShiftId) {
-        this.employeeShiftId = employeeShiftId;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public Shift getShift() {
-        return shift;
-    }
-
-    public void setShift(Shift shift) {
-        this.shift = shift;
-    }
-
-    public BigDecimal getSystemAmount() {
-        return systemAmount;
-    }
-
-    public void setSystemAmount(BigDecimal systemAmount) {
-        this.systemAmount = systemAmount;
-    }
-
-    public BigDecimal getActualAmount() {
-        return actualAmount;
-    }
-
-    public void setActualAmount(BigDecimal actualAmount) {
-        this.actualAmount = actualAmount;
-    }
-
-    public BigDecimal getDifference() {
-        return difference;
-    }
-
-    public void setDifference(BigDecimal difference) {
-        this.difference = difference;
-    }
-
-    public LocalDate getShiftDate() {
-        return shiftDate;
-    }
-
-    public void setShiftDate(LocalDate shiftDate) {
-        this.shiftDate = shiftDate;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof EmployeeShift that)) return false;
-        return Objects.equals(employeeShiftId, that.employeeShiftId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(employeeShiftId);
-    }
-
-    @Override
-    public String toString() {
-        return "EmployeeShift{" +
-                "employeeShiftId=" + employeeShiftId +
-                ", employee=" + employee +
-                ", shift=" + shift +
-                ", systemAmount=" + systemAmount +
-                ", actualAmount=" + actualAmount +
-                ", difference=" + difference +
-                ", shiftDate=" + shiftDate +
-                ", createdAt=" + createdAt +
-                '}';
     }
 }
