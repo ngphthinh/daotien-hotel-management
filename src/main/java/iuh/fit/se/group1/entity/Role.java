@@ -1,67 +1,31 @@
 package iuh.fit.se.group1.entity;
 
-import java.time.LocalDate;
-import java.util.Objects;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.*;
 
+import java.time.LocalDate;
+import java.util.Set;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString(exclude = {"accounts"})
+@Entity
 public class Role {
+    @Id
     private String roleId;
     private String roleName;
     private LocalDate createdAt;
 
-
-
-    public Role() {
-    }
+    @OneToMany(mappedBy = "role")
+    private Set<Account> accounts;
 
     public Role(String roleId) {
         this.roleId = roleId;
     }
 
-    public Role(String roleId, String roleName, LocalDate createdAt) {
-        this.roleId = roleId;
-        this.roleName = roleName;
-        this.createdAt = createdAt;
-    }
-
-    public String getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Role role)) return false;
-        return Objects.equals(roleId, role.roleId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(roleId);
-    }
-
-    @Override
-    public String toString() {
-        return "Role [roleId=" + roleId + ", roleName=" + roleName + ", createdAt=" + createdAt + "]";
-    }
-    
-    
 }

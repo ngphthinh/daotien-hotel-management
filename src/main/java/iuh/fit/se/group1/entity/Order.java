@@ -2,14 +2,17 @@ package iuh.fit.se.group1.entity;
 
 
 import iuh.fit.se.group1.enums.PaymentType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-
+@Entity
 public class Order {
+    @Id
     private Long orderId;
     private LocalDateTime orderDate;
     private BigDecimal totalAmount;

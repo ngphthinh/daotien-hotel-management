@@ -1,15 +1,34 @@
 package iuh.fit.se.group1.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.*;
+
 import java.time.LocalDate;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+@Entity
 public class SurchargeDetail {
 
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name="orderId")
+    private Order order;
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "surchargerId")
     private Surcharge surcharge;
     private int quantity;
     private LocalDate createdAt;
 
-    public SurchargeDetail() {
-    }
 
     public SurchargeDetail(Surcharge surcharge, int quantity, LocalDate createdAt) {
         this.surcharge = surcharge;
@@ -20,31 +39,6 @@ public class SurchargeDetail {
     public SurchargeDetail(Surcharge surcharge, int quantity) {
         this.surcharge = surcharge;
         this.quantity = quantity;
-    }
-
-    public Surcharge getSurcharge() {
-        return surcharge;
-    }
-
-
-    public void setSurcharge(Surcharge surcharge) {
-        this.surcharge = surcharge;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
     }
 
 

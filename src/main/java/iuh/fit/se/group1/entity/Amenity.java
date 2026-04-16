@@ -1,23 +1,32 @@
 package iuh.fit.se.group1.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+@Entity
 public class Amenity {
+	@Id
 	private Long amenityId;
     private String nameAmenity;
     private BigDecimal price;
+	private boolean isDeleted;
     private LocalDate createdAt;
-    
-    public Amenity() {
-   
-    }
 
-	public Amenity(Long amenityId,BigDecimal price) {
-		this.amenityId = amenityId;
-		this.price = price;
-	}
+
+	private Set<OrderDetail> orderDetails;
+
 
 	public Amenity(Long amenityId, String nameAmenity, BigDecimal price) {
 		this.amenityId = amenityId;
@@ -25,58 +34,10 @@ public class Amenity {
 		this.price = price;
 	}
 
-	public Amenity(Long amenityId, String nameAmenity, BigDecimal price, LocalDate createdAt) {
-		super();
-		this.amenityId = amenityId;
-		this.nameAmenity = nameAmenity;
-		this.price = price;
-		this.createdAt = createdAt;
-	}
 
 	public Amenity(String nameAmenity, BigDecimal price) {
 		this.nameAmenity = nameAmenity;
 		this.price = price;
-	}
-
-    public Amenity(Long amenityId) {
-		this.amenityId = amenityId;
-    }
-
-    public Long getAmenityId() {
-		return amenityId;
-	}
-
-	public void setAmenityId(Long amenityId) {
-		this.amenityId = amenityId;
-	}
-
-	public String getNameAmenity() {
-		return nameAmenity;
-	}
-
-	public void setNameAmenity(String nameAmenity) {
-		this.nameAmenity = nameAmenity;
-	}
-
-	public BigDecimal getPrice() {
-		return price;
-	}
-
-	public void setPrice(BigDecimal price) {
-		this.price = price;
-	}
-
-	public LocalDate getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDate createdAt) {
-		this.createdAt = createdAt;
-	}
-	
-	@Override
-	public String toString() {
-	    return "Amenity{" + "amenityId=" + amenityId + ", nameAmenity=" + nameAmenity + ", price=" + price + ", createdAt=" + createdAt + '}';
 	}
 
 
@@ -97,12 +58,5 @@ public class Amenity {
 		return Objects.equals(amenityId, other.amenityId);
 	}
 
-    public void setAmenityId(String maDV) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setPrice(double giaDV) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
     
 }

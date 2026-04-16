@@ -1,20 +1,34 @@
 package iuh.fit.se.group1.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Set;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+@Entity
 public class Surcharge {
-    private long surchargeId;
+    @Id
+    private Long surchargeId;
     private String name;
+    private boolean isDelete;
     private BigDecimal price;
     private LocalDate createdAt;
 
-    public Surcharge(long surchargeId, String name, BigDecimal price, LocalDate createdAt) {
-        this.surchargeId = surchargeId;
-        this.name = name;
-        this.price = price;
-        this.createdAt = createdAt;
-    }
+    @OneToMany(mappedBy = "Surcharge")
+    private Set<SurchargeDetail> surchargeDetails;
+
+
 
     public Surcharge(String name, BigDecimal price) {
         this.name = name;
@@ -27,69 +41,20 @@ public class Surcharge {
         this.price = price;
     }
 
-    public Surcharge() {
-    }
 
     public Surcharge(long surchargeId) {
         this.surchargeId = surchargeId;
     }
 
-    public long getSurchargeId() {
-        return surchargeId;
-    }
-
-    public void setSurchargeId(long surchargeId) {
-        this.surchargeId = surchargeId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + (int) (this.surchargeId ^ (this.surchargeId >>> 32));
-        return hash;
+        return Objects.hashCode(surchargeId);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        final Surcharge other = (Surcharge) obj;
-        return this.surchargeId == other.surchargeId;
-    }
-
-    @Override
-    public String toString() {
-        return "Surcharge{" +
-                "surchargeId=" + surchargeId +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", createdAt=" + createdAt +
-                '}';
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Surcharge surcharge = (Surcharge) o;
+        return Objects.equals(surchargeId, surcharge.surchargeId);
     }
 }

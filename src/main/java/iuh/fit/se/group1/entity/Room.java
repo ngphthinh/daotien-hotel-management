@@ -1,15 +1,28 @@
 package iuh.fit.se.group1.entity;
 
 import iuh.fit.se.group1.enums.RoomStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+@Entity
 public class Room {
-
+    @Id
     private Long roomId;
     private String roomNumber;
+
+
+    @ManyToOne
+    @JoinColumn(name = "roomTypeId")
     private RoomType roomType;
     private LocalDate createdAt;
+    @Enumerated
     private RoomStatus roomStatus;
 
     public Room(Long roomId, String roomNumber) {
@@ -17,20 +30,6 @@ public class Room {
         this.roomNumber = roomNumber;
     }
 
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public Room(Long roomId, String roomNumber, RoomType roomType, LocalDate createdAt, RoomStatus roomStatus) {
-        this.roomId = roomId;
-        this.roomNumber = roomNumber;
-        this.roomType = roomType;
-        this.createdAt = createdAt;
-        this.roomStatus = roomStatus;
-    }
-
-    public Room() {
-    }
 
     public Room(String roomNumber, RoomType roomType, RoomStatus roomStatus) {
         this.roomNumber = roomNumber;
@@ -42,73 +41,7 @@ public class Room {
         this.roomId = roomId;
     }
 
-    public Long getRoomId() {
-        return roomId;
-    }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public RoomType getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(RoomType roomType) {
-        this.roomType = roomType;
-    }
-
-    public LocalDate getCreateAt() {
-        return createdAt;
-    }
-
-    public void setCreateAt(LocalDate createAt) {
-        this.createdAt = createAt;
-    }
-
-    public RoomStatus getRoomStatus() {
-        return roomStatus;
-    }
-
-    public void setRoomStatus(RoomStatus roomStatus) {
-        this.roomStatus = roomStatus;
-    }
-
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + (int) (this.roomId ^ (this.roomId >>> 32));
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Room other = (Room) obj;
-        return this.roomId == other.roomId;
-    }
-
-    @Override
-    public String toString() {
-        return "Room{" + "roomId=" + roomId + ", roomNumber=" + roomNumber + ", roomType=" + roomType + ", createAt=" + createdAt + ", roomStatus=" + roomStatus + '}';
-    }
 
     public String getRoomTypeId() {
         if (roomType != null) {
@@ -116,9 +49,4 @@ public class Room {
         }
         return null;
     }
-
-    public void setCreatedAt(LocalDate now) {
-        this.createdAt = now;
-    }
-    
 }

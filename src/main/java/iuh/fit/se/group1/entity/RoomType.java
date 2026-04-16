@@ -1,10 +1,23 @@
 package iuh.fit.se.group1.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.Set;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString(exclude = {"rooms"})
+@Entity
+@EqualsAndHashCode(of = "roomTypeId")
 public class RoomType {
+    @Id
     private String roomTypeId;
     private String name;
     private BigDecimal hourlyRate;
@@ -13,117 +26,9 @@ public class RoomType {
     private BigDecimal additionalHourRate;
     private LocalDate createdAt;
 
+    @OneToMany(mappedBy = "roomType")
+    private Set<Room> rooms;
     public RoomType(String roomTypeId) {
         this.roomTypeId = roomTypeId;
-    }
-
-    public RoomType() {
-    }
-
-    public RoomType(String roomTypeId, String name, LocalDate createdAt) {
-        this.roomTypeId = roomTypeId;
-        this.name = name;
-        this.createdAt = createdAt;
-    }
-
-    public RoomType(String roomTypeId, String name, BigDecimal hourlyRate, BigDecimal dailyRate, BigDecimal overnightRate, BigDecimal additionalHourRate, LocalDate createdAt) {
-        this.roomTypeId = roomTypeId;
-        this.name = name;
-        this.hourlyRate = hourlyRate;
-        this.dailyRate = dailyRate;
-        this.overnightRate = overnightRate;
-        this.additionalHourRate = additionalHourRate;
-        this.createdAt = createdAt;
-    }
-
-    public BigDecimal getHourlyRate() {
-        return hourlyRate;
-    }
-
-    public void setHourlyRate(BigDecimal hourlyRate) {
-        this.hourlyRate = hourlyRate;
-    }
-
-    public BigDecimal getDailyRate() {
-        return dailyRate;
-    }
-
-    public void setDailyRate(BigDecimal dailyRate) {
-        this.dailyRate = dailyRate;
-    }
-
-    public BigDecimal getOvernightRate() {
-        return overnightRate;
-    }
-
-    public void setOvernightRate(BigDecimal overnightRate) {
-        this.overnightRate = overnightRate;
-    }
-
-    public BigDecimal getAdditionalHourRate() {
-        return additionalHourRate;
-    }
-
-    public void setAdditionalHourRate(BigDecimal additionalHourRate) {
-        this.additionalHourRate = additionalHourRate;
-    }
-
-    public String getRoomTypeId() {
-        return roomTypeId;
-    }
-
-    public void setRoomTypeId(String roomTypeId) {
-        this.roomTypeId = roomTypeId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.roomTypeId);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final RoomType other = (RoomType) obj;
-        return Objects.equals(this.roomTypeId, other.roomTypeId);
-    }
-
-    @Override
-    public String toString() {
-        return "RoomType{" +
-                "roomTypeId='" + roomTypeId + '\'' +
-                ", name='" + name + '\'' +
-                ", hourlyRate=" + hourlyRate +
-                ", dailyRate=" + dailyRate +
-                ", overnightRate=" + overnightRate +
-                ", additionalHourRate=" + additionalHourRate +
-                ", createdAt=" + createdAt +
-                '}';
     }
 }
