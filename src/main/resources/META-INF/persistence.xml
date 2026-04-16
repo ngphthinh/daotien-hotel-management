@@ -3,19 +3,40 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
     <persistence-unit name="daotien" transaction-type="RESOURCE_LOCAL">
+
+        <class>iuh.fit.se.group1.entity.Account</class>
+        <class>iuh.fit.se.group1.entity.Amenity</class>
+        <class>iuh.fit.se.group1.entity.Booking</class>
+        <class>iuh.fit.se.group1.entity.Customer</class>
+        <class>iuh.fit.se.group1.entity.DenominationDetail</class>
+        <class>iuh.fit.se.group1.entity.Employee</class>
+        <class>iuh.fit.se.group1.entity.EmployeeShift</class>
+        <class>iuh.fit.se.group1.entity.Order</class>
+        <class>iuh.fit.se.group1.entity.OrderDetail</class>
+        <class>iuh.fit.se.group1.entity.OrderType</class>
+        <class>iuh.fit.se.group1.entity.Promotion</class>
+        <class>iuh.fit.se.group1.entity.Role</class>
+        <class>iuh.fit.se.group1.entity.Room</class>
+        <class>iuh.fit.se.group1.entity.RoomType</class>
+        <class>iuh.fit.se.group1.entity.Shift</class>
+        <class>iuh.fit.se.group1.entity.ShiftClose</class>
+        <class>iuh.fit.se.group1.entity.Surcharge</class>
+        <class>iuh.fit.se.group1.entity.SurchargeDetail</class>
+
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
 
-            <property name="jakarta.persistence.jdbc.url"
-                      value="jdbc:sqlserver://localhost:1433;databaseName=daotien_hotel_jpa;encrypt=true;trustServerCertificate=true"/>
+<!--            <property name="jakarta.persistence.jdbc.url"-->
+<!--                      value="jdbc:sqlserver://localhost:1433;databaseName=daotien_hotel_jpa;encrypt=true;trustServerCertificate=true"/>-->
 
-            <property name="jakarta.persistence.jdbc.user" value="sa"/>
-            <property name="jakarta.persistence.jdbc.password" value="sapassword"/>
+<!--            <property name="jakarta.persistence.jdbc.user" value="sa"/>-->
+<!--            <property name="jakarta.persistence.jdbc.password" value="sapassword"/>-->
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect"/>
 
 
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
 
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>

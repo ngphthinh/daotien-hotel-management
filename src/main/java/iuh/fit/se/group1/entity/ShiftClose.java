@@ -6,10 +6,7 @@
 package iuh.fit.se.group1.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -30,6 +27,8 @@ import java.util.Objects;
 @Entity
 public class ShiftClose {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long shiftCloseId;
     @ManyToOne
     @JoinColumn(name = "employeeShiftId")

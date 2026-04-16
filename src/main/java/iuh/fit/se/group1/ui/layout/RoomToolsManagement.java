@@ -3,6 +3,7 @@ import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.OrderType;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.enums.BookingType;
+import iuh.fit.se.group1.enums.OrderBookStatus;
 import iuh.fit.se.group1.service.RoomToolsService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.modal.ExtendBookingModal;
@@ -352,7 +353,7 @@ public class RoomToolsManagement extends JPanel {
         }
         currentOrderType = currentBooking.getOrderType();
         
-        if (!currentOrderType.getName().equalsIgnoreCase("Đặt trước")) {
+        if (!currentOrderType.getName().equals(OrderBookStatus.RESERVED) ) {
             CustomDialog.showMessage(this,
                     "Chỉ có thể hủy phòng đặt trước!",
                     "Thông báo",

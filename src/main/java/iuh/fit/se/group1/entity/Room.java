@@ -12,8 +12,11 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
+@Builder
 public class Room {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long roomId;
     private String roomNumber;
 

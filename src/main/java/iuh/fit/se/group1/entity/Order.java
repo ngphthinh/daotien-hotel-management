@@ -20,9 +20,12 @@ import java.util.List;
 @Setter
 @ToString(exclude = {"employee", "employeePayment", "orderType", "customer", "promotion", "bookings"})
 @EqualsAndHashCode(of = "orderId")
+@Table(name = "Orders")
 @Entity
 public class Order {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long orderId;
     private LocalDateTime orderDate;
     private BigDecimal totalAmount;

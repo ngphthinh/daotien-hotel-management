@@ -11,11 +11,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"account", "order", "orderPayment", "employeeShifts"})
 @EqualsAndHashCode(of = "employeeId")
 @Entity
 public class Employee {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long employeeId;
     private String fullName;
     private String phone;
@@ -36,6 +38,7 @@ public class Employee {
 
     @OneToMany(mappedBy = "employee")
     private Set<EmployeeShift> employeeShifts;
+
     public Employee(Long employeeId) {
         this.employeeId = employeeId;
     }

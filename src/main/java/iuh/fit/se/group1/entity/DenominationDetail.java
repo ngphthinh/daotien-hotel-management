@@ -2,10 +2,7 @@ package iuh.fit.se.group1.entity;
 
 import iuh.fit.se.group1.enums.DenominationLabel;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -19,6 +16,8 @@ import java.time.LocalDate;
 
 public class DenominationDetail {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private	Long denominationDetailId;
     private DenominationLabel denomination;
     private	int quantity;

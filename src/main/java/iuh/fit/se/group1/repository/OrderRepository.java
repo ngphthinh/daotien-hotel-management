@@ -3,6 +3,7 @@ package iuh.fit.se.group1.repository;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
+import iuh.fit.se.group1.enums.OrderBookStatus;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import org.slf4j.Logger;
@@ -103,7 +104,7 @@ public class OrderRepository implements Repository<Order, Long> {
                         // 🔹 Map OrderType
                         OrderType orderType = new OrderType();
                         orderType.setOrderTypeId(rs.getLong("otId"));
-                        orderType.setName(rs.getString("otName"));
+                        orderType.setName(OrderBookStatus.valueOf(rs.getString("otName")));
 
                         // 🔹 Map Customer
                         Customer customer = new Customer();
@@ -222,7 +223,7 @@ public class OrderRepository implements Repository<Order, Long> {
                     long orderTypeId = rs.getLong("otId");
                     OrderType orderType = new OrderType();
                     orderType.setOrderTypeId(orderTypeId);
-                    orderType.setName(rs.getString("otName"));
+                    orderType.setName(OrderBookStatus.valueOf(rs.getString("otName")));
                     order.setOrderType(orderType);
 
                     long customerId = rs.getLong("customerId");
@@ -518,7 +519,7 @@ public class OrderRepository implements Repository<Order, Long> {
                     long orderTypeId = rs.getLong("otId");
                     OrderType orderType = new OrderType();
                     orderType.setOrderTypeId(orderTypeId);
-                    orderType.setName(rs.getString("otName"));
+                    orderType.setName(OrderBookStatus.valueOf(rs.getString("otName")));
                     order.setOrderType(orderType);
 
                     long customerId = rs.getLong("customerId");
@@ -609,7 +610,7 @@ public class OrderRepository implements Repository<Order, Long> {
                         // OrderType
                         OrderType ot = new OrderType();
                         ot.setOrderTypeId(rs.getLong("otId"));
-                        ot.setName(rs.getString("otName"));
+                        ot.setName(OrderBookStatus.valueOf(rs.getString("otName")));
                         order.setOrderType(ot);
 
                         // Customer
@@ -713,7 +714,7 @@ public class OrderRepository implements Repository<Order, Long> {
                     long orderTypeId = rs.getLong("otId");
                     OrderType orderType = new OrderType();
                     orderType.setOrderTypeId(orderTypeId);
-                    orderType.setName(rs.getString("otName"));
+                    orderType.setName(OrderBookStatus.valueOf(rs.getString("otName")));
                     order.setOrderType(orderType);
 
                     long customerId = rs.getLong("customerId");
@@ -790,7 +791,7 @@ public class OrderRepository implements Repository<Order, Long> {
                         long otId = rs.getLong("otId");
                         OrderType orderType = new OrderType();
                         orderType.setOrderTypeId(otId);
-                        orderType.setName(rs.getString("otName"));
+                        orderType.setName(OrderBookStatus.valueOf(rs.getString("otName")));
                         order.setOrderType(orderType);
 
                         order.setBookings(new ArrayList<>());

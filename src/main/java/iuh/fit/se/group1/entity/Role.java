@@ -1,9 +1,6 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -15,9 +12,12 @@ import java.util.Set;
 @Getter
 @ToString(exclude = {"accounts"})
 @Entity
+@Builder
+//@Table(name = "Roles")
 public class Role {
     @Id
     private String roleId;
+    @Column(columnDefinition = "nvarchar(100)")
     private String roleName;
     private LocalDate createdAt;
 

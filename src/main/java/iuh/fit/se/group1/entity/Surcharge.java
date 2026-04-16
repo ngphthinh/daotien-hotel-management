@@ -1,9 +1,6 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,15 +14,18 @@ import java.util.Set;
 @Getter
 @ToString(exclude = {"surchargeDetails"})
 @Entity
+@Builder
 public class Surcharge {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long surchargeId;
     private String name;
     private boolean isDelete;
     private BigDecimal price;
     private LocalDate createdAt;
 
-    @OneToMany(mappedBy = "Surcharge")
+    @OneToMany(mappedBy = "surcharge")
     private Set<SurchargeDetail> surchargeDetails;
 
 

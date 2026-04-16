@@ -1,9 +1,6 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -16,8 +13,10 @@ import java.util.Set;
 @ToString(exclude = {"orders"})
 @EqualsAndHashCode(of = "customerId")
 @Entity
+@Builder
 public class Customer {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
     private String fullName;
     private String phone;

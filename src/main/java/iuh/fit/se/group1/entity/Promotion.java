@@ -1,8 +1,6 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.Setter;
 
@@ -15,10 +13,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
+@ToString(exclude = {"orders"})
 @Entity
+@Builder
 public class Promotion {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long promotionId;
     private String promotionName;
     private String description;

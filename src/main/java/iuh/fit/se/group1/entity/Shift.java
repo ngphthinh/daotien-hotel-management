@@ -1,8 +1,6 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,10 +12,13 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
+@ToString(exclude = {"employeeShifts"})
 @Entity
+@Builder
 public class Shift {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long shiftId;
     private String name;
     private String startTime;

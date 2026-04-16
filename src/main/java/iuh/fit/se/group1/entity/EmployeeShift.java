@@ -18,6 +18,8 @@ import java.util.Set;
 @Entity
 public class EmployeeShift {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private	Long employeeShiftId;
     @ManyToOne
     @JoinColumn(name = "employeeId")

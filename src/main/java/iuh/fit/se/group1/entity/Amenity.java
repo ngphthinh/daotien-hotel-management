@@ -1,9 +1,6 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -15,10 +12,12 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
+@ToString(exclude = {"orderDetails"})
 @Entity
+@Builder
 public class Amenity {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long amenityId;
     private String nameAmenity;
     private BigDecimal price;

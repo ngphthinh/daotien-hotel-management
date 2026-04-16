@@ -1,8 +1,6 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,6 +14,7 @@ import java.util.Set;
 @ToString(exclude = {"rooms"})
 @Entity
 @EqualsAndHashCode(of = "roomTypeId")
+@Builder
 public class RoomType {
     @Id
     private String roomTypeId;
