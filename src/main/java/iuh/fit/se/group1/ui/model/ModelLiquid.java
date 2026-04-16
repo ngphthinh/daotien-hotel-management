@@ -1,4 +1,4 @@
-package iuh.fit.se.group1.model;
+package iuh.fit.se.group1.ui.model;
 
 import java.awt.Rectangle;
 import java.awt.Shape;

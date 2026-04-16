@@ -1,7 +1,10 @@
 package iuh.fit.se.group1.entity;
 
+import lombok.*;
+
 import java.time.LocalDate;
 import java.util.Objects;
+
 
 public class Account {
     private Long accountId;

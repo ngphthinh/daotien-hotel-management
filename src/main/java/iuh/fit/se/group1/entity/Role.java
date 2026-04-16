@@ -8,6 +8,8 @@ public class Role {
     private String roleName;
     private LocalDate createdAt;
 
+
+
     public Role() {
     }
 

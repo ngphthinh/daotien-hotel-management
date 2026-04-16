@@ -1,6 +1,6 @@
 package iuh.fit.se.group1.ui.component.chart;
 
-import iuh.fit.se.group1.model.ModelLiquid;
+import iuh.fit.se.group1.ui.model.ModelLiquid;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
