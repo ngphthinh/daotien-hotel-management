@@ -13,9 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @Getter
@@ -42,7 +40,7 @@ public class Order {
     private Customer customer;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "orders")
+    @JoinColumn(name = "promotionId")
     private Promotion promotion;
 
     private BigDecimal deposit;
@@ -54,6 +52,8 @@ public class Order {
     private LocalDate paymentDate;
     @Enumerated
     private PaymentType paymentType;
+
+
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "employeePaymentId")
@@ -70,3 +70,5 @@ public class Order {
     }
 
 }
+
+

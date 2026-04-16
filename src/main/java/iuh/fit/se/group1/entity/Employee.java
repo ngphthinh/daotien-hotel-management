@@ -31,5 +31,13 @@ public class Employee {
     @OneToMany(mappedBy = "employee")
     private Set<Order> order;
 
+    @OneToMany(mappedBy = "employeePayment")
+    private Set<Order> orderPayment;
+
+    @OneToMany(mappedBy = "employee")
+    private Set<EmployeeShift> employeeShifts;
+    public Employee(Long employeeId) {
+        this.employeeId = employeeId;
+    }
 
 }
