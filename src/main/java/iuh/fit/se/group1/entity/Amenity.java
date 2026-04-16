@@ -3,6 +3,7 @@ package iuh.fit.se.group1.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -24,7 +25,7 @@ public class Amenity {
 	private boolean isDeleted;
     private LocalDate createdAt;
 
-
+	@OneToMany(mappedBy = "amenity")
 	private Set<OrderDetail> orderDetails;
 
 
