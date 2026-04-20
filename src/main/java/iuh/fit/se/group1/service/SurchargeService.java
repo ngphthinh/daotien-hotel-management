@@ -1,17 +1,15 @@
 package iuh.fit.se.group1.service;
 
-import iuh.fit.se.group1.dto.SurchargeDTO;
 import iuh.fit.se.group1.entity.Surcharge;
-import iuh.fit.se.group1.repository.SurchargeRepository;
+import iuh.fit.se.group1.repository.SurchargeRepositoryImpl;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class SurchargeService {
-    private final SurchargeRepository surchargeRepository;
+    private final SurchargeRepositoryImpl surchargeRepositoryImpl;
 
     public SurchargeService() {
-        this.surchargeRepository = new SurchargeRepository();
+        this.surchargeRepositoryImpl = new SurchargeRepositoryImpl();
     }
 
     public Surcharge createSurcharge(Surcharge surcharge) {
@@ -20,32 +18,32 @@ public class SurchargeService {
             return null;
         }
 
-        return surchargeRepository.save(surcharge);
+        return surchargeRepositoryImpl.save(surcharge);
     }
 
     public void deleteSurcharge(Long surchargeId) {
-        surchargeRepository.deleteById(surchargeId);
+        surchargeRepositoryImpl.deleteById(surchargeId);
     }
 
     public List<Surcharge> getAllSurcharges() {
-        return surchargeRepository.findAll();
+        return surchargeRepositoryImpl.findAll();
     }
 
     public Surcharge updateSurcharge(Surcharge surcharge) {
-        return surchargeRepository.update(surcharge);
+        return surchargeRepositoryImpl.update(surcharge);
     }
 
     public List<Surcharge> getSurchargeByKeyword(String keyword) {
-        return surchargeRepository.findBySurchargeNameOrId(keyword);
+        return surchargeRepositoryImpl.findBySurchargeNameOrId(keyword);
     }
 
     public Surcharge getSurchargeByName(String name) {
-        return surchargeRepository.findBySurchargeName(name);
+        return surchargeRepositoryImpl.findBySurchargeName(name);
     }
 
 
     public Surcharge getSurchargeById(Long surchargeId) {
-        return surchargeRepository.findById(surchargeId);
+        return surchargeRepositoryImpl.findById(surchargeId);
     }
 
 

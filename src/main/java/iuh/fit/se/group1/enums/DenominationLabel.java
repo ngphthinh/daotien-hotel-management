@@ -1,5 +1,8 @@
 package iuh.fit.se.group1.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum DenominationLabel {
     VND_1000(1000L),
     VND_2000(2000L),
@@ -13,12 +16,10 @@ public enum DenominationLabel {
 
     private long value;
 
-    private DenominationLabel (Long value){
+    private DenominationLabel(Long value) {
         this.value = value;
     }
-    public long getValue() {
-        return value;
-    }
+
     public static DenominationLabel fromName(String name) {
         if (name == null) return null;
         try {
@@ -27,11 +28,11 @@ public enum DenominationLabel {
             return null;
         }
     }
+
     @Override
     public String toString() {
         return name(); // hoặc return Long.toString(value) tuỳ bạn muốn lưu tên hay giá trị
     }
-
 
 
 }

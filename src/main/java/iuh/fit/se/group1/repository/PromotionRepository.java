@@ -19,7 +19,7 @@ import iuh.fit.se.group1.entity.Promotion;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 
 public class PromotionRepository implements Repository<Promotion, Long> {
-    private static final Logger log = LoggerFactory.getLogger(AmenityRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(PromotionRepository.class);
 
     private final Connection connection;
 

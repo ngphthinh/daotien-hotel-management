@@ -11,13 +11,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AmenityRepository implements Repository<Amenity, Long> {
+public class AmenityRepositoryImpl implements Repository<Amenity, Long>, iuh.fit.se.group1.repository.interfaces.AmenityRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(AmenityRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(AmenityRepositoryImpl.class);
 
     private final Connection connection;
 
-    public AmenityRepository() {
+    public AmenityRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
@@ -124,6 +124,7 @@ public class AmenityRepository implements Repository<Amenity, Long> {
         return amenities;
     }
 
+    @Override
     public List<Amenity> findByAmenityNameOrId(String keyword) {
         List<Amenity> amenities = new ArrayList<>();
         String sql = "SELECT * FROM Amenity WHERE nameAmenity COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR amenityId LIKE ? Order BY amenityId ASC, nameAmenity ASC";
@@ -147,6 +148,7 @@ public class AmenityRepository implements Repository<Amenity, Long> {
         return amenities;
     }
 
+    @Override
     public Amenity findByAmenityName(String nameAmenity) {
         String sql = "SELECT * FROM Amenity WHERE nameAmenity = ? and  isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

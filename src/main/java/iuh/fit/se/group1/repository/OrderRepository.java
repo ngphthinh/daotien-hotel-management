@@ -7,6 +7,7 @@ import iuh.fit.se.group1.enums.OrderBookStatus;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import iuh.fit.se.group1.repository.interfaces.Repository;
+import iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +23,11 @@ public class OrderRepository implements Repository<Order, Long> {
 
     private static final Logger log = LoggerFactory.getLogger(OrderRepository.class);
 
-    private final CustomerRepository customerRepository;
+    private final iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl customerRepository;
     private final Connection connection;
 
     public OrderRepository() {
-        this.customerRepository = new CustomerRepository();
+        this.customerRepository = new CustomerRepositoryImpl();
         this.connection = DatabaseUtil.getConnection();
     }
 

@@ -3,9 +3,7 @@ package iuh.fit.se.group1.service;
 import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.entity.SurchargeDetail;
 import iuh.fit.se.group1.repository.SurchargeDetailRepository;
-import iuh.fit.se.group1.repository.SurchargeRepository;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class SurchargeDetailService {

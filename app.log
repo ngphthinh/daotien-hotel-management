@@ -100,3 +100,11 @@ Apr 20, 2026 10:03:12 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Attempting login - Username: '{}'
 Apr 20, 2026 10:03:12 PM iuh.fit.se.group1.config.AppLogger info
 INFO: LOGIN SUCCESS: '{}'
+Apr 20, 2026 10:36:29 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 20, 2026 10:36:29 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 20, 2026 10:36:30 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 20, 2026 10:36:30 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font

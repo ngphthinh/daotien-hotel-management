@@ -3,13 +3,13 @@ package iuh.fit.se.group1.service;
 import java.util.List;
 
 import iuh.fit.se.group1.entity.Customer;
-import iuh.fit.se.group1.repository.CustomerRepository;
+import iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl;
 
 public class CustomerService {
-    private final CustomerRepository customerRepository;
+    private final CustomerRepositoryImpl customerRepository;
 
     public CustomerService() {
-        this.customerRepository = new CustomerRepository();
+        this.customerRepository = new CustomerRepositoryImpl();
     }
 
     public Customer createCustomer(Customer customer) {
@@ -36,16 +36,16 @@ public class CustomerService {
     public List<Customer> getAmenityByKeyword(String keyword) {
         return customerRepository.findByCustomerNameOrId(keyword);
     }
-    
+
     public Customer getCustomerById(String idStr) {
         try {
             Long id = Long.parseLong(idStr);
             return customerRepository.findById(id);
         } catch (NumberFormatException e) {
-            return null; 
+            return null;
         }
     }
-    
+
     public Customer updateCustomer(Customer customer) {
         return customerRepository.update(customer);
     }

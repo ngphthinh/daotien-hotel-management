@@ -6,8 +6,8 @@ import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.repository.RoomRepository;
-import iuh.fit.se.group1.repository.RoomTypeRepository;
+import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
+import iuh.fit.se.group1.repository.RoomTypeRepositoryImpl;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -16,13 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 public class RoomService {
-    private final RoomRepository roomRepository;
-    private final RoomTypeRepository roomTypeRepository = new RoomTypeRepository();
+    private final RoomRepositoryImpl roomRepository;
+    private final RoomTypeRepositoryImpl roomTypeRepositoryImpl = new RoomTypeRepositoryImpl();
     private static final String SINGLE_ROOM_TYPE = "SINGLE";
     private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
     private final OrderService orderService = new OrderService();
+
     public RoomService() {
-        this.roomRepository = new RoomRepository();
+        this.roomRepository = new RoomRepositoryImpl();
     }
 
     public Room createRoom(Room room) {
@@ -73,13 +74,11 @@ public class RoomService {
     }
 
 
-
-
     public Map<RoomDTO, Long> countAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
         List<Room> rooms = roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
 
-        RoomType singleRoomType = roomTypeRepository.findById(SINGLE_ROOM_TYPE);
-        RoomType doubleRoomType = roomTypeRepository.findById(DOUBLE_ROOM_TYPE);
+        RoomType singleRoomType = roomTypeRepositoryImpl.findById(SINGLE_ROOM_TYPE);
+        RoomType doubleRoomType = roomTypeRepositoryImpl.findById(DOUBLE_ROOM_TYPE);
 
         RoomDTO singleRoom = toRoomDTO(singleRoomType);
         RoomDTO doubleRoom = toRoomDTO(doubleRoomType);
@@ -269,9 +268,9 @@ public class RoomService {
 
                 // Lấy booking của phòng này trong order
                 Booking bookingToReplace = bookings.stream()
-                    .filter(b -> b.getRoom().getRoomId().equals(roomId))
-                    .findFirst()
-                    .orElse(null);
+                        .filter(b -> b.getRoom().getRoomId().equals(roomId))
+                        .findFirst()
+                        .orElse(null);
 
                 if (bookingToReplace == null) {
                     continue;
@@ -279,16 +278,16 @@ public class RoomService {
 
                 // Tìm phòng thay thế: cùng loại, trống, chưa được đặt trong khoảng thời gian này
                 List<Room> availableRooms = roomRepository.findAvailableRooms(
-                    bookingToReplace.getCheckInDate(),
-                    bookingToReplace.getCheckOutDate(),
-                    RoomStatus.AVAILABLE
+                        bookingToReplace.getCheckInDate(),
+                        bookingToReplace.getCheckOutDate(),
+                        RoomStatus.AVAILABLE
                 );
 
                 Room replacementRoom = availableRooms.stream()
-                    .filter(r -> r.getRoomType().getRoomTypeId().equals(roomTypeId))
-                    .filter(r -> !r.getRoomId().equals(roomId)) // Loại trừ phòng đang xóa
-                    .findFirst()
-                    .orElse(null);
+                        .filter(r -> r.getRoomType().getRoomTypeId().equals(roomTypeId))
+                        .filter(r -> !r.getRoomId().equals(roomId)) // Loại trừ phòng đang xóa
+                        .findFirst()
+                        .orElse(null);
 
                 if (replacementRoom == null) {
                     // Không tìm thấy phòng thay thế -> không thể xóa
@@ -302,5 +301,9 @@ public class RoomService {
 
         // Kiểm tra phòng có đang được sử dụng trong các order khác không
         return !roomRepository.isRoomInUse(roomId);
+    }
+
+    public void updateRoomStatusBatch(List<Long> roomIds, RoomStatus roomStatus) {
+        roomRepository.updateRoomStatusBatch(roomIds, roomStatus);
     }
 }

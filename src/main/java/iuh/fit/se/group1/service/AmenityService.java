@@ -2,15 +2,15 @@ package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.entity.Amenity;
-import iuh.fit.se.group1.repository.AmenityRepository;
+import iuh.fit.se.group1.repository.jpa.AmenityRepositoryImpl;
 
 import java.util.List;
 
 public class AmenityService {
-    private final AmenityRepository amenityRepository;
+    private final AmenityRepositoryImpl amenityRepositoryImpl;
 
     public AmenityService() {
-        this.amenityRepository = new AmenityRepository();
+        this.amenityRepositoryImpl = new AmenityRepositoryImpl();
     }
 
     public Amenity createAmenity(Amenity amenity) {
@@ -19,28 +19,28 @@ public class AmenityService {
             return null;
         }
 
-        return amenityRepository.save(amenity);
+        return amenityRepositoryImpl.save(amenity);
     }
 
     private Amenity getAmenityByName(String nameAmenity) {
-        return amenityRepository.findByAmenityName(nameAmenity);
+        return amenityRepositoryImpl.findByAmenityName(nameAmenity);
     }
 
     public void deleteAmenity(Long amenityId) {
-        amenityRepository.deleteById(amenityId);
+        amenityRepositoryImpl.deleteById(amenityId);
     }
 
     public List<Amenity> getAllAmenities() {
-        return amenityRepository.findAll();
+        return amenityRepositoryImpl.findAll();
     }
 
 
     public Amenity updateAmenity(Amenity amenity) {
-        return amenityRepository.update(amenity);
+        return amenityRepositoryImpl.update(amenity);
     }
 
     public List<Amenity> getAmenityByKeyword(String keyword) {
-        return amenityRepository.findByAmenityNameOrId(keyword);
+        return amenityRepositoryImpl.findByAmenityNameOrId(keyword);
     }
 
 
@@ -57,6 +57,6 @@ public class AmenityService {
     }
 
     public Amenity getAmenityById(Long amenityId) {
-        return amenityRepository.findById(amenityId);
+        return amenityRepositoryImpl.findById(amenityId);
     }
 }

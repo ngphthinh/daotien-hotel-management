@@ -3,9 +3,8 @@ package iuh.fit.se.group1.ui.component.custom;
 import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.dto.SurchargeDTO;
 import iuh.fit.se.group1.entity.*;
-import iuh.fit.se.group1.service.OrderDetailService;
-import iuh.fit.se.group1.service.OrderService;
-import iuh.fit.se.group1.service.SurchargeDetailService;
+import iuh.fit.se.group1.repository.SurchargeRepositoryImpl;
+import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
@@ -196,8 +195,8 @@ public class OrderEditDialog extends JDialog {
             JPanel dateRow = new JPanel(new MigLayout("fill, insets 10", "[right]10[grow]20[right]10[grow]", "[]"));
             dateRow.setBackground(Color.WHITE);
             dateRow.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(230,230,230), 1, true),
-                    new EmptyBorder(8,8,8,8)));
+                    BorderFactory.createLineBorder(new Color(230, 230, 230), 1, true),
+                    new EmptyBorder(8, 8, 8, 8)));
 
             JLabel lblCheckIn = createLabel("Check-in:", Font.BOLD);
             lblCheckIn.setForeground(HEADER_COLOR);
@@ -229,7 +228,7 @@ public class OrderEditDialog extends JDialog {
             roomListPanel.setBackground(new Color(245, 248, 250));
             roomListPanel.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(HEADER_COLOR, 1, true),
-                    new EmptyBorder(5,5,5,5)));
+                    new EmptyBorder(5, 5, 5, 5)));
 
             JLabel lblRoomTitle = createLabel("Danh sách phòng (" + order.getBookings().size() + " phòng):", Font.BOLD);
             lblRoomTitle.setForeground(HEADER_COLOR);
@@ -604,8 +603,8 @@ public class OrderEditDialog extends JDialog {
                 new AmenityManagementPanel();
 
         // Load available amenities from repository
-        iuh.fit.se.group1.repository.AmenityRepository amenityRepo = new iuh.fit.se.group1.repository.AmenityRepository();
-        java.util.List<iuh.fit.se.group1.entity.Amenity> availableAmenities = amenityRepo.findAll();
+        AmenityService amenityService = new AmenityService();
+        java.util.List<iuh.fit.se.group1.entity.Amenity> availableAmenities = amenityService.getAllAmenities();
 
         List<AmenityDTO> existingAmenities = new ArrayList<>();
         for (int i = 0; i < amenityModel.getRowCount(); i++) {
@@ -621,7 +620,7 @@ public class OrderEditDialog extends JDialog {
             amenityModel.setRowCount(0);
             for (iuh.fit.se.group1.dto.AmenityDTO item : selected) {
                 amenityModel.addRow(new Object[]{
-                        amenityModel.getRowCount()+1,
+                        amenityModel.getRowCount() + 1,
                         item,
                         BigDecimal.valueOf(item.getPrice()),
                         item.getQuantity()
@@ -652,7 +651,7 @@ public class OrderEditDialog extends JDialog {
         SurchargeManagementPanel surchargePanel =
                 new SurchargeManagementPanel();
 
-        iuh.fit.se.group1.repository.SurchargeRepository surchargeRepo = new iuh.fit.se.group1.repository.SurchargeRepository();
+        SurchargeRepositoryImpl surchargeRepo = new SurchargeRepositoryImpl();
         java.util.List<iuh.fit.se.group1.entity.Surcharge> availableSurcharges = surchargeRepo.findAll();
 
         List<SurchargeDTO> existingSurcharges = new ArrayList<>();
@@ -669,7 +668,7 @@ public class OrderEditDialog extends JDialog {
             surchargeModel.setRowCount(0);
             for (iuh.fit.se.group1.dto.SurchargeDTO item : selected) {
                 surchargeModel.addRow(new Object[]{
-                        surchargeModel.getRowCount()+1,
+                        surchargeModel.getRowCount() + 1,
                         item,
                         item.getPrice(),
                         item.getQuantity()
@@ -724,7 +723,7 @@ public class OrderEditDialog extends JDialog {
                         orderDetailService.updateOrderDetailFormOrderId(existing.getAmenity().getAmenityId(), newDetail.getUnitPrice(), newDetail.getQuantity(), orderId);
                     } else {
                         // Insert new
-                        orderDetailService.save( newDetail,orderId);
+                        orderDetailService.save(newDetail, orderId);
                     }
                 }
 
@@ -757,7 +756,7 @@ public class OrderEditDialog extends JDialog {
                     if (existing != null) {
                         surchargeDetailService.updateSurchargeDetail(existing.getSurcharge().getSurchargeId(), newSurcharge.getQuantity(), orderId);
                     } else {
-                        surchargeDetailService.save( newSurcharge,orderId);
+                        surchargeDetailService.save(newSurcharge, orderId);
                     }
                 }
 
@@ -766,7 +765,7 @@ public class OrderEditDialog extends JDialog {
                     boolean stillExists = newSurcharges.stream()
                             .anyMatch(ns -> ns.getSurcharge().getSurchargeId() == existing.getSurcharge().getSurchargeId());
                     if (!stillExists) {
-                        surchargeDetailService.deleteById(existing.getSurcharge().getSurchargeId(),orderId);
+                        surchargeDetailService.deleteById(existing.getSurcharge().getSurchargeId(), orderId);
                     }
                 }
 
@@ -780,6 +779,7 @@ public class OrderEditDialog extends JDialog {
             CustomDialog.showMessage(this, "Lỗi khi lưu thông tin hóa đơn: " + ex.getMessage(), "Lỗi", CustomDialog.MessageType.ERROR, 500, 200);
         }
     }
+
     private SurchargeDetail toSurchargeDetail(SurchargeDTO surchargeDTO) {
         SurchargeDetail detail = new SurchargeDetail();
 
@@ -829,11 +829,11 @@ public class OrderEditDialog extends JDialog {
                 orderService.updateOrderType(order.getOrderId(), 2L);
 
                 // Update room status to OCCUPIED
-                iuh.fit.se.group1.repository.RoomRepository roomRepo = new iuh.fit.se.group1.repository.RoomRepository();
+                RoomService roomService = new RoomService();
                 List<Long> roomIds = order.getBookings().stream()
                         .map(b -> b.getRoom().getRoomId())
                         .toList();
-                roomRepo.updateRoomStatusBatch(roomIds, iuh.fit.se.group1.enums.RoomStatus.OCCUPIED);
+                roomService.updateRoomStatusBatch(roomIds, iuh.fit.se.group1.enums.RoomStatus.OCCUPIED);
 
                 CustomDialog.showMessage(
                         this,

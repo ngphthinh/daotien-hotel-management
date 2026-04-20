@@ -6,11 +6,9 @@ package iuh.fit.se.group1.ui.layout;
 
 import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
-import com.raven.datechooser.SelectedDate;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.Shift;
-import iuh.fit.se.group1.repository.ShiftRepository;
 import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
@@ -21,18 +19,12 @@ import iuh.fit.se.group1.ui.component.shift.ShiftList;
 import iuh.fit.se.group1.ui.component.shift.ShiftProfile;
 import iuh.fit.se.group1.util.Constants;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
 
 import org.imgscalr.Scalr;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -40,17 +32,13 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.swing.JPanel;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import raven.glasspanepopup.GlassPanePopup;
 
 
 /**

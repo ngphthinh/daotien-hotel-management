@@ -10,6 +10,7 @@ import iuh.fit.se.group1.entity.DenominationDetail;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.enums.DenominationLabel;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.DenominationDetailRepository;
 import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +26,11 @@ import java.util.ArrayList;
  * @created: 31/10/2025
  */
 
-public class DenominationDetailRepository implements Repository<DenominationDetail, Long> {
-    private static final Logger log = LoggerFactory.getLogger(DenominationDetailRepository.class);
+public class DenominationDetailRepositoryImpl implements Repository<DenominationDetail, Long>, DenominationDetailRepository {
+    private static final Logger log = LoggerFactory.getLogger(DenominationDetailRepositoryImpl.class);
     private final Connection connection;
 
-    public DenominationDetailRepository() {
+    public DenominationDetailRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
@@ -165,6 +166,7 @@ public class DenominationDetailRepository implements Repository<DenominationDeta
     /**
      * Find all denomination details by employee shift
      */
+    @Override
     public List<DenominationDetail> findByEmployeeShiftId(Long employeeShiftId) {
         List<DenominationDetail> list = new ArrayList<>();
         String sql = "SELECT * FROM DenominationDetail WHERE employeeShiftId = ?;";
@@ -199,6 +201,7 @@ public class DenominationDetailRepository implements Repository<DenominationDeta
     /**
      * Save multiple denomination details in batch
      */
+    @Override
     public void saveBatch(List<DenominationDetail> details) {
         String sql = "INSERT INTO DenominationDetail (denomination, quantity, employeeShiftId, createdAt) VALUES (?, ?, ?, ?);";
 
@@ -222,6 +225,7 @@ public class DenominationDetailRepository implements Repository<DenominationDeta
     /**
      * Lấy danh sách các mệnh giá DISTINCT từ database (sử dụng JDBC)
      */
+    @Override
     public List<Long> findAllDistinctDenominations() {
         List<Long> denominations = new ArrayList<>();
         String sql = "SELECT DISTINCT denomination FROM DenominationDetail ORDER BY denomination DESC;";

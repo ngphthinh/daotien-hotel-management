@@ -15,12 +15,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class BookingRepository implements Repository<Booking, Long> {
+public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit.se.group1.repository.interfaces.BookingRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(BookingRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(BookingRepositoryImpl.class);
     private final Connection connection;
 
-    public BookingRepository() {
+    public BookingRepositoryImpl() {
         this.connection = DatabaseUtil.getConnection();
     }
 
@@ -96,6 +96,7 @@ public class BookingRepository implements Repository<Booking, Long> {
         return null;
     }
 
+    @Override
     public void saveAllBookingsForOrder(Order savedOrder, List<Booking> bookings) {
         for (Booking booking : bookings) {
             booking.setOrder(savedOrder);
@@ -103,6 +104,7 @@ public class BookingRepository implements Repository<Booking, Long> {
         }
     }
 
+    @Override
     public void removeBookingsFromOrder(Order currentOrder, List<Booking> result) {
         String sql = "DELETE FROM Booking WHERE orderId = ? AND bookingId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -123,6 +125,7 @@ public class BookingRepository implements Repository<Booking, Long> {
      * Move a set of existing booking records to another order by updating their orderId.
      * This performs a batch UPDATE Booking SET orderId = ? WHERE bookingId = ?
      */
+    @Override
     public void moveBookingsToOrder(Long targetOrderId, List<Long> bookingIds) {
         if (bookingIds == null || bookingIds.isEmpty()) return;
         String sql = "UPDATE Booking SET orderId = ? WHERE bookingId = ?";
@@ -141,6 +144,7 @@ public class BookingRepository implements Repository<Booking, Long> {
     /**
      * Update check-in and check-out timestamps for a specific booking
      */
+    @Override
     public void updateBookingDates(Long bookingId, LocalDateTime checkIn, LocalDateTime checkOut) {
         String sql = "UPDATE Booking SET checkInDate = ?, checkOutDate = ? WHERE bookingId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -154,6 +158,7 @@ public class BookingRepository implements Repository<Booking, Long> {
     }
 
 
+    @Override
     public void deleteByOrderId(Long id) {
         String sql = "DELETE FROM Booking WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -164,6 +169,7 @@ public class BookingRepository implements Repository<Booking, Long> {
         }
     }
 
+    @Override
     public List<Booking> findByOrderId(Long orderId) {
         String sql = """
                 SELECT bookingId, orderId, checkInDate, checkOutDate, bookingType, R.roomId, roomNumber, roomStatus, RT.roomTypeId, name, hourlyRate, dailyRate, overnightRate, additionalHourRate
@@ -207,6 +213,7 @@ public class BookingRepository implements Repository<Booking, Long> {
     /**
      * Đếm số phòng sắp hết hạn (checkout trong khoảng thời gian)
      */
+    @Override
     public int countRoomsNearExpiry(LocalDateTime fromTime, LocalDateTime toTime) {
         String sql = "SELECT COUNT(DISTINCT b.roomId) " +
                      "FROM Booking b " +
@@ -231,6 +238,7 @@ public class BookingRepository implements Repository<Booking, Long> {
     /**
      * Đếm số lượt check-in trong khoảng thời gian
      */
+    @Override
     public int countCheckIns(LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COUNT(*) FROM Booking " +
                      "WHERE checkInDate BETWEEN ? AND ?";
@@ -253,6 +261,7 @@ public class BookingRepository implements Repository<Booking, Long> {
     /**
      * Đếm số lượt check-out trong khoảng thời gian
      */
+    @Override
     public int countCheckOuts(LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COUNT(*) FROM Booking " +
                      "WHERE checkOutDate BETWEEN ? AND ? " +
@@ -276,6 +285,7 @@ public class BookingRepository implements Repository<Booking, Long> {
     /**
      * Đếm phòng đã checkout trong khoảng thời gian
      */
+    @Override
     public int countCheckedOutRooms(LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COUNT(*) FROM Booking " +
                      "WHERE checkOutDate BETWEEN ? AND ? " +
@@ -299,6 +309,7 @@ public class BookingRepository implements Repository<Booking, Long> {
     /**
      * Đếm phòng trả trễ (checkout quá giờ quy định)
      */
+    @Override
     public int countLateCheckOuts(LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime) {
         String sql = "SELECT COUNT(*) FROM Booking " +
                      "WHERE checkOutDate BETWEEN ? AND ? " +

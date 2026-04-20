@@ -1,7 +1,7 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.Surcharge;
-import iuh.fit.se.group1.repository.SurchargeRepository;
+import iuh.fit.se.group1.repository.SurchargeRepositoryImpl;
 import iuh.fit.se.group1.util.Constants;
 import net.miginfocom.swing.MigLayout;
 
@@ -36,14 +36,14 @@ public class SurchargeSelectionDialog extends JDialog {
     private DefaultTableModel selectedModel;
 
     private Map<Long, SurchargeItem> selectedItems;
-    private SurchargeRepository surchargeRepository;
+    private SurchargeRepositoryImpl surchargeRepositoryImpl;
 
     private boolean confirmed = false;
 
     public SurchargeSelectionDialog(Window owner) {
         super(owner, "Chọn phụ phí", ModalityType.APPLICATION_MODAL);
         this.selectedItems = new HashMap<>();
-        this.surchargeRepository = new SurchargeRepository();
+        this.surchargeRepositoryImpl = new SurchargeRepositoryImpl();
 
         initComponents();
         loadAvailableSurcharges();
@@ -220,7 +220,7 @@ public class SurchargeSelectionDialog extends JDialog {
 
     private void loadAvailableSurcharges() {
         availableModel.setRowCount(0);
-        List<Surcharge> surcharges = surchargeRepository.findAll();
+        List<Surcharge> surcharges = surchargeRepositoryImpl.findAll();
         for (Surcharge s : surcharges) {
             availableModel.addRow(new Object[]{
                     s.getSurchargeId(),

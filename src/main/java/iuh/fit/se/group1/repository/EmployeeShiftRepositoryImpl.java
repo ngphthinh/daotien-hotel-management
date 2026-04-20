@@ -27,12 +27,12 @@ import java.util.List;
  * @created: 30/10/2025
  */
 
-public class EmployeeShiftRepository implements Repository<EmployeeShift,Long> {
-    private static final Logger log = LoggerFactory.getLogger(EmployeeShiftRepository.class);
+public class EmployeeShiftRepositoryImpl implements Repository<EmployeeShift,Long>, iuh.fit.se.group1.repository.interfaces.EmployeeShiftRepository {
+    private static final Logger log = LoggerFactory.getLogger(EmployeeShiftRepositoryImpl.class);
 
     private final Connection connection;
 
-    public EmployeeShiftRepository() {
+    public EmployeeShiftRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
@@ -176,6 +176,7 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long> {
             throw new RuntimeException(e);
         }
     }
+    @Override
     public List<EmployeeShift> findByShiftDate(LocalDate date) {
         List<EmployeeShift> list = new ArrayList<>();
 
@@ -228,6 +229,7 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long> {
     /**
      * Tìm EmployeeShift với thông tin đầy đủ của Employee và Shift
      */
+    @Override
     public EmployeeShift findByIdWithDetails(Long employeeShiftId) {
         String sql = """
         SELECT es.employeeShiftId, es.shiftDate, es.createdAt, es.employeeId, es.shiftId,
@@ -280,6 +282,7 @@ public class EmployeeShiftRepository implements Repository<EmployeeShift,Long> {
     /**
      * Lấy tổng doanh thu của ca làm việc từ các hóa đơn
      */
+    @Override
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
         String sql = """
         SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue

@@ -1,14 +1,14 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.config.AppLogger;
-import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.repository.BookingRepository;
+import iuh.fit.se.group1.repository.BookingRepositoryImpl;
 import iuh.fit.se.group1.repository.OrderRepository;
-import iuh.fit.se.group1.repository.RoomRepository;
+import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
+import iuh.fit.se.group1.repository.interfaces.BookingRepository;
+import iuh.fit.se.group1.repository.interfaces.RoomRepository;
 import iuh.fit.se.group1.util.Constants;
 import iuh.fit.se.group1.util.InvoiceItem;
 
@@ -20,12 +20,12 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private OrderDetailService orderDetailsService;
     private RoomRepository roomRepository;
-    private BookingRepository bookingRepository = new BookingRepository();
+    private BookingRepository bookingRepository = new BookingRepositoryImpl();
 
     public OrderService() {
         this.orderDetailsService = new OrderDetailService();
         this.orderRepository = new OrderRepository();
-        this.roomRepository = new RoomRepository();
+        this.roomRepository = new RoomRepositoryImpl();
     }
 
     public Order createOrder(Order order, List<OrderDetail> orderDetails) {
@@ -169,6 +169,7 @@ public class OrderService {
 
     /**
      * Lấy số lượng booking theo loại phòng cho một ngày cụ thể
+     *
      * @param date Ngày cần lấy dữ liệu
      * @return Map với key là tên loại phòng, value là số lượng booking
      */
@@ -258,7 +259,7 @@ public class OrderService {
                     "Phòng đôi",
                     unitBookingType,
                     Constants.VND_FORMAT.format(unitPrice),
-                     doubleRooms,
+                    doubleRooms,
                     Constants.VND_FORMAT.format((unitPrice * doubleRooms)));
             items.add(doubleRoomItem);
         }

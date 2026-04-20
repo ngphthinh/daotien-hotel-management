@@ -23,12 +23,12 @@ import java.util.List;
  * @created: 27/10/2025
  */
 
-public class ShiftRepository implements Repository<Shift,Long> {
-    private static final Logger log = LoggerFactory.getLogger(AmenityRepository.class);
+public class ShiftRepositoryImpl implements Repository<Shift,Long>, iuh.fit.se.group1.repository.interfaces.ShiftRepositort {
+    private static final Logger log = LoggerFactory.getLogger(ShiftRepositoryImpl.class);
 
     private final Connection connection;
 
-    public ShiftRepository() {
+    public ShiftRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
     @Override

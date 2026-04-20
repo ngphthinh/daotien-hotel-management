@@ -7,8 +7,9 @@ package iuh.fit.se.group1.service;
 
 
 import iuh.fit.se.group1.entity.EmployeeShift;
-import iuh.fit.se.group1.repository.EmployeeShiftRepository;
-import iuh.fit.se.group1.repository.ShiftCloseRepository;
+import iuh.fit.se.group1.repository.EmployeeShiftRepositoryImpl;
+import iuh.fit.se.group1.repository.ShiftCloseRepositoryImpl;
+import iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +29,10 @@ import java.util.stream.Collectors;
 
 public class EmployeeShiftService {
     private static final Logger log = LoggerFactory.getLogger(EmployeeShiftService.class);
-    private final EmployeeShiftRepository employeeShiftRepository;
+    private final EmployeeShiftRepositoryImpl employeeShiftRepository;
 
     public EmployeeShiftService() {
-        this.employeeShiftRepository = new EmployeeShiftRepository();
+        this.employeeShiftRepository = new EmployeeShiftRepositoryImpl();
     }
 
     public EmployeeShift addEmployeeShift(EmployeeShift employeeShift) {
@@ -73,7 +74,7 @@ public class EmployeeShiftService {
         return employeeShiftRepository.findByShiftDate(date);
     }
     public EmployeeShift getEmployeeShiftWithDetails(Long employeeShiftId) {
-        EmployeeShiftRepository repository = new EmployeeShiftRepository();
+        EmployeeShiftRepositoryImpl repository = new EmployeeShiftRepositoryImpl();
         return repository.findByIdWithDetails(employeeShiftId);
     }
 
@@ -81,7 +82,7 @@ public class EmployeeShiftService {
      * Lấy tổng doanh thu của ca làm việc
      */
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
-        ShiftCloseRepository shiftCloseRepo = new ShiftCloseRepository();
+        ShiftCloseRepository shiftCloseRepo = new ShiftCloseRepositoryImpl();
         return shiftCloseRepo.getTotalCashRevenueForShift(employeeShiftId);
     }
     public boolean isShiftActive(EmployeeShift shift) {

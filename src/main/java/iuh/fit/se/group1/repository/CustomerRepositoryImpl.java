@@ -17,12 +17,12 @@ import org.slf4j.LoggerFactory;
 import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 
-public class CustomerRepository implements Repository<Customer, Long> {
-    private static final Logger log = LoggerFactory.getLogger(CustomerRepository.class);
+public class CustomerRepositoryImpl implements Repository<Customer, Long>, iuh.fit.se.group1.repository.interfaces.CustomerRepository {
+    private static final Logger log = LoggerFactory.getLogger(CustomerRepositoryImpl.class);
 
     private final Connection connection;
 
-    public CustomerRepository() {
+    public CustomerRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
@@ -145,6 +145,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
         }
     }
 
+    @Override
     public List<Customer> findByCustomerNameOrId(String keyword) {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT * FROM Employee WHERE (fullName COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ? OR customerId LIKE ?) and isDeleted = 0 Order BY customerId ASC, fullName ASC";
@@ -172,6 +173,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
         return customers;
     }
 
+    @Override
     public boolean isCitizenIdExists(String citizenId) {
         String sql = "SELECT 1 FROM Customer WHERE citizenId = ? AND isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -188,6 +190,7 @@ public class CustomerRepository implements Repository<Customer, Long> {
         return false;
     }
 
+    @Override
     public Customer findByCitizenId(String citizenId) {
         String sql = "SELECT * FROM Customer WHERE citizenId = ? AND isDeleted = 0";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

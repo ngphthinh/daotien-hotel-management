@@ -1,6 +1,5 @@
 package iuh.fit.se.group1.service;
 
-import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.OrderDetail;

@@ -6,7 +6,7 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.DenominationDetail;
-import iuh.fit.se.group1.repository.DenominationDetailRepository;
+import iuh.fit.se.group1.repository.jpa.DenominationDetailRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class DenominationDetailService {
     private static final Logger log = LoggerFactory.getLogger(DenominationDetailService.class);
-    private final DenominationDetailRepository repository;
+    private final DenominationDetailRepositoryImpl repository;
 
     // Các mệnh giá tiền mặc định (VND)
     private static final List<Long> DEFAULT_DENOMINATIONS = Arrays.asList(
@@ -30,7 +30,19 @@ public class DenominationDetailService {
     );
 
     public DenominationDetailService() {
-        this.repository = new DenominationDetailRepository();
+        this.repository = new DenominationDetailRepositoryImpl();
+    }
+
+    public void saveAll(List<DenominationDetail> details) {
+        if (details == null || details.isEmpty()) {
+            throw new IllegalArgumentException("Details list cannot be null or empty");
+        }
+        for (DenominationDetail detail : details) {
+            if (detail.getEmployeeShift() == null) {
+                throw new IllegalArgumentException("EmployeeShift cannot be null for detail: " + detail);
+            }
+        }
+        repository.saveBatch(details);
     }
 
     /**

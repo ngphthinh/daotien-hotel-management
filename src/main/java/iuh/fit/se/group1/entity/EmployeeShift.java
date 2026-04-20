@@ -19,7 +19,6 @@ import java.util.Set;
 public class EmployeeShift {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private	Long employeeShiftId;
     @ManyToOne
     @JoinColumn(name = "employeeId")

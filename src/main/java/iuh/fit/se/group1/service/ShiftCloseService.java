@@ -8,7 +8,8 @@
 
     import iuh.fit.se.group1.entity.EmployeeShift;
     import iuh.fit.se.group1.entity.ShiftClose;
-    import iuh.fit.se.group1.repository.ShiftCloseRepository;
+    import iuh.fit.se.group1.repository.ShiftCloseRepositoryImpl;
+    import iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository;
 
     import java.math.BigDecimal;
     import java.util.List;
@@ -22,14 +23,14 @@
 
     public class ShiftCloseService {
 
-        private final ShiftCloseRepository repository;
+        private final ShiftCloseRepositoryImpl repository;
 
         public ShiftCloseService() {
-            this.repository = new ShiftCloseRepository();
+            this.repository = new ShiftCloseRepositoryImpl();
         }
 
         public ShiftClose saveShiftClose(ShiftClose shiftClose) {
-            ShiftCloseRepository repository = new ShiftCloseRepository();
+            ShiftCloseRepositoryImpl repository = new ShiftCloseRepositoryImpl();
             return repository.save(shiftClose);
         }
 
@@ -72,7 +73,7 @@
         }
 
         public List<ShiftClose> getShiftCloseByEmployeeShift(EmployeeShift employeeShift) {
-            ShiftCloseRepository repository = new ShiftCloseRepository();
+            ShiftCloseRepository repository = new ShiftCloseRepositoryImpl();
             return repository.findByEmployeeShift(employeeShift);
         }
         public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {

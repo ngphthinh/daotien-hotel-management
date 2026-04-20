@@ -3,26 +3,25 @@ package iuh.fit.se.group1.service;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.repository.BookingRepository;
+import iuh.fit.se.group1.repository.BookingRepositoryImpl;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class BookingService {
-    private final BookingRepository bookingRepository;
+    private final BookingRepositoryImpl bookingRepositoryImpl;
     public BookingService() {
-        this.bookingRepository = new BookingRepository();
+        this.bookingRepositoryImpl = new BookingRepositoryImpl();
     }
 
     public boolean existsByRoomIdAndDate(Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate) {
-        return bookingRepository.isExistsByRoomAndDate(roomId, checkInDate, checkOutDate);
+        return bookingRepositoryImpl.isExistsByRoomAndDate(roomId, checkInDate, checkOutDate);
     }
 
     public List<Booking> getAllBookings(){
-        return bookingRepository.findAll();
+        return bookingRepositoryImpl.findAll();
     }
 
 
@@ -71,6 +70,6 @@ public class BookingService {
 
 
     public List<Booking> getBookingsByOrderId(Long orderId) {
-        return bookingRepository.findByOrderId(orderId);
+        return bookingRepositoryImpl.findByOrderId(orderId);
     }
 }

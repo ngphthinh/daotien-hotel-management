@@ -27,11 +27,11 @@ import java.util.List;
  * @created: 31/10/2025
  */
 
-public class ShiftCloseRepository implements Repository<ShiftClose,Long> {
-    private static final Logger log = LoggerFactory.getLogger(ShiftCloseRepository.class);
+public class ShiftCloseRepositoryImpl implements Repository<ShiftClose,Long>, iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository {
+    private static final Logger log = LoggerFactory.getLogger(ShiftCloseRepositoryImpl.class);
     private final Connection connection;
 
-    public ShiftCloseRepository() {
+    public ShiftCloseRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
@@ -185,6 +185,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long> {
         }
     }
 
+    @Override
     public List<ShiftClose> findByEmployeeShift(EmployeeShift employeeShift) {
         List<ShiftClose> list = new ArrayList<>();
         String sql = "SELECT * FROM ShiftClose WHERE employeeShiftId=?;";
@@ -218,6 +219,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long> {
             throw new RuntimeException(e);
         }
     }
+    @Override
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
         String sql = """
         SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue
@@ -255,6 +257,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long> {
             throw new RuntimeException(e);
         }
     }
+    @Override
     public Employee validateManager(String username, String password) {
         // Query lấy thông tin manager và password hash
         String sql = "SELECT e.*, a.password as hashedPassword " +
@@ -315,6 +318,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long> {
             throw new RuntimeException(e);
         }
     }
+    @Override
     public Employee getManagerById(Long managerId) {
         String sql = "SELECT e.* FROM Employee e " +
                 "INNER JOIN Account a ON e.accountId = a.accountId " +
@@ -346,6 +350,7 @@ public class ShiftCloseRepository implements Repository<ShiftClose,Long> {
     /**
      * Lấy tên manager theo ID
      */
+    @Override
     public String getManagerNameById(Long managerId) {
         String sql = "SELECT fullName FROM Employee WHERE employeeId = ?;";
 

@@ -1,34 +1,34 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.RoomType;
-import iuh.fit.se.group1.repository.RoomTypeRepository;
+import iuh.fit.se.group1.repository.RoomTypeRepositoryImpl;
 import java.util.List;
 
 public class RoomTypeService {
-    private final RoomTypeRepository roomTypeRepository;
+    private final RoomTypeRepositoryImpl roomTypeRepositoryImpl;
 
     public RoomTypeService() {
-        this.roomTypeRepository = new RoomTypeRepository();
+        this.roomTypeRepositoryImpl = new RoomTypeRepositoryImpl();
     }
 
 
     public RoomType createRoomType(RoomType roomType) {
-        return roomTypeRepository.save(roomType);
+        return roomTypeRepositoryImpl.save(roomType);
     }
 
     public RoomType updateRoomType(RoomType roomType) {
-        return roomTypeRepository.update(roomType);
+        return roomTypeRepositoryImpl.update(roomType);
     }
 
     public void deleteRoomType(String roomTypeId) {
-        roomTypeRepository.deleteById(roomTypeId);
+        roomTypeRepositoryImpl.deleteById(roomTypeId);
     }
 
     public List<RoomType> getAllRoomTypes() {
-        return roomTypeRepository.findAll();
+        return roomTypeRepositoryImpl.findAll();
     }
 
     public RoomType getRoomTypeById(String roomTypeId) {
-        return roomTypeRepository.findById(roomTypeId);
+        return roomTypeRepositoryImpl.findById(roomTypeId);
     }
 }
