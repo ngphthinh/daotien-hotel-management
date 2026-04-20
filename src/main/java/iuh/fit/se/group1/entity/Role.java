@@ -17,6 +17,7 @@ import java.util.Set;
 @Entity
 public class Role {
     @Id
+    @Column(columnDefinition = "varchar(30)")
     private String roleId;
     private String roleName;
     private LocalDate createdAt;

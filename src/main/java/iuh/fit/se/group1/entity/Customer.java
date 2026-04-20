@@ -19,9 +19,13 @@ import java.util.Set;
 public class Customer {
     @Id
     private Long customerId;
+    @Column(columnDefinition = "nvarchar(255)")
     private String fullName;
+    @Column(columnDefinition = "varchar(10)")
     private String phone;
+    @Column(columnDefinition = "varchar(255)")
     private String email;
+    @Column(columnDefinition = "varchar(12)")
     private String citizenId;
     private boolean gender;
     private LocalDate dateOfBirth;

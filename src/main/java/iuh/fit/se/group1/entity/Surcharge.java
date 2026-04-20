@@ -20,6 +20,7 @@ import java.util.Set;
 public class Surcharge {
     @Id
     private Long surchargeId;
+    @Column(columnDefinition = "nvarchar(255)")
     private String name;
     private boolean isDelete;
     private BigDecimal price;

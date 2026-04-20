@@ -1,7 +1,7 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import iuh.fit.se.group1.enums.OrderBookStatus;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -14,10 +14,14 @@ import java.util.Objects;
 @Getter
 @ToString
 @Entity
+@Builder
 public class OrderType {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long orderTypeId;
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private OrderBookStatus name;
     private LocalDate createdAt;
     public OrderType(Long orderTypeId) {
         this.orderTypeId = orderTypeId;

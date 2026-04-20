@@ -19,8 +19,11 @@ import java.util.Set;
 public class Shift {
     @Id
     private Long shiftId;
+    @Column(columnDefinition = "varchar(50)")
     private String name;
+    @Column(columnDefinition = "varchar(10)")
     private String startTime;
+    @Column(columnDefinition = "varchar(10)")
     private String endTime;
     private LocalDate createdAt;
 

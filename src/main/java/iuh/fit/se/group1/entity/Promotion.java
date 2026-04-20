@@ -20,7 +20,9 @@ import java.util.Set;
 public class Promotion {
     @Id
     private Long promotionId;
+    @Column(columnDefinition = "nvarchar(255)")
     private String promotionName;
+    @Column(columnDefinition = "nvarchar(1000)")
     private String description;
     private Float discountPercent;
     private BigDecimal minOrderAmount;
