@@ -16,6 +16,7 @@ import java.util.Set;
 //@Table(name = "Roles")
 public class Role {
     @Id
+    @Column(columnDefinition = "varchar(30)")
     private String roleId;
     @Column(columnDefinition = "nvarchar(100)")
     private String roleName;

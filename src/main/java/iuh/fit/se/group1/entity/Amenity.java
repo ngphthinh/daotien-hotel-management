@@ -23,6 +23,7 @@ public class Amenity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long amenityId;
+    @Column(columnDefinition = "nvarchar(255)")
     private String nameAmenity;
     private BigDecimal price;
 	private boolean isDeleted;

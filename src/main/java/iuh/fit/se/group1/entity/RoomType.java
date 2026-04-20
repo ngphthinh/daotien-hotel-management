@@ -17,7 +17,9 @@ import java.util.Set;
 @Builder
 public class RoomType {
     @Id
+    @Column(columnDefinition = "varchar(20)")
     private String roomTypeId;
+    @Column(columnDefinition = "nvarchar(50)")
     private String name;
     private BigDecimal hourlyRate;
     private BigDecimal dailyRate;

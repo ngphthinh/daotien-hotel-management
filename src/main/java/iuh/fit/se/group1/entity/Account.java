@@ -20,7 +20,10 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String accountId;
+
+    @Column(columnDefinition = "varchar(50)")
     private String username;
+    @Column(columnDefinition = "varchar(255)")
     private String password;
     private LocalDate createdAt;
 

@@ -36,6 +36,7 @@ public class ShiftClose {
     private BigDecimal totalRevenue;
     private  BigDecimal cashInDrawer;
     private BigDecimal difference;
+    @Column(columnDefinition = "nvarchar(255)")
     private String note;
     private Long managerId;
     private LocalDateTime createdAt;

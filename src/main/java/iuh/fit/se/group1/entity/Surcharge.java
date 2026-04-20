@@ -24,6 +24,7 @@ public class Surcharge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long surchargeId;
+    @Column(columnDefinition = "nvarchar(255)")
     private String name;
     private boolean isDeleted;
     private BigDecimal price;

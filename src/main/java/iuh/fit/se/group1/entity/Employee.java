@@ -25,9 +25,12 @@ public class Employee {
     private Long employeeId;
     @Column(columnDefinition = "nvarchar(255)")
     private String fullName;
+    @Column(columnDefinition = "varchar(10)")
     private String phone;
+    @Column(columnDefinition = "varchar(255)")
     private String email;
     private boolean gender;
+    @Column(columnDefinition = "varchar(12)")
     private String citizenId;
     private LocalDate hireDate;
     @OneToOne
