@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 
 import java.math.BigDecimal;
@@ -22,6 +24,8 @@ import java.util.List;
 @EqualsAndHashCode(of = "orderId")
 @Table(name = "Orders")
 @Entity
+@SQLDelete(sql = "UPDATE Orders SET isDeleted = true WHERE orderId = ?")
+@SQLRestriction("isDeleted = false")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,8 +56,9 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private List<Booking> bookings;
 
+
     private LocalDate paymentDate;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
 
@@ -61,7 +66,7 @@ public class Order {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "employeePaymentId")
     private Employee employeePayment;
-    private boolean isDelete;
+    private boolean isDeleted;
 
     public Order() {
         bookings = new ArrayList<>();

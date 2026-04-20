@@ -6,6 +6,7 @@ import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.OrderBookStatus;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

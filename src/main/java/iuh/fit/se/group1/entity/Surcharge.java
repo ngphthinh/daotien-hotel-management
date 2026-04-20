@@ -2,6 +2,8 @@ package iuh.fit.se.group1.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,13 +17,15 @@ import java.util.Set;
 @ToString(exclude = {"surchargeDetails"})
 @Entity
 @Builder
+@SQLDelete(sql = "UPDATE Surcharge SET isDeleted = true WHERE surchargeId = ?")
+@SQLRestriction("isDeleted = false")
 public class Surcharge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long surchargeId;
     private String name;
-    private boolean isDelete;
+    private boolean isDeleted;
     private BigDecimal price;
     private LocalDate createdAt;
 

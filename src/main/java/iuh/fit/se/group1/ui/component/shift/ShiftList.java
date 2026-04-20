@@ -6,11 +6,10 @@ package iuh.fit.se.group1.ui.component.shift;
 
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
-import iuh.fit.se.group1.repository.EmployeeRepository;
+import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -193,8 +192,8 @@ public class ShiftList extends JPanel {
 
     private void loadEmployeesFromDatabase() {
         try {
-            EmployeeRepository employeeRepository = new EmployeeRepository();
-            List<Employee> employees = employeeRepository.findAllByRoleId(Role.RECEPTIONIST.toString());
+            EmployeeRepositoryImpl employeeRepositoryImpl = new EmployeeRepositoryImpl();
+            List<Employee> employees = employeeRepositoryImpl.findAllByRoleId(Role.RECEPTIONIST.toString());
 
             pnlEmployees.removeAll();
             pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);

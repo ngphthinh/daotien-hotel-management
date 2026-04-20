@@ -6,6 +6,7 @@ import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class BookingRepository implements Repository<Booking, Long>{
+public class BookingRepository implements Repository<Booking, Long> {
 
     private static final Logger log = LoggerFactory.getLogger(BookingRepository.class);
     private final Connection connection;

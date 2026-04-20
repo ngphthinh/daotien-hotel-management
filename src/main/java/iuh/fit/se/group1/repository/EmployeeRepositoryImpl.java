@@ -1,30 +1,27 @@
 package iuh.fit.se.group1.repository;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Role;
+import iuh.fit.se.group1.repository.interfaces.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 
-public class EmployeeRepository implements Repository<Employee, Long> {
-    private static final Logger log = LoggerFactory.getLogger(EmployeeRepository.class);
+public class EmployeeRepositoryImpl implements EmployeeRepository {
+    private static final Logger log = LoggerFactory.getLogger(EmployeeRepositoryImpl.class);
 
     private final Connection connection;
 
-    public EmployeeRepository() {
+    public EmployeeRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
@@ -40,16 +37,15 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             preparedStatement.setString(5, entity.getCitizenId());
             preparedStatement.setBoolean(6, entity.isGender());
             if (entity.getAccount() != null && entity.getAccount().getAccountId() != null) {
-                preparedStatement.setLong(7, entity.getAccount().getAccountId());
+                preparedStatement.setString(7, entity.getAccount().getAccountId());
             } else {
                 preparedStatement.setNull(7, java.sql.Types.BIGINT);
             }
             entity.setCreatedAt(LocalDate.now());
             if (entity.getAvt() != null && entity.getAvt().length > 0) {
-                String base64String = Base64.getEncoder().encodeToString(entity.getAvt());
-                preparedStatement.setString(8, base64String);
+                preparedStatement.setBytes(8, entity.getAvt());
             } else {
-                preparedStatement.setNull(8, java.sql.Types.NVARCHAR);
+                preparedStatement.setNull(8, java.sql.Types.VARBINARY);
             }
             preparedStatement.setDate(9, Date.valueOf(entity.getCreatedAt()));
 
@@ -65,7 +61,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
             }
             return entity;
         } catch (SQLException e) {
-            log.error("Error saving Employee: ", e);
+            AppLogger.error("Error saving Employee: ", e);
             throw new RuntimeException(e);
         }
 
@@ -104,8 +100,8 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                         employee.setAvt(originalBytes);
                     }
                     employee.setCreatedAt(rs.getDate("createdAt").toLocalDate());
-                    Long accountId = rs.getLong("accountId");
-                    if (accountId != null && accountId > 0) {
+                    String accountId = rs.getString("accountId");
+                    if (accountId != null) {
                         Account account = new Account();
                         account.setAccountId(accountId);
                         account.setUsername(rs.getString("username"));
@@ -202,7 +198,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     }
                     // Account
                     Account account = new Account();
-                    account.setAccountId(rs.getLong("accountId"));
+//                    account.setAccountId(rs.getLong("accountId"));
                     account.setUsername(rs.getString("username"));
                     account.setPassword(rs.getString("password"));
 
@@ -252,13 +248,12 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                 psEmp.setDate(4, Date.valueOf(entity.getHireDate()));
                 psEmp.setString(5, entity.getCitizenId());
                 psEmp.setBoolean(6, entity.isGender());
-                psEmp.setLong(7, entity.getAccount().getAccountId());
+                psEmp.setString(7, entity.getAccount().getAccountId());
 
                 if (entity.getAvt() != null && entity.getAvt().length > 0) {
-                    String base64String = Base64.getEncoder().encodeToString(entity.getAvt());
-                    psEmp.setString(8, base64String);
+                    psEmp.setBytes(8, entity.getAvt());
                 } else {
-                    psEmp.setNull(8, java.sql.Types.NVARCHAR);
+                    psEmp.setNull(8, Types.VARBINARY);
                 }
 
                 psEmp.setLong(9, entity.getEmployeeId());
@@ -267,7 +262,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                 // ===== Update Role =====
                 if (entity.getAccount() != null && entity.getAccount().getRole() != null) {
                     psRole.setString(1, entity.getAccount().getRole().getRoleId());
-                    psRole.setLong(2, entity.getAccount().getAccountId());
+                    psRole.setString(2, entity.getAccount().getAccountId());
                     psRole.executeUpdate();
                 }
 
@@ -285,6 +280,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
     }
 
 
+    @Override
     public List<Employee> findAllByRoleId(String roleId) {
         List<Employee> employees = new ArrayList<>();
         String sql = """
@@ -315,7 +311,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     }
                     // Account
                     Account account = new Account();
-                    account.setAccountId(rs.getLong("accountId"));
+                    account.setAccountId(rs.getString("accountId"));
                     account.setUsername(rs.getString("username"));
                     account.setPassword(rs.getString("password"));
 
@@ -337,6 +333,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return employees;
     }
 
+    @Override
     public Employee findByCitizenId(String citizenId) {
         String sql = """
                 SELECT e.employeeId, e.fullName, e.phone, e.email, e.hireDate, e.citizenId, e.gender,
@@ -369,7 +366,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     }
                     // Account
                     Account account = new Account();
-                    account.setAccountId(rs.getLong("accountId"));
+                    account.setAccountId(rs.getString("accountId"));
                     account.setUsername(rs.getString("username"));
                     account.setPassword(rs.getString("password"));
 
@@ -389,6 +386,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return null;
     }
 
+    @Override
     public List<Employee> findByIdOrNameOrPhoneNumber(String keyword) {
         List<Employee> employees = new ArrayList<>();
         String sql = """
@@ -425,7 +423,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     }
                     // Account
                     Account account = new Account();
-                    account.setAccountId(rs.getLong("accountId"));
+                    account.setAccountId(rs.getString("accountId"));
                     account.setUsername(rs.getString("username"));
                     account.setPassword(rs.getString("password"));
 
@@ -447,6 +445,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return employees;
     }
 
+    @Override
     public int count() {
         String sql = "SELECT COUNT(*) AS total FROM Employee";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -461,7 +460,8 @@ public class EmployeeRepository implements Repository<Employee, Long> {
         return 0;
     }
 
-    public Employee findByAccountId(Long accountId) {
+    @Override
+    public Employee findByAccountId(String accountId) {
 
         String sql = """
                 SELECT * 
@@ -471,7 +471,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                 """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setLong(1, accountId);
+            preparedStatement.setString(1, accountId);
 
 
             try (ResultSet rs = preparedStatement.executeQuery()) {
@@ -492,7 +492,7 @@ public class EmployeeRepository implements Repository<Employee, Long> {
                     }
                     // Account
                     Account account = new Account();
-                    account.setAccountId(rs.getLong("accountId"));
+                    account.setAccountId(rs.getString("accountId"));
                     account.setUsername(rs.getString("username"));
                     account.setPassword(rs.getString("password"));
 

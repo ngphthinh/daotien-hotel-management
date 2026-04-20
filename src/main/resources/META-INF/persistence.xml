@@ -27,16 +27,16 @@
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
 
-<!--            <property name="jakarta.persistence.jdbc.url"-->
-<!--                      value="jdbc:sqlserver://localhost:1433;databaseName=daotien_hotel_jpa;encrypt=true;trustServerCertificate=true"/>-->
+            <!--            <property name="jakarta.persistence.jdbc.url"-->
+            <!--                      value="jdbc:sqlserver://localhost:1433;databaseName=daotien_hotel_jpa;encrypt=true;trustServerCertificate=true"/>-->
 
-<!--            <property name="jakarta.persistence.jdbc.user" value="sa"/>-->
-<!--            <property name="jakarta.persistence.jdbc.password" value="sapassword"/>-->
+            <!--            <property name="jakarta.persistence.jdbc.user" value="sa"/>-->
+            <!--            <property name="jakarta.persistence.jdbc.password" value="sapassword"/>-->
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect"/>
 
 
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
 
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>

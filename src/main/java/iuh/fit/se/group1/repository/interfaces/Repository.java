@@ -1,4 +1,4 @@
-package iuh.fit.se.group1.repository;
+package iuh.fit.se.group1.repository.interfaces;
 
 import java.util.List;
 

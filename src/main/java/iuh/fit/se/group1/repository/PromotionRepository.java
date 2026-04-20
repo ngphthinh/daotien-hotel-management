@@ -11,13 +11,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import iuh.fit.se.group1.entity.Promotion;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 
-public class PromotionRepository implements Repository<Promotion, Long>{
+public class PromotionRepository implements Repository<Promotion, Long> {
     private static final Logger log = LoggerFactory.getLogger(AmenityRepository.class);
 
     private final Connection connection;

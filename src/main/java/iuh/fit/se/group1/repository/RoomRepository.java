@@ -5,6 +5,7 @@ import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -277,7 +277,7 @@ public class DashboardService {
             log.error("Error counting late checkouts: ", e);
         }
 
-        // Đếm phòng hỏng
+
         String sql2 = "SELECT COUNT(*) FROM Room " +
                       "WHERE roomStatus = 'OUT_OF_ORDER' AND isDeleted = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql2);

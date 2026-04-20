@@ -1,9 +1,10 @@
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.repository.AccountRepository;
-import iuh.fit.se.group1.repository.EmployeeRepository;
+import iuh.fit.se.group1.repository.jpa.AccountRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
 import iuh.fit.se.group1.util.PasswordUtil;
 import iuh.fit.se.group1.util.PropertiesReader;
 import org.slf4j.Logger;
@@ -11,56 +12,50 @@ import org.slf4j.LoggerFactory;
 
 public class AuthenticateService {
     private static final Logger log = LoggerFactory.getLogger(AuthenticateService.class);
-    private final AccountRepository accountRepository;
-    private final EmployeeRepository employeeRepository;
+    private final AccountRepositoryImpl accountRepositoryImpl;
+    private final EmployeeRepositoryImpl employeeRepositoryImpl;
 
     public AuthenticateService() {
-        this.accountRepository = new AccountRepository();
-        this.employeeRepository = new EmployeeRepository();
+        this.accountRepositoryImpl = new AccountRepositoryImpl();
+        this.employeeRepositoryImpl = new EmployeeRepositoryImpl();
     }
 
-    public Account authenticate (String username, String password) {
-        log.info("🔍 Attempting login - Username: '{}'", username);
+    public Account authenticate(String username, String password) {
+        AppLogger.info("Attempting login - Username: '{}'", username);
 
-        Account account = accountRepository.findByUsername(username);
+        Account account = accountRepositoryImpl.findByUsername(username);
 
         if (account == null) {
-            log.error("❌ Account NOT FOUND: '{}'", username);
+            log.error("Account NOT FOUND: '{}'", username);
             return null;
         }
-
-        log.info("✅ Account FOUND: '{}'", username);
-        log.info("📝 Hash from DB: {}", account.getPassword());
-        log.info("🔑 Plain password: {}", password);
 
         boolean isPasswordCorrect = PasswordUtil.checkPassword(password, account.getPassword());
 
-        log.info("🔐 Password check result: {}", isPasswordCorrect);
-
         if (!isPasswordCorrect) {
-            log.error("❌ WRONG PASSWORD for: '{}'", username);
+            AppLogger.error(String.format("WRONG PASSWORD for: '{%s}'", username));
             return null;
         }
 
-        log.info("✅ LOGIN SUCCESS: '{}'", username);
+        AppLogger.info("LOGIN SUCCESS: '{}'", username);
         return account;
     }
 
-    public Employee getEmployeeByAccountId(Long accountId) {
+    public Employee getEmployeeByAccountId(String accountId) {
         if (accountId == null) {
             return null;
         }
 
-        return employeeRepository.findByAccountId(accountId);
+        return employeeRepositoryImpl.findByAccountId(accountId);
     }
 
-    public void resetPassword (String username){
-        Account account = accountRepository.findByUsername(username);
+    public void resetPassword(String username) {
+        Account account = accountRepositoryImpl.findByUsername(username);
         String resetPassword = PropertiesReader.getInstance().get("daotien.password");
         if (account != null) {
             String hashedPassword = PasswordUtil.hashPassword(resetPassword);
             account.setPassword(hashedPassword);
-            accountRepository.update(account);
+            accountRepositoryImpl.update(account);
         }
     }
 }

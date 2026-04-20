@@ -454,6 +454,7 @@ public class MainLayout extends JPanel {
         this.isAdmin = isAdmin;
         sideBar.getMenu1().setAuth(isAdmin);
         if (isAdmin) {
+
             dashboard = new Dashboard();
             bookingPage = new BookingPage();
             bookingPage.setCurrentEmployee(currentEmployee);

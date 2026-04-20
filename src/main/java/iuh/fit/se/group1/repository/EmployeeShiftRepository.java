@@ -9,15 +9,14 @@ package iuh.fit.se.group1.repository;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.Shift;
-import iuh.fit.se.group1.entity.ShiftClose;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +27,8 @@ import java.util.List;
  * @created: 30/10/2025
  */
 
-public class EmployeeShiftRepository implements Repository<EmployeeShift,Long>{
-    private static final Logger log = LoggerFactory.getLogger(EmployeeRepository.class);
+public class EmployeeShiftRepository implements Repository<EmployeeShift,Long> {
+    private static final Logger log = LoggerFactory.getLogger(EmployeeShiftRepository.class);
 
     private final Connection connection;
 

@@ -3,6 +3,8 @@ package iuh.fit.se.group1.entity;
 import iuh.fit.se.group1.enums.RoomStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +15,8 @@ import java.time.LocalDate;
 @ToString
 @Entity
 @Builder
+@SQLDelete(sql = "UPDATE Room SET isDeleted = true WHERE roomId = ?")
+@SQLRestriction("isDeleted = false")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +28,9 @@ public class Room {
     @JoinColumn(name = "roomTypeId")
     private RoomType roomType;
     private LocalDate createdAt;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private RoomStatus roomStatus;
+    private boolean isDeleted;
 
     public Room(Long roomId, String roomNumber) {
         this.roomId = roomId;

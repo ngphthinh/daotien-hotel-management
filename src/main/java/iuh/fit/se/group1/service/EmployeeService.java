@@ -6,26 +6,27 @@ import java.util.List;
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.Role;
-import iuh.fit.se.group1.repository.EmployeeRepository;
+import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
 import iuh.fit.se.group1.util.PropertiesReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EmployeeService {
     private static final Logger log = LoggerFactory.getLogger(EmployeeService.class);
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeRepositoryImpl employeeRepositoryImpl;
     private final AccountService accountService;
     private final RoleService roleService;
 
     public EmployeeService() {
         this.accountService = new AccountService();
         this.roleService = new RoleService();
-        this.employeeRepository = new EmployeeRepository();
+        this.employeeRepositoryImpl = new EmployeeRepositoryImpl();
     }
 
     public int count(){
-        return employeeRepository.count();
+        return employeeRepositoryImpl.count();
     }
+
 
     public Employee createEmployee(Employee employee, String roleId) {
         Role role = roleService.getRoleById(roleId);
@@ -40,7 +41,7 @@ public class EmployeeService {
         Account accountSave = accountService.createAccount(account);
         // Tao nhan vien
         employee.setAccount(accountSave);
-        Employee employeeSave = employeeRepository.save(employee);
+        Employee employeeSave = employeeRepositoryImpl.save(employee);
         // Tạo account khi thêm nhân viên
         String username = generateUsername(employeeSave);
 
@@ -49,11 +50,11 @@ public class EmployeeService {
         accountSave = accountService.updateAccount(accountSave);
 
         employeeSave.setAccount(accountSave);
-        return employeeRepository.update(employeeSave);
+        return employeeRepositoryImpl.update(employeeSave);
     }
 
     public Employee getEmployeeByCitizenId(String citizenId) {
-        return employeeRepository.findByCitizenId(citizenId);
+        return employeeRepositoryImpl.findByCitizenId(citizenId);
     }
 
     private String generateUsername(Employee entitySave) {
@@ -69,26 +70,26 @@ public class EmployeeService {
     }
 
     public void deleteEmployee(Long employeeId) {
-        employeeRepository.deleteById(employeeId);
+        employeeRepositoryImpl.deleteById(employeeId);
     }
 
     public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+        return employeeRepositoryImpl.findAll();
     }
 
 
     public Employee updateEmployee(Employee employee) {
 
-        return employeeRepository.update(employee);
+        return employeeRepositoryImpl.update(employee);
     }
 
     public List<Employee> getEmployeeByKeyword(String keyword){
-        return employeeRepository.findByIdOrNameOrPhoneNumber(keyword);
+        return employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(keyword);
     }
     public Employee getEmployeeById(Long employeeId) {
-        return employeeRepository.findById(employeeId);
+        return employeeRepositoryImpl.findById(employeeId);
     }
     public Employee existsByCitizenId(String citizenId){
-        return employeeRepository.findByCitizenId(citizenId);
+        return employeeRepositoryImpl.findByCitizenId(citizenId);
     }
 }

@@ -1,32 +1,32 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.Role;
-import iuh.fit.se.group1.repository.RoleRepository;
+import iuh.fit.se.group1.repository.jpa.RoleRepositoryImpl;
 
 public class RoleService {
-    private final RoleRepository roleRepository;
+    private final RoleRepositoryImpl roleRepositoryImpl;
 
     public RoleService() {
-        this.roleRepository = new RoleRepository();
+        this.roleRepositoryImpl = new RoleRepositoryImpl();
     }
 
     public Role createRole(Role role) {
-        return roleRepository.save(role);
+        return roleRepositoryImpl.save(role);
     }
 
     public void deleteRole(String roleId) {
-        roleRepository.deleteById(roleId);
+        roleRepositoryImpl.deleteById(roleId);
     }
 
     public java.util.List<Role> getAllRoles() {
-        return roleRepository.findAll();
+        return roleRepositoryImpl.findAll();
     }
 
     public Role getRoleById(String roleId) {
-        return roleRepository.findById(roleId);
+        return roleRepositoryImpl.findById(roleId);
     }
 
     public boolean roleExists(String roleId) {
-        return roleRepository.existsById(roleId);
+        return roleRepositoryImpl.existsById(roleId);
     }
 }

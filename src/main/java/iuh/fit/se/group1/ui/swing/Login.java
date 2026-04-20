@@ -246,9 +246,11 @@ public class Login extends javax.swing.JFrame {
 
         txtUser.setBackground(new java.awt.Color(245, 245, 245));
         txtUser.setLabelText("Tên đăng nhập");
+        txtUser.setText("thinh2");
 
         txtPass.setBackground(new java.awt.Color(245, 245, 245));
         txtPass.setLabelText("Mật khẩu");
+        txtUser.setText("thinh2");
 
         btnSignIn.setBackground(new java.awt.Color(157, 153, 255));
         btnSignIn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -364,6 +366,9 @@ public class Login extends javax.swing.JFrame {
             signIn = true;
             String user = txtUser.getText().trim();
             String pass = String.valueOf(txtPass.getPassword());
+//            String user = "thinh2";
+//            String pass = "User@123";
+
             boolean action = true;
             if (user.equals("")) {
                 txtUser.setHelperText("Hãy nhập tên đăng nhập");
@@ -399,6 +404,7 @@ public class Login extends javax.swing.JFrame {
                 boolean isManager = authenticate.getRole().getRoleId().equals(Role.MANAGER.toString());
                 log.info("User '{}' login with role '{}'", authenticate.getUsername(), authenticate.getRole().getRoleId());
 
+                System.out.println(employee);
                 panelBody.setCurrentEmployee(employee);
                 panelBody.setAuth(isManager);
                 animatorLogin.start();

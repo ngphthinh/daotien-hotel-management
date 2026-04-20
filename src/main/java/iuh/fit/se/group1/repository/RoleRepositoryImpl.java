@@ -2,18 +2,19 @@ package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.entity.Role;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
 
-public class RoleRepository implements Repository<Role, String> {
-    private static final Logger log = LoggerFactory.getLogger(RoleRepository.class);
+public class RoleRepositoryImpl implements Repository<Role, String> {
+    private static final Logger log = LoggerFactory.getLogger(RoleRepositoryImpl.class);
 
     private final Connection connection;
 
-    public RoleRepository() {
+    public RoleRepositoryImpl() {
         this.connection = DatabaseUtil.getConnection();
     }
 

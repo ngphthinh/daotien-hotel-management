@@ -1,7 +1,9 @@
 package iuh.fit.se.group1;
 
+import iuh.fit.se.group1.config.InitData;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
+import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.ui.swing.AdvancedSplashScreen;
 
@@ -34,7 +36,8 @@ public class Main {
         new Thread(() -> {
             try {
                 System.out.println("Đang tải dữ liệu ứng dụng...");
-
+                JPAUtil.getEntityManager();
+                InitData.initAllData();
                 EmployeeService employeeService = new EmployeeService();
                 if (employeeService.count() == 0) {
                     Employee admin = new Employee();
@@ -44,7 +47,12 @@ public class Main {
                     admin.setEmail("nguyenphuocthinh0710@gmail.com");
                     admin.setGender(false);
                     admin.setCitizenId("082205000819");
-                    employeeService.createEmployee(admin, Role.MANAGER.toString());
+                    Employee employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
+                    if (employee == null) {
+                        System.out.println("Không tạo được tài khoản");
+                    }else {
+                        System.out.println(employee);
+                    }
                 }
 
                 System.out.println("Hoàn tất tải dữ liệu!");

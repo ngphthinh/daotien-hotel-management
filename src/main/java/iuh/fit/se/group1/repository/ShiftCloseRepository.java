@@ -9,6 +9,7 @@ import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.ShiftClose;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import iuh.fit.se.group1.util.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import java.util.List;
  * @created: 31/10/2025
  */
 
-public class ShiftCloseRepository implements Repository<ShiftClose,Long>{
+public class ShiftCloseRepository implements Repository<ShiftClose,Long> {
     private static final Logger log = LoggerFactory.getLogger(ShiftCloseRepository.class);
     private final Connection connection;
 

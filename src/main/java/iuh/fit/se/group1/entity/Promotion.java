@@ -3,6 +3,8 @@ package iuh.fit.se.group1.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +18,8 @@ import java.util.Set;
 @ToString(exclude = {"orders"})
 @Entity
 @Builder
+@SQLDelete(sql = "UPDATE Promotion SET isDeleted = true WHERE promotionId = ?")
+@SQLRestriction("isDeleted = false")
 public class Promotion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +34,9 @@ public class Promotion {
     private LocalDate createdAt;
     @OneToMany(mappedBy = "promotion")
     private Set<Order> orders;
+
+    private boolean isDeleted;
+
     public Promotion(String promotionName, String description, Float discountPercent, BigDecimal minOrderAmount, LocalDate startDate, LocalDate endDate, LocalDate createdAt) {
         this.promotionName = promotionName;
         this.description = description;

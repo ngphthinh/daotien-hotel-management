@@ -21,7 +21,7 @@ public class Booking {
     private Long bookingId;
     private LocalDateTime checkInDate;
     private LocalDateTime checkOutDate;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private BookingType bookingType;
 
     @ManyToOne

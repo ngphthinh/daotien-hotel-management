@@ -2,11 +2,10 @@ package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.HeadlessException;
-import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;

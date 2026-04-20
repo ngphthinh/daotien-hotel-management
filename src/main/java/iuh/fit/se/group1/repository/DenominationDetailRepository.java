@@ -10,12 +10,12 @@ import iuh.fit.se.group1.entity.DenominationDetail;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.enums.DenominationLabel;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**
