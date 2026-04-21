@@ -6,14 +6,15 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.Shift;
-import iuh.fit.se.group1.repository.ShiftRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.ShiftRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
 /**
  * @description
- * @author: Nguyen Tran Quoc Viet 
+ * @author: Nguyen Tran Quoc Viet
  * @version: 1.0
  * @created: 30/10/2025
  */

@@ -1,11 +1,11 @@
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.repository.RoomToolsRepository;
-import iuh.fit.se.group1.repository.RoomToolsRepository.BookingDTO;
 import iuh.fit.se.group1.repository.interfaces.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

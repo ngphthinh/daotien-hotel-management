@@ -102,7 +102,6 @@ public class OrderDetailRepositoryImpl extends AbstractRepositoryImpl<OrderDetai
         );
     }
 
-    @Override
     public void deleteById(Long orderId) {
         deleteByOrderId(orderId);
     }

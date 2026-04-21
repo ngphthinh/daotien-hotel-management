@@ -7,15 +7,16 @@ import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 import java.sql.*;
 import java.util.List;
 
-public class SurchargeDetailRepository {
+public class SurchargeDetailRepositoryImpl implements iuh.fit.se.group1.repository.interfaces.SurchargeDetailRepository {
 
     private final Connection connection;
 
-    public SurchargeDetailRepository() {
+    public SurchargeDetailRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
 
+    @Override
     public SurchargeDetail save(SurchargeDetail surchargeDetail, Long orderId) {
         String sql = """
                 INSERT INTO SurchargeDetail (orderId, surchargerId, quantity)
@@ -34,6 +35,7 @@ public class SurchargeDetailRepository {
         }
     }
 
+    @Override
     public List<SurchargeDetail> findSurchargeDetailsByOrderId(Long orderId) {
         String sql = """
                 SELECT sd.surchargerId, sd.quantity, sd.createdAt, s.name, s.price
@@ -65,6 +67,7 @@ public class SurchargeDetailRepository {
         }
     }
 
+    @Override
     public boolean existsBySurchargeIdAndOrderId(Long surchargeId, Long orderId) {
         String sql = "SELECT 1 FROM SurchargeDetail WHERE surchargerId = ? AND orderId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -77,6 +80,7 @@ public class SurchargeDetailRepository {
         }
     }
 
+    @Override
     public void deleteByOrderId(Long orderId) {
         String sql = "DELETE FROM SurchargeDetail WHERE orderId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -87,6 +91,7 @@ public class SurchargeDetailRepository {
         }
     }
 
+    @Override
     public boolean saveByOrderId(Long orderId, List<SurchargeDetail> surchargeDetails) {
         String sql = "INSERT INTO SurchargeDetail (orderId, surchargerId, quantity) VALUES (?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -103,6 +108,7 @@ public class SurchargeDetailRepository {
         }
     }
 
+    @Override
     public void deleteById(long surchargeId, Long orderId) {
         String sql = "DELETE FROM SurchargeDetail WHERE surchargerId = ? AND orderId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -114,6 +120,7 @@ public class SurchargeDetailRepository {
         }
     }
 
+    @Override
     public void deleteById(Long orderId) {
         String sql = "DELETE FROM SurchargeDetail where orderId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -124,6 +131,7 @@ public class SurchargeDetailRepository {
         }
     }
 
+    @Override
     public void updateSurchargeDetail(Long surchargeId, int quantity, Long orderId) {
         String sql = "UPDATE SurchargeDetail SET quantity = ? WHERE surchargerId = ? AND orderId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

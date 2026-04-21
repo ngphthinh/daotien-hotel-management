@@ -18,12 +18,12 @@ import java.util.List;
 
 /**
  * @description
- * @author: Nguyen Tran Quoc Viet 
+ * @author: Nguyen Tran Quoc Viet
  * @version: 1.0
  * @created: 27/10/2025
  */
 
-public class ShiftRepositoryImpl implements Repository<Shift,Long>, iuh.fit.se.group1.repository.interfaces.ShiftRepositort {
+public class ShiftRepositoryImpl implements Repository<Shift, Long>, iuh.fit.se.group1.repository.interfaces.ShiftRepository {
     private static final Logger log = LoggerFactory.getLogger(ShiftRepositoryImpl.class);
 
     private final Connection connection;
@@ -31,13 +31,14 @@ public class ShiftRepositoryImpl implements Repository<Shift,Long>, iuh.fit.se.g
     public ShiftRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
+
     @Override
     public Shift save(Shift entity) {
         String sql = "Insert into Shift(name,startTime,endTime,createdAt) values (?,?,?,?);";
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, entity.getName());
-            preparedStatement.setString(2,entity.getStartTime());
-            preparedStatement.setString(3,entity.getEndTime());
+            preparedStatement.setString(2, entity.getStartTime());
+            preparedStatement.setString(3, entity.getEndTime());
             if (entity.getCreatedAt() == null) {
                 entity.setCreatedAt(LocalDate.now());
             }
@@ -62,7 +63,7 @@ public class ShiftRepositoryImpl implements Repository<Shift,Long>, iuh.fit.se.g
     @Override
     public Shift findById(Long aLong) {
         String sql = "Select * from Shift where shiftId=?;";
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, aLong);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -76,7 +77,7 @@ public class ShiftRepositoryImpl implements Repository<Shift,Long>, iuh.fit.se.g
                 }
             }
             return null;
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             log.error("Error finding Shift by ID: ", e);
             throw new RuntimeException(e);
         }
@@ -101,7 +102,7 @@ public class ShiftRepositoryImpl implements Repository<Shift,Long>, iuh.fit.se.g
     public List<Shift> findAll() {
         List<Shift> shifts = new java.util.ArrayList<>();
         String sql = "Select * from Shift";
-        try(PreparedStatement preparedStatement= connection.prepareStatement(sql);ResultSet rs = preparedStatement.executeQuery()) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql); ResultSet rs = preparedStatement.executeQuery()) {
             while (rs.next()) {
                 Shift shift = new Shift();
                 shift.setShiftId(rs.getLong("shiftId"));
@@ -121,7 +122,7 @@ public class ShiftRepositoryImpl implements Repository<Shift,Long>, iuh.fit.se.g
     @Override
     public Shift update(Shift entity) {
         String sql = "Update Shift set name=?, startTime=?, endTime=? where shiftId=?;";
-        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setString(2, entity.getStartTime());
             preparedStatement.setString(3, entity.getEndTime());
