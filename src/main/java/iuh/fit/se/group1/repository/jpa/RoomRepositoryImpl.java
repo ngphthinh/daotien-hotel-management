@@ -2,7 +2,6 @@ package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.repository.AbstractRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.RoomRepository;
 
 import java.time.LocalDateTime;

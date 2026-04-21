@@ -4,8 +4,8 @@ import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.repository.BookingRepositoryImpl;
-import iuh.fit.se.group1.repository.OrderRepository;
+import iuh.fit.se.group1.repository.jpa.BookingRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.BookingRepository;
 import iuh.fit.se.group1.repository.interfaces.RoomRepository;
@@ -17,14 +17,14 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class OrderService {
-    private final OrderRepository orderRepository;
+    private final OrderRepositoryImpl orderRepositoryImpl;
     private OrderDetailService orderDetailsService;
     private RoomRepository roomRepository;
     private BookingRepository bookingRepository = new BookingRepositoryImpl();
 
     public OrderService() {
         this.orderDetailsService = new OrderDetailService();
-        this.orderRepository = new OrderRepository();
+        this.orderRepositoryImpl = new OrderRepositoryImpl();
         this.roomRepository = new RoomRepositoryImpl();
     }
 
@@ -49,7 +49,7 @@ public class OrderService {
         }
 
         // Lưu là đang sử li
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = orderRepositoryImpl.save(order);
         if (savedOrder == null) {
             AppLogger.info("Failed to save order");
             return null;
@@ -85,7 +85,7 @@ public class OrderService {
         }
 
 
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = orderRepositoryImpl.save(order);
         if (savedOrder == null) {
             AppLogger.info("Failed to save order");
             return null;
@@ -103,13 +103,15 @@ public class OrderService {
     public Order createOrderRecord(Order order) {
         if (order == null) return null;
         if (order.getEmployee() == null || order.getCustomer() == null) return null;
-        return orderRepository.save(order);
+        return orderRepositoryImpl.save(order);
     }
 
     /**
      * Move existing booking rows to another order by bookingId list.
      */
     public void moveBookingsToOrder(Long targetOrderId, List<Long> bookingIds) {
+        if (bookingIds == null || bookingIds.isEmpty()) return;
+
         bookingRepository.moveBookingsToOrder(targetOrderId, bookingIds);
     }
 
@@ -117,43 +119,43 @@ public class OrderService {
      * Update total amount for a given order id.
      */
     public void updateOrderTotalAmount(Long orderId, java.math.BigDecimal amount) {
-        orderRepository.updateTotalAmount(orderId, amount);
+        orderRepositoryImpl.updateTotalAmount(orderId, amount);
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        return orderRepositoryImpl.findAll();
     }
 
 
     public Order getOrderById(Long id) {
-        return orderRepository.findById(id);
+        return orderRepositoryImpl.findById(id);
     }
 
 
     public void updateOrderStatusToPaid(Order order) {
-        orderRepository.updateOrderStatusToPaid(order);
+        orderRepositoryImpl.updateOrderStatusToPaid(order);
         List<Long> roomIds = order.getBookings().stream().map(e -> e.getRoom().getRoomId()).toList();
         roomRepository.updateRoomStatusBatch(roomIds, RoomStatus.AVAILABLE);
     }
 
     public void updateOrderDeposit(Long orderId, java.math.BigDecimal deposit) {
-        orderRepository.updateDeposit(orderId, deposit);
+        orderRepositoryImpl.updateDeposit(orderId, deposit);
     }
 
     public void updateOrderType(Long orderId, Long newOrderTypeId) {
-        orderRepository.updateOrderType(orderId, newOrderTypeId);
+        orderRepositoryImpl.updateOrderType(orderId, newOrderTypeId);
     }
 
     public List<Order> getUnpaidOrders() {
-        return orderRepository.findAllByOrderUnPaid();
+        return orderRepositoryImpl.findAllByOrderUnPaid();
     }
 
     public List<Order> getUnpaidOrdersByKeyword(String keyword) {
-        return orderRepository.findUnpaidOrdersByKeyword(keyword);
+        return orderRepositoryImpl.findUnpaidOrdersByKeyword(keyword);
     }
 
     public BigDecimal getTotalRevenueBetweenDates(LocalDate from, LocalDate to) {
-        return orderRepository.calculateTotalRevenueBetweenDates(from, to);
+        return orderRepositoryImpl.calculateTotalRevenueBetweenDates(from, to);
     }
 
     /**
@@ -164,7 +166,7 @@ public class OrderService {
      * @return Map with room type name as key and revenue as value
      */
     public Map<String, BigDecimal> getRevenueByRoomType(LocalDate from, LocalDate to) {
-        return orderRepository.getRevenueByRoomType(from, to);
+        return orderRepositoryImpl.getRevenueByRoomType(from, to);
     }
 
     /**
@@ -174,7 +176,7 @@ public class OrderService {
      * @return Map với key là tên loại phòng, value là số lượng booking
      */
     public Map<String, Integer> getBookingCountByRoomTypeAndDate(LocalDate date) {
-        return orderRepository.getBookingCountByRoomTypeAndDate(date);
+        return orderRepositoryImpl.getBookingCountByRoomTypeAndDate(date);
     }
 
     public void removeBookingsFromOrder(Order currentOrder, List<Booking> result) {
@@ -183,7 +185,7 @@ public class OrderService {
 
 
     public void recalculateOrderTotal(Long orderId) {
-        Order order = orderRepository.findById(orderId);
+        Order order = orderRepositoryImpl.findById(orderId);
         if (order == null) {
             AppLogger.info("Order not found with id: " + orderId);
             return;
@@ -200,7 +202,7 @@ public class OrderService {
         BigDecimal totalSurcharge = surchargeDetailService.getSurchargeDetailsByOrderId(orderId).stream().map(e -> e.getSurcharge().getPrice().multiply(BigDecimal.valueOf(e.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalAmount = totalAmenity.add(totalSurcharge).add(totalRoom).subtract(order.getDeposit());
-        orderRepository.updateTotalAmount(orderId, totalAmount);
+        orderRepositoryImpl.updateTotalAmount(orderId, totalAmount);
     }
 
     private BookingService bookingService = new BookingService();
@@ -210,15 +212,15 @@ public class OrderService {
         surchargeDetailService.deleteById(id);
         orderDetailsService.deleteById(id);
         bookingRepository.deleteByOrderId(id);
-        orderRepository.deleteById(id);
+        orderRepositoryImpl.deleteById(id);
     }
 
     public List<Order> searchOrdersByKeyword(String searchText) {
-        return orderRepository.searchOrdersByKeyword(searchText);
+        return orderRepositoryImpl.searchOrdersByKeyword(searchText);
     }
 
     public List<Order> getOrdersByRoomIdAndOrderType(Long roomId, Long orderTypeId) {
-        return orderRepository.findOrdersByRoomIdAndOrderType(roomId, orderTypeId);
+        return orderRepositoryImpl.findOrdersByRoomIdAndOrderType(roomId, orderTypeId);
 
     }
 

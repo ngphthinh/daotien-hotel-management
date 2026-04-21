@@ -29,7 +29,6 @@ import java.util.List;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long orderId;
     private LocalDateTime orderDate;
     private BigDecimal totalAmount;

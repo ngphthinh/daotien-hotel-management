@@ -18,12 +18,12 @@ import org.slf4j.LoggerFactory;
 import iuh.fit.se.group1.entity.Promotion;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
 
-public class PromotionRepository implements Repository<Promotion, Long> {
-    private static final Logger log = LoggerFactory.getLogger(PromotionRepository.class);
+public class PromotionRepositoryImpl implements Repository<Promotion, Long>, iuh.fit.se.group1.repository.interfaces.PromotionRepository {
+    private static final Logger log = LoggerFactory.getLogger(PromotionRepositoryImpl.class);
 
     private final Connection connection;
 
-    public PromotionRepository() {
+    public PromotionRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
     }
 
@@ -196,6 +196,7 @@ public class PromotionRepository implements Repository<Promotion, Long> {
         return null;
     }
 
+    @Override
     public Promotion findAllWithDiscountPercentMax() {
         String sql = "SELECT TOP 1 * FROM Promotion where endDate > GETDATE() and isDeleted = 0 ORDER BY discountPercent DESC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -220,6 +221,7 @@ public class PromotionRepository implements Repository<Promotion, Long> {
     }
 
 
+    @Override
     public Promotion findByPrice(BigDecimal price) {
         String sql = "SELECT * FROM Promotion WHERE endDate > GETDATE() and discountPrice < ? and isDeleted = 0 ORDER BY discountPercent DESC";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -245,6 +247,7 @@ public class PromotionRepository implements Repository<Promotion, Long> {
     }
 
 
+    @Override
     public Promotion findActivePromotion(BigDecimal totalAmount) {
         String sql = """
                 SELECT * FROM Promotion

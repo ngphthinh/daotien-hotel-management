@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.repository.AbstractRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.EmployeeRepository;
 
 import java.util.List;

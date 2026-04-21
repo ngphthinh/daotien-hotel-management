@@ -3,7 +3,7 @@ package iuh.fit.se.group1.ui.component.custom;
 import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.dto.SurchargeDTO;
 import iuh.fit.se.group1.entity.*;
-import iuh.fit.se.group1.repository.SurchargeRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.SurchargeRepositoryImpl;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
@@ -651,8 +651,8 @@ public class OrderEditDialog extends JDialog {
         SurchargeManagementPanel surchargePanel =
                 new SurchargeManagementPanel();
 
-        SurchargeRepositoryImpl surchargeRepo = new SurchargeRepositoryImpl();
-        java.util.List<iuh.fit.se.group1.entity.Surcharge> availableSurcharges = surchargeRepo.findAll();
+        SurchargeService surchargeService = new SurchargeService();
+        java.util.List<iuh.fit.se.group1.entity.Surcharge> availableSurcharges = surchargeService.getAllSurcharges();
 
         List<SurchargeDTO> existingSurcharges = new ArrayList<>();
         for (int i = 0; i < surchargeModel.getRowCount(); i++) {

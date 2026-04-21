@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Customer;
-import iuh.fit.se.group1.repository.AbstractRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.CustomerRepository;
 
 import java.util.List;

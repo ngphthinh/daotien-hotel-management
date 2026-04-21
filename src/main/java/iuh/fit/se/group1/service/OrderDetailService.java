@@ -3,7 +3,7 @@ package iuh.fit.se.group1.service;
 import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.OrderDetail;
-import iuh.fit.se.group1.repository.OrderDetailRepository;
+import iuh.fit.se.group1.repository.jpa.OrderDetailRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,17 +13,18 @@ import java.util.List;
 public class OrderDetailService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderDetailService.class);
-    private final OrderDetailRepository orderDetailRepository;
+    private final OrderDetailRepositoryImpl orderDetailRepository;
     private AmenityService amenityService = new AmenityService();
+
     public OrderDetailService() {
-        this.orderDetailRepository = new OrderDetailRepository();
+        this.orderDetailRepository = new OrderDetailRepositoryImpl();
     }
 
     public boolean saveOrderDetailsForOrder(Order savedOrder, List<OrderDetail> orderDetails) {
         return orderDetailRepository.save(savedOrder, orderDetails);
     }
 
-    public List<OrderDetail> getOrderDetailsByOrderId(Long orderId){
+    public List<OrderDetail> getOrderDetailsByOrderId(Long orderId) {
         return orderDetailRepository.findByOrderId(orderId);
     }
 
@@ -56,6 +57,6 @@ public class OrderDetailService {
     }
 
     public void deleteById(Long id) {
-        orderDetailRepository.deleteById(id);
+        orderDetailRepository.deleteByOrderId(id);
     }
 }

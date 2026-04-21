@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.repository;
 
+import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.Room;
@@ -13,9 +14,47 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit.se.group1.repository.interfaces.BookingRepository {
+
+    @Override
+    public List<BookingDisplayDTO> findAllBookingDisplay() {
+        String sql = """
+                SELECT
+                    B.bookingId,
+                    R.roomNumber,
+                    C.fullName AS customerName,
+                    C.phone
+                FROM Booking B
+                JOIN Room R ON B.roomId = R.roomId
+                JOIN Orders O ON B.orderId = O.orderId
+                JOIN Customer C ON O.customerId = C.customerId
+                WHERE orderTypeId = 2
+                """;
+
+        List<BookingDisplayDTO> list = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Long bookingId = rs.getLong("bookingId");
+                String roomNumber = rs.getString("roomNumber");
+                String customerName = rs.getString("customerName");
+                String phoneNumber = rs.getString("phone");
+                BookingDisplayDTO dto = new BookingDisplayDTO(bookingId, roomNumber, customerName, phoneNumber);
+                list.add(dto);
+            }
+
+        } catch (SQLException e) {
+            log.error("Error retrieving booking display list: ", e);
+            throw new RuntimeException(e);
+        }
+
+        return list;
+    }
 
     private static final Logger log = LoggerFactory.getLogger(BookingRepositoryImpl.class);
     private final Connection connection;
@@ -46,9 +85,9 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
     @Override
     public Booking save(Booking entity) {
         String sql = """
-            INSERT INTO Booking(checkInDate, checkOutDate, orderId, roomId, bookingType, createdAt)
-            values (?, ?, ?, ?, ?, ?)
-            """;
+                INSERT INTO Booking(checkInDate, checkOutDate, orderId, roomId, bookingType, createdAt)
+                values (?, ?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setTimestamp(1, Timestamp.valueOf(entity.getCheckInDate()));
@@ -175,7 +214,7 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
                 SELECT bookingId, orderId, checkInDate, checkOutDate, bookingType, R.roomId, roomNumber, roomStatus, RT.roomTypeId, name, hourlyRate, dailyRate, overnightRate, additionalHourRate
                 FROM Booking B join Room R on B.roomId = R.roomId join RoomType RT on RT.roomTypeId = R.roomTypeId
                 WHERE B.orderId = ?
-                    """;
+                """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, orderId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -210,15 +249,16 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Đếm số phòng sắp hết hạn (checkout trong khoảng thời gian)
      */
     @Override
     public int countRoomsNearExpiry(LocalDateTime fromTime, LocalDateTime toTime) {
         String sql = "SELECT COUNT(DISTINCT b.roomId) " +
-                     "FROM Booking b " +
-                     "WHERE b.checkOutDate BETWEEN ? AND ? " +
-                     "AND b.checkOutDate IS NOT NULL";
+                "FROM Booking b " +
+                "WHERE b.checkOutDate BETWEEN ? AND ? " +
+                "AND b.checkOutDate IS NOT NULL";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(fromTime));
@@ -241,7 +281,7 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
     @Override
     public int countCheckIns(LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COUNT(*) FROM Booking " +
-                     "WHERE checkInDate BETWEEN ? AND ?";
+                "WHERE checkInDate BETWEEN ? AND ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(startDate));
@@ -264,8 +304,8 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
     @Override
     public int countCheckOuts(LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COUNT(*) FROM Booking " +
-                     "WHERE checkOutDate BETWEEN ? AND ? " +
-                     "AND checkOutDate IS NOT NULL";
+                "WHERE checkOutDate BETWEEN ? AND ? " +
+                "AND checkOutDate IS NOT NULL";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(startDate));
@@ -288,8 +328,8 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
     @Override
     public int countCheckedOutRooms(LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COUNT(*) FROM Booking " +
-                     "WHERE checkOutDate BETWEEN ? AND ? " +
-                     "AND checkOutDate IS NOT NULL";
+                "WHERE checkOutDate BETWEEN ? AND ? " +
+                "AND checkOutDate IS NOT NULL";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(startDate));
@@ -312,9 +352,9 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
     @Override
     public int countLateCheckOuts(LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime) {
         String sql = "SELECT COUNT(*) FROM Booking " +
-                     "WHERE checkOutDate BETWEEN ? AND ? " +
-                     "AND checkOutDate < ? " +
-                     "AND checkOutDate IS NOT NULL";
+                "WHERE checkOutDate BETWEEN ? AND ? " +
+                "AND checkOutDate < ? " +
+                "AND checkOutDate IS NOT NULL";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(startDate));

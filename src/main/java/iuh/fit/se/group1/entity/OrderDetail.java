@@ -1,11 +1,9 @@
 package iuh.fit.se.group1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -15,6 +13,7 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
+@IdClass(OrderDetail.OrderDetailId.class)
 public class OrderDetail {
     private BigDecimal unitPrice;
 
@@ -44,5 +43,16 @@ public class OrderDetail {
         this.createdAt = LocalDate.now();
     }
 
+    @Setter
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @EqualsAndHashCode
+    @ToString
+    public static class OrderDetailId implements Serializable {
+        private Long order;
+        private String amenity;
+
+    }
 
 }

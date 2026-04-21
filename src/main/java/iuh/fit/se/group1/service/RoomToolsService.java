@@ -3,9 +3,10 @@ package iuh.fit.se.group1.service;
 import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.repository.OrderRepository;
+import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.repository.RoomToolsRepository;
 import iuh.fit.se.group1.repository.RoomToolsRepository.BookingDTO;
+import iuh.fit.se.group1.repository.interfaces.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,7 @@ public class RoomToolsService {
 
     public RoomToolsService() {
         this.repository = new RoomToolsRepository();
-        this.orderRepository = new OrderRepository();
+        this.orderRepository = new OrderRepositoryImpl();
         this.roomService = new RoomService();
         this.roomTypeService = new RoomTypeService();
     }
@@ -226,7 +227,6 @@ public class RoomToolsService {
                 bookingType);
 
         RoomDTO roomDTO = roomService.toRoomDTO(room.getRoomType());
-
 
 
         int bookingTypeIndex = BookingType.toIndex(bookingType);
@@ -537,6 +537,7 @@ public class RoomToolsService {
         }
         return total;
     }
+
     public long calculateNewRoomPriceWithBookingDuration(Room newRoom, BookingType bookingType,
                                                          long orderId, Room referenceOldRoom) {
 

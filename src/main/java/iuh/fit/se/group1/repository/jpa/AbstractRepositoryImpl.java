@@ -1,4 +1,4 @@
-package iuh.fit.se.group1.repository;
+package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.repository.interfaces.Repository;

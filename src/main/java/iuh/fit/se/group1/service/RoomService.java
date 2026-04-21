@@ -7,7 +7,7 @@ import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
-import iuh.fit.se.group1.repository.RoomTypeRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.RoomTypeRepositoryImpl;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

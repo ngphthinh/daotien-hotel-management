@@ -3,7 +3,7 @@ package iuh.fit.se.group1.service;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.repository.BookingRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.BookingRepositoryImpl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -12,6 +12,7 @@ import java.util.List;
 
 public class BookingService {
     private final BookingRepositoryImpl bookingRepositoryImpl;
+
     public BookingService() {
         this.bookingRepositoryImpl = new BookingRepositoryImpl();
     }
@@ -20,7 +21,7 @@ public class BookingService {
         return bookingRepositoryImpl.isExistsByRoomAndDate(roomId, checkInDate, checkOutDate);
     }
 
-    public List<Booking> getAllBookings(){
+    public List<Booking> getAllBookings() {
         return bookingRepositoryImpl.findAll();
     }
 

@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.repository.interfaces;
 
+import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
 
@@ -7,6 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository {
+    boolean isExistsByRoomAndDate(Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate);
+
     void saveAllBookingsForOrder(Order savedOrder, List<Booking> bookings);
 
     void removeBookingsFromOrder(Order currentOrder, List<Booking> result);
@@ -28,4 +31,6 @@ public interface BookingRepository {
     int countCheckedOutRooms(LocalDateTime startDate, LocalDateTime endDate);
 
     int countLateCheckOuts(LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime);
+
+    List<BookingDisplayDTO> findAllBookingDisplay();
 }

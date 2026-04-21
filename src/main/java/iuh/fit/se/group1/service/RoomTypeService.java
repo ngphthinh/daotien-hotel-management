@@ -1,7 +1,8 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.RoomType;
-import iuh.fit.se.group1.repository.RoomTypeRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.RoomTypeRepositoryImpl;
+
 import java.util.List;
 
 public class RoomTypeService {

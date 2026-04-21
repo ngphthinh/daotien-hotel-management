@@ -19,14 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OrderRepository implements Repository<Order, Long> {
+public class OrderRepositoryImpl implements Repository<Order, Long>, iuh.fit.se.group1.repository.interfaces.OrderRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderRepositoryImpl.class);
 
     private final iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl customerRepository;
     private final Connection connection;
 
-    public OrderRepository() {
+    public OrderRepositoryImpl() {
         this.customerRepository = new CustomerRepositoryImpl();
         this.connection = DatabaseUtil.getConnection();
     }
@@ -266,47 +266,14 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
-    public List<BookingDisplayDTO> findAllBookingDisplay() {
-        String sql = """
-                SELECT
-                    B.bookingId,
-                    R.roomNumber,
-                    C.fullName AS customerName,
-                    C.phone
-                FROM Booking B
-                JOIN Room R ON B.roomId = R.roomId
-                JOIN Orders O ON B.orderId = O.orderId
-                JOIN Customer C ON O.customerId = C.customerId
-                WHERE orderTypeId = 2
-                """;
 
-        List<BookingDisplayDTO> list = new ArrayList<>();
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Long bookingId = rs.getLong("bookingId");
-                String roomNumber = rs.getString("roomNumber");
-                String customerName = rs.getString("customerName");
-                String phoneNumber = rs.getString("phone");
-                BookingDisplayDTO dto = new BookingDisplayDTO(bookingId, roomNumber, customerName, phoneNumber);
-                list.add(dto);
-            }
-
-        } catch (SQLException e) {
-            log.error("Error retrieving booking display list: ", e);
-            throw new RuntimeException(e);
-        }
-
-        return list;
-    }
 
     @Override
     public Order update(Order entity) {
         return null;
     }
 
+    @Override
     public void updateTotalAmount(Long orderId, BigDecimal totalAmount) {
         String sql = "UPDATE Orders SET totalAmount = ? WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -319,6 +286,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public void updateDeposit(Long orderId, BigDecimal deposit) {
         String sql = "UPDATE Orders SET deposit = ? WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -331,6 +299,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public void updateOrderType(Long orderId, Long newOrderTypeId) {
         String sql = "UPDATE Orders SET orderTypeId = ? WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -344,6 +313,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public List<Order> findAllByOrderUnPaid() {
         String sql = """
                 SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount, C.phone, C.fullName, R.roomNumber
@@ -402,6 +372,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public void updateOrderStatusToPaid(Order order) {
         String sql = "UPDATE Orders SET orderTypeId = 1, totalAmount = ?, paymentType = ?, promotionId = ?, paymentDate = ?, employeePaymentId = ?  WHERE orderId = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -422,6 +393,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public List<Order> findUnpaidOrdersByKeyword(String keyword) {
         String sql = """
                 SELECT O.orderId, B.checkInDate, B.checkOutDate, O.totalAmount,
@@ -486,6 +458,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public List<Order> findAllOrders() {
         String sql = """
                 SELECT
@@ -558,6 +531,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public List<Order> findOrdersUnPendingByKeyWord(String keyword) {
         String sql = """
                 SELECT
@@ -652,6 +626,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public BigDecimal calculateTotalRevenueBetweenDates(LocalDate from, LocalDate to) {
         String sql = "SELECT SUM(totalAmount) AS totalRevenue FROM Orders WHERE orderTypeId = 1 AND paymentDate BETWEEN ? AND ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -670,6 +645,7 @@ public class OrderRepository implements Repository<Order, Long> {
         return BigDecimal.ZERO;
     }
 
+    @Override
     public List<Order> searchOrdersByKeyword(String searchText) {
         String sql = """
                 SELECT
@@ -754,6 +730,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public List<Order> findOrdersByRoomIdAndOrderType(Long roomId, Long orderTypeId) {
         String sql = """
                 SELECT O.orderId, O.orderDate, O.totalAmount, O.deposit,
@@ -823,6 +800,7 @@ public class OrderRepository implements Repository<Order, Long> {
         }
     }
 
+    @Override
     public Map<String, BigDecimal> getRevenueByRoomType(LocalDate from, LocalDate to) {
         String sql = """
                 SELECT RT.name AS roomTypeName, SUM(O.totalAmount) AS totalRevenue
@@ -860,6 +838,7 @@ public class OrderRepository implements Repository<Order, Long> {
      * @param date Ngày cần lấy dữ liệu
      * @return Map với key là tên loại phòng, value là số lượng booking
      */
+    @Override
     public Map<String, Integer> getBookingCountByRoomTypeAndDate(LocalDate date) {
         String sql = """
                 SELECT RT.name AS roomTypeName, COUNT(B.bookingId) AS bookingCount

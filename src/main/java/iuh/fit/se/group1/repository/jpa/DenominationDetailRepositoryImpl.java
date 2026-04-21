@@ -2,9 +2,7 @@ package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.DenominationDetail;
 import iuh.fit.se.group1.enums.DenominationLabel;
-import iuh.fit.se.group1.repository.AbstractRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.DenominationDetailRepository;
-import iuh.fit.se.group1.repository.interfaces.Repository;
 
 import java.util.List;
 

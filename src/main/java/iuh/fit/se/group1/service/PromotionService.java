@@ -4,49 +4,54 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import iuh.fit.se.group1.entity.Promotion;
-import iuh.fit.se.group1.repository.PromotionRepository;
+import iuh.fit.se.group1.repository.jpa.PromotionRepositoryImpl;
 
 public class PromotionService {
-    private final PromotionRepository promotionRepository;
+    private final PromotionRepositoryImpl promotionRepositoryImpl;
+
     public PromotionService() {
-        this.promotionRepository = new PromotionRepository();
+        this.promotionRepositoryImpl = new PromotionRepositoryImpl();
     }
+
     public Promotion createPromotion(Promotion promotion) {
-        return promotionRepository.save(promotion);
+        return promotionRepositoryImpl.save(promotion);
     }
+
     public void deletePromotion(Long promotionId) {
-        promotionRepository.deleteById(promotionId);
+        promotionRepositoryImpl.deleteById(promotionId);
     }
 
     public Promotion getPromotionById(Long promotionId) {
-        return promotionRepository.findById(promotionId);
+        return promotionRepositoryImpl.findById(promotionId);
     }
 
     public List<Promotion> getAllPromotions() {
-        return promotionRepository.findAll();
+        return promotionRepositoryImpl.findAll();
     }
+
     public Promotion updatePromotion(Promotion promotion) {
-        return promotionRepository.update(promotion);
+        return promotionRepositoryImpl.update(promotion);
     }
+
     public List<Promotion> getPromotionByKeyword(String keyword) {
-        return promotionRepository.findByPromotionIdOrName(keyword);
+        return promotionRepositoryImpl.findByPromotionIdOrName(keyword);
     }
 
-    public Promotion getPromotionByPrice(BigDecimal price) {
-        return promotionRepository.findByPrice(price);
-    }
+//    public Promotion getPromotionByPrice(BigDecimal price) {
+//        return promotionRepositoryImpl.findByPrice(price);
+//    }
 
 
-    public Promotion getPromotionDiscountPriceMax() {
-        return promotionRepository.findAllWithDiscountPriceMax();
-    }
+//    public Promotion getPromotionDiscountPriceMax() {
+//        return promotionRepositoryImpl.findAllWithDiscountPriceMax();
+//    }
 
-    public Promotion getPromotionDiscountPercentMax(){
-        return promotionRepository.findAllWithDiscountPercentMax();
-    }
+//    public Promotion getPromotionDiscountPercentMax(){
+//        return promotionRepositoryImpl.findAllWithDiscountPercentMax();
+//    }
 
     public Promotion getActivePromotion(BigDecimal totalAmount) {
-        return promotionRepository.findActivePromotion(totalAmount);
+        return promotionRepositoryImpl.findActivePromotion(totalAmount);
     }
 
 }

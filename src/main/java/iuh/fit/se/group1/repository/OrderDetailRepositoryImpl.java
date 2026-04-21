@@ -13,15 +13,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderDetailRepository {
+public class OrderDetailRepositoryImpl implements iuh.fit.se.group1.repository.interfaces.OrderDetailRepository {
 
     private final Connection connection;
 
-    public OrderDetailRepository() {
+    public OrderDetailRepositoryImpl() {
         this.connection = DatabaseUtil.getConnection();
     }
 
 
+    @Override
     public boolean save(Order savedOrder, List<OrderDetail> orderDetails) {
         String sql = "INSERT INTO OrderDetail(unitPrice, quantity, amenityId, orderId) values (?,?,?,?)";
         try (var preparedStatement = connection.prepareStatement(sql)) {
@@ -41,6 +42,7 @@ public class OrderDetailRepository {
     }
 
     // New: save by orderId (used when order already exists and we need to insert details)
+    @Override
     public boolean saveByOrderId(Long orderId, List<OrderDetail> orderDetails) {
         String sql = "INSERT INTO OrderDetail(unitPrice, quantity, amenityId, orderId) values (?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -59,6 +61,7 @@ public class OrderDetailRepository {
     }
 
     // New: delete all details for an order
+    @Override
     public void deleteByOrderId(Long orderId) {
         String sql = "DELETE FROM OrderDetail WHERE orderId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -69,6 +72,7 @@ public class OrderDetailRepository {
         }
     }
 
+    @Override
     public List<OrderDetail> findByOrderId(Long orderId) {
         String sql = """
                 SELECT
@@ -108,7 +112,8 @@ public class OrderDetailRepository {
         return orderDetails;
     }
 
-    public void deleteById(Long amenityId,Long orderId) {
+    @Override
+    public void deleteById(Long amenityId, Long orderId) {
         String sql = "DELETE FROM OrderDetail WHERE orderId = ? AND amenityId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, orderId);
@@ -119,6 +124,7 @@ public class OrderDetailRepository {
         }
     }
 
+    @Override
     public OrderDetail save(Long orderId, OrderDetail newDetail) {
         String sql = "INSERT INTO OrderDetail(unitPrice, quantity, amenityId, orderId) values (?,?,?,?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -133,6 +139,7 @@ public class OrderDetailRepository {
         }
     }
 
+    @Override
     public void updateOrderDetailFormOrderId(Long amenityId, BigDecimal unitPrice, int quantity, Long orderId) {
         String sql = "UPDATE OrderDetail SET unitPrice = ?, quantity = ? WHERE amenityId = ? AND orderId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -146,13 +153,6 @@ public class OrderDetailRepository {
         }
     }
 
-    public void deleteById(Long id) {
-        String sql = "DELETE FROM OrderDetail WHERE orderId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error deleting OrderDetail by orderId", e);
-        }
-    }
+
+
 }

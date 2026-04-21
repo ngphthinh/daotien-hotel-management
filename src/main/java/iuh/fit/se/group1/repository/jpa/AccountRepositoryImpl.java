@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Account;
-import iuh.fit.se.group1.repository.AbstractRepositoryImpl;
 
 public class AccountRepositoryImpl extends AbstractRepositoryImpl<Account, String> implements iuh.fit.se.group1.repository.interfaces.AccountRepository {
     public AccountRepositoryImpl() {

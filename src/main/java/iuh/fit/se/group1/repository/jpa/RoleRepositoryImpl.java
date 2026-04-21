@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Role;
-import iuh.fit.se.group1.repository.AbstractRepositoryImpl;
 
 public class RoleRepositoryImpl extends AbstractRepositoryImpl<Role, String> implements iuh.fit.se.group1.repository.interfaces.RoleRepository {
     public RoleRepositoryImpl() {

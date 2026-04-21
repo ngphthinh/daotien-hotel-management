@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Amenity;
-import iuh.fit.se.group1.repository.AbstractRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.AmenityRepository;
 
 import java.util.List;

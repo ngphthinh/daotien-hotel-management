@@ -1,7 +1,7 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.entity.Surcharge;
-import iuh.fit.se.group1.repository.SurchargeRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.SurchargeRepositoryImpl;
 
 import java.util.List;
 
