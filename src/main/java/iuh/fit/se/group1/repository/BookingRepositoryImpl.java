@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.repository;
 
+import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
@@ -18,6 +19,114 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit.se.group1.repository.interfaces.BookingRepository {
+
+    /**
+     * Gia hạn ngày check-out cho booking
+     */
+    @Override
+    public boolean extendRoomBooking(Long orderId, List<Long> roomIds,
+                                     int extendValue, String bookingType) {
+        try {
+            connection.setAutoCommit(false);
+
+            // Validate booking type
+            if ("OVERNIGHT".equals(bookingType)) {
+                log.warn("Cannot extend OVERNIGHT booking type");
+                connection.rollback();
+                return false;
+            }
+
+            // Lấy thông tin booking hiện tại
+            String getBookingSql = """
+                    SELECT checkInDate, checkOutDate
+                    FROM Booking
+                    WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                    """;
+
+            LocalDateTime currentCheckOut = null;
+
+            try (PreparedStatement stmt = connection.prepareStatement(getBookingSql)) {
+                stmt.setLong(1, orderId);
+                stmt.setString(2, bookingType);
+                stmt.setLong(3, roomIds.get(0)); // Lấy từ phòng đầu tiên
+
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    Timestamp checkOutTimestamp = rs.getTimestamp("checkOutDate");
+                    if (checkOutTimestamp != null) {
+                        currentCheckOut = checkOutTimestamp.toLocalDateTime();
+                    }
+                } else {
+                    connection.rollback();
+                    log.warn("Booking not found for orderId: {}", orderId);
+                    return false;
+                }
+            }
+
+            if (currentCheckOut == null) {
+                connection.rollback();
+                return false;
+            }
+
+            // Tính checkout date mới dựa trên booking type
+            LocalDateTime newCheckOut;
+            if ("HOURLY".equals(bookingType)) {
+                // Gia hạn theo giờ
+                newCheckOut = currentCheckOut.plusHours(extendValue);
+                log.info("Extending HOURLY booking by {} hours. Current: {}, New: {}",
+                        extendValue, currentCheckOut, newCheckOut);
+            } else if ("DAILY".equals(bookingType)) {
+                // Gia hạn theo ngày
+                newCheckOut = currentCheckOut.plusDays(extendValue);
+                log.info("Extending DAILY booking by {} days. Current: {}, New: {}",
+                        extendValue, currentCheckOut, newCheckOut);
+            } else {
+                connection.rollback();
+                log.warn("Invalid booking type for extension: {}", bookingType);
+                return false;
+            }
+
+            // Cập nhật checkout date cho tất cả phòng
+            String updateSql = """
+                    UPDATE Booking
+                    SET checkOutDate = ?
+                    WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                    """;
+
+            try (PreparedStatement stmt = connection.prepareStatement(updateSql)) {
+                for (Long roomId : roomIds) {
+                    stmt.setTimestamp(1, Timestamp.valueOf(newCheckOut));
+                    stmt.setLong(2, orderId);
+                    stmt.setString(3, bookingType);
+                    stmt.setLong(4, roomId);
+
+                    int updated = stmt.executeUpdate();
+                    if (updated == 0) {
+                        log.warn("No booking updated for roomId: {}", roomId);
+                    }
+                }
+            }
+
+            connection.commit();
+            log.info("Successfully extended {} bookings for order {}", roomIds.size(), orderId);
+            return true;
+
+        } catch (SQLException e) {
+            log.error("Error extending room booking", e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                log.error("Error rolling back transaction", ex);
+            }
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                log.error("Error resetting auto-commit", e);
+            }
+        }
+    }
 
     @Override
     public List<BookingDisplayDTO> findAllBookingDisplay() {
@@ -370,5 +479,286 @@ public class BookingRepositoryImpl implements Repository<Booking, Long>, iuh.fit
             log.error("Error counting late checkouts: ", e);
         }
         return 0;
+    }
+
+
+    @Override
+    public List<BookingDTO> getAllBookings() {
+        List<BookingDTO> bookings = new ArrayList<>();
+        String sql = """
+                    SELECT
+                        MIN(b.bookingId) as bookingId,
+                        c.fullName,
+                        c.citizenId,
+                        b.bookingType,
+                        MIN(o.orderId) as orderId,
+                        MIN(ot.name) as orderTypeName,
+                        STRING_AGG(r.roomNumber, ', ') WITHIN GROUP (ORDER BY r.roomNumber) as rooms
+                    FROM Booking b
+                    JOIN Orders o ON b.orderId = o.orderId
+                    JOIN Customer c ON o.customerId = c.customerId
+                    JOIN Room r ON b.roomId = r.roomId
+                    JOIN OrderType ot ON o.orderTypeId = ot.orderTypeId
+                    WHERE o.orderTypeId IN (2, 3)
+                    AND (
+                        -- CASE 1: Đã check-in và chưa check-out (cho tất cả loại thuê)
+                        (b.checkInDate <= GETDATE() AND b.checkOutDate >= GETDATE())
+                        OR
+                        -- CASE 2: Booking trong ngày hôm nay nhưng chưa check-in
+                        (CAST(b.checkInDate AS DATE) = CAST(GETDATE() AS DATE) AND b.checkInDate > GETDATE())
+                    )
+                    GROUP BY c.citizenId, c.fullName, b.bookingType, o.orderId
+                    ORDER BY c.citizenId, b.bookingType
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                try {
+                    BookingDTO dto = new BookingDTO();
+                    dto.bookingId = rs.getLong("bookingId");
+                    dto.bookingIdDisplay = String.format("%d", rs.getLong("bookingId"));
+                    dto.guestName = rs.getString("fullName");
+                    dto.cccd = rs.getString("citizenId");
+
+                    String bookingTypeStr = rs.getString("bookingType");
+                    log.info("Found booking with type: {}", bookingTypeStr);
+
+                    dto.bookingType = BookingType.valueOf(bookingTypeStr);
+                    dto.rooms = rs.getString("rooms");
+                    dto.orderId = rs.getLong("orderId");
+                    dto.orderTypeName = rs.getString("orderTypeName");
+                    bookings.add(dto);
+                } catch (IllegalArgumentException e) {
+                    log.error("Invalid booking type: {}", rs.getString("bookingType"), e);
+                }
+            }
+
+        } catch (SQLException e) {
+            log.error("Error getting bookings", e);
+        }
+
+        log.info("Total bookings found: {}", bookings.size());
+        return bookings;
+    }
+
+
+    @Override
+    public List<BookingDTO> searchBookingsByCitizenId(String citizenId) {
+        List<BookingDTO> bookings = new ArrayList<>();
+        String sql = """
+                    SELECT
+                        MIN(b.bookingId) as bookingId,
+                        c.fullName,
+                        c.citizenId,
+                        b.bookingType,
+                        MIN(o.orderId) as orderId,
+                        MIN(ot.name) as orderTypeName,
+                        STRING_AGG(r.roomNumber, ', ') WITHIN GROUP (ORDER BY r.roomNumber) as rooms
+                    FROM Booking b
+                    JOIN Orders o ON b.orderId = o.orderId
+                    JOIN Customer c ON o.customerId = c.customerId
+                    JOIN Room r ON b.roomId = r.roomId
+                    JOIN OrderType ot ON o.orderTypeId = ot.orderTypeId
+                    WHERE o.orderTypeId IN (2, 3)
+                    AND (
+                        -- CASE 1: Đã check-in và chưa check-out (cho tất cả loại thuê)
+                        (b.checkInDate <= GETDATE() AND b.checkOutDate >= GETDATE())
+                        OR
+                        -- CASE 2: Booking trong ngày hôm nay nhưng chưa check-in
+                        (CAST(b.checkInDate AS DATE) = CAST(GETDATE() AS DATE) AND b.checkInDate > GETDATE())
+                    )
+                    AND c.citizenId LIKE ?
+                    GROUP BY c.citizenId, c.fullName, b.bookingType, o.orderId
+                    ORDER BY c.citizenId, b.bookingType
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            String searchPattern = "%" + citizenId + "%";
+            stmt.setString(1, searchPattern);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                try {
+                    BookingDTO dto = new BookingDTO();
+                    dto.bookingId = rs.getLong("bookingId");
+                    dto.bookingIdDisplay = String.format("%d", rs.getLong("bookingId"));
+                    dto.guestName = rs.getString("fullName");
+                    dto.cccd = rs.getString("citizenId");
+
+                    String bookingTypeStr = rs.getString("bookingType");
+                    dto.bookingType = BookingType.valueOf(bookingTypeStr);
+                    dto.rooms = rs.getString("rooms");
+                    dto.orderId = rs.getLong("orderId");
+                    dto.orderTypeName = rs.getString("orderTypeName");
+                    bookings.add(dto);
+                } catch (IllegalArgumentException e) {
+                    log.error("Invalid booking type: {}", rs.getString("bookingType"), e);
+                }
+            }
+
+        } catch (SQLException e) {
+            log.error("Error searching bookings by citizen ID", e);
+        }
+
+        return bookings;
+    }
+
+
+    /**
+     * Lấy thông tin booking chi tiết
+     */
+    @Override
+    public Booking getBookingById(long bookingId, long roomId) {
+        String sql = """
+                SELECT checkInDate, checkOutDate, bookingType, orderId
+                FROM Booking
+                WHERE bookingId = ? AND roomId = ?
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, bookingId);
+            stmt.setLong(2, roomId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingId(bookingId);
+                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
+                booking.setBookingType(BookingType.valueOf(rs.getString("bookingType")));
+
+                Order order = new Order();
+                order.setOrderId(rs.getLong("orderId"));
+                booking.setOrder(order);
+
+                return booking;
+            }
+
+        } catch (SQLException e) {
+            log.error("Error getting booking by ID", e);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Lấy thông tin booking chi tiết theo orderId và bookingType
+     */
+    @Override
+    public Booking getBookingByOrderIdAndType(long orderId, String bookingType, long roomId) {
+        String sql = """
+                SELECT checkInDate, checkOutDate, bookingType, orderId, bookingId
+                FROM Booking
+                WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, orderId);
+            stmt.setString(2, bookingType);
+            stmt.setLong(3, roomId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Booking booking = new Booking();
+                booking.setBookingId(rs.getLong("bookingId"));
+                booking.setCheckInDate(rs.getTimestamp("checkInDate").toLocalDateTime());
+                booking.setCheckOutDate(rs.getTimestamp("checkOutDate").toLocalDateTime());
+                booking.setBookingType(BookingType.valueOf(rs.getString("bookingType")));
+
+                Order order = new Order();
+                order.setOrderId(rs.getLong("orderId"));
+                booking.setOrder(order);
+
+                return booking;
+            }
+
+        } catch (SQLException e) {
+            log.error("Error getting booking by orderId and type", e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Implement cancelRoomBooking method to cancel room bookings
+     * Xóa booking và cập nhật trạng thái phòng về AVAILABLE
+     */
+    @Override
+    public boolean cancelRoomBooking(Long orderId, Long roomId, String bookingType) {
+        try {
+            connection.setAutoCommit(false);
+
+            // 1. Check booking tồn tại và chưa check-in
+            String checkBookingSql = """
+                    SELECT checkInDate
+                    FROM Booking
+                    WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                    """;
+
+            Timestamp checkInTimestamp = null;
+
+            try (PreparedStatement stmt = connection.prepareStatement(checkBookingSql)) {
+                stmt.setLong(1, orderId);
+                stmt.setString(2, bookingType);
+                stmt.setLong(3, roomId);
+
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    checkInTimestamp = rs.getTimestamp("checkInDate");
+                } else {
+                    connection.rollback();
+                    log.warn("Booking not found for orderId: {}, roomId: {}", orderId, roomId);
+                    return false;
+                }
+            }
+
+            // Nếu đã check-in → không cho hủy
+            if (checkInTimestamp != null &&
+                    checkInTimestamp.before(Timestamp.from(java.time.Instant.now()))) {
+                connection.rollback();
+                log.warn("Cannot cancel room booking: already checked in.");
+                return false;
+            }
+
+            // 2. Xóa booking
+            String deleteBookingSql = """
+                    DELETE FROM Booking
+                    WHERE orderId = ? AND bookingType = ? AND roomId = ?
+                    """;
+
+            try (PreparedStatement stmt = connection.prepareStatement(deleteBookingSql)) {
+                stmt.setLong(1, orderId);
+                stmt.setString(2, bookingType);
+                stmt.setLong(3, roomId);
+                stmt.executeUpdate();
+            }
+
+//            // 3. Update room status → AVAILABLE
+//            String updateRoomSql = "UPDATE Room SET roomStatus = 'AVAILABLE' WHERE roomId = ?";
+//            try (PreparedStatement stmt = connection.prepareStatement(updateRoomSql)) {
+//                stmt.setLong(1, roomId);
+//                stmt.executeUpdate();
+//            }
+
+            connection.commit();
+            log.info("Cancelled booking for orderId {}, roomId {}", orderId, roomId);
+            return true;
+
+        } catch (SQLException e) {
+            log.error("Error canceling room booking", e);
+            try {
+                connection.rollback();
+            } catch (Exception ignored) {
+            }
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (Exception ignored) {
+            }
+        }
     }
 }

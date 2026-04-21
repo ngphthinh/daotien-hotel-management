@@ -7,13 +7,14 @@ package iuh.fit.se.group1.service;
 
 
 import iuh.fit.se.group1.entity.EmployeeShift;
-import iuh.fit.se.group1.repository.EmployeeShiftRepositoryImpl;
-import iuh.fit.se.group1.repository.ShiftCloseRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.EmployeeShiftRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.ShiftCloseRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * @description
- * @author: Nguyen Tran Quoc Viet 
+ * @author: Nguyen Tran Quoc Viet
  * @version: 1.0
  * @created: 30/10/2025
  */
@@ -36,9 +37,13 @@ public class EmployeeShiftService {
     }
 
     public EmployeeShift addEmployeeShift(EmployeeShift employeeShift) {
-        log.info("Adding shift {} for employee {}",
-                employeeShift.getShift().getShiftId(),
-                employeeShift.getEmployee().getEmployeeId());
+        if (employeeShift.getCreatedAt() == null) {
+            employeeShift.setCreatedAt(LocalDate.now());
+        }
+
+        if (employeeShift.getShiftDate() == null) {
+            employeeShift.setShiftDate(LocalDate.now());
+        }
         return employeeShiftRepository.save(employeeShift);
     }
 
@@ -69,10 +74,12 @@ public class EmployeeShiftService {
                 .filter(es -> es.getEmployee().getEmployeeId().equals(employeeId))
                 .collect(Collectors.toList());
     }
+
     public List<EmployeeShift> getAllShiftsByDate(LocalDate date) {
         log.info("Fetching all shifts on date {}", date);
         return employeeShiftRepository.findByShiftDate(date);
     }
+
     public EmployeeShift getEmployeeShiftWithDetails(Long employeeShiftId) {
         EmployeeShiftRepositoryImpl repository = new EmployeeShiftRepositoryImpl();
         return repository.findByIdWithDetails(employeeShiftId);
@@ -85,6 +92,7 @@ public class EmployeeShiftService {
         ShiftCloseRepository shiftCloseRepo = new ShiftCloseRepositoryImpl();
         return shiftCloseRepo.getTotalCashRevenueForShift(employeeShiftId);
     }
+
     public boolean isShiftActive(EmployeeShift shift) {
         try {
             if (shift == null || shift.getShift() == null) {

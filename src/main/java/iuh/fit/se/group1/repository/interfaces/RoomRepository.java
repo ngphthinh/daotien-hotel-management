@@ -24,4 +24,14 @@ public interface RoomRepository {
     void updateBookingRoom(Long bookingId, Long newRoomId);
 
     boolean isRoomInUse(Long roomId);
+
+    List<Room> getRoomsByOrderIdAndType(long orderId, String bookingType);
+
+    List<Room> getRoomsByBookingId(long bookingId);
+
+    List<Room> getAvailableRoomsByType(String roomTypeId);
+
+    boolean transferRooms(long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds);
+
+
 }

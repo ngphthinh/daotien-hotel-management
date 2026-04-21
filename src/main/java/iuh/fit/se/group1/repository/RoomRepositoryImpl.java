@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.repository;
 
 import iuh.fit.se.group1.config.AppLogger;
+import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
@@ -20,11 +21,169 @@ public class RoomRepositoryImpl implements Repository<Room, Long>, iuh.fit.se.gr
     private static final Logger log = LoggerFactory.getLogger(RoomRepositoryImpl.class);
     private final Connection connection;
     private final RoomTypeRepositoryImpl roomTypeRepositoryImpl;  // Inject để load full RoomType
+    private final BookingRepositoryImpl bookingRepositoryImpl = new BookingRepositoryImpl(); // Dùng để lấy thông tin booking khi chuyển phòng
 
     public RoomRepositoryImpl() {
         connection = DatabaseUtil.getConnection();
         this.roomTypeRepositoryImpl = new RoomTypeRepositoryImpl();  // Tạm new; tốt hơn inject qua DI
     }
+
+    /**
+     * Lấy thông tin TẤT CẢ phòng theo orderId và bookingType
+     * (vì giờ 1 CCCD có nhiều phòng được gộp lại, cần lấy theo orderId)
+     */
+    @Override
+    public List<Room> getRoomsByOrderIdAndType(long orderId, String bookingType) {
+        List<Room> rooms = new ArrayList<>();
+        String sql = """
+                    SELECT
+                        r.roomId,
+                        r.roomNumber,
+                        r.roomStatus,
+                        rt.roomTypeId,
+                        rt.name as roomTypeName,
+                        rt.hourlyRate,
+                        rt.dailyRate,
+                        rt.overnightRate,
+                        rt.additionalHourRate
+                    FROM Booking b
+                    JOIN Room r ON b.roomId = r.roomId
+                    JOIN RoomType rt ON r.roomTypeId = rt.roomTypeId
+                    WHERE b.orderId = ? AND b.bookingType = ?
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, orderId);
+            stmt.setString(2, bookingType);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                RoomType roomType = new RoomType();
+                roomType.setRoomTypeId(rs.getString("roomTypeId"));
+                roomType.setName(rs.getString("roomTypeName"));
+                roomType.setHourlyRate(rs.getBigDecimal("hourlyRate"));
+                roomType.setDailyRate(rs.getBigDecimal("dailyRate"));
+                roomType.setOvernightRate(rs.getBigDecimal("overnightRate"));
+                roomType.setAdditionalHourRate(rs.getBigDecimal("additionalHourRate"));
+
+                Room room = new Room();
+                room.setRoomId(rs.getLong("roomId"));
+                room.setRoomNumber(rs.getString("roomNumber"));
+                room.setRoomType(roomType);
+
+                rooms.add(room);
+            }
+
+        } catch (SQLException e) {
+            log.error("Error getting rooms by orderId and bookingType", e);
+        }
+
+        return rooms;
+    }
+
+    /**
+     * Lấy thông tin phòng theo booking ID (giữ lại cho tương thích)
+     */
+    @Override
+    public List<Room> getRoomsByBookingId(long bookingId) {
+        List<Room> rooms = new ArrayList<>();
+        String sql = """
+                    SELECT
+                        r.roomId,
+                        r.roomNumber,
+                        r.roomStatus,
+                        rt.roomTypeId,
+                        rt.name as roomTypeName,
+                        rt.hourlyRate,
+                        rt.dailyRate,
+                        rt.overnightRate,
+                        rt.additionalHourRate
+                    FROM Booking b
+                    JOIN Room r ON b.roomId = r.roomId
+                    JOIN RoomType rt ON r.roomTypeId = rt.roomTypeId
+                    WHERE b.bookingId = ?
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, bookingId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                RoomType roomType = new RoomType();
+                roomType.setRoomTypeId(rs.getString("roomTypeId"));
+                roomType.setName(rs.getString("roomTypeName"));
+                roomType.setHourlyRate(rs.getBigDecimal("hourlyRate"));
+                roomType.setDailyRate(rs.getBigDecimal("dailyRate"));
+                roomType.setOvernightRate(rs.getBigDecimal("overnightRate"));
+                roomType.setAdditionalHourRate(rs.getBigDecimal("additionalHourRate"));
+
+                Room room = new Room();
+                room.setRoomId(rs.getLong("roomId"));
+                room.setRoomNumber(rs.getString("roomNumber"));
+                room.setRoomType(roomType);
+
+                rooms.add(room);
+            }
+
+        } catch (SQLException e) {
+            log.error("Error getting rooms by booking ID", e);
+        }
+
+        return rooms;
+    }
+
+    /**
+     * Lấy danh sách phòng trống theo loại phòng
+     */
+    @Override
+    public List<Room> getAvailableRoomsByType(String roomTypeId) {
+        List<Room> rooms = new ArrayList<>();
+        String sql = """
+                SELECT
+                    r.roomId,
+                    r.roomNumber,
+                    r.roomStatus,
+                    rt.roomTypeId,
+                    rt.name as roomTypeName,
+                    rt.hourlyRate,
+                    rt.dailyRate,
+                    rt.overnightRate,
+                    rt.additionalHourRate
+                FROM Room r
+                JOIN RoomType rt ON r.roomTypeId = rt.roomTypeId
+                WHERE r.roomStatus = 'AVAILABLE'
+                AND r.roomTypeId = ?
+                ORDER BY r.roomNumber
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, roomTypeId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                RoomType roomType = new RoomType();
+                roomType.setRoomTypeId(rs.getString("roomTypeId"));
+                roomType.setName(rs.getString("roomTypeName"));
+                roomType.setHourlyRate(rs.getBigDecimal("hourlyRate"));
+                roomType.setDailyRate(rs.getBigDecimal("dailyRate"));
+                roomType.setOvernightRate(rs.getBigDecimal("overnightRate"));
+                roomType.setAdditionalHourRate(rs.getBigDecimal("additionalHourRate"));
+
+                Room room = new Room();
+                room.setRoomId(rs.getLong("roomId"));
+                room.setRoomNumber(rs.getString("roomNumber"));
+                room.setRoomType(roomType);
+
+                rooms.add(room);
+            }
+
+        } catch (SQLException e) {
+            log.error("Error getting available rooms", e);
+        }
+
+        return rooms;
+    }
+
 
     @Override
     public Room save(Room room) {
@@ -207,6 +366,89 @@ public class RoomRepositoryImpl implements Repository<Room, Long>, iuh.fit.se.gr
 
         return rooms;
     }
+
+    /**
+     * Thực hiện chuyển phòng theo orderId và bookingType (cho phép 1 phòng -> nhiều
+     * phòng)
+     */
+    @Override
+    public boolean transferRooms(long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds) {
+        try {
+            connection.setAutoCommit(false);
+
+            // 1. Lấy thông tin booking gốc từ orderId, bookingType và phòng đầu tiên
+            Booking bookingInfo = bookingRepositoryImpl.getBookingByOrderIdAndType(orderId, bookingType, oldRoomIds.get(0));
+            if (bookingInfo == null) {
+                connection.rollback();
+                return false;
+            }
+
+            // 2. Cập nhật trạng thái phòng cũ về AVAILABLE
+            String updateOldRooms = "UPDATE Room SET roomStatus = 'AVAILABLE' WHERE roomId = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(updateOldRooms)) {
+                for (Long roomId : oldRoomIds) {
+                    stmt.setLong(1, roomId);
+                    stmt.executeUpdate();
+                }
+            }
+
+            // 3. Xóa booking cũ theo orderId và bookingType
+            String deleteOldBookings = "DELETE FROM Booking WHERE orderId = ? AND bookingType = ? AND roomId = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(deleteOldBookings)) {
+                for (Long roomId : oldRoomIds) {
+                    stmt.setLong(1, orderId);
+                    stmt.setString(2, bookingType);
+                    stmt.setLong(3, roomId);
+                    stmt.executeUpdate();
+                }
+            }
+
+            // 4. Tạo booking mới với các phòng mới
+            String insertNewBookings = """
+                        INSERT INTO Booking (orderId, roomId, checkInDate, checkOutDate, bookingType, createdAt)
+                        VALUES (?, ?, ?, ?, ?, GETDATE())
+                    """;
+
+            try (PreparedStatement stmt = connection.prepareStatement(insertNewBookings)) {
+                for (Long roomId : newRoomIds) {
+                    stmt.setLong(1, orderId);
+                    stmt.setLong(2, roomId);
+                    stmt.setTimestamp(3, Timestamp.valueOf(bookingInfo.getCheckInDate()));
+                    stmt.setTimestamp(4, Timestamp.valueOf(bookingInfo.getCheckOutDate()));
+                    stmt.setString(5, bookingType);
+                    stmt.executeUpdate();
+                }
+            }
+
+            // 5. Cập nhật trạng thái phòng mới
+            String updateNewRooms = "UPDATE Room SET roomStatus = 'OCCUPIED' WHERE roomId = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(updateNewRooms)) {
+                for (Long roomId : newRoomIds) {
+                    stmt.setLong(1, roomId);
+                    stmt.executeUpdate();
+                }
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (SQLException e) {
+            log.error("Error transferring rooms", e);
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                log.error("Error rolling back transaction", ex);
+            }
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                log.error("Error resetting auto-commit", e);
+            }
+        }
+    }
+
 
     @Override
     public List<Room> findByRoomNumberOrId(String keyword) {
@@ -437,6 +679,7 @@ public class RoomRepositoryImpl implements Repository<Room, Long>, iuh.fit.se.gr
 
     /**
      * Kiểm tra xem phòng có đang được sử dụng trong các order đang hoạt động không
+     *
      * @param roomId ID phòng cần kiểm tra
      * @return true nếu phòng đang được dùng, false nếu có thể xóa
      */
@@ -445,12 +688,12 @@ public class RoomRepositoryImpl implements Repository<Room, Long>, iuh.fit.se.gr
         // Kiểm tra xem phòng có trong booking của các order đang xử lý không
         // Order type: 2 = Đang xử lý (không thể xóa phòng)
         String sql = """
-            SELECT COUNT(*) 
-            FROM Booking b
-            JOIN Orders o ON b.orderId = o.orderId
-            WHERE b.roomId = ? 
-              AND o.orderTypeId = 2
-            """;
+                SELECT COUNT(*) 
+                FROM Booking b
+                JOIN Orders o ON b.orderId = o.orderId
+                WHERE b.roomId = ? 
+                  AND o.orderTypeId = 2
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, roomId);

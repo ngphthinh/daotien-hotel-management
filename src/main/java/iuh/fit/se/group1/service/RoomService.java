@@ -306,4 +306,21 @@ public class RoomService {
     public void updateRoomStatusBatch(List<Long> roomIds, RoomStatus roomStatus) {
         roomRepository.updateRoomStatusBatch(roomIds, roomStatus);
     }
+
+    public List<Room> getRoomsByOrderIdAndType(long orderId, String bookingType) {
+        return roomRepository.getRoomsByOrderIdAndType(orderId, bookingType);
+    }
+
+    public List<Room> getRoomsByBookingId(long bookingId) {
+        return roomRepository.getRoomsByBookingId(bookingId);
+    }
+
+    public List<Room> getAvailableRoomsByType(String roomTypeId) {
+        return roomRepository.getAvailableRoomsByType(roomTypeId);
+    }
+
+    public boolean transferRooms(long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds) {
+        return roomRepository.transferRooms(orderId, bookingType, oldRoomIds, newRoomIds);
+    }
+
 }

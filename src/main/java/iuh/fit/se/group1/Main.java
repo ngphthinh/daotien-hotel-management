@@ -36,10 +36,9 @@ public class Main {
         new Thread(() -> {
             try {
                 System.out.println("Đang tải dữ liệu ứng dụng...");
-                JPAUtil.getEntityManager();
-                InitData.initAllData();
                 EmployeeService employeeService = new EmployeeService();
                 if (employeeService.count() == 0) {
+                    InitData.initAllData();
                     Employee admin = new Employee();
                     admin.setFullName("Quản Trị Viên Admin");
                     admin.setPhone("0123456789");
@@ -50,7 +49,7 @@ public class Main {
                     Employee employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
                     if (employee == null) {
                         System.out.println("Không tạo được tài khoản");
-                    }else {
+                    } else {
                         System.out.println(employee);
                     }
                 }

@@ -1,9 +1,7 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
-import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.entity.Order;
-import iuh.fit.se.group1.entity.Promotion;
+import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.repository.interfaces.OrderRepository;
 
 import java.math.BigDecimal;
@@ -84,18 +82,23 @@ public class OrderRepositoryImpl extends AbstractRepositoryImpl<Order, Long> imp
             managed.setPaymentDate(order.getPaymentDate());
 
             if (order.getPromotion() != null) {
-                managed.setPromotion(em.getReference(Promotion.class,
-                        order.getPromotion().getPromotionId()));
+                managed.setPromotion(em.getReference(
+                        Promotion.class,
+                        order.getPromotion().getPromotionId()
+                ));
             } else {
                 managed.setPromotion(null);
             }
 
             managed.setEmployeePayment(
-                    em.getReference(Employee.class,
-                            order.getEmployeePayment().getEmployeeId())
+                    em.getReference(
+                            Employee.class,
+                            order.getEmployeePayment().getEmployeeId()
+                    )
             );
 
-            managed.getOrderType().setOrderTypeId(1L);
+            OrderType paidType = em.getReference(OrderType.class, 1L);
+            managed.setOrderType(paidType);
         });
     }
 
@@ -265,6 +268,101 @@ public class OrderRepositoryImpl extends AbstractRepositoryImpl<Order, Long> imp
                 map.put((String) row[0], ((Long) row[1]).intValue());
             }
             return map;
+        });
+    }
+
+    @Override
+    public boolean addSurchargeToOrder(long orderId, long surchargeAmount) {
+
+        return callInTransaction(em -> {
+            int updated = em.createQuery("""
+                            UPDATE Order o
+                            SET o.totalAmount = o.totalAmount + :amount
+                            WHERE o.orderId = :orderId
+                            """)
+                    .setParameter("amount", BigDecimal.valueOf(surchargeAmount))
+                    .setParameter("orderId", orderId)
+                    .executeUpdate();
+
+            return updated > 0;
+        });
+    }
+
+    @Override
+    public boolean existsTransformType(Long orderId) {
+        return callInTransaction(em -> {
+            Long count = em.createQuery("""
+                            SELECT COUNT(b)
+                            FROM Booking b
+                            WHERE b.order.orderId = :orderId
+                            """, Long.class)
+                    .setParameter("orderId", orderId)
+                    .getSingleResult();
+
+            return count > 0;
+        });
+    }
+
+    @Override
+    public boolean addRoomAmountToOrder(long orderId, long amount) {
+        return callInTransaction(em -> {
+            int updated = em.createQuery("""
+                            UPDATE Order o
+                            SET o.totalAmount = o.totalAmount + :amount
+                            WHERE o.orderId = :orderId
+                            """)
+                    .setParameter("amount", BigDecimal.valueOf(amount))
+                    .setParameter("orderId", orderId)
+                    .executeUpdate();
+
+            return updated > 0;
+        });
+    }
+
+    @Override
+    public Order save(Order o) {
+        return callInTransaction(em -> {
+
+            Customer customer;
+
+            if (o.getCustomer().getCustomerId() != null) {
+                customer = em.find(Customer.class, o.getCustomer().getCustomerId());
+                if (customer == null) {
+                    throw new IllegalArgumentException("Customer not found");
+                }
+            } else {
+                customer = o.getCustomer();
+                em.persist(customer);
+                em.flush(); // đảm bảo có ID ngay
+            }
+
+            Employee employee = em.find(Employee.class, o.getEmployee().getEmployeeId());
+            if (employee == null) {
+                throw new IllegalArgumentException("Employee not found");
+            }
+
+            o.setCustomer(customer);
+            o.setEmployee(employee);
+
+            em.persist(o);
+
+            return o;
+        });
+    }
+
+    @Override
+    public boolean subtractAmountFromOrder(long orderId, double amount) {
+        return callInTransaction(em -> {
+            int updated = em.createQuery("""
+                            UPDATE Order o
+                            SET o.totalAmount = o.totalAmount - :amount
+                            WHERE o.orderId = :orderId
+                            """)
+                    .setParameter("amount", BigDecimal.valueOf(amount))
+                    .setParameter("orderId", orderId)
+                    .executeUpdate();
+
+            return updated > 0;
         });
     }
 }

@@ -51,7 +51,7 @@ public class OrderDetail {
     @ToString
     public static class OrderDetailId implements Serializable {
         private Long order;
-        private String amenity;
+        private Long amenity;
 
     }
 

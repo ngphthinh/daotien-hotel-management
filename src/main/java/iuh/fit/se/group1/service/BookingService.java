@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.BookingType;
@@ -19,10 +20,6 @@ public class BookingService {
 
     public boolean existsByRoomIdAndDate(Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate) {
         return bookingRepositoryImpl.isExistsByRoomAndDate(roomId, checkInDate, checkOutDate);
-    }
-
-    public List<Booking> getAllBookings() {
-        return bookingRepositoryImpl.findAll();
     }
 
 
@@ -72,5 +69,35 @@ public class BookingService {
 
     public List<Booking> getBookingsByOrderId(Long orderId) {
         return bookingRepositoryImpl.findByOrderId(orderId);
+    }
+
+
+    public List<BookingDTO> getAllBookings() {
+        return bookingRepositoryImpl.getAllBookings();
+    }
+
+    public Booking getBookingById(long bookingId, long roomId) {
+        return bookingRepositoryImpl.getBookingById(bookingId, roomId);
+    }
+
+    public boolean extendRoomBooking(Long orderId, List<Long> roomIds, int extendValue, String bookingType) {
+        return bookingRepositoryImpl.extendRoomBooking(orderId, roomIds, extendValue, bookingType);
+    }
+
+
+    public boolean cancelRoomBooking(Long orderId, Long roomId, String bookingType) {
+        return bookingRepositoryImpl.cancelRoomBooking(orderId, roomId, bookingType);
+
+    }
+
+
+    public Booking getBookingByOrderIdAndType(long orderId, String bookingType, long roomId) {
+        return bookingRepositoryImpl.getBookingByOrderIdAndType(orderId, bookingType, roomId);
+
+    }
+
+    public List<BookingDTO> searchBookingsByCitizenId(String citizenId) {
+        return bookingRepositoryImpl.searchBookingsByCitizenId(citizenId);
+
     }
 }

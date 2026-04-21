@@ -14,6 +14,7 @@ import iuh.fit.se.group1.util.InvoiceItem;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class OrderService {
@@ -39,6 +40,8 @@ public class OrderService {
             return null;
         }
 
+
+        order.setCreatedAt(LocalDate.now());
 
         // nếu 2 là đặt phòng thì cập nhật trạng thái phòng thành đang sử dụng
         if (order.getOrderType().getOrderTypeId() == 2) {
@@ -124,6 +127,10 @@ public class OrderService {
 
     public List<Order> getAllOrders() {
         return orderRepositoryImpl.findAll();
+    }
+
+    public List<Order> getAllOrdersWithRelationship() {
+        return orderRepositoryImpl.findAllOrders();
     }
 
 
@@ -303,6 +310,29 @@ public class OrderService {
             case OVERNIGHT -> "Đêm";
             default -> "";
         };
+    }
+
+    public List<Order> getOrdersUnPendingByKeyWord(String keyword) {
+
+        return orderRepositoryImpl.findOrdersUnPendingByKeyWord(keyword);
+    }
+
+    public boolean addSurchargeToOrder(long orderId, long surchargeAmount) {
+        if (surchargeAmount == 0) return true;
+
+        return orderRepositoryImpl.addSurchargeToOrder(orderId, surchargeAmount);
+    }
+
+    public boolean existsTransformType(Long orderId) {
+        return orderRepositoryImpl.existsTransformType(orderId);
+    }
+
+    public boolean addRoomAmountToOrder(long orderId, long amount) {
+        return orderRepositoryImpl.addRoomAmountToOrder(orderId, amount);
+    }
+
+    public boolean subtractAmountFromOrder(long orderId, double amount) {
+        return orderRepositoryImpl.subtractAmountFromOrder(orderId, amount);
     }
 
 }

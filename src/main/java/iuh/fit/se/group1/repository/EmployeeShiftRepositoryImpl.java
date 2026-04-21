@@ -27,7 +27,7 @@ import java.util.List;
  * @created: 30/10/2025
  */
 
-public class EmployeeShiftRepositoryImpl implements Repository<EmployeeShift,Long>, iuh.fit.se.group1.repository.interfaces.EmployeeShiftRepository {
+public class EmployeeShiftRepositoryImpl implements Repository<EmployeeShift, Long>, iuh.fit.se.group1.repository.interfaces.EmployeeShiftRepository {
     private static final Logger log = LoggerFactory.getLogger(EmployeeShiftRepositoryImpl.class);
 
     private final Connection connection;
@@ -119,13 +119,13 @@ public class EmployeeShiftRepositoryImpl implements Repository<EmployeeShift,Lon
     public List<EmployeeShift> findAll() {
         List<EmployeeShift> list = new ArrayList<>();
         String sql = """
-        SELECT es.employeeShiftId, es.shiftDate, es.createdAt,
-               e.employeeId, e.fullName,
-               s.shiftId, s.name, s.startTime, s.endTime
-        FROM EmployeeShift es
-        JOIN Employee e ON es.employeeId = e.employeeId
-        JOIN Shift s ON es.shiftId = s.shiftId
-    """;
+                    SELECT es.employeeShiftId, es.shiftDate, es.createdAt,
+                           e.employeeId, e.fullName,
+                           s.shiftId, s.name, s.startTime, s.endTime
+                    FROM EmployeeShift es
+                    JOIN Employee e ON es.employeeId = e.employeeId
+                    JOIN Shift s ON es.shiftId = s.shiftId
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -176,19 +176,20 @@ public class EmployeeShiftRepositoryImpl implements Repository<EmployeeShift,Lon
             throw new RuntimeException(e);
         }
     }
+
     @Override
     public List<EmployeeShift> findByShiftDate(LocalDate date) {
         List<EmployeeShift> list = new ArrayList<>();
 
         String sql = """
-        SELECT es.employeeShiftId, es.shiftDate, es.createdAt,
-               e.employeeId, e.fullName, e.avt,
-               s.shiftId, s.name AS shiftName, s.startTime, s.endTime
-        FROM EmployeeShift es
-        JOIN Employee e ON es.employeeId = e.employeeId
-        JOIN Shift s ON es.shiftId = s.shiftId
-        WHERE es.shiftDate = ?
-    """;
+                    SELECT es.employeeShiftId, es.shiftDate, es.createdAt,
+                           e.employeeId, e.fullName, e.avt,
+                           s.shiftId, s.name AS shiftName, s.startTime, s.endTime
+                    FROM EmployeeShift es
+                    JOIN Employee e ON es.employeeId = e.employeeId
+                    JOIN Shift s ON es.shiftId = s.shiftId
+                    WHERE es.shiftDate = ?
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setDate(1, Date.valueOf(date));
@@ -232,14 +233,14 @@ public class EmployeeShiftRepositoryImpl implements Repository<EmployeeShift,Lon
     @Override
     public EmployeeShift findByIdWithDetails(Long employeeShiftId) {
         String sql = """
-        SELECT es.employeeShiftId, es.shiftDate, es.createdAt, es.employeeId, es.shiftId,
-               e.fullName AS employeeName, e.phone AS employeePhone, e.email AS employeeEmail,
-               s.name AS shiftName, s.startTime, s.endTime
-        FROM EmployeeShift es
-        JOIN Employee e ON es.employeeId = e.employeeId
-        JOIN Shift s ON es.shiftId = s.shiftId
-        WHERE es.employeeShiftId = ?
-    """;
+                    SELECT es.employeeShiftId, es.shiftDate, es.createdAt, es.employeeId, es.shiftId,
+                           e.fullName AS employeeName, e.phone AS employeePhone, e.email AS employeeEmail,
+                           s.name AS shiftName, s.startTime, s.endTime
+                    FROM EmployeeShift es
+                    JOIN Employee e ON es.employeeId = e.employeeId
+                    JOIN Shift s ON es.shiftId = s.shiftId
+                    WHERE es.employeeShiftId = ?
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, employeeShiftId);
@@ -285,13 +286,13 @@ public class EmployeeShiftRepositoryImpl implements Repository<EmployeeShift,Lon
     @Override
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
         String sql = """
-        SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue
-        FROM Orders O
-        INNER JOIN Booking B ON O.orderId = B.orderId
-        WHERE B.employeeShiftId = ?
-        AND O.orderTypeId = 1
-        AND O.paymentType = 'CASH'
-    """;
+                    SELECT COALESCE(SUM(O.totalAmount), 0) as totalCashRevenue
+                    FROM Orders O
+                    INNER JOIN Booking B ON O.orderId = B.orderId
+                    WHERE B.employeeShiftId = ?
+                    AND O.orderTypeId = 1
+                    AND O.paymentType = 'CASH'
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, employeeShiftId);

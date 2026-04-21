@@ -33,26 +33,26 @@ public class Order {
     private LocalDateTime orderDate;
     private BigDecimal totalAmount;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "employeeId")
     private Employee employee;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "orderTypeId")
     private OrderType orderType;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "customerId")
     private Customer customer;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "promotionId")
     private Promotion promotion;
 
     private BigDecimal deposit;
     private LocalDate createdAt;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
     private List<Booking> bookings;
 
 
@@ -61,8 +61,7 @@ public class Order {
     private PaymentType paymentType;
 
 
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "employeePaymentId")
     private Employee employeePayment;
     private boolean isDeleted;

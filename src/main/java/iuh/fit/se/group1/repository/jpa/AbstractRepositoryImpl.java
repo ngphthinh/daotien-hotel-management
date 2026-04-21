@@ -34,23 +34,28 @@ public class AbstractRepositoryImpl<T, ID> implements Repository<T, ID> {
     }
 
     protected <R> R callInTransaction(Function<EntityManager, R> function) {
-        EntityTransaction entityTransaction = null;
+        EntityManager entityManager = null;
+        EntityTransaction tx = null;
 
-        try (EntityManager entityManager = JPAUtil.getEntityManager()) {
+        try {
+            entityManager = JPAUtil.getEntityManager();
+            tx = entityManager.getTransaction();
 
-            entityTransaction = entityManager.getTransaction();
-            entityTransaction.begin();
+            tx.begin();
             R rs = function.apply(entityManager);
+            tx.commit();
 
-            entityTransaction.commit();
             return rs;
         } catch (Exception e) {
-            if (entityTransaction != null && entityTransaction.isActive()) {
-                entityTransaction.rollback();
+            if (tx != null && tx.isActive()) {
+                tx.rollback();   // lúc này connection vẫn còn mở
             }
             throw new RuntimeException(e);
+        } finally {
+            if (entityManager != null && entityManager.isOpen()) {
+                entityManager.close();   // đóng sau cùng
+            }
         }
-
     }
 
     @Override

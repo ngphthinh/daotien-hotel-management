@@ -34,4 +34,13 @@ public interface OrderRepository {
     Map<String, BigDecimal> getRevenueByRoomType(LocalDate from, LocalDate to);
 
     Map<String, Integer> getBookingCountByRoomTypeAndDate(LocalDate date);
+
+
+    boolean addSurchargeToOrder(long orderId, long surchargeAmount);
+
+    boolean existsTransformType(Long orderId);
+
+    boolean addRoomAmountToOrder(long orderId, long amount);
+
+    boolean subtractAmountFromOrder(long orderId, double amount);
 }

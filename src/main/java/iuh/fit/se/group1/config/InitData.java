@@ -6,15 +6,16 @@ import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.function.Consumer;
 
+@Slf4j
 public class InitData {
 
-    public static void initAllData(){
+    public static void initAllData() {
         initAmenity();
         initRole();
         initShift();
@@ -51,6 +52,7 @@ public class InitData {
             }
         }
     }
+
     private static void initRole() {
         Role roleManager = Role.builder()
                 .roleId("MANAGER")
@@ -81,6 +83,7 @@ public class InitData {
             Long count = em.createQuery(
                     "select count(r) from Shift r", Long.class
             ).getSingleResult();
+            // only create shifts when table is empty
             if (count != 0) {
                 return;
             }
@@ -119,6 +122,7 @@ public class InitData {
             Long count = em.createQuery(
                     "select count(r) from RoomType r", Long.class
             ).getSingleResult();
+            // only create room types when table is empty
             if (count != 0) {
                 return;
             }
@@ -149,6 +153,7 @@ public class InitData {
             Long count = em.createQuery(
                     "select count(r) from OrderType r", Long.class
             ).getSingleResult();
+            // only create order types when table is empty
             if (count != 0) {
                 return;
             }
@@ -167,6 +172,7 @@ public class InitData {
             Long count = em.createQuery(
                     "select count(r) from Surcharge r", Long.class
             ).getSingleResult();
+            // only create surcharges when table is empty
             if (count != 0) {
                 return;
             }
@@ -191,6 +197,7 @@ public class InitData {
             Long count = em.createQuery(
                     "select count(r) from Amenity r", Long.class
             ).getSingleResult();
+            // only create amenities when table is empty
             if (count != 0) {
                 return;
             }
@@ -209,11 +216,12 @@ public class InitData {
     }
 
     private static void initRoom() {
+        log.info("Initializing rooms...");
         doInTransaction(em -> {
             Long count = em.createQuery(
                     "select count(r) from RoomType r", Long.class
             ).getSingleResult();
-            if (count != 0) {
+            if (count == 0) {
                 return;
             }
             RoomType doubleType = em.find(RoomType.class, "DOUBLE");
@@ -240,6 +248,7 @@ public class InitData {
             }
 
         });
+        log.info("Rooms initialized successfully.");
     }
 
 
@@ -291,33 +300,33 @@ public class InitData {
             if (count != 0) {
                 return;
             }
-            em.persist(Customer.builder().fullName("Trần Minh Hoàng").phone("0911111111").email("tranminhhoang@gmail.com").citizenId("079201001234").gender(true).dateOfBirth(LocalDate.of(1990,5,15)).createdAt(LocalDate.of(2025,12,1)).build());
+            em.persist(Customer.builder().fullName("Trần Minh Hoàng").phone("0911111111").email("tranminhhoang@gmail.com").citizenId("079201001234").gender(true).dateOfBirth(LocalDate.of(1990, 5, 15)).createdAt(LocalDate.of(2025, 12, 1)).build());
 
-            em.persist(Customer.builder().fullName("Nguyễn Thị Lan").phone("0922222222").email("nguyenthilan@gmail.com").citizenId("079201001235").gender(false).dateOfBirth(LocalDate.of(1992,8,20)).createdAt(LocalDate.of(2025,12,2)).build());
+            em.persist(Customer.builder().fullName("Nguyễn Thị Lan").phone("0922222222").email("nguyenthilan@gmail.com").citizenId("079201001235").gender(false).dateOfBirth(LocalDate.of(1992, 8, 20)).createdAt(LocalDate.of(2025, 12, 2)).build());
 
-            em.persist(Customer.builder().fullName("Phạm Đức Anh").phone("0933333333").email("phamducanh@gmail.com").citizenId("079201001236").gender(true).dateOfBirth(LocalDate.of(1988,3,10)).createdAt(LocalDate.of(2025,12,3)).build());
+            em.persist(Customer.builder().fullName("Phạm Đức Anh").phone("0933333333").email("phamducanh@gmail.com").citizenId("079201001236").gender(true).dateOfBirth(LocalDate.of(1988, 3, 10)).createdAt(LocalDate.of(2025, 12, 3)).build());
 
-            em.persist(Customer.builder().fullName("Lê Thị Mai").phone("0944444444").email("lethimai@gmail.com").citizenId("079201001237").gender(false).dateOfBirth(LocalDate.of(1995,11,25)).createdAt(LocalDate.of(2025,12,4)).build());
+            em.persist(Customer.builder().fullName("Lê Thị Mai").phone("0944444444").email("lethimai@gmail.com").citizenId("079201001237").gender(false).dateOfBirth(LocalDate.of(1995, 11, 25)).createdAt(LocalDate.of(2025, 12, 4)).build());
 
-            em.persist(Customer.builder().fullName("Vũ Văn Nam").phone("0955555555").email("vuvannam@gmail.com").citizenId("079201001238").gender(true).dateOfBirth(LocalDate.of(1987,7,18)).createdAt(LocalDate.of(2025,12,5)).build());
+            em.persist(Customer.builder().fullName("Vũ Văn Nam").phone("0955555555").email("vuvannam@gmail.com").citizenId("079201001238").gender(true).dateOfBirth(LocalDate.of(1987, 7, 18)).createdAt(LocalDate.of(2025, 12, 5)).build());
 
-            em.persist(Customer.builder().fullName("Đặng Thị Hương").phone("0966666666").email("dangthihuong@gmail.com").citizenId("079201001239").gender(false).dateOfBirth(LocalDate.of(1993,2,14)).createdAt(LocalDate.of(2025,12,6)).build());
+            em.persist(Customer.builder().fullName("Đặng Thị Hương").phone("0966666666").email("dangthihuong@gmail.com").citizenId("079201001239").gender(false).dateOfBirth(LocalDate.of(1993, 2, 14)).createdAt(LocalDate.of(2025, 12, 6)).build());
 
-            em.persist(Customer.builder().fullName("Ngô Quang Huy").phone("0977777777").email("ngoquanghuy@gmail.com").citizenId("079201001240").gender(true).dateOfBirth(LocalDate.of(1991,9,30)).createdAt(LocalDate.of(2025,12,7)).build());
+            em.persist(Customer.builder().fullName("Ngô Quang Huy").phone("0977777777").email("ngoquanghuy@gmail.com").citizenId("079201001240").gender(true).dateOfBirth(LocalDate.of(1991, 9, 30)).createdAt(LocalDate.of(2025, 12, 7)).build());
 
-            em.persist(Customer.builder().fullName("Bùi Thị Thảo").phone("0988888888").email("buithithao@gmail.com").citizenId("079201001241").gender(false).dateOfBirth(LocalDate.of(1994,6,22)).createdAt(LocalDate.of(2025,12,8)).build());
+            em.persist(Customer.builder().fullName("Bùi Thị Thảo").phone("0988888888").email("buithithao@gmail.com").citizenId("079201001241").gender(false).dateOfBirth(LocalDate.of(1994, 6, 22)).createdAt(LocalDate.of(2025, 12, 8)).build());
 
-            em.persist(Customer.builder().fullName("Đinh Văn Tùng").phone("0999999999").email("dinhvantung@gmail.com").citizenId("079201001242").gender(true).dateOfBirth(LocalDate.of(1989,12,5)).createdAt(LocalDate.of(2025,12,9)).build());
+            em.persist(Customer.builder().fullName("Đinh Văn Tùng").phone("0999999999").email("dinhvantung@gmail.com").citizenId("079201001242").gender(true).dateOfBirth(LocalDate.of(1989, 12, 5)).createdAt(LocalDate.of(2025, 12, 9)).build());
 
-            em.persist(Customer.builder().fullName("Hoàng Thị Nga").phone("0910101010").email("hoangthinga@gmail.com").citizenId("079201001243").gender(false).dateOfBirth(LocalDate.of(1996,4,17)).createdAt(LocalDate.of(2025,12,10)).build());
+            em.persist(Customer.builder().fullName("Hoàng Thị Nga").phone("0910101010").email("hoangthinga@gmail.com").citizenId("079201001243").gender(false).dateOfBirth(LocalDate.of(1996, 4, 17)).createdAt(LocalDate.of(2025, 12, 10)).build());
 
-            em.persist(Customer.builder().fullName("Trịnh Văn Kiên").phone("0920202020").email("trinhvankien@gmail.com").citizenId("079201001244").gender(true).dateOfBirth(LocalDate.of(1993,8,12)).createdAt(LocalDate.of(2025,12,11)).build());
+            em.persist(Customer.builder().fullName("Trịnh Văn Kiên").phone("0920202020").email("trinhvankien@gmail.com").citizenId("079201001244").gender(true).dateOfBirth(LocalDate.of(1993, 8, 12)).createdAt(LocalDate.of(2025, 12, 11)).build());
 
-            em.persist(Customer.builder().fullName("Võ Thị Yến").phone("0930303030").email("vothiyen@gmail.com").citizenId("079201001245").gender(false).dateOfBirth(LocalDate.of(1991,3,28)).createdAt(LocalDate.of(2025,12,12)).build());
+            em.persist(Customer.builder().fullName("Võ Thị Yến").phone("0930303030").email("vothiyen@gmail.com").citizenId("079201001245").gender(false).dateOfBirth(LocalDate.of(1991, 3, 28)).createdAt(LocalDate.of(2025, 12, 12)).build());
 
-            em.persist(Customer.builder().fullName("Dương Văn Sơn").phone("0940404040").email("duongvanson@gmail.com").citizenId("079201001246").gender(true).dateOfBirth(LocalDate.of(1989,11,15)).createdAt(LocalDate.of(2025,12,13)).build());
+            em.persist(Customer.builder().fullName("Dương Văn Sơn").phone("0940404040").email("duongvanson@gmail.com").citizenId("079201001246").gender(true).dateOfBirth(LocalDate.of(1989, 11, 15)).createdAt(LocalDate.of(2025, 12, 13)).build());
 
-            em.persist(Customer.builder().fullName("Mai Văn Đức").phone("0960606060").email("phanthithu@gmail.com").citizenId("079201001248").gender(false).dateOfBirth(LocalDate.of(1994,7,22)).createdAt(LocalDate.of(2025,12,14)).build());
+            em.persist(Customer.builder().fullName("Mai Văn Đức").phone("0960606060").email("phanthithu@gmail.com").citizenId("079201001248").gender(false).dateOfBirth(LocalDate.of(1994, 7, 22)).createdAt(LocalDate.of(2025, 12, 14)).build());
 
         });
     }

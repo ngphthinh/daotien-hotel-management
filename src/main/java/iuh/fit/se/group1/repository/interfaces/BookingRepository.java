@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.repository.interfaces;
 
+import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
@@ -33,4 +34,20 @@ public interface BookingRepository {
     int countLateCheckOuts(LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime);
 
     List<BookingDisplayDTO> findAllBookingDisplay();
+
+    List<BookingDTO> getAllBookings();
+
+    Booking getBookingById(long bookingId, long roomId);
+
+    boolean extendRoomBooking(Long orderId, List<Long> roomIds,
+                              int extendValue, String bookingType);
+
+
+    boolean cancelRoomBooking(Long orderId, Long roomId, String bookingType);
+
+
+    Booking getBookingByOrderIdAndType(long orderId, String bookingType, long roomId);
+
+    List<BookingDTO> searchBookingsByCitizenId(String citizenId);
+
 }

@@ -246,11 +246,11 @@ public class Login extends javax.swing.JFrame {
 
         txtUser.setBackground(new java.awt.Color(245, 245, 245));
         txtUser.setLabelText("Tên đăng nhập");
-        txtUser.setText("thinh2");
+        txtUser.setText("admin1");
 
         txtPass.setBackground(new java.awt.Color(245, 245, 245));
         txtPass.setLabelText("Mật khẩu");
-        txtUser.setText("thinh2");
+        txtPass.setText("User@123");
 
         btnSignIn.setBackground(new java.awt.Color(157, 153, 255));
         btnSignIn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N

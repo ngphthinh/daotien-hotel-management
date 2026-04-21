@@ -4,9 +4,6 @@ import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
-import iuh.fit.se.group1.repository.RoomToolsRepository;
-import iuh.fit.se.group1.repository.interfaces.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,14 +19,15 @@ public class RoomToolsService {
     private static final String SINGLE_ROOM_TYPE = "SINGLE";
     private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
 
-    private final RoomToolsRepository repository;
-    private final OrderRepository orderRepository;
+    private final OrderService orderService;
     private final RoomService roomService;
     private final RoomTypeService roomTypeService;
+    private final BookingService bookingService;
 
     public RoomToolsService() {
-        this.repository = new RoomToolsRepository();
-        this.orderRepository = new OrderRepositoryImpl();
+
+        this.bookingService = new BookingService();
+        this.orderService = new OrderService();
         this.roomService = new RoomService();
         this.roomTypeService = new RoomTypeService();
     }
@@ -39,11 +37,11 @@ public class RoomToolsService {
      */
 
     public List<BookingDTO> getAllBookings() {
-        return repository.getAllBookings();
+        return bookingService.getAllBookings();
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.findAllOrders();
+        return orderService.getAllOrdersWithRelationship();
     }
 
     /**
@@ -53,28 +51,28 @@ public class RoomToolsService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllBookings();
         }
-        return repository.searchBookingsByCitizenId(keyword.trim());
+        return bookingService.searchBookingsByCitizenId(keyword.trim());
     }
 
     /**
      * Lấy thông tin TẤT CẢ phòng theo orderId và bookingType
      */
     public List<Room> getRoomsByOrderAndType(long orderId, BookingType bookingType) {
-        return repository.getRoomsByOrderIdAndType(orderId, bookingType.name());
+        return roomService.getRoomsByOrderIdAndType(orderId, bookingType.name());
     }
 
     /**
      * Lấy thông tin phòng theo booking (giữ lại cho tương thích)
      */
     public List<Room> getRoomsByBooking(long bookingId) {
-        return repository.getRoomsByBookingId(bookingId);
+        return roomService.getRoomsByBookingId(bookingId);
     }
 
     /**
      * Lấy phòng trống theo loại
      */
     public List<Room> getAvailableRoomsByType(String roomTypeId) {
-        return repository.getAvailableRoomsByType(roomTypeId);
+        return roomService.getAvailableRoomsByType(roomTypeId);
     }
 
     /**
@@ -118,7 +116,7 @@ public class RoomToolsService {
         }
 
         // Lấy thông tin booking để biết thời gian thuê
-        Booking bookingInfo = repository.getBookingByOrderIdAndType(
+        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
                 orderId, bookingType.name(), oldRooms.get(0).getRoomId());
 
         if (bookingInfo == null) {
@@ -214,7 +212,7 @@ public class RoomToolsService {
      * Lấy giá phòng đã tính duration để hiển thị (cho UI)
      */
     public long getRoomPriceWithDuration(Room room, BookingType bookingType, long orderId) {
-        Booking bookingInfo = repository.getBookingByOrderIdAndType(
+        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
                 orderId, bookingType.name(), room.getRoomId());
 
         if (bookingInfo == null) {
@@ -264,7 +262,7 @@ public class RoomToolsService {
                 .collect(Collectors.toList());
 
         // Thực hiện chuyển phòng với orderId và bookingType
-        boolean transferSuccess = repository.transferRooms(orderId, bookingType.name(), oldRoomIds, newRoomIds);
+        boolean transferSuccess = roomService.transferRooms(orderId, bookingType.name(), oldRoomIds, newRoomIds);
 
         if (!transferSuccess) {
             result.success = false;
@@ -274,7 +272,7 @@ public class RoomToolsService {
 
         // Cập nhật phụ phí vào order
         if (surcharge != 0) {
-            boolean surchargeSuccess = repository.addSurchargeToOrder(orderId, surcharge);
+            boolean surchargeSuccess = orderService.addSurchargeToOrder(orderId, surcharge);
             if (!surchargeSuccess) {
                 log.warn("Failed to add surcharge to order {}", orderId);
             }
@@ -385,7 +383,7 @@ public class RoomToolsService {
     }
 
     public List<Order> findOrdersUnPendingByKeyWord(String keyword) {
-        return orderRepository.findOrdersUnPendingByKeyWord(keyword);
+        return orderService.getOrdersUnPendingByKeyWord(keyword);
     }
 
     // Result classes
@@ -409,7 +407,7 @@ public class RoomToolsService {
                 log.warn("Room not found: {}", roomId);
                 return false;
             }
-            Booking booking = repository.getBookingByOrderIdAndType(
+            Booking booking = bookingService.getBookingByOrderIdAndType(
                     orderId, bookingType.name(), room.getRoomId());
 
             if (booking == null) {
@@ -426,21 +424,21 @@ public class RoomToolsService {
             long roomPrice = calculatePriceByTypeAndDuration(
                     bookingTypeIndex, roomDTO, (int) duration
             );
-            boolean subtractSuccess = repository.subtractAmountFromOrder(orderId, roomPrice);
+            boolean subtractSuccess = orderService.subtractAmountFromOrder(orderId, roomPrice);
             if (!subtractSuccess) {
                 log.error("Failed to subtract {} from order {}", roomPrice, orderId);
                 return false;
             }
-            boolean cancelSuccess = repository.cancelRoomBooking(orderId, roomId, bookingType.name());
+            boolean cancelSuccess = bookingService.cancelRoomBooking(orderId, roomId, bookingType.name());
             if (!cancelSuccess) {
                 log.error("Failed to cancel booking in DB — rolling back not implemented");
                 return false;
             }
 
-            boolean isTransformType = !repository.existsTransformType(orderId);
+            boolean isTransformType = !orderService.existsTransformType(orderId);
             if (isTransformType) {
                 log.info("Order {} is of transform type, updating order type", orderId);
-                orderRepository.updateOrderType(orderId, 4L); // Cập nhật sang loại "Đã hủy"
+                orderService.updateOrderType(orderId, 4L); // Cập nhật sang loại "Đã hủy"
             }
 
             log.info("Successfully cancelled booking: -{} VND removed from order {}", roomPrice, orderId);
@@ -476,7 +474,7 @@ public class RoomToolsService {
             BigDecimal extensionAmount = calculateExtensionAmount(rooms, bookingType, extendValue);
 
             // 1. Extend booking trong database (cập nhật checkOutDate)
-            boolean extendSuccess = repository.extendRoomBooking(
+            boolean extendSuccess = bookingService.extendRoomBooking(
                     orderId, roomIds, extendValue, bookingType.name());
 
             if (!extendSuccess) {
@@ -485,7 +483,7 @@ public class RoomToolsService {
             }
 
             // 2. Cộng tiền vào hóa đơn
-            boolean addAmountSuccess = repository.addRoomAmountToOrder(
+            boolean addAmountSuccess = orderService.addRoomAmountToOrder(
                     orderId, extensionAmount.longValue());
 
             if (!addAmountSuccess) {
@@ -542,7 +540,7 @@ public class RoomToolsService {
                                                          long orderId, Room referenceOldRoom) {
 
         // Lấy thông tin booking từ phòng cũ để biết duration
-        Booking bookingInfo = repository.getBookingByOrderIdAndType(
+        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
                 orderId, bookingType.name(), referenceOldRoom.getRoomId());
 
         if (bookingInfo == null) {

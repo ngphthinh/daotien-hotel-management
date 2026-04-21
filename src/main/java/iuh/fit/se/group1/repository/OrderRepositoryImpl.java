@@ -267,7 +267,6 @@ public class OrderRepositoryImpl implements Repository<Order, Long>, iuh.fit.se.
     }
 
 
-
     @Override
     public Order update(Order entity) {
         return null;
@@ -542,13 +541,13 @@ public class OrderRepositoryImpl implements Repository<Order, Long>, iuh.fit.se.
                     OT.orderTypeId AS otId, OT.name AS otName,
                     R.roomNumber AS rRoomNumber,
                     C.fullName AS cFullName, C.phone AS cPhone, C.citizenId AS cCitizenId
-
+                
                 FROM Orders O
                 JOIN Booking B ON O.orderId = B.orderId
                 JOIN OrderType OT ON O.orderTypeId = OT.orderTypeId
                 JOIN Room R ON B.roomId = R.roomId
                 JOIN Customer C ON O.customerId = C.customerId
-
+                
                 WHERE O.orderTypeId != 1
                   AND (C.fullName LIKE ?
                     OR C.phone LIKE ?
@@ -835,6 +834,7 @@ public class OrderRepositoryImpl implements Repository<Order, Long>, iuh.fit.se.
 
     /**
      * Lấy số lượng booking theo loại phòng và ngày cụ thể
+     *
      * @param date Ngày cần lấy dữ liệu
      * @return Map với key là tên loại phòng, value là số lượng booking
      */
@@ -870,4 +870,81 @@ public class OrderRepositoryImpl implements Repository<Order, Long>, iuh.fit.se.
 
         return bookingCountByRoomType;
     }
+
+
+    @Override
+    public boolean addSurchargeToOrder(long orderId, long surchargeAmount) {
+        if (surchargeAmount == 0)
+            return true;
+
+        String sql = "UPDATE Orders SET totalAmount = totalAmount + ? WHERE orderId = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, surchargeAmount);
+            stmt.setLong(2, orderId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            log.error("Error adding surcharge to order", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean existsTransformType(Long orderId) {
+        String sql = "SELECT 1 FROM Orders o join Booking b on o.orderId = b.orderId where b.orderId = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, orderId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            log.error("Error checking existence of transform type", e);
+            return false;
+        }
+    }
+
+    /**
+     * DTO class cho transfer data
+     */
+
+
+    @Override
+    public boolean addRoomAmountToOrder(long orderId, long amount) {
+        String sql = """
+                UPDATE Orders
+                SET totalAmount = totalAmount + ?
+                WHERE orderId = ?
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, amount);
+            stmt.setLong(2, orderId);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            log.error("Error adding room amount to order", e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean subtractAmountFromOrder(long orderId, double amount) {
+        String sql = """
+                    UPDATE Orders
+                    SET totalAmount = totalAmount - ?
+                    WHERE orderId = ?
+                """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setBigDecimal(1, BigDecimal.valueOf(amount));
+            stmt.setLong(2, orderId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.error("Error subtracting amount from order", e);
+            return false;
+        }
+    }
+
 }

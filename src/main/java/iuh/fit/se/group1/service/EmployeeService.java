@@ -23,7 +23,7 @@ public class EmployeeService {
         this.employeeRepositoryImpl = new EmployeeRepositoryImpl();
     }
 
-    public int count(){
+    public int count() {
         return employeeRepositoryImpl.count();
     }
 
@@ -31,26 +31,27 @@ public class EmployeeService {
     public Employee createEmployee(Employee employee, String roleId) {
         Role role = roleService.getRoleById(roleId);
         if (role == null) {
-            log.error("Role with ID {} not found. Cannot create employee.", roleId);
             throw new IllegalArgumentException("Invalid role ID: " + roleId);
         }
+
         Account account = new Account();
         account.setUsername("username");
         account.setPassword(PropertiesReader.getInstance().get("daotien.password"));
         account.setRole(role);
+
         Account accountSave = accountService.createAccount(account);
-        // Tao nhan vien
+
+        // set account trước khi save employee
         employee.setAccount(accountSave);
         Employee employeeSave = employeeRepositoryImpl.save(employee);
-        // Tạo account khi thêm nhân viên
+
+        // generate username
         String username = generateUsername(employeeSave);
-
-        // update employee với account vừa tạo
         accountSave.setUsername(username);
-        accountSave = accountService.updateAccount(accountSave);
 
-        employeeSave.setAccount(accountSave);
-        return employeeRepositoryImpl.update(employeeSave);
+        accountService.updateAccount(accountSave);
+
+        return employeeSave; // ✔ không update lại employee nữa
     }
 
     public Employee getEmployeeByCitizenId(String citizenId) {
@@ -83,13 +84,15 @@ public class EmployeeService {
         return employeeRepositoryImpl.update(employee);
     }
 
-    public List<Employee> getEmployeeByKeyword(String keyword){
+    public List<Employee> getEmployeeByKeyword(String keyword) {
         return employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(keyword);
     }
+
     public Employee getEmployeeById(Long employeeId) {
         return employeeRepositoryImpl.findById(employeeId);
     }
-    public Employee existsByCitizenId(String citizenId){
+
+    public Employee existsByCitizenId(String citizenId) {
         return employeeRepositoryImpl.findByCitizenId(citizenId);
     }
 }

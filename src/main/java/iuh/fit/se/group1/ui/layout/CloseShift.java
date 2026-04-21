@@ -125,8 +125,8 @@ public class CloseShift extends javax.swing.JPanel {
                     return;
                 }
 
-                ShiftCloseRepository repository = new ShiftCloseRepositoryImpl();
-                Employee manager = repository.validateManager(username, password);
+                ShiftCloseService service = new ShiftCloseService();
+                Employee manager = service.validateManager(username, password);
 
                 if (manager != null) {
                     GlassPanePopup.closePopupLast();
