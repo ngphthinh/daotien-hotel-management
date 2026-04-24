@@ -28,9 +28,10 @@ import java.util.stream.Collectors;
  * @created: 30/10/2025
  */
 
-public class EmployeeShiftService {
+public class EmployeeShiftService extends Service {
     private static final Logger log = LoggerFactory.getLogger(EmployeeShiftService.class);
     private final EmployeeShiftRepositoryImpl employeeShiftRepository;
+    private final ShiftCloseService shiftCloseService = new ShiftCloseService();
 
     public EmployeeShiftService() {
         this.employeeShiftRepository = new EmployeeShiftRepositoryImpl();
@@ -44,32 +45,38 @@ public class EmployeeShiftService {
         if (employeeShift.getShiftDate() == null) {
             employeeShift.setShiftDate(LocalDate.now());
         }
-        return employeeShiftRepository.save(employeeShift);
+//        return employeeShiftRepository.save(employeeShift);
+        return doInTransaction(entityManager -> employeeShiftRepository.save(entityManager, employeeShift));
     }
 
     public EmployeeShift updateEmployeeShift(EmployeeShift employeeShift) {
         log.info("Updating EmployeeShift {}", employeeShift.getEmployeeShiftId());
-        return employeeShiftRepository.update(employeeShift);
+//        return employeeShiftRepository.update(employeeShift);
+        return doInTransaction(entityManager -> employeeShiftRepository.update(entityManager, employeeShift));
     }
 
     public void deleteEmployeeShift(Long employeeShiftId) {
         log.info("Deleting EmployeeShift {}", employeeShiftId);
-        employeeShiftRepository.deleteById(employeeShiftId);
+//        employeeShiftRepository.deleteById(employeeShiftId);
+        doInTransactionVoid(entityManager -> employeeShiftRepository.deleteById(entityManager, employeeShiftId));
     }
 
     public EmployeeShift findEmployeeShiftById(Long employeeShiftId) {
         log.info("Finding EmployeeShift by ID {}", employeeShiftId);
-        return employeeShiftRepository.findById(employeeShiftId);
+//        return employeeShiftRepository.findById(employeeShiftId);
+        return doInTransaction(entityManager -> employeeShiftRepository.findById(entityManager, employeeShiftId));
     }
 
     public List<EmployeeShift> getAllEmployeeShifts() {
         log.info("Fetching all EmployeeShifts");
-        return employeeShiftRepository.findAll();
+//        return employeeShiftRepository.findAll();
+        return doInTransaction(employeeShiftRepository::findAll);
     }
 
     public List<EmployeeShift> getShiftsByEmployeeAndDate(Long employeeId, LocalDate date) {
         log.info("Fetching shifts for employee {} on date {}", employeeId, date);
-        List<EmployeeShift> allShifts = employeeShiftRepository.findByShiftDate(date);
+//        List<EmployeeShift> allShifts = employeeShiftRepository.findByShiftDate(date);
+        List<EmployeeShift> allShifts = doInTransaction(entityManager -> employeeShiftRepository.findByShiftDate(entityManager, date));
         return allShifts.stream()
                 .filter(es -> es.getEmployee().getEmployeeId().equals(employeeId))
                 .collect(Collectors.toList());
@@ -77,20 +84,22 @@ public class EmployeeShiftService {
 
     public List<EmployeeShift> getAllShiftsByDate(LocalDate date) {
         log.info("Fetching all shifts on date {}", date);
-        return employeeShiftRepository.findByShiftDate(date);
+//        return employeeShiftRepository.findByShiftDate(date);
+        return doInTransaction(entityManager -> employeeShiftRepository.findByShiftDate(entityManager, date));
     }
 
     public EmployeeShift getEmployeeShiftWithDetails(Long employeeShiftId) {
         EmployeeShiftRepositoryImpl repository = new EmployeeShiftRepositoryImpl();
-        return repository.findByIdWithDetails(employeeShiftId);
+//        return repository.findByIdWithDetails(employeeShiftId);
+        return doInTransaction(entityManager -> repository.findByIdWithDetails(entityManager, employeeShiftId));
     }
 
     /**
      * Lấy tổng doanh thu của ca làm việc
      */
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
-        ShiftCloseRepository shiftCloseRepo = new ShiftCloseRepositoryImpl();
-        return shiftCloseRepo.getTotalCashRevenueForShift(employeeShiftId);
+
+        return shiftCloseService.getTotalCashRevenueForShift(employeeShiftId);
     }
 
     public boolean isShiftActive(EmployeeShift shift) {

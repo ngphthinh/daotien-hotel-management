@@ -5,13 +5,14 @@ import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.repository.jpa.BookingRepositoryImpl;
+import jakarta.persistence.EntityManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-public class BookingService {
+public class BookingService extends Service {
     private final BookingRepositoryImpl bookingRepositoryImpl;
 
     public BookingService() {
@@ -19,7 +20,8 @@ public class BookingService {
     }
 
     public boolean existsByRoomIdAndDate(Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate) {
-        return bookingRepositoryImpl.isExistsByRoomAndDate(roomId, checkInDate, checkOutDate);
+//        return bookingRepositoryImpl.isExistsByRoomAndDate(roomId, checkInDate, checkOutDate);
+        return doInTransaction(entityManager -> bookingRepositoryImpl.isExistsByRoomAndDate(entityManager, roomId, checkInDate, checkOutDate));
     }
 
 
@@ -67,37 +69,48 @@ public class BookingService {
     }
 
 
-    public List<Booking> getBookingsByOrderId(Long orderId) {
-        return bookingRepositoryImpl.findByOrderId(orderId);
+    public List<Booking> getBookingsByOrderId(EntityManager em, Long orderId) {
+
+//        return bookingRepositoryImpl.findByOrderId(orderId);
+        return bookingRepositoryImpl.findByOrderId(em, orderId);
     }
 
 
     public List<BookingDTO> getAllBookings() {
-        return bookingRepositoryImpl.getAllBookings();
+//        return bookingRepositoryImpl.getAllBookings();
+        return doInTransaction(bookingRepositoryImpl::getAllBookings);
     }
+
 
     public Booking getBookingById(long bookingId, long roomId) {
-        return bookingRepositoryImpl.getBookingById(bookingId, roomId);
+//        return bookingRepositoryImpl.getBookingById(bookingId, roomId);
+        return doInTransaction(entityManager -> bookingRepositoryImpl.getBookingById(entityManager, bookingId, roomId));
     }
 
+
     public boolean extendRoomBooking(Long orderId, List<Long> roomIds, int extendValue, String bookingType) {
-        return bookingRepositoryImpl.extendRoomBooking(orderId, roomIds, extendValue, bookingType);
+
+//        return bookingRepositoryImpl.extendRoomBooking(orderId, roomIds, extendValue, bookingType);
+        return doInTransaction(entityManager -> bookingRepositoryImpl.extendRoomBooking(entityManager, orderId, roomIds, extendValue, bookingType));
     }
 
 
     public boolean cancelRoomBooking(Long orderId, Long roomId, String bookingType) {
-        return bookingRepositoryImpl.cancelRoomBooking(orderId, roomId, bookingType);
-
+//        return bookingRepositoryImpl.cancelRoomBooking(orderId, roomId, bookingType);
+        return doInTransaction(entityManager -> bookingRepositoryImpl.cancelRoomBooking(entityManager, orderId, roomId, bookingType));
     }
 
 
     public Booking getBookingByOrderIdAndType(long orderId, String bookingType, long roomId) {
-        return bookingRepositoryImpl.getBookingByOrderIdAndType(orderId, bookingType, roomId);
+//        return bookingRepositoryImpl.getBookingByOrderIdAndType(orderId, bookingType, roomId);
+//        return bookingRepositoryImpl.getBookingByOrderIdAndType(entityManager, orderId, bookingType, roomId);
+        return doInTransaction(em -> bookingRepositoryImpl.getBookingByOrderIdAndType(em, orderId, bookingType, roomId));
 
     }
 
     public List<BookingDTO> searchBookingsByCitizenId(String citizenId) {
-        return bookingRepositoryImpl.searchBookingsByCitizenId(citizenId);
+//        return bookingRepositoryImpl.searchBookingsByCitizenId(citizenId);
+        return doInTransaction(entityManager -> bookingRepositoryImpl.searchBookingsByCitizenId(entityManager, citizenId));
 
     }
 }

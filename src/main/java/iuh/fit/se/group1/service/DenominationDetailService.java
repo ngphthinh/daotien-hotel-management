@@ -20,7 +20,7 @@ import java.util.List;
  * @created: 31/10/2025
  */
 
-public class DenominationDetailService {
+public class DenominationDetailService extends Service {
     private static final Logger log = LoggerFactory.getLogger(DenominationDetailService.class);
     private final DenominationDetailRepositoryImpl repository;
 
@@ -42,7 +42,10 @@ public class DenominationDetailService {
                 throw new IllegalArgumentException("EmployeeShift cannot be null for detail: " + detail);
             }
         }
-        repository.saveBatch(details);
+//        repository.saveBatch(details);
+        doInTransactionVoid(em -> {
+            repository.saveBatch(em, details);
+        });
     }
 
     /**
@@ -55,7 +58,8 @@ public class DenominationDetailService {
         if (detail.getEmployeeShift() == null) {
             throw new IllegalArgumentException("EmployeeShift cannot be null");
         }
-        return repository.save(detail);
+//        return repository.save(detail);
+        return doInTransaction(em -> repository.save(em, detail));
     }
 
     /**
@@ -65,7 +69,8 @@ public class DenominationDetailService {
         if (detail == null || detail.getDenominationDetailId() == null) {
             throw new IllegalArgumentException("Invalid DenominationDetail to update");
         }
-        return repository.update(detail);
+//        return repository.update(detail);
+        return doInTransaction(em -> repository.update(em, detail));
     }
 
     /**
@@ -75,14 +80,16 @@ public class DenominationDetailService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Invalid ID");
         }
-        repository.deleteById(id);
+//        repository.deleteById(id);
+        doInTransactionVoid(em -> repository.deleteById(em, id));
     }
 
     /**
      * Tìm tất cả
      */
     public List<DenominationDetail> findAll() {
-        return repository.findAll();
+//        return repository.findAll();
+        return doInTransaction(repository::findAll);
     }
 
     /**
@@ -92,7 +99,8 @@ public class DenominationDetailService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Invalid ID");
         }
-        return repository.findById(id);
+//        return repository.findById(id);
+        return doInTransaction(em -> repository.findById(em, id));
     }
 
     /**
@@ -103,7 +111,8 @@ public class DenominationDetailService {
         if (employeeShiftId == null || employeeShiftId <= 0) {
             throw new IllegalArgumentException("Invalid employeeShiftId");
         }
-        return repository.findByEmployeeShiftId(employeeShiftId);
+//        return repository.findByEmployeeShiftId(employeeShiftId);
+        return doInTransaction(em -> repository.findByEmployeeShiftId(em, employeeShiftId));
     }
 
     /**
@@ -112,7 +121,8 @@ public class DenominationDetailService {
      */
     public List<Long> getAvailableDenominations() {
         try {
-            List<Long> dbDenominations = repository.findAllDistinctDenominations();
+//            List<Long> dbDenominations = repository.findAllDistinctDenominations();
+            List<Long> dbDenominations = doInTransaction(repository::findAllDistinctDenominations);
 
             if (dbDenominations != null && !dbDenominations.isEmpty()) {
                 return dbDenominations;

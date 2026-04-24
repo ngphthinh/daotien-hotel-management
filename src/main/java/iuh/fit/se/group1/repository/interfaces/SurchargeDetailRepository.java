@@ -1,23 +1,24 @@
 package iuh.fit.se.group1.repository.interfaces;
 
 import iuh.fit.se.group1.entity.SurchargeDetail;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
 public interface SurchargeDetailRepository {
-    SurchargeDetail save(SurchargeDetail surchargeDetail, Long orderId);
+    SurchargeDetail save(EntityManager em, SurchargeDetail surchargeDetail, Long orderId);
 
-    List<SurchargeDetail> findSurchargeDetailsByOrderId(Long orderId);
+    List<SurchargeDetail> findSurchargeDetailsByOrderId(EntityManager em,Long orderId);
 
-    boolean existsBySurchargeIdAndOrderId(Long surchargeId, Long orderId);
+    boolean existsBySurchargeIdAndOrderId(EntityManager em,Long surchargeId, Long orderId);
 
-    void deleteByOrderId(Long orderId);
+    void deleteByOrderId(EntityManager em,Long orderId);
 
-    boolean saveByOrderId(Long orderId, List<SurchargeDetail> surchargeDetails);
+    boolean saveByOrderId(EntityManager em,Long orderId, List<SurchargeDetail> surchargeDetails);
 
-    void deleteById(long surchargeId, Long orderId);
+    void deleteById(EntityManager em,long surchargeId, Long orderId);
 
-    void deleteById(Long orderId);
+    void deleteById(EntityManager em,Long orderId);
 
-    void updateSurchargeDetail(Long surchargeId, int quantity, Long orderId);
+    void updateSurchargeDetail(EntityManager em,Long surchargeId, int quantity, Long orderId);
 }

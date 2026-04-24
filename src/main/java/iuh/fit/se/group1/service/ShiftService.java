@@ -19,7 +19,7 @@ import java.util.List;
  * @created: 30/10/2025
  */
 
-public class ShiftService {
+public class ShiftService extends Service {
     private static final Logger log = LoggerFactory.getLogger(ShiftService.class);
 
     private final ShiftRepositoryImpl shiftRepositoryImpl;
@@ -31,7 +31,8 @@ public class ShiftService {
     // Create a new Shift
     public Shift createShift(Shift shift) {
         log.info("Creating new Shift: {}", shift.getName());
-        Shift savedShift = shiftRepositoryImpl.save(shift);
+        Shift savedShift = doInTransaction(entityManager -> shiftRepositoryImpl.save(entityManager, shift));
+//        Shift savedShift = shiftRepositoryImpl.save(shift);
         log.info("Shift created with ID: {}", savedShift.getShiftId());
         return savedShift;
     }
@@ -39,7 +40,8 @@ public class ShiftService {
     // Find a Shift by ID
     public Shift getShiftById(Long id) {
         log.info("Fetching Shift by ID: {}", id);
-        Shift shift = shiftRepositoryImpl.findById(id);
+//        Shift shift = shiftRepositoryImpl.findById(id);
+        Shift shift = doInTransaction(entityManager -> shiftRepositoryImpl.findById(entityManager, id));
         if (shift != null) {
             log.info("Shift found: {}", shift.getName());
         } else {
@@ -51,7 +53,8 @@ public class ShiftService {
     // Update an existing Shift
     public Shift updateShift(Shift shift) {
         log.info("Updating Shift ID {}: {}", shift.getShiftId(), shift.getName());
-        Shift updatedShift = shiftRepositoryImpl.update(shift);
+//        Shift updatedShift = shiftRepositoryImpl.update(shift);
+        Shift updatedShift = doInTransaction(entityManager -> shiftRepositoryImpl.update(entityManager, shift));
         log.info("Shift updated successfully: ID {}", updatedShift.getShiftId());
         return updatedShift;
     }
@@ -59,12 +62,17 @@ public class ShiftService {
     // Delete a Shift by ID
     public void deleteShift(Long id) {
         log.info("Deleting Shift with ID: {}", id);
-        shiftRepositoryImpl.deleteById(id);
+//        shiftRepositoryImpl.deleteById(id);
+        doInTransactionVoid(entityManager -> shiftRepositoryImpl.deleteById(entityManager, id));
         log.info("Shift deleted successfully: ID {}", id);
     }
 
     // Get all Shifts
     public List<Shift> getAllShifts() {
-        return shiftRepositoryImpl.findAll();
+//        return shiftRepositoryImpl.findAll();
+        log.info("Fetching all Shifts");
+        List<Shift> shifts = doInTransaction(shiftRepositoryImpl::findAll);
+        log.info("Total Shifts found: {}", shifts.size());
+        return shifts;
     }
 }

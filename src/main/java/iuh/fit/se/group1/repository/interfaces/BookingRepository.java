@@ -4,50 +4,51 @@ import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository {
-    boolean isExistsByRoomAndDate(Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate);
+    boolean isExistsByRoomAndDate(EntityManager em, Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate);
 
-    void saveAllBookingsForOrder(Order savedOrder, List<Booking> bookings);
+    void saveAllBookingsForOrder(EntityManager em, Order savedOrder, List<Booking> bookings);
 
-    void removeBookingsFromOrder(Order currentOrder, List<Booking> result);
+    void removeBookingsFromOrder(EntityManager em, Order currentOrder, List<Booking> result);
 
-    void moveBookingsToOrder(Long targetOrderId, List<Long> bookingIds);
+    void moveBookingsToOrder(EntityManager em, Long targetOrderId, List<Long> bookingIds);
 
-    void updateBookingDates(Long bookingId, LocalDateTime checkIn, LocalDateTime checkOut);
+    void updateBookingDates(EntityManager em, Long bookingId, LocalDateTime checkIn, LocalDateTime checkOut);
 
-    void deleteByOrderId(Long id);
+    void deleteByOrderId(EntityManager em, Long id);
 
-    List<Booking> findByOrderId(Long orderId);
+    List<Booking> findByOrderId(EntityManager em, Long orderId);
 
-    int countRoomsNearExpiry(LocalDateTime fromTime, LocalDateTime toTime);
+    int countRoomsNearExpiry(EntityManager em, LocalDateTime fromTime, LocalDateTime toTime);
 
-    int countCheckIns(LocalDateTime startDate, LocalDateTime endDate);
+    int countCheckIns(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
 
-    int countCheckOuts(LocalDateTime startDate, LocalDateTime endDate);
+    int countCheckOuts(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
 
-    int countCheckedOutRooms(LocalDateTime startDate, LocalDateTime endDate);
+    int countCheckedOutRooms(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
 
-    int countLateCheckOuts(LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime);
+    int countLateCheckOuts(EntityManager em, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime);
 
-    List<BookingDisplayDTO> findAllBookingDisplay();
+    List<BookingDisplayDTO> findAllBookingDisplay(EntityManager em);
 
-    List<BookingDTO> getAllBookings();
+    List<BookingDTO> getAllBookings(EntityManager em);
 
-    Booking getBookingById(long bookingId, long roomId);
+    Booking getBookingById(EntityManager em, long bookingId, long roomId);
 
-    boolean extendRoomBooking(Long orderId, List<Long> roomIds,
+    boolean extendRoomBooking(EntityManager em, Long orderId, List<Long> roomIds,
                               int extendValue, String bookingType);
 
 
-    boolean cancelRoomBooking(Long orderId, Long roomId, String bookingType);
+    boolean cancelRoomBooking(EntityManager em, Long orderId, Long roomId, String bookingType);
 
 
-    Booking getBookingByOrderIdAndType(long orderId, String bookingType, long roomId);
+    Booking getBookingByOrderIdAndType(EntityManager em, long orderId, String bookingType, long roomId);
 
-    List<BookingDTO> searchBookingsByCitizenId(String citizenId);
+    List<BookingDTO> searchBookingsByCitizenId(EntityManager em, String citizenId);
 
 }

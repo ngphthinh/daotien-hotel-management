@@ -17,8 +17,8 @@ import java.util.Set;
 @ToString(exclude = {"orderDetails"})
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Amenity SET isDeleted = true WHERE amenityId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Amenity SET isDeleted = 1 WHERE amenityId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Amenity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

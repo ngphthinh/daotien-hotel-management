@@ -22,7 +22,7 @@ import java.util.List;
  * @created: 31/10/2025
  */
 
-public class ShiftCloseService {
+public class ShiftCloseService extends Service {
 
     private final ShiftCloseRepositoryImpl repository;
 
@@ -31,18 +31,20 @@ public class ShiftCloseService {
     }
 
     public ShiftClose saveShiftClose(ShiftClose shiftClose) {
-        ShiftCloseRepositoryImpl repository = new ShiftCloseRepositoryImpl();
-        return repository.save(shiftClose);
+//        return repository.save(shiftClose);
+        return doInTransaction(em -> repository.save(em, shiftClose));
     }
 
     public Employee validateManager(String username, String password) {
-        return repository.validateManager(username, password);
+//        return repository.validateManager(username, password);
+        return doInTransaction(em -> repository.validateManager(em, username, password));
     }
 
     // Tìm ShiftClose theo ID
     public ShiftClose getShiftCloseById(Long id) {
         if (id == null) return null;
-        return repository.findById(id);
+//        return repository.findById(id);
+        return doInTransaction(em -> repository.findById(em, id));
     }
 
     // Cập nhật ShiftClose
@@ -62,26 +64,30 @@ public class ShiftCloseService {
             shiftClose.setDifference(difference);
         }
 
-        return repository.update(shiftClose);
+//        return repository.update(shiftClose);
+        return doInTransaction(em -> repository.update(em, shiftClose));
     }
 
     // Xóa ShiftClose theo ID
     public void deleteShiftClose(Long id) {
         if (id == null) return;
-        repository.deleteById(id);
+//        repository.deleteById(id);
+        doInTransactionVoid(em -> repository.deleteById(em, id));
     }
 
     // Lấy tất cả ShiftClose
     public List<ShiftClose> getAllShiftClose() {
-        return repository.findAll();
+//        return repository.findAll();
+        return doInTransaction(repository::findAll);
     }
 
     public List<ShiftClose> getShiftCloseByEmployeeShift(EmployeeShift employeeShift) {
-        ShiftCloseRepository repository = new ShiftCloseRepositoryImpl();
-        return repository.findByEmployeeShift(employeeShift);
+
+        return doInTransaction(em -> repository.findByEmployeeShift(em, employeeShift));
     }
 
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
-        return repository.getTotalCashRevenueForShift(employeeShiftId);
+//        return repository.getTotalCashRevenueForShift(employeeShiftId);
+        return doInTransaction(em -> repository.getTotalCashRevenueForShift(em, employeeShiftId));
     }
 }

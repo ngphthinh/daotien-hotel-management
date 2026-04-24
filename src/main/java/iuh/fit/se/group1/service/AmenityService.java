@@ -3,10 +3,11 @@ package iuh.fit.se.group1.service;
 import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.repository.jpa.AmenityRepositoryImpl;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
-public class AmenityService {
+public class AmenityService extends Service {
     private final AmenityRepositoryImpl amenityRepositoryImpl;
 
     public AmenityService() {
@@ -19,28 +20,28 @@ public class AmenityService {
             return null;
         }
 
-        return amenityRepositoryImpl.save(amenity);
+        return doInTransaction(entityManager -> amenityRepositoryImpl.save(entityManager, amenity));
     }
 
     private Amenity getAmenityByName(String nameAmenity) {
-        return amenityRepositoryImpl.findByAmenityName(nameAmenity);
+        return doInTransaction(entityManager -> amenityRepositoryImpl.findByAmenityName(entityManager, nameAmenity));
     }
 
     public void deleteAmenity(Long amenityId) {
-        amenityRepositoryImpl.deleteById(amenityId);
+        doInTransactionVoid(entityManager -> amenityRepositoryImpl.deleteById(entityManager, amenityId));
     }
 
     public List<Amenity> getAllAmenities() {
-        return amenityRepositoryImpl.findAll();
+        return doInTransaction(amenityRepositoryImpl::findAll);
     }
 
 
     public Amenity updateAmenity(Amenity amenity) {
-        return amenityRepositoryImpl.update(amenity);
+        return doInTransaction(entityManager -> amenityRepositoryImpl.update(entityManager, amenity));
     }
 
     public List<Amenity> getAmenityByKeyword(String keyword) {
-        return amenityRepositoryImpl.findByAmenityNameOrId(keyword);
+        return doInTransaction(entityManager -> amenityRepositoryImpl.findByAmenityNameOrId(entityManager, keyword));
     }
 
 
@@ -56,7 +57,7 @@ public class AmenityService {
         );
     }
 
-    public Amenity getAmenityById(Long amenityId) {
-        return amenityRepositoryImpl.findById(amenityId);
+    public Amenity getAmenityById(EntityManager em, Long amenityId) {
+        return amenityRepositoryImpl.findById(em, amenityId);
     }
 }

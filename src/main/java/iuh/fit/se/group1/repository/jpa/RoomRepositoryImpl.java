@@ -6,6 +6,7 @@ import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.repository.interfaces.RoomRepository;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,108 +18,98 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
     }
 
     @Override
-    public List<Room> findByRoomNumberOrId(String keyword) {
-        return callInTransaction(em -> {
+    public List<Room> findByRoomNumberOrId(EntityManager em, String keyword) {
 
-            String jpql = """
-                        SELECT r
-                        FROM Room r
-                        JOIN FETCH r.roomType rt
-                        WHERE r.isDeleted = false
-                          AND (
-                                CAST(r.roomId AS string) LIKE :kw
-                             OR LOWER(r.roomNumber) LIKE LOWER(:kw)
-                          )
-                        ORDER BY r.roomId ASC, r.roomNumber ASC
-                    """;
+        String jpql = """
+                    SELECT r
+                    FROM Room r
+                    JOIN FETCH r.roomType rt
+                    WHERE r.isDeleted = false
+                      AND (
+                            CAST(r.roomId AS string) LIKE :kw
+                         OR LOWER(r.roomNumber) LIKE LOWER(:kw)
+                      )
+                    ORDER BY r.roomId ASC, r.roomNumber ASC
+                """;
 
-            return em.createQuery(jpql, Room.class)
-                    .setParameter("kw", "%" + keyword + "%")
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Room.class)
+                .setParameter("kw", "%" + keyword + "%")
+                .getResultList();
     }
 
     @Override
-    public List<Room> findRoomByStatusAndRoomType(String roomTypeId, RoomStatus roomStatus) {
-        return callInTransaction(em -> {
+    public List<Room> findRoomByStatusAndRoomType(EntityManager em, String roomTypeId, RoomStatus roomStatus) {
 
-            String jpql = """
-                        SELECT r
-                        FROM Room r
-                        JOIN FETCH r.roomType rt
-                        WHERE rt.roomTypeId = :typeId
-                          AND r.roomStatus = :status
-                          AND r.isDeleted = false
-                        ORDER BY r.roomId ASC
-                    """;
+        String jpql = """
+                    SELECT r
+                    FROM Room r
+                    JOIN FETCH r.roomType rt
+                    WHERE rt.roomTypeId = :typeId
+                      AND r.roomStatus = :status
+                      AND r.isDeleted = false
+                    ORDER BY r.roomId ASC
+                """;
 
-            return em.createQuery(jpql, Room.class)
-                    .setParameter("typeId", roomTypeId)
-                    .setParameter("status", roomStatus)
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Room.class)
+                .setParameter("typeId", roomTypeId)
+                .setParameter("status", roomStatus)
+                .getResultList();
     }
 
     @Override
-    public void updateRoomStatusBatch(List<Long> roomIds, RoomStatus roomStatus) {
-        runInTransaction(em -> {
+    public void updateRoomStatusBatch(EntityManager em, List<Long> roomIds, RoomStatus roomStatus) {
 
-            em.createQuery("""
-                                UPDATE Room r
-                                SET r.roomStatus = :status
-                                WHERE r.roomId IN :ids
-                            """)
-                    .setParameter("status", roomStatus)
-                    .setParameter("ids", roomIds)
-                    .executeUpdate();
+        em.createQuery("""
+                            UPDATE Room r
+                            SET r.roomStatus = :status
+                            WHERE r.roomId IN :ids
+                        """)
+                .setParameter("status", roomStatus)
+                .setParameter("ids", roomIds)
+                .executeUpdate();
 
-        });
     }
 
     @Override
-    public List<Room> findAvailableRooms(LocalDateTime checkIn,
+    public List<Room> findAvailableRooms(EntityManager em, LocalDateTime checkIn,
                                          LocalDateTime checkOut,
                                          RoomStatus roomStatus) {
 
-        return callInTransaction(em -> {
 
-            String jpql = """
-                        SELECT r
-                        FROM Room r
-                        WHERE r.isDeleted = false
-                          AND r.roomStatus = :status
-                          AND r.roomId NOT IN (
-                                SELECT b.room.roomId
-                                FROM Booking b
-                                WHERE b.checkInDate < :checkOut
-                                  AND b.checkOutDate > :checkIn
-                          )
-                        ORDER BY r.roomId ASC
-                    """;
+        String jpql = """
+                    SELECT r
+                    FROM Room r
+                    WHERE r.isDeleted = false
+                      AND r.roomStatus = :status
+                      AND r.roomId NOT IN (
+                            SELECT b.room.roomId
+                            FROM Booking b
+                            WHERE b.checkInDate < :checkOut
+                              AND b.checkOutDate > :checkIn
+                      )
+                    ORDER BY r.roomId ASC
+                """;
 
-            return em.createQuery(jpql, Room.class)
-                    .setParameter("status", roomStatus)
-                    .setParameter("checkIn", checkIn)
-                    .setParameter("checkOut", checkOut)
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Room.class)
+                .setParameter("status", roomStatus)
+                .setParameter("checkIn", checkIn)
+                .setParameter("checkOut", checkOut)
+                .getResultList();
     }
 
     @Override
-    public boolean existsByRoomNumber(String roomNumber) {
-        return callInTransaction(em -> {
+    public boolean existsByRoomNumber(EntityManager em, String roomNumber) {
 
-            return !em.createQuery("""
-                                SELECT r.id
-                                FROM Room r
-                                WHERE r.roomNumber = :roomNumber
-                                  AND r.isDeleted = false
-                            """)
-                    .setParameter("roomNumber", roomNumber)
-                    .setMaxResults(1)
-                    .getResultList()
-                    .isEmpty();
-        });
+        return !em.createQuery("""
+                            SELECT r.id
+                            FROM Room r
+                            WHERE r.roomNumber = :roomNumber
+                              AND r.isDeleted = false
+                        """)
+                .setParameter("roomNumber", roomNumber)
+                .setMaxResults(1)
+                .getResultList()
+                .isEmpty();
     }
 
     @Override
@@ -132,100 +123,89 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
     }
 
     @Override
-    public void updateBookingRoom(Long bookingId, Long newRoomId) {
-        runInTransaction(em -> {
+    public void updateBookingRoom(EntityManager em, Long bookingId, Long newRoomId) {
 
-            em.createQuery("""
-                                UPDATE Booking b
-                                SET b.room.roomId = :roomId
-                                WHERE b.bookingId = :bookingId
-                            """)
-                    .setParameter("roomId", newRoomId)
-                    .setParameter("bookingId", bookingId)
-                    .executeUpdate();
-        });
+        em.createQuery("""
+                            UPDATE Booking b
+                            SET b.room.roomId = :roomId
+                            WHERE b.bookingId = :bookingId
+                        """)
+                .setParameter("roomId", newRoomId)
+                .setParameter("bookingId", bookingId)
+                .executeUpdate();
     }
 
     @Override
-    public boolean isRoomInUse(Long roomId) {
-        return callInTransaction(em -> {
-            String jpql = """
-                        SELECT COUNT(b)
-                        FROM Booking b
-                        JOIN b.order o
-                        JOIN o.orderType ot
-                        WHERE b.room.roomId = :roomId
-                          AND ot.id = 2
-                    """;
+    public boolean isRoomInUse(EntityManager em, Long roomId) {
+        String jpql = """
+                    SELECT COUNT(b)
+                    FROM Booking b
+                    JOIN b.order o
+                    JOIN o.orderType ot
+                    WHERE b.room.roomId = :roomId
+                      AND ot.id = 2
+                """;
 
-            Long count = em.createQuery(jpql, Long.class)
-                    .setParameter("roomId", roomId)
-                    .getSingleResult();
+        Long count = em.createQuery(jpql, Long.class)
+                .setParameter("roomId", roomId)
+                .getSingleResult();
 
-            return count > 0;
-        });
+        return count > 0;
     }
 
     @Override
-    public List<Room> getRoomsByOrderIdAndType(long orderId, String bookingType) {
-        return callInTransaction(em -> {
-            String jpql = """
-                        SELECT r
-                        FROM Booking b
-                        JOIN b.room r
-                        JOIN FETCH r.roomType rt
-                        WHERE b.order.orderId = :orderId
-                          AND b.bookingType = :bookingType
-                    """;
+    public List<Room> getRoomsByOrderIdAndType(EntityManager em, long orderId, String bookingType) {
+        String jpql = """
+                    SELECT r
+                    FROM Booking b
+                    JOIN b.room r
+                    JOIN FETCH r.roomType rt
+                    WHERE b.order.orderId = :orderId
+                      AND b.bookingType = :bookingType
+                """;
 
-            return em.createQuery(jpql, Room.class)
-                    .setParameter("orderId", orderId)
-                    .setParameter("bookingType", BookingType.valueOf(bookingType))
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Room.class)
+                .setParameter("orderId", orderId)
+                .setParameter("bookingType", BookingType.valueOf(bookingType))
+                .getResultList();
     }
 
     @Override
-    public List<Room> getRoomsByBookingId(long bookingId) {
-        return callInTransaction(em -> {
-            String jpql = """
-                        SELECT r
-                        FROM Booking b
-                        JOIN b.room r
-                        JOIN FETCH r.roomType
-                        WHERE b.bookingId = :bookingId
-                    """;
+    public List<Room> getRoomsByBookingId(EntityManager em, long bookingId) {
+        String jpql = """
+                    SELECT r
+                    FROM Booking b
+                    JOIN b.room r
+                    JOIN FETCH r.roomType
+                    WHERE b.bookingId = :bookingId
+                """;
 
-            return em.createQuery(jpql, Room.class)
-                    .setParameter("bookingId", bookingId)
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Room.class)
+                .setParameter("bookingId", bookingId)
+                .getResultList();
     }
 
     @Override
-    public List<Room> getAvailableRoomsByType(String roomTypeId) {
-        return callInTransaction(em -> {
-            String jpql = """
-                        SELECT r
-                        FROM Room r
-                        JOIN FETCH r.roomType rt
-                        WHERE r.roomStatus = :status
-                          AND rt.roomTypeId = :roomTypeId
-                        ORDER BY r.roomNumber
-                    """;
+    public List<Room> getAvailableRoomsByType(EntityManager em, String roomTypeId) {
+        String jpql = """
+                    SELECT r
+                    FROM Room r
+                    JOIN FETCH r.roomType rt
+                    WHERE r.roomStatus = :status
+                      AND rt.roomTypeId = :roomTypeId
+                    ORDER BY r.roomNumber
+                """;
 
-            return em.createQuery(jpql, Room.class)
-                    .setParameter("status", RoomStatus.AVAILABLE)
-                    .setParameter("roomTypeId", roomTypeId)
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Room.class)
+                .setParameter("status", RoomStatus.AVAILABLE)
+                .setParameter("roomTypeId", roomTypeId)
+                .getResultList();
     }
 
     @Override
-    public boolean transferRooms(long orderId, String bookingType,
+    public boolean transferRooms( EntityManager em,long orderId, String bookingType,
                                  List<Long> oldRoomIds, List<Long> newRoomIds) {
 
-        return callInTransaction(em -> {
             try {
                 // 1. Lấy booking gốc
                 Booking bookingInfo = em.createQuery("""
@@ -298,6 +278,5 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
             } catch (Exception e) {
                 throw new RuntimeException("Error transferring rooms", e);
             }
-        });
     }
 }

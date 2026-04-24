@@ -14,8 +14,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @ToString
 @Entity
-@SQLDelete(sql = "UPDATE Account SET isDeleted = true WHERE accountId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Account SET isDeleted = 1 WHERE accountId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

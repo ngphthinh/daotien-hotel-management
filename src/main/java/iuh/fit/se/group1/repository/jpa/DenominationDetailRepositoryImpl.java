@@ -3,6 +3,7 @@ package iuh.fit.se.group1.repository.jpa;
 import iuh.fit.se.group1.entity.DenominationDetail;
 import iuh.fit.se.group1.enums.DenominationLabel;
 import iuh.fit.se.group1.repository.interfaces.DenominationDetailRepository;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
@@ -12,59 +13,60 @@ public class DenominationDetailRepositoryImpl extends AbstractRepositoryImpl<Den
     }
 
     @Override
-    public List<DenominationDetail> findByEmployeeShiftId(Long employeeShiftId) {
-        return callInTransaction(em -> {
+    public List<DenominationDetail> findByEmployeeShiftId(EntityManager em,
+                                                          Long employeeShiftId) {
 
-            String jpql = """
-                        SELECT d
-                        FROM DenominationDetail d
-                        WHERE d.employeeShift.employeeShiftId = :id
-                        ORDER BY d.denominationDetailId
-                    """;
 
-            return em.createQuery(jpql, DenominationDetail.class)
-                    .setParameter("id", employeeShiftId)
-                    .getResultList();
-        });
+        String jpql = """
+                    SELECT d
+                    FROM DenominationDetail d
+                    WHERE d.employeeShift.employeeShiftId = :id
+                    ORDER BY d.denominationDetailId
+                """;
+
+        return em.createQuery(jpql, DenominationDetail.class)
+                .setParameter("id", employeeShiftId)
+                .getResultList();
+
     }
 
     @Override
-    public void saveBatch(List<DenominationDetail> details) {
-        runInTransaction(em -> {
+    public void saveBatch(EntityManager em, List<DenominationDetail> details) {
 
-            int batchSize = 30;
-            int i = 0;
 
-            for (DenominationDetail detail : details) {
+        int batchSize = 30;
+        int i = 0;
 
-                em.persist(detail);
+        for (DenominationDetail detail : details) {
 
-                if (i > 0 && i % batchSize == 0) {
-                    em.flush();
-                    em.clear();
-                }
+            em.persist(detail);
 
-                i++;
+            if (i > 0 && i % batchSize == 0) {
+                em.flush();
+                em.clear();
             }
-        });
+
+            i++;
+        }
+
     }
 
     @Override
-    public List<Long> findAllDistinctDenominations() {
-        return callInTransaction(em -> {
+    public List<Long> findAllDistinctDenominations(EntityManager em) {
 
-            String jpql = """
-                        SELECT DISTINCT d.denomination
-                        FROM DenominationDetail d
-                        ORDER BY d.denomination DESC
-                    """;
 
-            List<DenominationLabel> result = em.createQuery(jpql, DenominationLabel.class)
-                    .getResultList();
+        String jpql = """
+                    SELECT DISTINCT d.denomination
+                    FROM DenominationDetail d
+                    ORDER BY d.denomination DESC
+                """;
 
-            return result.stream()
-                    .map(DenominationLabel::getValue)
-                    .toList();
-        });
+        List<DenominationLabel> result = em.createQuery(jpql, DenominationLabel.class)
+                .getResultList();
+
+        return result.stream()
+                .map(DenominationLabel::getValue)
+                .toList();
+
     }
 }

@@ -116,8 +116,11 @@ public class RoomToolsService {
         }
 
         // Lấy thông tin booking để biết thời gian thuê
-        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
-                orderId, bookingType.name(), oldRooms.get(0).getRoomId());
+//        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
+//                orderId, bookingType.name(), oldRooms.get(0).getRoomId());
+
+            Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
+                    orderId, bookingType.name(), oldRooms.get(0).getRoomId());
 
         if (bookingInfo == null) {
             log.error("Cannot find booking info for orderId={}, bookingType={}", orderId, bookingType);

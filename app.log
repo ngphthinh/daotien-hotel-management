@@ -242,3 +242,73 @@ Apr 21, 2026 11:20:03 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Order created successfully with order details
 Apr 21, 2026 11:20:25 PM iuh.fit.se.group1.config.AppLogger info
 INFO: Invoice exported successfully to: {}
+Apr 24, 2026 8:44:12 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 8:44:12 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 8:44:13 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 8:44:13 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 24, 2026 8:48:08 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 8:48:08 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 8:48:10 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 8:48:10 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 24, 2026 8:48:45 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Invoice exported successfully to: {}
+Apr 24, 2026 8:55:05 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 8:55:05 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 8:55:08 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 8:55:08 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 24, 2026 9:08:48 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 9:08:48 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 9:08:48 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 9:08:48 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 24, 2026 9:13:52 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 9:13:52 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 9:13:53 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 9:13:53 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 24, 2026 9:15:14 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 9:15:14 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 9:15:15 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 9:15:15 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 24, 2026 9:19:47 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 9:19:47 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 9:19:48 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 9:19:48 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 24, 2026 9:20:08 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 9:20:08 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 9:27:53 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 24, 2026 9:27:53 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 24, 2026 9:27:53 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 24, 2026 9:27:53 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font

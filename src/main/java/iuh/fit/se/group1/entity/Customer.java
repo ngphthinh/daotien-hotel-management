@@ -16,8 +16,8 @@ import java.util.Set;
 @EqualsAndHashCode(of = "customerId")
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Customer SET isDeleted = true WHERE customerId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Customer SET isDeleted = 1 WHERE customerId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

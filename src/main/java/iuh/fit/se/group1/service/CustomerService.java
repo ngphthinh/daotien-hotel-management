@@ -5,7 +5,7 @@ import java.util.List;
 import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl;
 
-public class CustomerService {
+public class CustomerService extends Service {
     private final CustomerRepositoryImpl customerRepository;
 
     public CustomerService() {
@@ -16,42 +16,49 @@ public class CustomerService {
         if (getCustomerByCitizenId(customer.getCitizenId()) != null) {
             return null;
         }
-        return customerRepository.save(customer);
+        return doInTransaction(entityManager -> customerRepository.save(entityManager, customer));
     }
 
     public void deleteCustomer(Long customerId) {
-        customerRepository.deleteById(customerId);
+//        customerRepository.deleteById(customerId);
+        doInTransactionVoid(entityManager -> customerRepository.deleteById(entityManager, customerId));
     }
 
 
     public List<Customer> getAllCustomer() {
-        return customerRepository.findAll();
+//        return customerRepository.findAll();
+        return doInTransaction(customerRepository::findAll);
     }
 
 
     public Customer updateAmenity(Customer customer) {
-        return customerRepository.update(customer);
+//        return customerRepository.update(customer);
+        return doInTransaction(entityManager -> customerRepository.update(entityManager, customer));
     }
 
     public List<Customer> getAmenityByKeyword(String keyword) {
-        return customerRepository.findByCustomerNameOrId(keyword);
+//        return customerRepository.findByCustomerNameOrId(keyword);
+        return doInTransaction(entityManager -> customerRepository.findByCustomerNameOrId(entityManager, keyword));
     }
 
     public Customer getCustomerById(String idStr) {
         try {
             Long id = Long.parseLong(idStr);
-            return customerRepository.findById(id);
+//            return customerRepository.findById(id);
+            return doInTransaction(entityManager -> customerRepository.findById(entityManager, id));
         } catch (NumberFormatException e) {
             return null;
         }
     }
 
     public Customer updateCustomer(Customer customer) {
-        return customerRepository.update(customer);
+//        return customerRepository.update(customer);
+        return doInTransaction(entityManager -> customerRepository.update(entityManager, customer));
     }
 
     public Customer getCustomerByCitizenId(String citizenId) {
-        return customerRepository.findByCitizenId(citizenId);
+//        return customerRepository.findByCitizenId(citizenId);
+        return doInTransaction(entityManager -> customerRepository.findByCitizenId(entityManager, citizenId));
     }
 
 }

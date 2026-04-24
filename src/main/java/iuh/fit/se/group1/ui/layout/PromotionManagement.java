@@ -68,13 +68,13 @@ public class PromotionManagement extends javax.swing.JPanel {
         model.setRowCount(0);
         for (Promotion promotion : promotions) {
             model.addRow(new Object[]{
-                promotion.getPromotionId(),
-                promotion.getPromotionName(),
-                Constants.VND_FORMAT.format(promotion.getMinOrderAmount()),
-                promotion.getDiscountPercent() + "%",
-                promotion.getStartDate().format(Constants.DATE_FORMATTER),
-                promotion.getEndDate().format(Constants.DATE_FORMATTER),
-                promotion.getCreatedAt().format(Constants.DATE_FORMATTER)
+                    promotion.getPromotionId(),
+                    promotion.getPromotionName(),
+                    Constants.VND_FORMAT.format(promotion.getMinOrderAmount()),
+                    promotion.getDiscountPercent() + "%",
+                    promotion.getStartDate().format(Constants.DATE_FORMATTER),
+                    promotion.getEndDate().format(Constants.DATE_FORMATTER),
+                    promotion.getCreatedAt().format(Constants.DATE_FORMATTER)
             });
         }
     }
@@ -124,14 +124,14 @@ public class PromotionManagement extends javax.swing.JPanel {
                 "<html><span style='color:white;'>Quản lý khuyến mãi</span>");
         headerCustom1.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
         String cols[] = {
-            "Mã KM",
-            "Tên KM",
-            "Giá KM",
-            "% Giảm",
-            "Ngày bắt đầu",
-            "Ngày kết thúc",
-            "Ngày tạo",
-            "Chức năng"
+                "Mã KM",
+                "Tên KM",
+                "Giá KM",
+                "% Giảm",
+                "Ngày bắt đầu",
+                "Ngày kết thúc",
+                "Ngày tạo",
+                "Chức năng"
 
         };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
@@ -357,7 +357,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         });
 
         GlassPanePopup.showPopup(modal);
-            }
+    }
 
     private void saveData(InfoPromotionModal modal) {
         Valid result = getValid(modal);
@@ -382,6 +382,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                 return;
             }
 
+            System.out.println("Khuyến mãi đã lưu: " + entitySave);
             DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
             model.addRow(new Object[]{
                     entitySave.getPromotionId(),
@@ -520,12 +521,12 @@ public class PromotionManagement extends javax.swing.JPanel {
     }
 
     private record Valid(String name,
-            boolean valid,
-            BigDecimal discountPrice,
-            float discountPercent,
-            String description,
-            LocalDate startDate,
-            LocalDate endDate) {
+                         boolean valid,
+                         BigDecimal discountPrice,
+                         float discountPercent,
+                         String description,
+                         LocalDate startDate,
+                         LocalDate endDate) {
 
     }
 

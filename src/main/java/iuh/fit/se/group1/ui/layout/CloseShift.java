@@ -6,9 +6,9 @@ package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.DenominationLabel;
-import iuh.fit.se.group1.repository.*;
-import iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository;
-import iuh.fit.se.group1.service.*;
+import iuh.fit.se.group1.service.DenominationDetailService;
+import iuh.fit.se.group1.service.EmployeeShiftService;
+import iuh.fit.se.group1.service.ShiftCloseService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.*;
 import iuh.fit.se.group1.ui.component.modal.ConfirmInfoModal;

@@ -7,6 +7,8 @@ package iuh.fit.se.group1.ui.component.shift;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
+import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.service.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +21,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+
 import org.imgscalr.Scalr;
 
 /**
- *
  * @author Administrator
  */
 public class ShiftList extends JPanel {
 
+    private final EmployeeService employeeService = new EmployeeService();
     private static final Logger log = LoggerFactory.getLogger(ShiftList.class);
 
     /**
@@ -125,6 +128,7 @@ public class ShiftList extends JPanel {
             log.error("Error adding new employee to shift list: ", ex);
         }
     }
+
     public void loadEmployees(List<Employee> employees) {
         try {
             pnlEmployees.removeAll();
@@ -192,8 +196,7 @@ public class ShiftList extends JPanel {
 
     private void loadEmployeesFromDatabase() {
         try {
-            EmployeeRepositoryImpl employeeRepositoryImpl = new EmployeeRepositoryImpl();
-            List<Employee> employees = employeeRepositoryImpl.findAllByRoleId(Role.RECEPTIONIST.toString());
+            List<Employee> employees = employeeService.findAllByRoleId(Role.RECEPTIONIST.toString());
 
             pnlEmployees.removeAll();
             pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
@@ -327,23 +330,24 @@ public class ShiftList extends JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addComponent(lblTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addComponent(lblTitle, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblTitle)
-                .addGap(12, 12, 12)
-                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblTitle)
+                                .addGap(12, 12, 12)
+                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
     private void addEmployees(String employeeName, String code, String imagePath) {
         ShiftProfile shiftProfile = new ShiftProfile();
         shiftProfile.getLblName().setText(employeeName);

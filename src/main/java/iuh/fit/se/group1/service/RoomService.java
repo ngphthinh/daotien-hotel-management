@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RoomService {
+public class RoomService extends Service {
     private final RoomRepositoryImpl roomRepository;
     private final RoomTypeRepositoryImpl roomTypeRepositoryImpl = new RoomTypeRepositoryImpl();
     private static final String SINGLE_ROOM_TYPE = "SINGLE";
@@ -27,33 +27,42 @@ public class RoomService {
     }
 
     public Room createRoom(Room room) {
-        return roomRepository.save(room);
+//        return roomRepository.save(room);
+
+        return doInTransaction(entityManager -> roomRepository.save(entityManager, room));
+
     }
 
     public void deleteRoom(Long roomId) {
 
-        roomRepository.deleteById(roomId);
+//        roomRepository.deleteById(roomId);
+        doInTransactionVoid(entityManager -> roomRepository.deleteById(entityManager, roomId));
     }
 
     public List<Room> getAllRooms() {
-        return roomRepository.findAll();
+//        return roomRepository.findAll();
+        return doInTransaction(roomRepository::findAll);
     }
 
     public Room updateRoom(Room room) {
-        return roomRepository.update(room);
+//        return roomRepository.update(room);
+        return doInTransaction(entityManager -> roomRepository.update(entityManager, room));
     }
 
 
     public boolean existsByRoomNumber(String roomNumber) {
-        return roomRepository.existsByRoomNumber(roomNumber);
+//        return roomRepository.existsByRoomNumber(roomNumber);
+        return doInTransaction(entityManager -> roomRepository.existsByRoomNumber(entityManager, roomNumber));
     }
 
     public List<Room> getRoomByKeyword(String keyword) {
-        return roomRepository.findByRoomNumberOrId(keyword);
+//        return roomRepository.findByRoomNumberOrId(keyword);
+        return doInTransaction(entityManager -> roomRepository.findByRoomNumberOrId(entityManager, keyword));
     }
 
     public List<Room> getRoomByStatusOrRoomType(String roomTypeId, RoomStatus status) {
-        return roomRepository.findRoomByStatusAndRoomType(roomTypeId, status);
+//        return roomRepository.findRoomByStatusAndRoomType(roomTypeId, status);
+        return doInTransaction(entityManager -> roomRepository.findRoomByStatusAndRoomType(entityManager, roomTypeId, status));
     }
 
     public RoomDTO toRoomDTO(RoomType rt) {
@@ -75,10 +84,30 @@ public class RoomService {
 
 
     public Map<RoomDTO, Long> countAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
-        List<Room> rooms = roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
+//        List<Room> rooms = roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
+//
+//        RoomType singleRoomType = roomTypeRepositoryImpl.findById(SINGLE_ROOM_TYPE);
+//        RoomType doubleRoomType = roomTypeRepositoryImpl.findById(DOUBLE_ROOM_TYPE);
+//
+//        RoomDTO singleRoom = toRoomDTO(singleRoomType);
+//        RoomDTO doubleRoom = toRoomDTO(doubleRoomType);
+//
+//        Long singleRooms = rooms.stream()
+//                .filter(room -> room.getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
+//                .count();
+//
+//        Long doubleRooms = rooms.stream()
+//                .filter(room -> room.getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
+//                .count();
+//
+//        Map<RoomDTO, Long> map = new LinkedHashMap<>();
+//        map.put(singleRoom, singleRooms);
+//        map.put(doubleRoom, doubleRooms);
+//        return map;
+        List<Room> rooms = doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE));
 
-        RoomType singleRoomType = roomTypeRepositoryImpl.findById(SINGLE_ROOM_TYPE);
-        RoomType doubleRoomType = roomTypeRepositoryImpl.findById(DOUBLE_ROOM_TYPE);
+        RoomType singleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, SINGLE_ROOM_TYPE));
+        RoomType doubleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, DOUBLE_ROOM_TYPE));
 
         RoomDTO singleRoom = toRoomDTO(singleRoomType);
         RoomDTO doubleRoom = toRoomDTO(doubleRoomType);
@@ -238,35 +267,89 @@ public class RoomService {
     }
 
     public List<Room> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
-        return roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
+//        return roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
+        return doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE));
     }
 
     public Room getRoomByRoomId(Long roomId) {
-        return roomRepository.findById(roomId);
+//        return roomRepository.findById(roomId);
+        return doInTransaction(entityManager -> roomRepository.findById(entityManager, roomId));
     }
 
     public boolean canDeleteRoom(Long roomId) {
         // Tìm trong hóa đơn ordertype = 3 (Đặt trước) xem có roomId này không
         // Nếu có thì thay bằng 1 phòng khác cùng loại, đang trống và chưa được đặt trước
+//        Long orderTypeBooked = 3L;
+//        List<Order> ordersUsingRoom = orderService.getOrdersByRoomIdAndOrderType(roomId, orderTypeBooked);
+//
+//        if (!ordersUsingRoom.isEmpty()) {
+//            // Lấy thông tin phòng cần xóa
+////            Room roomToDelete = roomRepository.findById(roomId);
+//            Room roomToDelete = doInTransaction(entityManager -> roomRepository.findById(entityManager, roomId));
+//            if (roomToDelete == null) {
+//                return false;
+//            }
+//
+//            String roomTypeId = roomToDelete.getRoomType().getRoomTypeId();
+//
+//            // Duyệt qua từng order đang dùng phòng này
+//            for (Order order : ordersUsingRoom) {
+//                BookingService bookingService = new BookingService();
+//
+////                List<Booking> bookings = bookingService.getBookingsByOrderId(order.getOrderId());
+//                List<Booking> bookings = doInTransaction(entityManager -> bookingService.getBookingsByOrderId(entityManager, order.getOrderId()));
+//
+//                // Lấy booking của phòng này trong order
+//                Booking bookingToReplace = bookings.stream()
+//                        .filter(b -> b.getRoom().getRoomId().equals(roomId))
+//                        .findFirst()
+//                        .orElse(null);
+//
+//                if (bookingToReplace == null) {
+//                    continue;
+//                }
+//
+//                // Tìm phòng thay thế: cùng loại, trống, chưa được đặt trong khoảng thời gian này
+//                List<Room> availableRooms = roomRepository.findAvailableRooms(
+//                        bookingToReplace.getCheckInDate(),
+//                        bookingToReplace.getCheckOutDate(),
+//                        RoomStatus.AVAILABLE
+//                );
+//
+//                Room replacementRoom = availableRooms.stream()
+//                        .filter(r -> r.getRoomType().getRoomTypeId().equals(roomTypeId))
+//                        .filter(r -> !r.getRoomId().equals(roomId)) // Loại trừ phòng đang xóa
+//                        .findFirst()
+//                        .orElse(null);
+//
+//                if (replacementRoom == null) {
+//                    // Không tìm thấy phòng thay thế -> không thể xóa
+//                    return false;
+//                }
+//
+//                // Cập nhật booking sang phòng mới
+//                roomRepository.updateBookingRoom(bookingToReplace.getBookingId(), replacementRoom.getRoomId());
+//            }
+//        }
+//
+//        // Kiểm tra phòng có đang được sử dụng trong các order khác không
+//        return !roomRepository.isRoomInUse(roomId);
         Long orderTypeBooked = 3L;
         List<Order> ordersUsingRoom = orderService.getOrdersByRoomIdAndOrderType(roomId, orderTypeBooked);
 
         if (!ordersUsingRoom.isEmpty()) {
-            // Lấy thông tin phòng cần xóa
-            Room roomToDelete = roomRepository.findById(roomId);
+            Room roomToDelete = doInTransaction(entityManager -> roomRepository.findById(entityManager, roomId));
             if (roomToDelete == null) {
                 return false;
             }
 
             String roomTypeId = roomToDelete.getRoomType().getRoomTypeId();
 
-            // Duyệt qua từng order đang dùng phòng này
             for (Order order : ordersUsingRoom) {
                 BookingService bookingService = new BookingService();
 
-                List<Booking> bookings = bookingService.getBookingsByOrderId(order.getOrderId());
+                List<Booking> bookings = doInTransaction(entityManager -> bookingService.getBookingsByOrderId(entityManager, order.getOrderId()));
 
-                // Lấy booking của phòng này trong order
                 Booking bookingToReplace = bookings.stream()
                         .filter(b -> b.getRoom().getRoomId().equals(roomId))
                         .findFirst()
@@ -276,51 +359,49 @@ public class RoomService {
                     continue;
                 }
 
-                // Tìm phòng thay thế: cùng loại, trống, chưa được đặt trong khoảng thời gian này
-                List<Room> availableRooms = roomRepository.findAvailableRooms(
-                        bookingToReplace.getCheckInDate(),
-                        bookingToReplace.getCheckOutDate(),
-                        RoomStatus.AVAILABLE
-                );
+                List<Room> availableRooms = doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, bookingToReplace.getCheckInDate(), bookingToReplace.getCheckOutDate(), RoomStatus.AVAILABLE));
 
                 Room replacementRoom = availableRooms.stream()
                         .filter(r -> r.getRoomType().getRoomTypeId().equals(roomTypeId))
-                        .filter(r -> !r.getRoomId().equals(roomId)) // Loại trừ phòng đang xóa
+                        .filter(r -> !r.getRoomId().equals(roomId))
                         .findFirst()
                         .orElse(null);
 
                 if (replacementRoom == null) {
-                    // Không tìm thấy phòng thay thế -> không thể xóa
                     return false;
                 }
 
-                // Cập nhật booking sang phòng mới
-                roomRepository.updateBookingRoom(bookingToReplace.getBookingId(), replacementRoom.getRoomId());
+                doInTransactionVoid(entityManager -> roomRepository.updateBookingRoom(entityManager, bookingToReplace.getBookingId(), replacementRoom.getRoomId()));
             }
         }
 
-        // Kiểm tra phòng có đang được sử dụng trong các order khác không
-        return !roomRepository.isRoomInUse(roomId);
+        return doInTransaction(entityManager -> !roomRepository.isRoomInUse(entityManager, roomId));
     }
 
     public void updateRoomStatusBatch(List<Long> roomIds, RoomStatus roomStatus) {
-        roomRepository.updateRoomStatusBatch(roomIds, roomStatus);
+//        roomRepository.updateRoomStatusBatch(roomIds, roomStatus);
+        doInTransactionVoid(entityManager -> roomRepository.updateRoomStatusBatch(entityManager, roomIds, roomStatus));
     }
 
     public List<Room> getRoomsByOrderIdAndType(long orderId, String bookingType) {
-        return roomRepository.getRoomsByOrderIdAndType(orderId, bookingType);
+//        return roomRepository.getRoomsByOrderIdAndType(orderId, bookingType);
+        return doInTransaction(entityManager -> roomRepository.getRoomsByOrderIdAndType(entityManager, orderId, bookingType));
     }
 
     public List<Room> getRoomsByBookingId(long bookingId) {
-        return roomRepository.getRoomsByBookingId(bookingId);
+//        return roomRepository.getRoomsByBookingId(bookingId);
+        return doInTransaction(entityManager -> roomRepository.getRoomsByBookingId(entityManager, bookingId));
+
     }
 
     public List<Room> getAvailableRoomsByType(String roomTypeId) {
-        return roomRepository.getAvailableRoomsByType(roomTypeId);
+//        return roomRepository.getAvailableRoomsByType(roomTypeId);
+        return doInTransaction(entityManager -> roomRepository.getAvailableRoomsByType(entityManager, roomTypeId));
     }
 
     public boolean transferRooms(long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds) {
-        return roomRepository.transferRooms(orderId, bookingType, oldRoomIds, newRoomIds);
+//        return roomRepository.transferRooms(orderId, bookingType, oldRoomIds, newRoomIds);
+        return doInTransaction(entityManager -> roomRepository.transferRooms(entityManager, orderId, bookingType, oldRoomIds, newRoomIds));
     }
 
 }

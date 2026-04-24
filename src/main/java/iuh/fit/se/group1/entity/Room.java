@@ -15,8 +15,8 @@ import java.time.LocalDate;
 @ToString
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Room SET isDeleted = true WHERE roomId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Room SET isDeleted = 1 WHERE roomId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,9 +1,10 @@
 package iuh.fit.se.group1.repository.interfaces;
 
 import iuh.fit.se.group1.entity.Account;
+import jakarta.persistence.EntityManager;
 
 public interface AccountRepository {
-    Account findByUsername(String username);
+    Account findByUsername(EntityManager em,String username);
 
-    boolean updatePassword(String accountId, String newHashedPassword);
+    boolean updatePassword(EntityManager em, String accountId, String newHashedPassword);
 }

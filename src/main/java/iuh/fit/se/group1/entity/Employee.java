@@ -16,8 +16,8 @@ import java.util.Set;
 @ToString(exclude = {"account", "orders", "orderPayment", "employeeShifts"})
 @EqualsAndHashCode(of = "employeeId")
 @Entity
-@SQLDelete(sql = "UPDATE Employee SET isDeleted = true WHERE employeeId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Employee SET isDeleted = 1 WHERE employeeId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

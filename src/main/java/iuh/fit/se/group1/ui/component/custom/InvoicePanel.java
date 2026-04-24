@@ -544,28 +544,49 @@ public class InvoicePanel extends JPanel {
     }
 
     private void updateInvoiceData() {
+        if (order == null) return;
+
         // Header
-        lblInvoiceId.setText("Mã hóa đơn: #" + order.getOrderId());
-        lblInvoiceDate.setText("Ngày tạo: " +
-                order.getOrderDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+        lblInvoiceId.setText("Mã hóa đơn: #" + (order.getOrderId() != null ? order.getOrderId() : "N/A"));
+        if (order.getOrderDate() != null) {
+            lblInvoiceDate.setText("Ngày tạo: " +
+                    order.getOrderDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+        } else {
+            lblInvoiceDate.setText("Ngày tạo: N/A");
+        }
 
         // Customer
         Customer customer = order.getCustomer();
         if (customer != null) {
-            lblCustomerName.setText(customer.getFullName());
-            lblCustomerPhone.setText(customer.getPhone());
-            lblCustomerCitizenId.setText(customer.getCitizenId());
-            lblCustomerEmail.setText(customer.getEmail());
+            lblCustomerName.setText(customer.getFullName() != null ? customer.getFullName() : "-");
+            lblCustomerPhone.setText(customer.getPhone() != null ? customer.getPhone() : "-");
+            lblCustomerCitizenId.setText(customer.getCitizenId() != null ? customer.getCitizenId() : "-");
+            lblCustomerEmail.setText(customer.getEmail() != null ? customer.getEmail() : "-");
+        } else {
+            lblCustomerName.setText("-");
+            lblCustomerPhone.setText("-");
+            lblCustomerCitizenId.setText("-");
+            lblCustomerEmail.setText("-");
         }
 
         // Employee
         Employee employee = order.getEmployee();
         if (employee != null) {
-            lblEmployeeName.setText(employee.getFullName());
+            lblEmployeeName.setText(employee.getFullName() != null ? employee.getFullName() : "-");
+        } else {
+            lblEmployeeName.setText("-");
         }
-        Employee employeePayment = employeeService.getEmployeeById(order.getEmployeePayment().getEmployeeId());
-        if (employeePayment != null) {
-            lblEmployeePayment.setText(employeePayment.getFullName());
+
+        // Employee Payment
+        if (order.getEmployeePayment() != null && order.getEmployeePayment().getEmployeeId() != null) {
+            Employee employeePayment = employeeService.getEmployeeById(order.getEmployeePayment().getEmployeeId());
+            if (employeePayment != null) {
+                lblEmployeePayment.setText(employeePayment.getFullName() != null ? employeePayment.getFullName() : "-");
+            } else {
+                lblEmployeePayment.setText("-");
+            }
+        } else {
+            lblEmployeePayment.setText("-");
         }
 
         // Room bookings
@@ -587,33 +608,57 @@ public class InvoicePanel extends JPanel {
     private void updateRoomBookings() {
         roomBookingModel.setRowCount(0);
 
-        if (order.getBookings() != null) {
+        if (order.getBookings() != null && !order.getBookings().isEmpty()) {
             for (Booking booking : order.getBookings()) {
+                if (booking == null) continue;
+
                 Room room = booking.getRoom();
-                BigDecimal price = calculateRoomPrice(booking);
+                if (room == null) continue;
+
+                String roomNumber = room.getRoomNumber() != null ? room.getRoomNumber() : "-";
+                String roomTypeName = room.getRoomType() != null && room.getRoomType().getName() != null
+                    ? room.getRoomType().getName() : "-";
+                String checkIn = booking.getCheckInDate() != null
+                    ? booking.getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    : "-";
+                String checkOut = booking.getCheckOutDate() != null
+                    ? booking.getCheckOutDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    : "-";
+                String bookingType = booking.getBookingType() != null
+                    ? booking.getBookingType().getDisplayName()
+                    : "-";
+                BigDecimal price = BigDecimal.valueOf(bookingService.getPriceFromBooking(booking));
+                if (price == null) price = BigDecimal.ZERO;
 
                 roomBookingModel.addRow(new Object[] {
-                        room.getRoomNumber(),
-                        room.getRoomType().getName(),
-                        booking.getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
-                        booking.getCheckOutDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
-                        booking.getBookingType().getDisplayName(),
-                        bookingService.getPriceFromBooking(booking)
+                        roomNumber,
+                        roomTypeName,
+                        checkIn,
+                        checkOut,
+                        bookingType,
+                        price
                 });
             }
         }
     }
 
     private BigDecimal calculateRoomPrice(Booking booking) {
-        // This is a simplified calculation - adjust according to your business logic
+        if (booking == null || booking.getRoom() == null || booking.getRoom().getRoomType() == null) {
+            return BigDecimal.ZERO;
+        }
+
         RoomType roomType = booking.getRoom().getRoomType();
+        if (booking.getBookingType() == null) {
+            return BigDecimal.ZERO;
+        }
+
         switch (booking.getBookingType()) {
             case HOURLY:
-                return roomType.getHourlyRate();
+                return roomType.getHourlyRate() != null ? roomType.getHourlyRate() : BigDecimal.ZERO;
             case OVERNIGHT:
-                return roomType.getOvernightRate();
+                return roomType.getOvernightRate() != null ? roomType.getOvernightRate() : BigDecimal.ZERO;
             case DAILY:
-                return roomType.getDailyRate();
+                return roomType.getDailyRate() != null ? roomType.getDailyRate() : BigDecimal.ZERO;
             default:
                 return BigDecimal.ZERO;
         }
@@ -658,10 +703,16 @@ public class InvoicePanel extends JPanel {
     }
 
     private void updatePromotion() {
+        if (order == null || order.getPromotion() == null || order.getPromotion().getPromotionId() == null) {
+            lblPromotionName.setText("Không áp dụng");
+            lblPromotionDiscount.setText("0%");
+            return;
+        }
+
         Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
 
         if (promotion != null) {
-            lblPromotionName.setText(promotion.getPromotionName());
+            lblPromotionName.setText(promotion.getPromotionName() != null ? promotion.getPromotionName() : "Không áp dụng");
             lblPromotionDiscount.setText(promotion.getDiscountPercent() + "%");
         } else {
             lblPromotionName.setText("Không áp dụng");
@@ -672,16 +723,19 @@ public class InvoicePanel extends JPanel {
     private void updateSummary() {
         // Default behavior: use order totals when not in edit mode
         if (!editMode) {
-            BigDecimal totalAmount = order.getTotalAmount();
+            if (order == null) return;
+
+            BigDecimal totalAmount = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
             BigDecimal deposit = order.getDeposit() != null ? order.getDeposit() : BigDecimal.ZERO;
 
             // Calculate promotion discount
             BigDecimal promotionAmount = BigDecimal.ZERO;
-            Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
-            if (promotion != null) {
-
-                float discountPercent = promotion.getDiscountPercent();
-                promotionAmount = totalAmount.multiply(BigDecimal.valueOf(discountPercent / 100));
+            if (order.getPromotion() != null && order.getPromotion().getPromotionId() != null) {
+                Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+                if (promotion != null) {
+                    float discountPercent = promotion.getDiscountPercent();
+                    promotionAmount = totalAmount.multiply(BigDecimal.valueOf(discountPercent / 100));
+                }
             }
 
             BigDecimal subtotal = totalAmount.add(promotionAmount); // subtotal before discount
@@ -723,6 +777,8 @@ public class InvoicePanel extends JPanel {
     }
 
     private void updateSummaryFromTableTotals() {
+        if (order == null) return;
+
         BigDecimal amenityTotal = BigDecimal.ZERO;
         for (int i = 0; i < amenityModel.getRowCount(); i++) {
             amenityTotal = amenityTotal.add(parseCurrency(amenityModel.getValueAt(i, 3)));
@@ -736,10 +792,12 @@ public class InvoicePanel extends JPanel {
         BigDecimal roomTotal = getRoomTotal();
 
         BigDecimal promotionAmount = BigDecimal.ZERO;
-        Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
-        if (promotion != null) {
-            float discountPercent = promotion.getDiscountPercent();
-            promotionAmount = roomTotal.multiply(BigDecimal.valueOf(discountPercent / 100));
+        if (order.getPromotion() != null && order.getPromotion().getPromotionId() != null) {
+            Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+            if (promotion != null) {
+                float discountPercent = promotion.getDiscountPercent();
+                promotionAmount = roomTotal.multiply(BigDecimal.valueOf(discountPercent / 100));
+            }
         }
 
         BigDecimal subtotal = roomTotal.add(amenityTotal).add(surchargeTotal);
@@ -756,9 +814,11 @@ public class InvoicePanel extends JPanel {
 
     private BigDecimal getRoomTotal() {
         BigDecimal sum = BigDecimal.ZERO;
-        if (order.getBookings() != null) {
+        if (order != null && order.getBookings() != null) {
             for (Booking b : order.getBookings()) {
-                sum = sum.add(calculateRoomPrice(b));
+                if (b != null) {
+                    sum = sum.add(calculateRoomPrice(b));
+                }
             }
         }
         return sum;

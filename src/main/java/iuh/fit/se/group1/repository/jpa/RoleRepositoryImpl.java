@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Role;
+import jakarta.persistence.EntityManager;
 
 public class RoleRepositoryImpl extends AbstractRepositoryImpl<Role, String> implements iuh.fit.se.group1.repository.interfaces.RoleRepository {
     public RoleRepositoryImpl() {
@@ -8,16 +9,15 @@ public class RoleRepositoryImpl extends AbstractRepositoryImpl<Role, String> imp
     }
 
     @Override
-    public boolean existsById(String roleId) {
+    public boolean existsById(EntityManager em, String roleId) {
         String query = """
                 SELECT COUNT(r) FROM Role r
                 WHERE r.roleId = :roleId
                 """;
 
-        return callInTransaction(em ->
+        return
                 em.createQuery(query, Long.class)
                         .setParameter("roleId", roleId)
-                        .getSingleResult() > 0
-        );
+                        .getSingleResult() > 0;
     }
 }

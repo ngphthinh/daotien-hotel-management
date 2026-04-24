@@ -17,8 +17,8 @@ import java.util.Set;
 @ToString(exclude = {"surchargeDetails"})
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Surcharge SET isDeleted = true WHERE surchargeId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Surcharge SET isDeleted = 1 WHERE surchargeId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Surcharge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,8 +1,8 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.EmployeeShift;
-import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.repository.interfaces.EmployeeShiftRepository;
+import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,21 +15,20 @@ public class EmployeeShiftRepositoryImpl extends AbstractRepositoryImpl<Employee
     }
 
     @Override
-    public List<EmployeeShift> findAll() {
-        return callInTransaction(em ->
+    public List<EmployeeShift> findAll(EntityManager em) {
+        return
                 em.createQuery("""
                                     SELECT es
                                     FROM EmployeeShift es
                                     JOIN FETCH es.employee
                                     JOIN FETCH es.shift
                                 """, EmployeeShift.class)
-                        .getResultList()
-        );
+                        .getResultList();
     }
 
     @Override
-    public List<EmployeeShift> findByShiftDate(LocalDate date) {
-        return callInTransaction(em ->
+    public List<EmployeeShift> findByShiftDate(EntityManager em, LocalDate date) {
+        return
                 em.createQuery("""
                                     SELECT es
                                     FROM EmployeeShift es
@@ -38,13 +37,12 @@ public class EmployeeShiftRepositoryImpl extends AbstractRepositoryImpl<Employee
                                     WHERE es.shiftDate = :date
                                 """, EmployeeShift.class)
                         .setParameter("date", date)
-                        .getResultList()
-        );
+                        .getResultList();
     }
 
     @Override
-    public EmployeeShift findByIdWithDetails(Long employeeShiftId) {
-        return callInTransaction(em ->
+    public EmployeeShift findByIdWithDetails(EntityManager em, Long employeeShiftId) {
+        return
                 em.createQuery("""
                                     SELECT es
                                     FROM EmployeeShift es
@@ -55,25 +53,22 @@ public class EmployeeShiftRepositoryImpl extends AbstractRepositoryImpl<Employee
                         .setParameter("id", employeeShiftId)
                         .getResultStream()
                         .findFirst()
-                        .orElse(null)
-        );
+                        .orElse(null);
     }
 
     @Override
-    public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
-        return callInTransaction(em -> {
-            Object result = em.createNativeQuery("""
-                                    SELECT COALESCE(SUM(O.totalAmount), 0)
-                                    FROM Orders O
-                                    INNER JOIN Booking B ON O.orderId = B.orderId
-                                    WHERE B.employeeShiftId = ?
-                                      AND O.orderTypeId = 1
-                                      AND O.paymentType = 'CASH'
-                            """)
-                    .setParameter(1, employeeShiftId)
-                    .getSingleResult();
+    public BigDecimal getTotalCashRevenueForShift(EntityManager em, Long employeeShiftId) {
+        Object result = em.createNativeQuery("""
+                                SELECT COALESCE(SUM(O.totalAmount), 0)
+                                FROM Orders O
+                                INNER JOIN Booking B ON O.orderId = B.orderId
+                                WHERE B.employeeShiftId = ?
+                                  AND O.orderTypeId = 1
+                                  AND O.paymentType = 'CASH'
+                        """)
+                .setParameter(1, employeeShiftId)
+                .getSingleResult();
 
-            return result != null ? (BigDecimal) result : BigDecimal.ZERO;
-        });
+        return result != null ? (BigDecimal) result : BigDecimal.ZERO;
     }
 }

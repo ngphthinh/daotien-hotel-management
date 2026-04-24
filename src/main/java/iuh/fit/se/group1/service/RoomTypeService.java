@@ -5,7 +5,7 @@ import iuh.fit.se.group1.repository.jpa.RoomTypeRepositoryImpl;
 
 import java.util.List;
 
-public class RoomTypeService {
+public class RoomTypeService extends Service {
     private final RoomTypeRepositoryImpl roomTypeRepositoryImpl;
 
     public RoomTypeService() {
@@ -14,22 +14,27 @@ public class RoomTypeService {
 
 
     public RoomType createRoomType(RoomType roomType) {
-        return roomTypeRepositoryImpl.save(roomType);
+//        return roomTypeRepositoryImpl.save(roomType);
+        return doInTransaction(entityManager -> roomTypeRepositoryImpl.save(entityManager, roomType));
     }
 
     public RoomType updateRoomType(RoomType roomType) {
-        return roomTypeRepositoryImpl.update(roomType);
+//        return roomTypeRepositoryImpl.update(roomType);
+        return doInTransaction(entityManager -> roomTypeRepositoryImpl.update(entityManager, roomType));
     }
 
     public void deleteRoomType(String roomTypeId) {
-        roomTypeRepositoryImpl.deleteById(roomTypeId);
+//        roomTypeRepositoryImpl.deleteById(roomTypeId);
+        doInTransactionVoid(entityManager -> roomTypeRepositoryImpl.deleteById(entityManager, roomTypeId));
     }
 
     public List<RoomType> getAllRoomTypes() {
-        return roomTypeRepositoryImpl.findAll();
+//        return roomTypeRepositoryImpl.findAll();
+        return doInTransaction(roomTypeRepositoryImpl::findAll);
     }
 
     public RoomType getRoomTypeById(String roomTypeId) {
-        return roomTypeRepositoryImpl.findById(roomTypeId);
+//        return roomTypeRepositoryImpl.findById(roomTypeId);
+        return doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, roomTypeId));
     }
 }

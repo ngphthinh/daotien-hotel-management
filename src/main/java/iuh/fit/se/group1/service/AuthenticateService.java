@@ -10,10 +10,12 @@ import iuh.fit.se.group1.util.PropertiesReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AuthenticateService {
+public class AuthenticateService extends Service {
     private static final Logger log = LoggerFactory.getLogger(AuthenticateService.class);
     private final AccountRepositoryImpl accountRepositoryImpl;
     private final EmployeeRepositoryImpl employeeRepositoryImpl;
+
+    private static final String DEFAULT_PASSWORD_PROPERTY = "daotien.password";
 
     public AuthenticateService() {
         this.accountRepositoryImpl = new AccountRepositoryImpl();
@@ -23,7 +25,9 @@ public class AuthenticateService {
     public Account authenticate(String username, String password) {
         AppLogger.info("Attempting login - Username: '{}'", username);
 
-        Account account = accountRepositoryImpl.findByUsername(username);
+//        Account account = accountRepositoryImpl.findByUsername(username);
+
+        Account account = doInTransaction(em -> accountRepositoryImpl.findByUsername(em, username));
 
         if (account == null) {
             log.error("Account NOT FOUND: '{}'", username);
@@ -46,17 +50,24 @@ public class AuthenticateService {
             return null;
         }
 
-        return employeeRepositoryImpl.findByAccountId(accountId);
+//        return employeeRepositoryImpl.findByAccountId(accountId);
+        return doInTransaction(em -> employeeRepositoryImpl.findByAccountId(em, accountId));
     }
 
     public void resetPassword(String username) {
-        Account account = accountRepositoryImpl.findByUsername(username);
-        String resetPassword = PropertiesReader.getInstance().get("daotien.password");
-        if (account != null) {
-            String hashedPassword = PasswordUtil.hashPassword(resetPassword);
-            account.setPassword(hashedPassword);
-            accountRepositoryImpl.update(account);
-        }
+
+        doInTransactionVoid(em -> {
+
+            Account account = accountRepositoryImpl.findByUsername(em, username);
+            String resetPassword = PropertiesReader.getInstance().get(DEFAULT_PASSWORD_PROPERTY);
+            if (account != null) {
+                String hashedPassword = PasswordUtil.hashPassword(resetPassword);
+                account.setPassword(hashedPassword);
+                accountRepositoryImpl.update(em, account);
+                AppLogger.info("Password reset successful for: '{}'", username);
+            }
+        });
+
     }
 }
 

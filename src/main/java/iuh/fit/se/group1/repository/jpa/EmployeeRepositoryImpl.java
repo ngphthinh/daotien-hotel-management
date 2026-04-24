@@ -2,6 +2,7 @@ package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.repository.interfaces.EmployeeRepository;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
@@ -11,115 +12,105 @@ public class EmployeeRepositoryImpl extends AbstractRepositoryImpl<Employee, Lon
     }
 
     @Override
-    public Employee update(Employee entity) {
-        return callInTransaction(em -> {
+    public Employee update(EntityManager em, Employee entity) {
 
-            Employee managed = em.find(Employee.class, entity.getEmployeeId());
-            if (managed == null) {
-                throw new RuntimeException("Employee not found");
-            }
 
-            managed.setFullName(entity.getFullName());
-            managed.setPhone(entity.getPhone());
-            managed.setEmail(entity.getEmail());
-            managed.setHireDate(entity.getHireDate());
-            managed.setCitizenId(entity.getCitizenId());
-            managed.setGender(entity.isGender());
-            managed.setAvt(entity.getAvt());
+        Employee managed = em.find(Employee.class, entity.getEmployeeId());
+        if (managed == null) {
+            throw new RuntimeException("Employee not found");
+        }
 
-            managed.setAccount(entity.getAccount());
+        managed.setFullName(entity.getFullName());
+        managed.setPhone(entity.getPhone());
+        managed.setEmail(entity.getEmail());
+        managed.setHireDate(entity.getHireDate());
+        managed.setCitizenId(entity.getCitizenId());
+        managed.setGender(entity.isGender());
+        managed.setAvt(entity.getAvt());
+        managed.setAccount(entity.getAccount());
 
-            return managed;
-        });
+        return managed;
+
     }
 
     @Override
-    public List<Employee> findAllByRoleId(String roleId) {
-        return callInTransaction(em -> {
+    public List<Employee> findAllByRoleId(EntityManager em, String roleId) {
 
-            String jpql = """
-                        SELECT DISTINCT e
-                        FROM Employee e
-                        JOIN FETCH e.account a
-                        JOIN FETCH a.role r
-                        WHERE r.roleId = :roleId AND e.isDeleted = false
-                        ORDER BY e.employeeId
-                    """;
+        String jpql = """
+                    SELECT DISTINCT e
+                    FROM Employee e
+                    JOIN FETCH e.account a
+                    JOIN FETCH a.role r
+                    WHERE r.roleId = :roleId AND e.isDeleted = false
+                    ORDER BY e.employeeId
+                """;
 
-            return em.createQuery(jpql, Employee.class)
-                    .setParameter("roleId", roleId)
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Employee.class)
+                .setParameter("roleId", roleId)
+                .getResultList();
     }
 
     @Override
-    public Employee findByCitizenId(String citizenId) {
-        return callInTransaction(em -> {
+    public Employee findByCitizenId(EntityManager em, String citizenId) {
 
-            String jpql = """
-                        SELECT e
-                        FROM Employee e
-                        JOIN FETCH e.account a
-                        JOIN FETCH a.role
-                        WHERE e.citizenId = :citizenId AND e.isDeleted = false
-                    """;
+        String jpql = """
+                    SELECT e
+                    FROM Employee e
+                    JOIN FETCH e.account a
+                    JOIN FETCH a.role
+                    WHERE e.citizenId = :citizenId AND e.isDeleted = false
+                """;
 
-            return em.createQuery(jpql, Employee.class)
-                    .setParameter("citizenId", citizenId)
-                    .getResultStream()
-                    .findFirst()
-                    .orElse(null);
-        });
+        return em.createQuery(jpql, Employee.class)
+                .setParameter("citizenId", citizenId)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
-    public List<Employee> findByIdOrNameOrPhoneNumber(String keyword) {
-        return callInTransaction(em -> {
+    public List<Employee> findByIdOrNameOrPhoneNumber(EntityManager em, String keyword) {
 
-            String jpql = """
-                        SELECT DISTINCT e
-                        FROM Employee e
-                        JOIN FETCH e.account a
-                        JOIN FETCH a.role
-                        WHERE CAST(e.employeeId AS string) LIKE :kw
-                           OR LOWER(e.fullName) LIKE LOWER(:kw)
-                           OR e.phone LIKE :kw AND e.isDeleted = false
-                        ORDER BY e.employeeId, e.fullName
-                    """;
+        String jpql = """
+                    SELECT DISTINCT e
+                    FROM Employee e
+                    JOIN FETCH e.account a
+                    JOIN FETCH a.role
+                    WHERE CAST(e.employeeId AS string) LIKE :kw
+                       OR LOWER(e.fullName) LIKE LOWER(:kw)
+                       OR e.phone LIKE :kw AND e.isDeleted = false
+                    ORDER BY e.employeeId, e.fullName
+                """;
 
-            return em.createQuery(jpql, Employee.class)
-                    .setParameter("kw", "%" + keyword + "%")
-                    .getResultList();
-        });
+        return em.createQuery(jpql, Employee.class)
+                .setParameter("kw", "%" + keyword + "%")
+                .getResultList();
     }
 
     @Override
-    public int count() {
-        return callInTransaction(em ->
+    public int count(EntityManager em) {
+        return
                 Math.toIntExact(
                         em.createQuery("SELECT COUNT(e) FROM Employee e WHERE e.isDeleted = false ", Long.class)
                                 .getSingleResult()
-                )
-        );
+                );
     }
 
     @Override
-    public Employee findByAccountId(String accountId) {
-        return callInTransaction(em -> {
+    public Employee findByAccountId(EntityManager em, String accountId) {
 
-            String jpql = """
-                        SELECT e
-                        FROM Employee e
-                        JOIN FETCH e.account a
-                        JOIN FETCH a.role
-                        WHERE a.accountId = :accountId AND e.isDeleted = false AND a.isDeleted = false
-                    """;
+        String jpql = """
+                    SELECT e
+                    FROM Employee e
+                    JOIN FETCH e.account a
+                    JOIN FETCH a.role
+                    WHERE a.accountId = :accountId AND e.isDeleted = false AND a.isDeleted = false
+                """;
 
-            return em.createQuery(jpql, Employee.class)
-                    .setParameter("accountId", accountId)
-                    .getResultStream()
-                    .findFirst()
-                    .orElse(null);
-        });
+        return em.createQuery(jpql, Employee.class)
+                .setParameter("accountId", accountId)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 }
