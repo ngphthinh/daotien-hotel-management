@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString(exclude = {"order", "room"})
+//@ToString(exclude = {"order", "room"})
 @Entity
 public class Booking {
     @Id
@@ -60,5 +60,10 @@ public class Booking {
         return Objects.hashCode(bookingId);
     }
 
+
+    @Override
+    public String toString() {
+        return room.getRoomNumber();
+    }
 
 }

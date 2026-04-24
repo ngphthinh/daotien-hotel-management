@@ -18,7 +18,6 @@ import java.util.Set;
 @Entity
 @Builder
 @SQLDelete(sql = "UPDATE Amenity SET isDeleted = 1 WHERE amenityId = ?")
-@SQLRestriction("isDeleted = 0")
 public class Amenity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

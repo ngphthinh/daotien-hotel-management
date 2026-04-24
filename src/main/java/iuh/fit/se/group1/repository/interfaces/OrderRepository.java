@@ -1,6 +1,5 @@
 package iuh.fit.se.group1.repository.interfaces;
 
-import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.entity.Order;
 import jakarta.persistence.EntityManager;
 
@@ -22,7 +21,7 @@ public interface OrderRepository {
 
     List<Order> findUnpaidOrdersByKeyword(EntityManager em, String keyword);
 
-    List<Order> findAllOrders(EntityManager em);
+    List<Order> findAllOrdersCompleteYet(EntityManager em);
 
     List<Order> findOrdersUnPendingByKeyWord(EntityManager em, String keyword);
 

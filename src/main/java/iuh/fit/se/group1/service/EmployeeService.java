@@ -7,6 +7,7 @@ import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.Role;
 import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.util.PropertiesReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +18,14 @@ public class EmployeeService extends Service {
     private final AccountService accountService;
     private final RoleService roleService;
 
-    private final BookingService bookingService;
+    private final OrderRepositoryImpl orderRepository;
 
-    private final RoomToolsService roomToolsService;
 
     public EmployeeService() {
-        this.bookingService = new BookingService();
         this.accountService = new AccountService();
         this.roleService = new RoleService();
         this.employeeRepositoryImpl = new EmployeeRepositoryImpl();
-        this.roomToolsService = new RoomToolsService();
+        this.orderRepository = new OrderRepositoryImpl();
     }
 
     public int count() {
@@ -89,17 +88,17 @@ public class EmployeeService extends Service {
                 throw new IllegalArgumentException("Employee not found with ID: " + employeeId);
             }
 
-            var orders = roomToolsService.getAllOrders();
-            if (orders.stream().anyMatch(order -> order.getEmployee().getEmployeeId().equals(employeeId))) {
+            boolean exists = orderRepository.existsByEmployeeIdAndCompleteYet(entityManager, employeeId);
+            if (exists) {
                 throw new IllegalStateException("Cannot delete employee with active orders");
             }
 
 
             employeeRepositoryImpl.deleteById(entityManager, employeeId);
         });
+    }
 //        employeeRepositoryImpl.deleteById(employeeId);
 //        doInTransactionVoid(entityManager -> employeeRepositoryImpl.deleteById(entityManager, employeeId));
-    }
 
     public List<Employee> getAllEmployees() {
 //        return employeeRepositoryImpl.findAll();

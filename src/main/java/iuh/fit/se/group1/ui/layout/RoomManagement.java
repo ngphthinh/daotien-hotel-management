@@ -628,9 +628,9 @@ public class RoomManagement extends javax.swing.JPanel {
         room.setRoomNumber(number);
 
 
-        if (typeName.equals("Phòng đôi")){
+        if (typeName.equals("Phòng đôi")) {
             room.setRoomType(new RoomType("DOUBLE"));
-        }else {
+        } else {
             room.setRoomType(new RoomType("SINGLE"));
         }
 
@@ -835,8 +835,8 @@ public class RoomManagement extends javax.swing.JPanel {
 
 
     public void loadData() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'loadData'");
+        loadTable(roomService.getAllRooms());
+        loadPricesFromFile();
     }
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {

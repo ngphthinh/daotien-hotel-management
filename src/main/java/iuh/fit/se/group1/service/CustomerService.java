@@ -4,11 +4,14 @@ import java.util.List;
 
 import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 
 public class CustomerService extends Service {
     private final CustomerRepositoryImpl customerRepository;
+    private final OrderRepositoryImpl orderRepository;
 
     public CustomerService() {
+        this.orderRepository = new OrderRepositoryImpl();
         this.customerRepository = new CustomerRepositoryImpl();
     }
 
@@ -19,9 +22,23 @@ public class CustomerService extends Service {
         return doInTransaction(entityManager -> customerRepository.save(entityManager, customer));
     }
 
-    public void deleteCustomer(Long customerId) {
+    public boolean deleteCustomer(Long customerId) {
 //        customerRepository.deleteById(customerId);
-        doInTransactionVoid(entityManager -> customerRepository.deleteById(entityManager, customerId));
+        // kiểm tra xem customer đang có hóa đơn có tồn tại bookng không
+
+
+        return doInTransaction(entityManager ->
+                {
+
+                    boolean exists = orderRepository.existsByCustomerIdAndCompleteYet(entityManager, customerId);
+                    if (exists) {
+                        return false;
+                    }
+
+                    customerRepository.deleteById(entityManager, customerId);
+                    return true;
+                }
+        );
     }
 
 

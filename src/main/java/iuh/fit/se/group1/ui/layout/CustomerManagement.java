@@ -7,6 +7,7 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.service.CustomerService;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoCustomerModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -63,7 +64,7 @@ public class CustomerManagement extends javax.swing.JPanel {
         loadTable(customerService.getAllCustomer());
     }
 
-    public void loadData(){
+    public void loadData() {
         loadTable(customerService.getAllCustomer());
     }
 
@@ -215,8 +216,12 @@ public class CustomerManagement extends javax.swing.JPanel {
 
                     if (rowDelete >= 0) {
                         Long id = (Long) model.getValueAt(rowDelete, 0);
-                        model.removeRow(rowDelete);
-                        customerService.deleteCustomer(id);
+                        boolean isSuccess = customerService.deleteCustomer(id);
+                        if (!isSuccess) {
+                            CustomDialog.showMessage(null, "Không thể xóa khách hàng này vì đang có hóa đơn liên quan!", "Lỗi", CustomDialog.MessageType.ERROR, 500, 300);
+                        } else {
+                            model.removeRow(rowDelete);
+                        }
                     }
                 });
             }
@@ -500,7 +505,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             isValid = false;
         }
 
-            String regexPassport = "^[A-Za-z][0-9]{7,8}$";
+        String regexPassport = "^[A-Za-z][0-9]{7,8}$";
         if (citizen.isEmpty()) {
             modal.getLblErrolCitizen().setText("Vui lòng nhập số CCCD/CMND!");
             isValid = false;

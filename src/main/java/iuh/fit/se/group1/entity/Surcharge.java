@@ -18,7 +18,6 @@ import java.util.Set;
 @Entity
 @Builder
 @SQLDelete(sql = "UPDATE Surcharge SET isDeleted = 1 WHERE surchargeId = ?")
-@SQLRestriction("isDeleted = 0")
 public class Surcharge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

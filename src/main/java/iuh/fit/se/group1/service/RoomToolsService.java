@@ -41,7 +41,7 @@ public class RoomToolsService {
     }
 
     public List<Order> getAllOrders() {
-        return orderService.getAllOrdersWithRelationship();
+        return orderService.getAllOrdersWithRelationshipAndCompleteYet();
     }
 
     /**

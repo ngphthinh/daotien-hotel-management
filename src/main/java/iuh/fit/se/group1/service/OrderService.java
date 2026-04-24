@@ -4,7 +4,6 @@ import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.repository.jpa.BookingRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
@@ -12,12 +11,9 @@ import iuh.fit.se.group1.repository.interfaces.BookingRepository;
 import iuh.fit.se.group1.repository.interfaces.RoomRepository;
 import iuh.fit.se.group1.util.Constants;
 import iuh.fit.se.group1.util.InvoiceItem;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class OrderService extends Service {
@@ -192,9 +188,14 @@ public class OrderService extends Service {
         return doInTransaction(orderRepositoryImpl::findAll);
     }
 
+    public List<Order> getAllOrdersWithRelationshipAndCompleteYet() {
+//        return orderRepositoryImpl.findAllOrdersCompleteYet();
+        return doInTransaction(orderRepositoryImpl::findAllOrdersCompleteYet);
+    }
+
     public List<Order> getAllOrdersWithRelationship() {
-//        return orderRepositoryImpl.findAllOrders();
-        return doInTransaction(orderRepositoryImpl::findAllOrders);
+//        return orderRepositoryImpl.findAllOrdersWithRelationship();
+        return doInTransaction(orderRepositoryImpl::findAllOrdersWithRelationship);
     }
 
 

@@ -22,7 +22,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -60,7 +59,7 @@ public class OrderManagement extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
         model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
 
-        for (Order order : orderService.getAllOrders()) {
+        for (Order order : orderService.getAllOrdersWithRelationship()) {
 
             if (!order.getBookings().isEmpty() && order.getBookings() != null) {
 

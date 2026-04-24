@@ -62,7 +62,7 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
         em.createQuery("""
                             UPDATE Room r
                             SET r.roomStatus = :status
-                            WHERE r.roomId IN :ids
+                            WHERE r.roomId IN :ids AND r.isDeleted = false
                         """)
                 .setParameter("status", roomStatus)
                 .setParameter("ids", roomIds)

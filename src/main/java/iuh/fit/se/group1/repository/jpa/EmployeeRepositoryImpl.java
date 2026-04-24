@@ -42,7 +42,7 @@ public class EmployeeRepositoryImpl extends AbstractRepositoryImpl<Employee, Lon
                     JOIN FETCH e.account a
                     JOIN FETCH a.role r
                     WHERE r.roleId = :roleId AND e.isDeleted = false
-                    ORDER BY e.employeeId
+                    ORDER BY e.employeeId ASC, e.fullName ASC
                 """;
 
         return em.createQuery(jpql, Employee.class)
@@ -112,5 +112,18 @@ public class EmployeeRepositoryImpl extends AbstractRepositoryImpl<Employee, Lon
                 .getResultStream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public List<Employee> findAll(EntityManager em) {
+        String query = """
+                    SELECT e
+                    FROM Employee e
+                    JOIN FETCH e.account a
+                    JOIN FETCH a.role
+                    WHERE e.isDeleted = false AND a.isDeleted = false
+                    ORDER BY e.employeeId ASC, e.fullName ASC
+                """;
+        return em.createQuery(query, Employee.class).getResultList();
     }
 }

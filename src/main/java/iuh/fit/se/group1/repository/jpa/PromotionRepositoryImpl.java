@@ -80,4 +80,16 @@ public class PromotionRepositoryImpl extends AbstractRepositoryImpl<Promotion, L
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public List<Promotion> findAll(EntityManager em) {
+        String query = """
+                    SELECT p
+                    FROM Promotion p
+                    WHERE p.isDeleted = false
+                    ORDER BY p.promotionId ASC, p.promotionName ASC
+                """;
+        return em.createQuery(query, Promotion.class).getResultList();
+
+    }
 }

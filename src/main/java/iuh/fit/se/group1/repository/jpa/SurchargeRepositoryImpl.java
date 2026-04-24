@@ -17,8 +17,8 @@ public class SurchargeRepositoryImpl extends AbstractRepositoryImpl<Surcharge, L
         String jpql = """
                     SELECT s
                     FROM Surcharge s
-                    WHERE LOWER(s.name) LIKE LOWER(:kw)
-                         OR CAST(s.surchargeId AS string) LIKE :kw
+                    WHERE( LOWER(s.name) LIKE LOWER(:kw)
+                         OR CAST(s.surchargeId AS string) LIKE :kw) AND s.isDeleted = false
                     ORDER BY s.surchargeId ASC, s.name ASC
                 """;
 
@@ -33,7 +33,7 @@ public class SurchargeRepositoryImpl extends AbstractRepositoryImpl<Surcharge, L
         String jpql = """
                     SELECT s
                     FROM Surcharge s
-                    WHERE s.name = :name
+                    WHERE s.name = :name AND s.isDeleted = false
                 """;
 
         return em.createQuery(jpql, Surcharge.class)
@@ -41,5 +41,17 @@ public class SurchargeRepositoryImpl extends AbstractRepositoryImpl<Surcharge, L
                 .getResultStream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public List<Surcharge> findAll(EntityManager em) {
+        String query = """
+                    SELECT s
+                    FROM Surcharge s
+                    WHERE s.isDeleted = false
+                    ORDER BY s.surchargeId ASC, s.name ASC
+                """;
+        return em.createQuery(query, Surcharge.class).getResultList();
+
     }
 }

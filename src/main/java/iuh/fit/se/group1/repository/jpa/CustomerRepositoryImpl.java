@@ -3,6 +3,7 @@ package iuh.fit.se.group1.repository.jpa;
 import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.repository.interfaces.CustomerRepository;
 import jakarta.persistence.EntityManager;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.util.List;
 
@@ -21,7 +22,8 @@ public class CustomerRepositoryImpl extends AbstractRepositoryImpl<Customer, Lon
                     WHERE (
                         LOWER(c.fullName) LIKE LOWER(:kw)
                         OR CAST(c.customerId AS string) LIKE :kw
-                    )
+                
+                    )AND  c.isDeleted = false
                     ORDER BY c.customerId ASC, c.fullName ASC
                 """;
 
@@ -35,7 +37,7 @@ public class CustomerRepositoryImpl extends AbstractRepositoryImpl<Customer, Lon
     public boolean isCitizenIdExists(EntityManager em, String citizenId) {
         return
                 em.createQuery(
-                                "SELECT 1 FROM Employee e WHERE e.citizenId = :cid",
+                                "SELECT 1 FROM Customer e WHERE e.citizenId = :cid AND  e.isDeleted = false",
                                 Integer.class
                         )
                         .setParameter("cid", citizenId)
@@ -44,20 +46,28 @@ public class CustomerRepositoryImpl extends AbstractRepositoryImpl<Customer, Lon
     }
 
     @Override
-    public Customer findByCitizenId(EntityManager em,String citizenId) {
+    public Customer findByCitizenId(EntityManager em, String citizenId) {
 
 
-            String jpql = """
-                        SELECT c
-                        FROM Customer c
-                        WHERE c.citizenId = :cid
-                    """;
+        String jpql = """
+                    SELECT c
+                    FROM Customer c
+                    WHERE c.citizenId = :cid AND c.isDeleted = false
+                """;
 
-            return em.createQuery(jpql, Customer.class)
-                    .setParameter("cid", citizenId)
-                    .getResultStream()
-                    .findFirst()
-                    .orElse(null);
+        return em.createQuery(jpql, Customer.class)
+                .setParameter("cid", citizenId)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
 
+    @Override
+    public List<Customer> findAll(EntityManager em) {
+        String query = """
+               Select c from Customer c
+               where c.isDeleted = false
+           """;
+        return em.createQuery(query, entityClass).getResultList();
     }
 }

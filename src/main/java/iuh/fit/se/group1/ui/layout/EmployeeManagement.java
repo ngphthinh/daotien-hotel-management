@@ -5,6 +5,7 @@
 package iuh.fit.se.group1.ui.layout;
 
 
+import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -292,8 +293,17 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
                     if (rowDelete >= 0) {
                         Long id = (Long) model.getValueAt(rowDelete, 0);
-                        model.removeRow(rowDelete);
-                        employeeService.deleteEmployee(id);
+
+                        try {
+                            employeeService.deleteEmployee(id);
+                            model.removeRow(rowDelete);
+                        } catch (Exception e) {
+                            CustomDialog.showMessage(null,
+                                    e.getMessage(),
+                                    "Lỗi",
+                                    CustomDialog.MessageType.ERROR, 650, 120);
+                        }
+
                         if (shiftList != null) {
                             shiftList.reloadEmployees();
                             log.info("Reloaded ShiftList after deleting employee: {}", id);

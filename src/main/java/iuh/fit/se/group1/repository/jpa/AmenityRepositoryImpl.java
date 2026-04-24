@@ -16,8 +16,8 @@ public class AmenityRepositoryImpl extends AbstractRepositoryImpl<Amenity, Long>
         String jpql = """
                     SELECT a
                     FROM Amenity a
-                    WHERE LOWER(a.nameAmenity) LIKE LOWER(:keyword)
-                       OR CAST(a.amenityId AS string) LIKE :keyword
+                    WHERE ( LOWER(a.nameAmenity) LIKE LOWER(:keyword)
+                       OR CAST(a.amenityId AS string) LIKE :keyword )  and a.isDeleted = false
                     ORDER BY a.amenityId ASC, a.nameAmenity ASC
                 """;
 
@@ -34,7 +34,7 @@ public class AmenityRepositoryImpl extends AbstractRepositoryImpl<Amenity, Long>
         String jpql = """
                     SELECT a
                     FROM Amenity a
-                    WHERE a.nameAmenity = :name
+                    WHERE a.nameAmenity = :name and a.isDeleted = false
                 """;
 
         return em.createQuery(jpql, Amenity.class)
@@ -45,5 +45,16 @@ public class AmenityRepositoryImpl extends AbstractRepositoryImpl<Amenity, Long>
     }
 
 
+    @Override
+    public List<Amenity> findAll(EntityManager em) {
+        String query = """
+                    SELECT a
+                    FROM Amenity a
+                    WHERE a.isDeleted = false
+                    ORDER BY a.amenityId ASC, a.nameAmenity ASC
+                """;
+        return em.createQuery(query, Amenity.class).getResultList();
+
+    }
 }
 
