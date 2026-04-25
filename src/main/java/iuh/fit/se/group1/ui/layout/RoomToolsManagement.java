@@ -1,7 +1,8 @@
 package iuh.fit.se.group1.ui.layout;
-import iuh.fit.se.group1.entity.Order;
-import iuh.fit.se.group1.entity.OrderType;
-import iuh.fit.se.group1.entity.Room;
+
+import iuh.fit.se.group1.dto.OrderDTO;
+import iuh.fit.se.group1.dto.OrderTypeDTO;
+import iuh.fit.se.group1.dto.RoomViewDTO;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.OrderBookStatus;
 import iuh.fit.se.group1.service.RoomToolsService;
@@ -35,15 +36,15 @@ public class RoomToolsManagement extends JPanel {
 
     private final RoomToolsService service;
 
-    private List<Order> orders = new ArrayList<>();
+    private List<OrderDTO> orders = new ArrayList<>();
 
-    private Map<String, Room> currentRoomsMap = new HashMap<>();
-    private List<Room> selectedOldRooms = new ArrayList<>();
-    private List<Room> selectedNewRooms = new ArrayList<>();
-    private Order currentBooking = null;
+    private Map<String, RoomViewDTO> currentRoomsMap = new HashMap<>();
+    private List<RoomViewDTO> selectedOldRooms = new ArrayList<>();
+    private List<RoomViewDTO> selectedNewRooms = new ArrayList<>();
+    private OrderDTO currentBooking = null;
     private BookingType currentBookingType = null;
-    private OrderType currentOrderType = null;
-    
+    private OrderTypeDTO currentOrderType = null;
+
     public RoomToolsManagement() {
         setLayout(new BorderLayout());
         this.service = new RoomToolsService();
@@ -127,7 +128,7 @@ public class RoomToolsManagement extends JPanel {
 
         pnlSearch.add(txtSearch, BorderLayout.CENTER);
 
-        String[] columns = { "CCCD", "Khách hàng", "Phòng", "Loại thuê" };
+        String[] columns = {"CCCD", "Khách hàng", "Phòng", "Loại thuê"};
         bookingsModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -211,14 +212,14 @@ public class RoomToolsManagement extends JPanel {
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblTitle.setForeground(new Color(55, 65, 81));
 
-        String[] columns = { "Phòng", "Loại", "Giá", "Hủy phòng" };
+        String[] columns = {"Phòng", "Loại", "Giá", "Hủy phòng"};
         currentRoomsModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == 3;
             }
         };
-        tblCurrentRooms = new JTable(currentRoomsModel){
+        tblCurrentRooms = new JTable(currentRoomsModel) {
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
                 if (isRowSelected(rowIndex)) {
@@ -307,10 +308,10 @@ public class RoomToolsManagement extends JPanel {
             return;
         }
 
-        List<Room> roomsToExtend = new ArrayList<>();
+        List<RoomViewDTO> roomsToExtend = new ArrayList<>();
         for (int row : rows) {
             String roomNum = currentRoomsModel.getValueAt(row, 0).toString();
-            Room room = currentRoomsMap.get(roomNum);
+            RoomViewDTO room = currentRoomsMap.get(roomNum);
             if (room != null) {
                 roomsToExtend.add(room);
             }
@@ -323,7 +324,7 @@ public class RoomToolsManagement extends JPanel {
         showExtendBookingPopup(roomsToExtend);
     }
 
-    private void showExtendBookingPopup(List<Room> roomsToExtend) {
+    private void showExtendBookingPopup(List<RoomViewDTO> roomsToExtend) {
         ExtendBookingModal extendPanel = new ExtendBookingModal(
                 currentBooking,
                 roomsToExtend,
@@ -346,14 +347,14 @@ public class RoomToolsManagement extends JPanel {
         }
 
         String roomNumber = currentRoomsModel.getValueAt(row, 0).toString();
-        Room roomToCancel = currentRoomsMap.get(roomNumber);
+        RoomViewDTO roomToCancel = currentRoomsMap.get(roomNumber);
 
         if (roomToCancel == null) {
             return;
         }
         currentOrderType = currentBooking.getOrderType();
-        
-        if (!currentOrderType.getName().equals(OrderBookStatus.RESERVED) ) {
+
+        if (!currentOrderType.getName().equals(OrderBookStatus.RESERVED)) {
             CustomDialog.showMessage(this,
                     "Chỉ có thể hủy phòng đặt trước!",
                     "Thông báo",
@@ -459,7 +460,7 @@ public class RoomToolsManagement extends JPanel {
         pnlHeader.add(lblTitle, BorderLayout.WEST);
         pnlHeader.add(pnlType, BorderLayout.EAST);
 
-        String[] columns = { "Phòng", "Loại", "Giá" };
+        String[] columns = {"Phòng", "Loại", "Giá"};
         newRoomsModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -620,10 +621,10 @@ public class RoomToolsManagement extends JPanel {
 
     private void loadBookingsToTable() {
         bookingsModel.setRowCount(0);
-        for (Order order : orders) {
+        for (OrderDTO order : orders) {
             String room = order.getBookings().stream().map(e -> e.getRoom().getRoomNumber())
                     .collect(Collectors.joining(", "));
-            bookingsModel.addRow(new Object[] {
+            bookingsModel.addRow(new Object[]{
                     order.getCustomer().getCitizenId(),
                     order.getCustomer().getFullName(),
                     room,
@@ -639,7 +640,10 @@ public class RoomToolsManagement extends JPanel {
 
         currentBooking = orders.get(row);
         currentBookingType = currentBooking.getBookings().get(0).getBookingType();
-        currentOrderType = currentBooking.getBookings().get(0).getOrder().getOrderType();
+//        currentOrderType = currentBooking.getBookings().get(0).getOrder().getOrderType();
+        currentOrderType = currentBooking.getOrderType();
+
+
         String typeDisplay = currentBookingType.getDisplayName();
         lblBookingType.setText(String.format(
                 "%s (%s) - Loại thuê: %s - Loại hóa đơn: %s",
@@ -648,15 +652,15 @@ public class RoomToolsManagement extends JPanel {
                 typeDisplay, currentOrderType.getName()));
         lblBookingType.setForeground(new Color(5, 150, 105));
 
-        List<Room> rooms = service.getRoomsByOrderAndType(currentBooking.getOrderId(), currentBookingType);
+        List<RoomViewDTO> rooms = service.getRoomsByOrderAndType(currentBooking.getOrderId(), currentBookingType);
 
         currentRoomsMap.clear();
         currentRoomsModel.setRowCount(0);
 
-        for (Room room : rooms) {
+        for (RoomViewDTO room : rooms) {
             currentRoomsMap.put(room.getRoomNumber(), room);
             long price = service.getRoomPriceWithDuration(room, currentBookingType, currentBooking.getOrderId());
-            currentRoomsModel.addRow(new Object[] {
+            currentRoomsModel.addRow(new Object[]{
                     room.getRoomNumber(),
                     room.getRoomType().getName(),
                     String.format("%,dđ", price),
@@ -691,7 +695,7 @@ public class RoomToolsManagement extends JPanel {
         selectedOldRooms.clear();
         for (int row : rows) {
             String roomNum = currentRoomsModel.getValueAt(row, 0).toString();
-            Room room = currentRoomsMap.get(roomNum);
+            RoomViewDTO room = currentRoomsMap.get(roomNum);
             if (room != null) {
                 selectedOldRooms.add(room);
             }
@@ -722,7 +726,7 @@ public class RoomToolsManagement extends JPanel {
             return;
         }
 
-        List<Room> available = service.getAvailableRoomsByType(roomTypeId);
+        List<RoomViewDTO> available = service.getAvailableRoomsByType(roomTypeId);
 
         if (available.isEmpty()) {
             String typeName = roomTypeId.equals("SINGLE") ? "Phòng đơn" : "Phòng đôi";
@@ -733,12 +737,12 @@ public class RoomToolsManagement extends JPanel {
             return;
         }
 
-        Room selectedRoom = showRoomSelectionDialog(available);
+        RoomViewDTO selectedRoom = showRoomSelectionDialog(available);
 
         if (selectedRoom != null && !selectedNewRooms.contains(selectedRoom)) {
             selectedNewRooms.add(selectedRoom);
             long price = calculateNewRoomPrice(selectedRoom);
-            newRoomsModel.addRow(new Object[] {
+            newRoomsModel.addRow(new Object[]{
                     selectedRoom.getRoomNumber(),
                     selectedRoom.getRoomType().getName(),
                     String.format("%,dđ", price)
@@ -746,22 +750,22 @@ public class RoomToolsManagement extends JPanel {
             updateSummary();
         }
     }
-    
-    private long calculateNewRoomPrice(Room newRoom) {
+
+    private long calculateNewRoomPrice(RoomViewDTO newRoom) {
         if (currentBooking == null || currentBookingType == null || selectedOldRooms.isEmpty()) {
             return service.getRoomPriceByType(newRoom, currentBookingType);
         }
 
-        Room referenceRoom = selectedOldRooms.get(0);
+        RoomViewDTO referenceRoom = selectedOldRooms.get(0);
         return service.calculateNewRoomPriceWithBookingDuration(
                 newRoom, currentBookingType, currentBooking.getOrderId(), referenceRoom);
     }
-    
+
     public void loadData() {
         orders = service.getAllOrders();
         bookingsModel.setRowCount(0);
 
-        for (Order order : orders) {
+        for (OrderDTO order : orders) {
             String rooms = order.getBookings().stream()
                     .map(b -> b.getRoom().getRoomNumber())
                     .collect(Collectors.joining(", "));
@@ -770,7 +774,7 @@ public class RoomToolsManagement extends JPanel {
                     ? ""
                     : order.getBookings().get(0).getBookingType().getDisplayName();
 
-            bookingsModel.addRow(new Object[] {
+            bookingsModel.addRow(new Object[]{
                     order.getCustomer().getCitizenId(),
                     order.getCustomer().getFullName(),
                     rooms,
@@ -779,7 +783,7 @@ public class RoomToolsManagement extends JPanel {
         }
     }
 
-    private Room showRoomSelectionDialog(List<Room> available) {
+    private RoomViewDTO showRoomSelectionDialog(List<RoomViewDTO> available) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(parentFrame, "Chọn Phòng Trống", true);
         dialog.setSize(600, 500);
@@ -794,10 +798,10 @@ public class RoomToolsManagement extends JPanel {
         lblTitle.setForeground(Color.WHITE);
         pnlHeader.add(lblTitle);
 
-        DefaultListModel<Room> listModel = new DefaultListModel<>();
+        DefaultListModel<RoomViewDTO> listModel = new DefaultListModel<>();
         available.forEach(listModel::addElement);
 
-        JList<Room> lstRooms = new JList<>(listModel);
+        JList<RoomViewDTO> lstRooms = new JList<>(listModel);
         lstRooms.setFont(new Font("Arial", Font.PLAIN, 16));
         lstRooms.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lstRooms.setCellRenderer(new RoomListCellRenderer());
@@ -828,7 +832,7 @@ public class RoomToolsManagement extends JPanel {
         addButtonHoverEffect(btnSelect, new Color(46, 204, 113), new Color(39, 174, 96));
         addButtonHoverEffect(btnCancel, new Color(231, 76, 60), new Color(192, 57, 43));
 
-        final Room[] selectedRoom = { null };
+        final RoomViewDTO[] selectedRoom = {null};
 
         btnSelect.addActionListener(e -> {
             if (lstRooms.getSelectedValue() != null) {
@@ -873,7 +877,7 @@ public class RoomToolsManagement extends JPanel {
         public Component getListCellRendererComponent(JList<?> list, Object value,
                                                       int index, boolean isSelected, boolean cellHasFocus) {
 
-            Room room = (Room) value;
+            RoomViewDTO room = (RoomViewDTO) value;
             JPanel pnl = new JPanel(new BorderLayout(10, 5));
             pnl.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)),
@@ -999,12 +1003,12 @@ public class RoomToolsManagement extends JPanel {
                 currentBookingType, currentBooking.getOrderId());
 
         String oldRoomNumbers = selectedOldRooms.stream()
-                .map(Room::getRoomNumber)
+                .map(RoomViewDTO::getRoomNumber)
                 .reduce((a, b) -> a + ", " + b)
                 .orElse("");
 
         String newRoomNumbers = selectedNewRooms.stream()
-                .map(Room::getRoomNumber)
+                .map(RoomViewDTO::getRoomNumber)
                 .reduce((a, b) -> a + ", " + b)
                 .orElse("");
 

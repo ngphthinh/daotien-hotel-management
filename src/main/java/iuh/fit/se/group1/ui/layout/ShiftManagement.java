@@ -6,9 +6,9 @@ package iuh.fit.se.group1.ui.layout;
 
 import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
-import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.entity.EmployeeShift;
-import iuh.fit.se.group1.entity.Shift;
+import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.dto.EmployeeShiftDTO;
+import iuh.fit.se.group1.dto.ShiftDTO;
 import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
@@ -48,7 +48,7 @@ public class ShiftManagement extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(ShiftManagement.class);
     private DateChooser dateChooser;
     private ShiftService shiftService;
-    private List<Shift> shifts;
+    private List<ShiftDTO> shifts;
     private EmployeeShiftService employeeShiftService;
     private EmployeeService employeeService;
 
@@ -71,7 +71,7 @@ public class ShiftManagement extends javax.swing.JPanel {
 
     private void loadAllEmployees() {
         try {
-            List<Employee> employees = employeeService.getAllEmployees();
+            List<EmployeeDTO> employees = employeeService.getAllEmployees();
             if (employees != null && !employees.isEmpty()) {
                 shiftList.loadEmployees(employees);
                 log.info("Loaded {} employees into ShiftList", employees.size());
@@ -111,7 +111,7 @@ public class ShiftManagement extends javax.swing.JPanel {
     private void handleSearch() {
         try {
             String keyword = search.getText().trim();
-            List<Employee> filteredEmployees;
+            List<EmployeeDTO> filteredEmployees;
 
             if (keyword.isEmpty()) {
                 filteredEmployees = employeeService.getAllEmployees();
@@ -145,7 +145,7 @@ public class ShiftManagement extends javax.swing.JPanel {
             Color[] colors = {Color.RED, new Color(51, 204, 255), Color.GREEN, Color.yellow};
 
             for (int i = 0; i < Math.min(shifts.size(), shiftCards.length); i++) {
-                Shift shift = shifts.get(i);
+                ShiftDTO shift = shifts.get(i);
                 ShiftCard card = shiftCards[i];
 
                 // Set màu header
@@ -217,26 +217,26 @@ public class ShiftManagement extends javax.swing.JPanel {
             }
 
             // Lấy danh sách EmployeeShift theo ngày
-            List<EmployeeShift> employeeShifts = employeeShiftService.getAllShiftsByDate(date);
+            List<EmployeeShiftDTO> employeeShifts = employeeShiftService.getAllShiftsByDate(date);
             if (employeeShifts == null || employeeShifts.isEmpty()) {
                 // Ngày này không có nhân viên -> giữ mặc định
                 return;
             }
 
             // Nhóm EmployeeShift theo ShiftId
-            Map<Long, List<EmployeeShift>> shiftMap = employeeShifts.stream()
+            Map<Long, List<EmployeeShiftDTO>> shiftMap = employeeShifts.stream()
                     .collect(Collectors.groupingBy(es -> es.getShift().getShiftId()));
 
             // Load nhân viên vào ShiftCard
             for (int i = 0; i < Math.min(shifts.size(), shiftCards.length); i++) {
-                Shift shift = shifts.get(i);
+                ShiftDTO shift = shifts.get(i);
                 ShiftCard card = shiftCards[i];
 
-                List<EmployeeShift> employeesInShift = shiftMap.get(shift.getShiftId());
+                List<EmployeeShiftDTO> employeesInShift = shiftMap.get(shift.getShiftId());
                 if (employeesInShift != null && !employeesInShift.isEmpty()) {
                     for (int j = 0; j < Math.min(2, employeesInShift.size()); j++) {
-                        EmployeeShift es = employeesInShift.get(j);
-                        Employee employee = employeeService.getEmployeeById(es.getEmployee().getEmployeeId());
+                        EmployeeShiftDTO es = employeesInShift.get(j);
+                        EmployeeDTO employee = employeeService.getEmployeeById(es.getEmployee().getEmployeeId());
                         if (employee == null) continue;
 
                         String employeeName = employee.getFullName();
@@ -366,10 +366,10 @@ public class ShiftManagement extends javax.swing.JPanel {
                 Message.showMessageNoCancel("Lỗi", "Ca làm việc không tồn tại!");
                 return;
             }
-            Shift shift = shifts.get(shiftIndex);
+            ShiftDTO shift = shifts.get(shiftIndex);
 
             // KIỂM TRA XEM CA ĐÃ CÓ NHÂN VIÊN CHƯA
-            List<EmployeeShift> existingShifts = employeeShiftService.getAllShiftsByDate(shiftDate)
+            List<EmployeeShiftDTO> existingShifts = employeeShiftService.getAllShiftsByDate(shiftDate)
                     .stream()
                     .filter(es -> es.getShift().getShiftId().equals(shift.getShiftId()))
                     .collect(Collectors.toList());
@@ -380,7 +380,7 @@ public class ShiftManagement extends javax.swing.JPanel {
             if (hasExistingEmployees) {
                 ShiftCloseService shiftCloseService = new ShiftCloseService();
                 boolean hasClosedShift = existingShifts.stream()
-                        .anyMatch(es -> !shiftCloseService.getShiftCloseByEmployeeShift(es).isEmpty());
+                        .anyMatch(es -> !shiftCloseService.getShiftCloseByEmployeeShift(es.getEmployeeShiftId()).isEmpty());
 
                 if (hasClosedShift) {
                     Message.showMessageNoCancel("Không thể cập nhật",
@@ -405,15 +405,15 @@ public class ShiftManagement extends javax.swing.JPanel {
                 try {
                     // NẾU ĐÃ CÓ NHÂN VIÊN → XÓA HẾT TRƯỚC KHI THÊM MỚI
                     if (hasExistingEmployees) {
-                        for (EmployeeShift es : existingShifts) {
+                        for (EmployeeShiftDTO es : existingShifts) {
                             employeeShiftService.deleteEmployeeShift(es.getEmployeeShiftId());
                             log.info("Deleted existing EmployeeShift: {}", es.getEmployeeShiftId());
                         }
                     }
 
                     // Lưu nhân viên 1 vào EmployeeShift
-                    EmployeeShift employeeShift1 = new EmployeeShift();
-                    Employee emp1 = new Employee();
+                    EmployeeShiftDTO employeeShift1 = new EmployeeShiftDTO();
+                    EmployeeDTO emp1 = new EmployeeDTO();
                     emp1.setEmployeeId(Long.parseLong(code1));
                     employeeShift1.setEmployee(emp1);
                     employeeShift1.setShift(shift);
@@ -422,8 +422,8 @@ public class ShiftManagement extends javax.swing.JPanel {
                     employeeShiftService.addEmployeeShift(employeeShift1);
 
                     // Lưu nhân viên 2 vào EmployeeShift
-                    EmployeeShift employeeShift2 = new EmployeeShift();
-                    Employee emp2 = new Employee();
+                    EmployeeShiftDTO employeeShift2 = new EmployeeShiftDTO();
+                    EmployeeDTO emp2 = new EmployeeDTO();
                     emp2.setEmployeeId(Long.parseLong(code2));
                     employeeShift2.setEmployee(emp2);
                     employeeShift2.setShift(shift);

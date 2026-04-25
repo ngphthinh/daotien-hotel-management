@@ -4,8 +4,9 @@
  * Copyright (c) 2025 IUH. All rights reserved
  */
 package iuh.fit.se.group1.ui.component.modal;
-import iuh.fit.se.group1.entity.Order;
-import iuh.fit.se.group1.entity.Room;
+
+import iuh.fit.se.group1.dto.OrderDTO;
+import iuh.fit.se.group1.dto.RoomViewDTO;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.service.RoomToolsService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -28,8 +29,8 @@ import java.util.stream.Collectors;
 
 public class ExtendBookingModal extends JPanel {
     private final RoomToolsService service;
-    private final Order currentBooking;
-    private final List<Room> roomsToExtend;
+    private final OrderDTO currentBooking;
+    private final List<RoomViewDTO> roomsToExtend;
     private final BookingType bookingType;
     private final Runnable onSuccess;
     private final Runnable onCancel;
@@ -40,7 +41,7 @@ public class ExtendBookingModal extends JPanel {
     private JButton confirmBtn;
     private JButton cancelBtn;
 
-    public ExtendBookingModal(Order currentBooking, List<Room> roomsToExtend,
+    public ExtendBookingModal(OrderDTO currentBooking, List<RoomViewDTO> roomsToExtend,
                               BookingType bookingType, Runnable onSuccess, Runnable onCancel) {
         this.service = new RoomToolsService();
         this.currentBooking = currentBooking;
@@ -351,6 +352,7 @@ public class ExtendBookingModal extends JPanel {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(bgColor.darker());
             }
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(bgColor);
             }
@@ -364,7 +366,7 @@ public class ExtendBookingModal extends JPanel {
         roomListPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
         for (int i = 0; i < roomsToExtend.size(); i++) {
-            Room room = roomsToExtend.get(i);
+            RoomViewDTO room = roomsToExtend.get(i);
             long currentPrice = service.getRoomPriceWithDuration(
                     room, bookingType, currentBooking.getOrderId());
 
@@ -380,7 +382,7 @@ public class ExtendBookingModal extends JPanel {
         roomListPanel.repaint();
     }
 
-    private JPanel createRoomCard(Room room, long currentPrice, int index) {
+    private JPanel createRoomCard(RoomViewDTO room, long currentPrice, int index) {
         JPanel card = new JPanel(new BorderLayout(12, 0));
         card.setBackground(new Color(249, 250, 251));
         card.setBorder(BorderFactory.createCompoundBorder(
@@ -463,7 +465,7 @@ public class ExtendBookingModal extends JPanel {
                 extendValue,
                 unit,
                 roomsToExtend.stream()
-                        .map(Room::getRoomNumber)
+                        .map(RoomViewDTO::getRoomNumber)
                         .collect(Collectors.joining(", ")),
                 amount.longValue(),
                 currentBooking.getTotalAmount().longValue(),
@@ -512,7 +514,7 @@ public class ExtendBookingModal extends JPanel {
                                 "Tổng hóa đơn mới: <b style='color: #DC2626; font-size: 18px;'>%,dđ</b>" +
                                 "</div>",
                         roomsToExtend.stream()
-                                .map(Room::getRoomNumber)
+                                .map(RoomViewDTO::getRoomNumber)
                                 .collect(Collectors.joining(", ")),
                         extendValue,
                         unit,

@@ -10,14 +10,11 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.*;
 
-import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.AuthenticateService;
 import iuh.fit.se.group1.service.EmailSenderService;
@@ -400,11 +397,10 @@ public class Login extends javax.swing.JFrame {
             if (action) {
                 this.setTitle("Hệ thống quản lý khách sạn Đào Tiên");
 
-                Employee employee = authenticateService.getEmployeeByAccountId(authenticate.getAccountId());
+                EmployeeDTO employee = employeeService.getEmployeeByAccountId(authenticate.getAccountId());
                 boolean isManager = authenticate.getRole().getRoleId().equals(Role.MANAGER.toString());
                 log.info("User '{}' login with role '{}'", authenticate.getUsername(), authenticate.getRole().getRoleId());
 
-                System.out.println(employee);
                 panelBody.setCurrentEmployee(employee);
                 panelBody.setAuth(isManager);
                 animatorLogin.start();
@@ -420,7 +416,7 @@ public class Login extends javax.swing.JFrame {
         modal.closeModal(e -> {
             GlassPanePopup.closePopupLast();
         });
-        AtomicReference<Employee> employeeAtomicReference = new AtomicReference<>();
+        AtomicReference<EmployeeDTO> employeeAtomicReference = new AtomicReference<>();
         modal.sendRestCode(e -> {
             var result = sendCode(modal, sendCodeModal);
             employeeAtomicReference.set(result);
@@ -441,7 +437,7 @@ public class Login extends javax.swing.JFrame {
     }// GEN-LAST:event_btnForgotPassActionPerformed
 
 
-    private Employee sendCode(VerifyIdentityModal modal, SendResetCodeModal sendCodeModal) {
+    private EmployeeDTO sendCode(VerifyIdentityModal modal, SendResetCodeModal sendCodeModal) {
         String citizenId = modal.getTxtCitizenID().getText();
 
         if (citizenId.isBlank()) {
@@ -466,7 +462,7 @@ public class Login extends javax.swing.JFrame {
         return employee;
     }
 
-    private void sendCodeToEmail(Employee employee) {
+    private void sendCodeToEmail(EmployeeDTO employee) {
 
         authenticateService.resetPassword(employee.getAccount().getUsername());
 

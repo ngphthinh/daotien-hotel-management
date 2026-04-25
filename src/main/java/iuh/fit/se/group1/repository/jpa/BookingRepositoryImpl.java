@@ -5,6 +5,7 @@ import iuh.fit.se.group1.dto.BookingDisplayDTO;
 import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
+import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.repository.interfaces.BookingRepository;
 import jakarta.persistence.EntityManager;
@@ -113,6 +114,10 @@ public class BookingRepositoryImpl extends AbstractRepositoryImpl<Booking, Long>
 
         for (Booking b : bookings) {
             b.setOrder(order);
+
+            Room room = em.find(Room.class, b.getRoom().getRoomId());
+            b.setRoom(room);
+
             em.persist(b);
         }
 

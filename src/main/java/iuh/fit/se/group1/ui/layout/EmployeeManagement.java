@@ -5,27 +5,25 @@
 package iuh.fit.se.group1.ui.layout;
 
 
+import iuh.fit.se.group1.dto.AccountDTO;
+import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.dto.RoleDTO;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.CellStyle;
 
-import java.awt.Graphics2D;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import iuh.fit.se.group1.entity.Account;
-import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.service.EmployeeService;
-import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoEmployeeModal;
 import iuh.fit.se.group1.ui.component.shift.ShiftList;
-import iuh.fit.se.group1.ui.component.table.Table;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.Color;
@@ -39,7 +37,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -57,7 +54,6 @@ import iuh.fit.se.group1.util.Constants;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
@@ -75,11 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
-import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.ImportExcelService;
-
-import java.io.File;
-import java.util.List;
 
 public class EmployeeManagement extends javax.swing.JPanel {
 
@@ -122,7 +114,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 ImportExcelService importService = new ImportExcelService();
-                List<Employee> imported = importService.importEmployeesFromExcel(file);
+                List<EmployeeDTO> imported = importService.importEmployeesFromExcel(file);
                 if (imported != null && !imported.isEmpty()) {
                     employeeService.getAllEmployees().addAll(imported);
                     loadTable(employeeService.getAllEmployees());
@@ -137,7 +129,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
 
-        String cols[] = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
+        String[] cols = {"Mã nhân viên", "Họ tên", "Giới tính", "Chức vụ", "Số điện thoại", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
 
         tblEmployee.getTbl().setModel(model);
@@ -167,7 +159,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 Long employeeId = (Long) model.getValueAt(row, 0);
 
                 // Lấy thông tin đầy đủ từ database
-                Employee employee = employeeService.getEmployeeById(employeeId);
+                EmployeeDTO employee = employeeService.getEmployeeById(employeeId);
 
                 if (employee == null) {
                     Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
@@ -217,13 +209,13 @@ public class EmployeeManagement extends javax.swing.JPanel {
                                 ? Role.MANAGER.toString()
                                 : Role.RECEPTIONIST.toString();
 
-                        iuh.fit.se.group1.entity.Role newRole = roleService.getRoleById(roleId);
+                        RoleDTO newRole = roleService.getRoleById(roleId);
                         if (newRole == null) {
                             Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
                             return;
                         }
 
-                        Employee employeeUpdate = new Employee();
+                        EmployeeDTO employeeUpdate = new EmployeeDTO();
                         employeeUpdate.setEmployeeId(employeeId);
                         employeeUpdate.setFullName(result.fullName);
                         employeeUpdate.setPhone(result.phone);
@@ -233,7 +225,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         employeeUpdate.setGender(gender);
 
                         if (employee.getAccount() != null) {
-                            Account accountToUpdate = employee.getAccount();
+                            AccountDTO accountToUpdate = employee.getAccount();
                             accountToUpdate.setRole(newRole);
                             employeeUpdate.setAccount(accountToUpdate);
                         } else {
@@ -254,7 +246,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                             employeeUpdate.setAvt(employee.getAvt());
                         }
 
-                        Employee entitySave = employeeService.updateEmployee(employeeUpdate);
+                        EmployeeDTO entitySave = employeeService.updateEmployee(employeeUpdate);
 
                         String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
                         String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
@@ -318,7 +310,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 Long employeeId = (Long) model.getValueAt(row, 0);
 
                 // Lấy thông tin đầy đủ từ database
-                Employee employee = employeeService.getEmployeeById(employeeId);
+                EmployeeDTO employee = employeeService.getEmployeeById(employeeId);
 
                 if (employee == null) {
                     Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
@@ -593,11 +585,11 @@ public class EmployeeManagement extends javax.swing.JPanel {
                                 .addGap(37, 37, 37)));
     }
 
-    private void loadTable(java.util.List<Employee> employees) {
+    private void loadTable(java.util.List<EmployeeDTO> employees) {
 
         DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
         model.setRowCount(0);
-        for (Employee employee : employees) {
+        for (EmployeeDTO employee : employees) {
             String genderStr = employee.isGender() ? "Nữ" : "Nam";
             String roleName = employee.getAccount() != null && employee.getAccount().getRole() != null
                     ? employee.getAccount().getRole().getRoleName()
@@ -794,7 +786,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
     }
 
     private void exportAllEmployeesToExcel() {
-        List<Employee> employees = employeeService.getAllEmployees();
+        List<EmployeeDTO> employees = employeeService.getAllEmployees();
         if (employees == null || employees.isEmpty()) {
             Message.showMessage("Thông báo", "Không có nhân viên để xuất Excel!");
             return;
@@ -832,7 +824,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             int rowIndex = 1;
             int stt = 1;
 
-            for (Employee emp : employees) {
+            for (EmployeeDTO emp : employees) {
                 Row row = sheet.createRow(rowIndex++);
 
                 row.createCell(0).setCellValue(stt++); // STT
@@ -886,7 +878,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             } else {
                 roleId = Role.MANAGER.toString();
             }
-            Employee employee = new Employee();
+            EmployeeDTO employee = new EmployeeDTO();
             employee.setFullName(result.fullName);
             employee.setPhone(result.phone);
             employee.setEmail(result.email);
@@ -905,7 +897,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             } else {
                 log.warn("AvatarLabel is null in modal");
             }
-            Employee employeeSave = employeeService.createEmployee(employee, roleId);
+            EmployeeDTO employeeSave = employeeService.createEmployee(employee, roleId);
 
             if (employeeSave == null) {
                 Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
@@ -1043,7 +1035,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             valid = false;
         } else {
             // Kiểm tra CCCD có tồn tại không
-            Employee existingEmployee = service.existsByCitizenId(citizenId);
+            EmployeeDTO existingEmployee = service.existsByCitizenId(citizenId);
             if (existingEmployee != null) {
                 if (currentEmployeeId != null) {
                     if (!existingEmployee.getEmployeeId().equals(currentEmployeeId)) {

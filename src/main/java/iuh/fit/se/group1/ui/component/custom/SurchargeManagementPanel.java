@@ -100,7 +100,7 @@ public class SurchargeManagementPanel extends JPanel {
     }
 
     private void setupAvailableSurchargesTable() {
-        String[] columnNames = { "Mã phụ phí", "Tên phụ phí", "Giá" };
+        String[] columnNames = {"Mã phụ phí", "Tên phụ phí", "Giá"};
         availableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -127,7 +127,7 @@ public class SurchargeManagementPanel extends JPanel {
     }
 
     private void setupSelectedSurchargesTable() {
-        String[] columnNames = { "STT", "Tên phụ phí", "Giá", "SL", "Thành tiền" };
+        String[] columnNames = {"STT", "Tên phụ phí", "Giá", "SL", "Thành tiền"};
         selectedModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -312,7 +312,7 @@ public class SurchargeManagementPanel extends JPanel {
         }
 
         if (!exists) {
-            selectedModel.addRow(new Object[] {
+            selectedModel.addRow(new Object[]{
                     id,
                     surchargeDTO,
                     surchargeDTO.getPrice(),
@@ -464,7 +464,7 @@ public class SurchargeManagementPanel extends JPanel {
         int idx = 1;
         for (SurchargeDTO data : selectedSurcharges.values()) {
             double total = data.getPrice().doubleValue() * data.getQuantity();
-            selectedModel.addRow(new Object[] {
+            selectedModel.addRow(new Object[]{
                     idx++,
                     data,
                     data.getPrice(),
@@ -510,7 +510,7 @@ public class SurchargeManagementPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setBackground(HEADER_COLOR);
             setForeground(Color.WHITE);
@@ -531,7 +531,7 @@ public class SurchargeManagementPanel extends JPanel {
     private class AlternatingRowRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
             if (isSelected) {
@@ -554,7 +554,7 @@ public class SurchargeManagementPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
             // if (value instanceof Double) {
             // value = currencyFormat.format((Double) value).split(" ")[0];
             // }
@@ -581,7 +581,7 @@ public class SurchargeManagementPanel extends JPanel {
 
     public void addSurcharge(String id, String name, double price, int quantity) {
         double total = price * quantity;
-        selectedModel.addRow(new Object[] { id, name, price, quantity, total });
+        selectedModel.addRow(new Object[]{id, name, price, quantity, total});
         SurchargeDTO dto = new SurchargeDTO();
         dto.setSurchargeId(Long.parseLong(id));
         dto.setName(name);
@@ -594,13 +594,12 @@ public class SurchargeManagementPanel extends JPanel {
 
     /**
      * Lấy danh sách dữ liệu từ bảng bên phải (bảng phụ phí đã chọn)
-     * 
+     *
      * @return List các SurchargeDTO từ bảng phụ phí đã chọn
      */
     public java.util.List<SurchargeDTO> getSelectedTableData() {
         java.util.List<SurchargeDTO> data = new java.util.ArrayList<>();
         for (int i = 0; i < selectedModel.getRowCount(); i++) {
-
 
 
             Integer quantity = (Integer) selectedModel.getValueAt(i, 3); // Số lượng
@@ -616,13 +615,13 @@ public class SurchargeManagementPanel extends JPanel {
 
     /**
      * Đưa dữ liệu vào 2 bảng
-     * 
+     *
      * @param availableData Dữ liệu cho bảng trái (danh sách phụ phí có sẵn)
      *                      Format: [STT, Tên phụ phí, Giá, Thành tiền]
      * @param selectedData  Dữ liệu cho bảng phải (phụ phí đã chọn)
      *                      Format: [Mã, Tên, Giá, Số lượng, Thành tiền]
      */
-    public void loadData(java.util.List<Surcharge> availableData, java.util.List<SurchargeDTO> selectedData) {
+    public void loadData(java.util.List<SurchargeDTO> availableData, java.util.List<SurchargeDTO> selectedData) {
         // Clear existing data
         availableModel.setRowCount(0);
         selectedModel.setRowCount(0);
@@ -631,8 +630,8 @@ public class SurchargeManagementPanel extends JPanel {
 
         // Load available surcharges (left table)
         if (availableData != null) {
-            for (Surcharge surcharge : availableData) {
-                availableModel.addRow(new Object[] {
+            for (SurchargeDTO surcharge : availableData) {
+                availableModel.addRow(new Object[]{
                         surcharge.getSurchargeId(),
                         surcharge.getName(),
                         surcharge.getPrice(),
@@ -645,7 +644,7 @@ public class SurchargeManagementPanel extends JPanel {
             int index = 1;
             for (SurchargeDTO dto : selectedData) {
                 BigDecimal total = dto.getPrice().multiply(new BigDecimal(dto.getQuantity()));
-                selectedModel.addRow(new Object[] {
+                selectedModel.addRow(new Object[]{
                         index++,
                         dto,
                         dto.getPrice(),

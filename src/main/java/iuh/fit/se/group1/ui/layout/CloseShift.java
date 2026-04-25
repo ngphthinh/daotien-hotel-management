@@ -4,11 +4,13 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.dto.DenominationDetailDTO;
+import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.dto.EmployeeShiftDTO;
+import iuh.fit.se.group1.dto.ShiftCloseDTO;
+import iuh.fit.se.group1.entity.DenominationDetail;
 import iuh.fit.se.group1.enums.DenominationLabel;
-import iuh.fit.se.group1.service.DenominationDetailService;
-import iuh.fit.se.group1.service.EmployeeShiftService;
-import iuh.fit.se.group1.service.ShiftCloseService;
+import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.*;
 import iuh.fit.se.group1.ui.component.modal.ConfirmInfoModal;
@@ -32,10 +34,10 @@ public class CloseShift extends javax.swing.JPanel {
     private EmployeeShiftService employeeShiftService;
     private DenominationDetailService denominationDetailService;
     private final ShiftCloseService shiftCloseService;
-    private EmployeeShift currentEmployeeShift;
+    private EmployeeShiftDTO currentEmployeeShift;
     private BigDecimal totalRevenue = BigDecimal.ZERO;
     private ConfirmInfoModal confirmModal;
-
+    private final AuthenticateService authenticateService;
     // Timer
     private Timer autoRefreshTimer;
     private BigDecimal openingCash = new BigDecimal("5000000");
@@ -43,6 +45,7 @@ public class CloseShift extends javax.swing.JPanel {
     private Runnable onCloseShiftSuccess;
 
     public CloseShift() {
+        this.authenticateService = new AuthenticateService();
         this.employeeShiftService = new EmployeeShiftService();
         this.denominationDetailService = new DenominationDetailService();
         this.shiftCloseService = new ShiftCloseService();
@@ -125,13 +128,12 @@ public class CloseShift extends javax.swing.JPanel {
                     return;
                 }
 
-                ShiftCloseService service = new ShiftCloseService();
-                Employee manager = service.validateManager(username, password);
+                EmployeeDTO manager = authenticateService.validateManager(username, password);
 
                 if (manager != null) {
                     GlassPanePopup.closePopupLast();
                     confirmModal.clearFields();
-                    performCloseShift(manager.getEmployeeId());
+                    performCloseShift(manager);
                 } else {
                     Message.showMessage("Lỗi", "Sai tài khoản hoặc mật khẩu!\nHoặc tài khoản không phải Manager!");
                     SwingUtilities.invokeLater(() -> confirmModal.clearFields());
@@ -151,7 +153,7 @@ public class CloseShift extends javax.swing.JPanel {
         });
     }
 
-    private void performCloseShift(Long managerId) {
+    private void performCloseShift(EmployeeDTO manager) {
         Message.showConfirm("Xác nhận đóng ca",
                 "Bạn có chắc chắn muốn đóng ca làm việc này?",
                 () -> {
@@ -161,19 +163,19 @@ public class CloseShift extends javax.swing.JPanel {
                             autoRefreshTimer.stop();
                         }
 
-                        ShiftClose shiftClose = new ShiftClose();
+                        ShiftCloseDTO shiftClose = new ShiftCloseDTO();
                         shiftClose.setEmployeeShift(currentEmployeeShift);
 
                         BigDecimal cashInDrawer = parseCurrency(txtReality.getText());
                         shiftClose.setCashInDrawer(cashInDrawer);
                         shiftClose.setTotalRevenue(totalRevenue);
                         shiftClose.setNote(jTextArea1.getText());
-                        shiftClose.setManagerId(managerId);
+                        shiftClose.setManager(manager);
 
                         LocalDateTime now = LocalDateTime.now();
                         shiftClose.setCreatedAt(now);
 
-                        ShiftClose savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
+                        ShiftCloseDTO savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
 
                         String formattedTime = now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
                         String differenceText = formatCurrency(savedShiftClose.getDifference());
@@ -242,12 +244,12 @@ public class CloseShift extends javax.swing.JPanel {
         return formatter.format(value) + "VND";
     }
 
-    public void setCurrentEmployeeShift(EmployeeShift employeeShift) {
+    public void setCurrentEmployeeShift(EmployeeShiftDTO employeeShift) {
         this.currentEmployeeShift = employeeShift;
 
         if (employeeShift != null) {
             try {
-                EmployeeShift detailedShift = employeeShiftService.getEmployeeShiftWithDetails(
+                EmployeeShiftDTO detailedShift = employeeShiftService.getEmployeeShiftWithDetails(
                         employeeShift.getEmployeeShiftId()
                 );
 
@@ -272,7 +274,7 @@ public class CloseShift extends javax.swing.JPanel {
         }
     }
 
-    private void displayShiftInfo(EmployeeShift shift) {
+    private void displayShiftInfo(EmployeeShiftDTO shift) {
         if (shift.getEmployee() != null) {
             infoShift1.setEmployeeName(shift.getEmployee().getFullName());
             infoShift1.setEmployeeId(String.valueOf(shift.getEmployee().getEmployeeId()));
@@ -414,7 +416,7 @@ public class CloseShift extends javax.swing.JPanel {
     }
 
     private void saveDenominationDetails() {
-        List<DenominationDetail> details = new ArrayList<>();
+        List<DenominationDetailDTO> details = new ArrayList<>();
         Money[] moneyPanels = {money1, money2, money3, money4, money5, money6, money7, money8, money9};
         DenominationLabel[] labels = {
                 DenominationLabel.VND_500000,
@@ -434,7 +436,7 @@ public class CloseShift extends javax.swing.JPanel {
                 if (qtyText != null && !qtyText.trim().isEmpty()) {
                     int quantity = Integer.parseInt(qtyText.trim());
                     if (quantity > 0) {
-                        DenominationDetail detail = new DenominationDetail();
+                        DenominationDetailDTO detail = new DenominationDetailDTO();
                         detail.setDenomination(labels[i]);
                         detail.setQuantity(quantity);
                         detail.setEmployeeShift(currentEmployeeShift);

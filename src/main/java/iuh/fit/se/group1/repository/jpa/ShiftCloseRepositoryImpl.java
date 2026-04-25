@@ -1,11 +1,8 @@
 package iuh.fit.se.group1.repository.jpa;
 
-import iuh.fit.se.group1.dto.ShiftNoteDto;
 import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.ShiftClose;
 import iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository;
-import iuh.fit.se.group1.util.PasswordUtil;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
@@ -58,13 +55,13 @@ public class ShiftCloseRepositoryImpl extends AbstractRepositoryImpl<ShiftClose,
     }
 
     @Override
-    public List<ShiftClose> findByEmployeeShift(EntityManager em, EmployeeShift employeeShift) {
+    public List<ShiftClose> findByEmployeeShift(EntityManager em, Long employeeShiftId) {
         return
                 em.createQuery("""
                                     FROM ShiftClose sc
                                     WHERE sc.employeeShift.employeeShiftId = :id
                                 """, ShiftClose.class)
-                        .setParameter("id", employeeShift.getEmployeeShiftId())
+                        .setParameter("id", employeeShiftId)
                         .getResultList();
     }
 
@@ -94,32 +91,6 @@ public class ShiftCloseRepositoryImpl extends AbstractRepositoryImpl<ShiftClose,
         return result != null ? (BigDecimal) result : BigDecimal.ZERO;
     }
 
-    @Override
-    public Employee validateManager(EntityManager em, String username, String password) {
-        List<Object[]> rs = em.createNativeQuery("""
-                            SELECT e.employeeId, e.fullName, e.phone, e.email, a.password
-                            FROM Employee e
-                            JOIN Account a ON e.accountId = a.accountId
-                            WHERE a.username = ? AND a.roleId = 'MANAGER'
-                        """)
-                .setParameter(1, username)
-                .getResultList();
-
-        if (rs.isEmpty()) return null;
-
-        Object[] row = rs.get(0);
-        String hashed = (String) row[4];
-        if (!PasswordUtil.checkPassword(password, hashed)) return null;
-
-
-        Employee e = new Employee();
-        e.setEmployeeId(((Number) row[0]).longValue());
-        e.setFullName((String) row[1]);
-        e.setPhone((String) row[2]);
-        e.setEmail((String) row[3]);
-
-        return e;
-    }
 
     @Override
     public Employee getManagerById(Long managerId) {

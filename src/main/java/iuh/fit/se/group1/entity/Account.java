@@ -14,6 +14,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @ToString
 @Entity
+@Builder
 @SQLDelete(sql = "UPDATE Account SET isDeleted = 1 WHERE accountId = ?")
 @SQLRestriction("isDeleted = 0")
 public class Account {

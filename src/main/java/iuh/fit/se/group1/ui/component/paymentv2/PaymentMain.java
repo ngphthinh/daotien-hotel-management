@@ -6,10 +6,8 @@ package iuh.fit.se.group1.ui.component.paymentv2;
 
 import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.dto.*;
-import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.service.*;
-import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.SurchargeManagementPanel;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -37,15 +35,17 @@ import java.util.stream.Collectors;
  * @author THIS PC
  */
 public class PaymentMain extends javax.swing.JPanel {
-    private Employee currentEmployee;
+    private EmployeeDTO currentEmployee;
     private OrderService orderService;
-    private Order currentOrder = null;
+    private OrderDTO currentOrder = null;
     private JaspersoftExportService jaspersoftExportService = new JaspersoftExportService();
-    public Employee getCurrentEmployee() {
+    private PromotionService promotionService = new PromotionService();
+
+    public EmployeeDTO getCurrentEmployee() {
         return currentEmployee;
     }
 
-    public void setCurrentEmployee(Employee currentEmployee) {
+    public void setCurrentEmployee(EmployeeDTO currentEmployee) {
         this.currentEmployee = currentEmployee;
         log.info("Current employee set to: {}", currentEmployee.getFullName());
 
@@ -56,12 +56,12 @@ public class PaymentMain extends javax.swing.JPanel {
     private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private static final long SURCHARGE_HOLIDAY = 50_000;
     private static final Logger log = LoggerFactory.getLogger(PaymentMain.class);
-    private Promotion promotion = null;
+    private PromotionDTO promotion = null;
     private Runnable backStep1Action;
     private Runnable backStep3Action;
 
 
-    public void setBackStep3Action (Runnable backStep3Action) {
+    public void setBackStep3Action(Runnable backStep3Action) {
         this.backStep3Action = backStep3Action;
     }
 
@@ -715,7 +715,7 @@ public class PaymentMain extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-   private BookingService bookingService = new BookingService();
+    private BookingService bookingService = new BookingService();
 
     private void btnCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCashActionPerformed
         backStep3Action.run();
@@ -799,12 +799,12 @@ public class PaymentMain extends javax.swing.JPanel {
     private void saveSurchargesByOrderId(Long orderId) {
         DefaultTableModel model = (DefaultTableModel) tblSurcharge.getModel();
 
-        List<SurchargeDetail> surchargesToSave = new ArrayList<>();
+        List<SurchargeDetailDTO> surchargesToSave = new ArrayList<>();
 
         for (int i = 0; i < model.getRowCount(); i++) {
             SurchargeDTO surchargeDTO = (SurchargeDTO) model.getValueAt(i, 1);
-            SurchargeDetail surchargeDetail = new SurchargeDetail();
-            surchargeDetail.setSurcharge(new Surcharge(surchargeDTO.getSurchargeId()));
+            SurchargeDetailDTO surchargeDetail = new SurchargeDetailDTO();
+            surchargeDetail.setSurcharge(SurchargeDTO.builder().surchargeId(surchargeDTO.getSurchargeId()).build());
             surchargeDetail.setQuantity(surchargeDTO.getQuantity());
             surchargesToSave.add(surchargeDetail);
         }
@@ -898,10 +898,10 @@ public class PaymentMain extends javax.swing.JPanel {
 
     private boolean setupBookingPayment() {
 
-        Set<Booking> selectedBookings =
+        Set<BookingViewDTO> selectedBookings =
                 new HashSet<>(tblRoom.getSelectedRoom());
 
-        List<Booking> allBookings = currentOrder.getBookings();
+        List<BookingViewDTO> allBookings = currentOrder.getBookings();
 
         if (selectedBookings.isEmpty()) {
             CustomDialog.showMessage(this,
@@ -918,7 +918,7 @@ public class PaymentMain extends javax.swing.JPanel {
         }
 
         // Booking KHÔNG được chọn → lưu lại
-        List<Booking> remainingBookings = allBookings.stream()
+        List<BookingViewDTO> remainingBookings = allBookings.stream()
                 .filter(b -> !selectedBookings.contains(b))
                 .collect(Collectors.toCollection(ArrayList::new));
 
@@ -926,7 +926,7 @@ public class PaymentMain extends javax.swing.JPanel {
         currentOrder.setBookings(new ArrayList<>(selectedBookings));
 
         // Create a new order record for the remaining bookings (without duplicating booking rows)
-        Order newOrderRecord = new Order();
+        OrderDTO newOrderRecord = new OrderDTO();
         newOrderRecord.setEmployee(currentOrder.getEmployee());
         newOrderRecord.setCustomer(currentOrder.getCustomer());
         newOrderRecord.setOrderDate(java.time.LocalDateTime.now());
@@ -935,7 +935,7 @@ public class PaymentMain extends javax.swing.JPanel {
         newOrderRecord.setDeposit(java.math.BigDecimal.ZERO);
         newOrderRecord.setTotalAmount(java.math.BigDecimal.ZERO);
 
-        Order createdOrder = orderService.createOrderRecord(newOrderRecord);
+        OrderDTO createdOrder = orderService.createOrderRecord(newOrderRecord);
         if (createdOrder == null) {
             CustomDialog.showMessage(this, "Không thể tạo đơn mới cho phần còn lại của phòng", "Lỗi", CustomDialog.MessageType.ERROR, 400, 180);
             return false;
@@ -943,7 +943,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
         // Collect bookingIds to move (the ones we want to remain in the new order)
         List<Long> bookingIdsToMove = remainingBookings.stream()
-                .map(Booking::getBookingId)
+                .map(BookingViewDTO::getBookingId)
                 .toList();
 
         // Move booking rows in DB to the new order id
@@ -1125,18 +1125,18 @@ public class PaymentMain extends javax.swing.JPanel {
         for (AmenityDTO amenity : selectedAmenities) {
             Object[] row = new Object[]{
                     index++,
-                    amenity.getName(),
+                    amenity.getNameAmenity(),
                     Constants.VND_FORMAT.format(amenity.getPrice()),
                     amenity.getQuantity()
             };
-            total = total.add(BigDecimal.valueOf(amenity.getPrice() * amenity.getQuantity()));
+            total = total.add(amenity.getPrice().multiply(new BigDecimal(amenity.getQuantity())));
             model.addRow(row);
         }
         lblTotalAmenity.setText(Constants.VND_FORMAT.format(total));
         recalculateTotalAndPromotion(); // Recalculate when amenity changes
     }
 
-    public void setupCustomer(Customer customer) {
+    public void setupCustomer(CustomerDTO customer) {
         lblFullName.setText(customer.getFullName());
         lblPhone.setText(customer.getPhone());
         lblEmail.setText(customer.getEmail() != null ? customer.getEmail() : "N/A");
@@ -1147,7 +1147,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
     public void setInfoBooking(
             String bookingType,
-            List<Booking> selectedRoom,
+            List<BookingViewDTO> selectedRoom,
             BigDecimal deposit,
             BigDecimal totalPrice) {
 
@@ -1157,10 +1157,10 @@ public class PaymentMain extends javax.swing.JPanel {
 
         tblRoom.clearData();
 
-        for (Booking booking : selectedRoom) {
-            Room room = booking.getRoom();
+        for (BookingViewDTO booking : selectedRoom) {
+            RoomViewDTO room = booking.getRoom();
 
-            RoomType roomType = room.getRoomType();
+            RoomTypeDTO roomType = room.getRoomType();
 
             if (roomType == null) {
                 System.out.println("Room ID " + room.getRoomId() + " has no associated room type.");
@@ -1179,13 +1179,10 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
 
-
-
-
     public void setOrder(Long orderId, OrderService orderService, OrderDetailService orderDetailService,
                          SurchargeDetailService surchargeDetailService) {
         this.orderService = orderService;
-        Order order = orderService.getOrderById(orderId);
+        OrderDTO order = orderService.getOrderById(orderId);
         this.currentOrder = order;
 
         String bookingTypeStr = order.getBookings().get(0).getBookingType().getDisplayName();
@@ -1199,11 +1196,11 @@ public class PaymentMain extends javax.swing.JPanel {
         List<AmenityDTO> amenityDTOS = orderDetailService.getOrderDetailsByOrderId(orderId).stream()
                 .filter(od -> od.getAmenity() != null)
                 .map(od -> {
-                    Amenity amenity = od.getAmenity();
+                    AmenityDTO amenity = od.getAmenity();
                     AmenityDTO dto = new AmenityDTO();
-                    dto.setId(amenity.getAmenityId());
-                    dto.setName(amenity.getNameAmenity());
-                    dto.setPrice(amenity.getPrice().doubleValue());
+                    dto.setAmenityId(amenity.getAmenityId());
+                    dto.setNameAmenity(amenity.getNameAmenity());
+                    dto.setPrice(amenity.getPrice());
                     dto.setQuantity(od.getQuantity());
                     return dto;
                 })
@@ -1211,7 +1208,7 @@ public class PaymentMain extends javax.swing.JPanel {
         setAmenity(amenityDTOS);
         List<SurchargeDTO> surchargeDTOS = surchargeDetailService.getSurchargeDetailsByOrderId(orderId).stream()
                 .map(e -> {
-                    Surcharge surcharge = e.getSurcharge();
+                    SurchargeDTO surcharge = e.getSurcharge();
                     SurchargeDTO dto = new SurchargeDTO();
                     dto.setSurchargeId(surcharge.getSurchargeId());
                     dto.setName(surcharge.getName());
@@ -1221,13 +1218,13 @@ public class PaymentMain extends javax.swing.JPanel {
                 }).collect(Collectors.toList());
 
         List<LocalDateTime> checkOutDates = order.getBookings().stream()
-                .map(Booking::getCheckOutDate)
+                .map(BookingViewDTO::getCheckOutDate)
                 .toList();
 
 
         int countAfterNow = countAfterNow(checkOutDates);
         if (countAfterNow < 1) {
-            Surcharge surchargeCheckOut = surchargeService.getSurchargeByName(SURCHARGE_CHECKOUT);
+            SurchargeDTO surchargeCheckOut = surchargeService.getSurchargeByName(SURCHARGE_CHECKOUT);
             if (surchargeCheckOut != null) {
                 SurchargeDTO dto = new SurchargeDTO();
                 dto.setSurchargeId(surchargeCheckOut.getSurchargeId());
@@ -1255,7 +1252,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
 
     private void setPromotion(BigDecimal totalAmount) {
-        PromotionService promotionService = new PromotionService();
+
         promotion = promotionService.getActivePromotion(totalAmount);
         if (promotion != null) {
             lblPromotionName.setText(promotion.getPromotionName());
@@ -1263,7 +1260,7 @@ public class PaymentMain extends javax.swing.JPanel {
             BigDecimal discountPercent = new BigDecimal(promotion.getDiscountPercent().toString());
             BigDecimal discountAmount = totalAmount.multiply(discountPercent)
                     .divide(BigDecimal.valueOf(100));
-            lblPromotion.setText("- " +Constants.VND_FORMAT.format(discountAmount));
+            lblPromotion.setText("- " + Constants.VND_FORMAT.format(discountAmount));
         } else {
             lblPromotionName.setText("Không có khuyến mãi");
             lblPromotion.setText(Constants.VND_FORMAT.format(0));

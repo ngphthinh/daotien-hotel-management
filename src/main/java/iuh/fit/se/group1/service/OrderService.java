@@ -1,9 +1,16 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.config.AppLogger;
+import iuh.fit.se.group1.dto.BookingViewDTO;
+import iuh.fit.se.group1.dto.OrderDTO;
+import iuh.fit.se.group1.dto.OrderDetailDTO;
+import iuh.fit.se.group1.dto.SurchargeDetailDTO;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.RoomStatus;
+import iuh.fit.se.group1.mapper.BookingMapper;
+import iuh.fit.se.group1.mapper.OrderDetailMapper;
+import iuh.fit.se.group1.mapper.OrderMapper;
 import iuh.fit.se.group1.repository.jpa.BookingRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
@@ -18,17 +25,24 @@ import java.util.*;
 
 public class OrderService extends Service {
     private final OrderRepositoryImpl orderRepositoryImpl;
-    private OrderDetailService orderDetailsService;
-    private RoomRepository roomRepository;
-    private BookingRepository bookingRepository = new BookingRepositoryImpl();
+    private final OrderDetailService orderDetailsService;
+    private final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository = new BookingRepositoryImpl();
+    private final BookingMapper bookingMapper = new BookingMapper();
+    private final OrderMapper orderMapper;
+    private final OrderDetailMapper orderDetailMapper;
+    private final BookingService bookingService = new BookingService();
+    private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
     public OrderService() {
+        this.orderMapper = new OrderMapper();
         this.orderDetailsService = new OrderDetailService();
+        this.orderDetailMapper = new OrderDetailMapper();
         this.orderRepositoryImpl = new OrderRepositoryImpl();
         this.roomRepository = new RoomRepositoryImpl();
     }
 
-    public Order createOrder(Order order, List<OrderDetail> orderDetails) {
+    public OrderDTO createOrder(OrderDTO order, List<OrderDetailDTO> orderDetails) {
 //        EntityManager em = JPAUtil.getEntityManager();
 //        EntityTransaction tx = em.getTransaction();
 //
@@ -74,6 +88,8 @@ public class OrderService extends Service {
         return doInTransaction(entityManager -> {
             if (order == null) return null;
 
+            System.out.println(order);
+
             if (order.getEmployee() == null || order.getCustomer() == null
                     || order.getBookings() == null || order.getBookings().isEmpty()) {
                 return null;
@@ -89,13 +105,14 @@ public class OrderService extends Service {
                 roomRepository.updateRoomStatusBatch(entityManager, roomsIdx, RoomStatus.OCCUPIED);
             }
 
-            Order savedOrder = orderRepositoryImpl.save(entityManager, order);
+            Order savedOrder = orderRepositoryImpl.save(entityManager, orderMapper.toOrder(order));
             if (savedOrder == null) return null;
 
-            bookingRepository.saveAllBookingsForOrder(entityManager, savedOrder, order.getBookings());
+
+            bookingRepository.saveAllBookingsForOrder(entityManager, savedOrder, order.getBookings().stream().map(bookingMapper::toBooking).toList());
 
             if (orderDetailsService.saveOrderDetailsForOrder(entityManager, savedOrder, orderDetails)) {
-                return savedOrder;
+                return orderMapper.toOrderDTO(savedOrder);
             }
 
             throw new RuntimeException("Failed to save order details");
@@ -159,11 +176,11 @@ public class OrderService extends Service {
      * Create an empty order record (no bookings saved) based on the provided order object.
      * Returns the saved Order with generated orderId.
      */
-    public Order createOrderRecord(Order order) {
+    public OrderDTO createOrderRecord(OrderDTO order) {
         if (order == null) return null;
         if (order.getEmployee() == null || order.getCustomer() == null) return null;
 //        return orderRepositoryImpl.save(order);
-        return doInTransaction(entityManager -> orderRepositoryImpl.save(entityManager, order));
+        return doInTransaction(entityManager -> orderMapper.toOrderDTO(orderRepositoryImpl.save(entityManager, orderMapper.toOrder(order))));
     }
 
     /**
@@ -183,32 +200,38 @@ public class OrderService extends Service {
         doInTransactionVoid(entityManager -> orderRepositoryImpl.updateTotalAmount(entityManager, orderId, amount));
     }
 
-    public List<Order> getAllOrders() {
+    public List<OrderDTO> getAllOrders() {
 //        return orderRepositoryImpl.findAll();
-        return doInTransaction(orderRepositoryImpl::findAll);
+        return doInTransaction(orderRepositoryImpl::findAll).stream().map(orderMapper::toOrderDTO).toList();
     }
 
-    public List<Order> getAllOrdersWithRelationshipAndCompleteYet() {
+    public List<OrderDTO> getAllOrdersWithRelationshipAndCompleteYet() {
 //        return orderRepositoryImpl.findAllOrdersCompleteYet();
-        return doInTransaction(orderRepositoryImpl::findAllOrdersCompleteYet);
+        return doInTransaction(orderRepositoryImpl::findAllOrdersCompleteYet).stream()
+                .map(orderMapper::toOrderDTO)
+                .toList();
     }
 
-    public List<Order> getAllOrdersWithRelationship() {
+    public List<OrderDTO> getAllOrdersWithRelationship() {
 //        return orderRepositoryImpl.findAllOrdersWithRelationship();
-        return doInTransaction(orderRepositoryImpl::findAllOrdersWithRelationship);
+        return doInTransaction(orderRepositoryImpl::findAllOrdersWithRelationship).stream()
+                .map(orderMapper::toOrderDTO)
+                .toList();
     }
 
 
-    public Order getOrderById(Long id) {
+    public OrderDTO getOrderById(Long id) {
 //        return orderRepositoryImpl.findById(id);
-        return doInTransaction(entityManager -> orderRepositoryImpl.findById(entityManager, id));
+        return doInTransaction(entityManager -> orderMapper.toOrderDTO(orderRepositoryImpl.findById(entityManager, id)));
     }
 
 
-    public void updateOrderStatusToPaid(Order order) {
-//        orderRepositoryImpl.updateOrderStatusToPaid(order);
-//        List<Long> roomIds = order.getBookings().stream().map(e -> e.getRoom().getRoomId()).toList();
-//        roomRepository.updateRoomStatusBatch(roomIds, RoomStatus.AVAILABLE);
+    public void updateOrderStatusToPaid(OrderDTO orderDTO) {
+
+        Order order = orderMapper.toOrder(orderDTO);
+
+
+
         doInTransactionVoid(entityManager -> {
             orderRepositoryImpl.updateOrderStatusToPaid(entityManager, order);
             List<Long> roomIds = order.getBookings().stream().map(e -> e.getRoom().getRoomId()).toList();
@@ -226,14 +249,15 @@ public class OrderService extends Service {
         doInTransactionVoid(entityManager -> orderRepositoryImpl.updateOrderType(entityManager, orderId, newOrderTypeId));
     }
 
-    public List<Order> getUnpaidOrders() {
+    public List<OrderDTO> getUnpaidOrders() {
 //        return orderRepositoryImpl.findAllByOrderUnPaid();
-        return doInTransaction(orderRepositoryImpl::findAllByOrderUnPaid);
+        return doInTransaction(orderRepositoryImpl::findAllByOrderUnPaid).stream().map(orderMapper::toOrderDTO).toList();
     }
 
-    public List<Order> getUnpaidOrdersByKeyword(String keyword) {
+    public List<OrderDTO> getUnpaidOrdersByKeyword(String keyword) {
 //        return orderRepositoryImpl.findUnpaidOrdersByKeyword(keyword);
-        return doInTransaction(entityManager -> orderRepositoryImpl.findUnpaidOrdersByKeyword(entityManager, keyword));
+        return doInTransaction(entityManager -> orderRepositoryImpl.findUnpaidOrdersByKeyword(entityManager, keyword)).stream().map(orderMapper::toOrderDTO)
+                .toList();
     }
 
     public BigDecimal getTotalRevenueBetweenDates(LocalDate from, LocalDate to) {
@@ -298,10 +322,10 @@ public class OrderService extends Service {
             // lấy tổng tièn phòng
             List<Booking> bookings = order.getBookings();
 
-            BigDecimal totalRoom = BigDecimal.valueOf(bookings.stream().mapToDouble(e -> bookingService.getPriceFromBooking(e)).sum());
+            BigDecimal totalRoom = BigDecimal.valueOf(bookings.stream().mapToDouble(e -> bookingService.getPriceFromBooking(bookingMapper.toDTO(e))).sum());
 
             // lấy tổng tiền dịch vu
-            BigDecimal totalAmenity = orderDetailsService.getOrderDetailsByOrderId(orderId).stream().map(OrderDetail::getUnitPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalAmenity = orderDetailsService.getOrderDetailsByOrderId(orderId).stream().map(OrderDetailDTO::getUnitPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             // lấy tổng tiền phụ phí
             BigDecimal totalSurcharge = surchargeDetailService.getSurchargeDetailsByOrderId(orderId).stream().map(e -> e.getSurcharge().getPrice().multiply(BigDecimal.valueOf(e.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -310,8 +334,6 @@ public class OrderService extends Service {
         });
     }
 
-    private BookingService bookingService = new BookingService();
-    private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
     public void deleteOrderById(Long id) {
         surchargeDetailService.deleteById(id);
@@ -322,20 +344,25 @@ public class OrderService extends Service {
         });
     }
 
-    public List<Order> searchOrdersByKeyword(String searchText) {
+    public List<OrderDTO> searchOrdersByKeyword(String searchText) {
 //        return orderRepositoryImpl.searchOrdersByKeyword(searchText);
-        return doInTransaction(entityManager -> orderRepositoryImpl.searchOrdersByKeyword(entityManager, searchText));
+        return doInTransaction(entityManager ->
+                orderRepositoryImpl.searchOrdersByKeyword(entityManager, searchText))
+                .stream().map(orderMapper::toOrderDTO).toList()
+                ;
     }
 
     public List<Order> getOrdersByRoomIdAndOrderType(Long roomId, Long orderTypeId) {
-//        return orderRepositoryImpl.findOrdersByRoomIdAndOrderType(roomId, orderTypeId);
 
-        return doInTransaction(entityManager -> orderRepositoryImpl.findOrdersByRoomIdAndOrderType(entityManager, roomId, orderTypeId));
+        return doInTransaction(entityManager ->
+                orderRepositoryImpl.findOrdersByRoomIdAndOrderType(entityManager, roomId, orderTypeId))
+
+                ;
     }
 
-    public List<InvoiceItem> getInvoiceItems(Order order) {
+    public List<InvoiceItem> getInvoiceItems(OrderDTO order) {
 
-        List<Booking> bookings = order.getBookings();
+        List<BookingViewDTO> bookings = order.getBookings();
         String unitBookingType = getUnitBookingType(bookings.get(0).getBookingType());
         List<InvoiceItem> items = new ArrayList<>();
         int index = 1;
@@ -344,13 +371,13 @@ public class OrderService extends Service {
                 .count();
 
         int doubleRooms = (int) bookings.stream()
-                .filter(e -> e.getRoom().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
+                .filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
                 .count();
 
         if (singleRooms > 0) {
             double unitPrice = bookings.stream().filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
                     .findFirst()
-                    .map(e -> bookingService.getPriceFromBooking(e)).orElse(0.0);
+                    .map(bookingService::getPriceFromBooking).orElse(0.0);
             InvoiceItem singleRoomItem = new InvoiceItem(
                     index++,
                     "Phòng đơn",
@@ -364,7 +391,7 @@ public class OrderService extends Service {
         if (doubleRooms > 0) {
             double unitPrice = bookings.stream().filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
                     .findFirst()
-                    .map(e -> bookingService.getPriceFromBooking(e)).orElse(0.0);
+                    .map(bookingService::getPriceFromBooking).orElse(0.0);
             InvoiceItem doubleRoomItem = new InvoiceItem(
                     index++,
                     "Phòng đôi",
@@ -375,9 +402,9 @@ public class OrderService extends Service {
             items.add(doubleRoomItem);
         }
 
-        List<OrderDetail> orderDetails = this.orderDetailsService.getOrderDetailsByOrderId(order.getOrderId());
+        List<OrderDetailDTO> orderDetails = this.orderDetailsService.getOrderDetailsByOrderId(order.getOrderId());
 
-        for (OrderDetail orderDetail : orderDetails) {
+        for (OrderDetailDTO orderDetail : orderDetails) {
             InvoiceItem amenityItem = new InvoiceItem(
                     index++,
                     orderDetail.getAmenity().getNameAmenity(),
@@ -389,8 +416,8 @@ public class OrderService extends Service {
             items.add(amenityItem);
         }
 
-        List<SurchargeDetail> surchargeDetails = this.surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
-        for (SurchargeDetail surchargeDetail : surchargeDetails) {
+        List<SurchargeDetailDTO> surchargeDetails = this.surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
+        for (SurchargeDetailDTO surchargeDetail : surchargeDetails) {
             InvoiceItem surchargeItem = new InvoiceItem(
                     index++,
                     surchargeDetail.getSurcharge().getName(),
@@ -414,10 +441,11 @@ public class OrderService extends Service {
         };
     }
 
-    public List<Order> getOrdersUnPendingByKeyWord(String keyword) {
+    public List<OrderDTO> getOrdersUnPendingByKeyWord(String keyword) {
 
 //        return orderRepositoryImpl.findOrdersUnPendingByKeyWord(keyword);
-        return doInTransaction(entityManager -> orderRepositoryImpl.findOrdersUnPendingByKeyWord(entityManager, keyword));
+        return doInTransaction(entityManager -> orderRepositoryImpl.findOrdersUnPendingByKeyWord(entityManager, keyword)).stream().map(orderMapper::toOrderDTO)
+                .toList();
     }
 
     public boolean addSurchargeToOrder(long orderId, long surchargeAmount) {

@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface EmployeeRepository extends Repository<Employee, Long> {
 
+    Employee validateManager(EntityManager em, String username, String password);
+
     List<Employee> findAllByRoleId(EntityManager em, String roleId);
 
     Employee findByCitizenId(EntityManager em, String citizenId);
@@ -16,4 +18,6 @@ public interface EmployeeRepository extends Repository<Employee, Long> {
     int count(EntityManager em);
 
     Employee findByAccountId(EntityManager em, String accountId);
+
+
 }

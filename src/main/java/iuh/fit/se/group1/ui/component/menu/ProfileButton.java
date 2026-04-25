@@ -4,19 +4,18 @@
  */
 package iuh.fit.se.group1.ui.component.menu;
 
-import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Button;
-import iuh.fit.se.group1.ui.component.custom.CircleLabel;
 import iuh.fit.se.group1.util.Constants;
-import java.awt.Color;
+
 import java.awt.Cursor;
 import javax.swing.border.EmptyBorder;
+
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
 /**
- *
  * @author THIS PC
  */
 public class ProfileButton extends javax.swing.JPanel {
@@ -31,11 +30,12 @@ public class ProfileButton extends javax.swing.JPanel {
         btnSignOut.setText("");
         btnSignOut.setIcon(FontIcon.of(FontAwesomeSolid.SIGN_OUT_ALT, 18, Constants.FOREGROUND_COLOR_MENU));
         btnSignOut.setBackground(Constants.BACKGROUND_COLOR_MENU);
-        btnSignOut.setBorder(new EmptyBorder(10,0,0,0));
+        btnSignOut.setBorder(new EmptyBorder(10, 0, 0, 0));
         btnSignOut.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lblAvartar.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
-    public void setEmployeeInfo(Employee employee) {
+
+    public void setEmployeeInfo(EmployeeDTO employee) {
         if (employee != null) {
             if (employee.getFullName() != null && !employee.getFullName().isEmpty()) {
                 lblFullName.setText(employee.getFullName());
@@ -52,6 +52,7 @@ public class ProfileButton extends javax.swing.JPanel {
             }
         }
     }
+
     public void updateAvatar(byte[] avatarBytes) {
         if (avatarBytes != null && avatarBytes.length > 0) {
             lblAvartar.setImageFromBytes(avatarBytes);
@@ -59,22 +60,25 @@ public class ProfileButton extends javax.swing.JPanel {
             lblAvartar.resetToDefault();
         }
     }
+
     public void setFullName(String fullName) {
         if (fullName != null && !fullName.isEmpty()) {
             lblFullName.setText(fullName);
         }
     }
+
     public void setRoleName(String roleName) {
         if (roleName != null && !roleName.isEmpty()) {
             lblRoleName.setText(roleName);
         }
     }
+
     public void resetToDefault() {
         lblFullName.setText("Chưa có tên nhân viên");
         lblRoleName.setText("Chưa có vai trò");
         lblAvartar.resetToDefault();
     }
-    
+
     public Button getBtnSignOut() {
         return btnSignOut;
     }
@@ -86,7 +90,7 @@ public class ProfileButton extends javax.swing.JPanel {
     public AvatarLabel getLblAvartar() {
         return lblAvartar;
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -112,45 +116,45 @@ public class ProfileButton extends javax.swing.JPanel {
         javax.swing.GroupLayout lblAvartarLayout = new javax.swing.GroupLayout(lblAvartar);
         lblAvartar.setLayout(lblAvartarLayout);
         lblAvartarLayout.setHorizontalGroup(
-            lblAvartarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 72, Short.MAX_VALUE)
+                lblAvartarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 72, Short.MAX_VALUE)
         );
         lblAvartarLayout.setVerticalGroup(
-            lblAvartarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                lblAvartarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblAvartar, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblFullName, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                .addComponent(btnSignOut, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblAvartar, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(7, 7, 7)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblFullName, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                                .addComponent(btnSignOut, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblAvartar, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSignOut, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblFullName)))
-                        .addGap(0, 8, Short.MAX_VALUE)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(16, 16, 16)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblAvartar, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(btnSignOut, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(12, 12, 12)
+                                                                .addComponent(lblRoleName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(lblFullName)))
+                                                .addGap(0, 8, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

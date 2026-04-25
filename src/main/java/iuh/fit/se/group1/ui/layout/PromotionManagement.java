@@ -4,23 +4,17 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.entity.Amenity;
-import iuh.fit.se.group1.entity.Promotion;
-import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.dto.PromotionDTO;
 import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.service.PromotionService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
-import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
@@ -63,10 +57,10 @@ public class PromotionManagement extends javax.swing.JPanel {
         loadTable(promotionService.getAllPromotions());
     }
 
-    private void loadTable(java.util.List<Promotion> promotions) {
+    private void loadTable(java.util.List<PromotionDTO> promotions) {
         DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
         model.setRowCount(0);
-        for (Promotion promotion : promotions) {
+        for (PromotionDTO promotion : promotions) {
             model.addRow(new Object[]{
                     promotion.getPromotionId(),
                     promotion.getPromotionName(),
@@ -97,7 +91,7 @@ public class PromotionManagement extends javax.swing.JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 ImportExcelService importService = new ImportExcelService();
-                List<Promotion> imported = importService.importPromotionsFromExcel(file);
+                List<PromotionDTO> imported = importService.importPromotionsFromExcel(file);
                 if (imported != null && !imported.isEmpty()) {
                     promotionService.getAllPromotions().addAll(imported);
                     loadTable(promotionService.getAllPromotions());
@@ -147,7 +141,7 @@ public class PromotionManagement extends javax.swing.JPanel {
             public void onEdit(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
                 Long id = (Long) model.getValueAt(row, 0);
-                Promotion promotionFind = promotionService.getPromotionById(id);
+                PromotionDTO promotionFind = promotionService.getPromotionById(id);
 
                 InfoPromotionModal modal = new InfoPromotionModal();
                 modal.getLblTitle().setText("Cập nhật khuyến mãi");
@@ -169,7 +163,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                             return;
                         }
 
-                        Promotion promotion = new Promotion();
+                        PromotionDTO promotion = new PromotionDTO();
                         promotion.setPromotionId(id);
                         promotion.setPromotionName(result.name);
                         promotion.setMinOrderAmount(result.discountPrice);
@@ -178,7 +172,7 @@ public class PromotionManagement extends javax.swing.JPanel {
                         promotion.setStartDate(result.startDate);
                         promotion.setEndDate(result.endDate);
 
-                        Promotion entitySave = promotionService.updatePromotion(promotion);
+                        PromotionDTO entitySave = promotionService.updatePromotion(promotion);
 
                         if (entitySave == null) {
                             Message.showMessage("Lỗi", "Không thể cập nhật khuyến mãi!");
@@ -367,7 +361,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         }
 
         try {
-            Promotion promotion = new Promotion();
+            PromotionDTO promotion = new PromotionDTO();
             promotion.setPromotionName(result.name);
             promotion.setMinOrderAmount(result.discountPrice);
             promotion.setDiscountPercent(result.discountPercent);
@@ -375,7 +369,7 @@ public class PromotionManagement extends javax.swing.JPanel {
             promotion.setStartDate(result.startDate);
             promotion.setEndDate(result.endDate);
 
-            Promotion entitySave = promotionService.createPromotion(promotion);
+            PromotionDTO entitySave = promotionService.createPromotion(promotion);
 
             if (entitySave == null) {
                 Message.showMessage("Lỗi", "Không thể thêm khuyến mãi!");

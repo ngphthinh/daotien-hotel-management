@@ -3,9 +3,12 @@ package iuh.fit.se.group1.service;
 import java.text.Normalizer;
 import java.util.List;
 
+import iuh.fit.se.group1.dto.AccountDTO;
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.Role;
+import iuh.fit.se.group1.mapper.EmployeeMapper;
 import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.util.PropertiesReader;
@@ -18,10 +21,13 @@ public class EmployeeService extends Service {
     private final AccountService accountService;
     private final RoleService roleService;
 
+    private final EmployeeMapper employeeMapper;
+
     private final OrderRepositoryImpl orderRepository;
 
 
     public EmployeeService() {
+        this.employeeMapper = new EmployeeMapper();
         this.accountService = new AccountService();
         this.roleService = new RoleService();
         this.employeeRepositoryImpl = new EmployeeRepositoryImpl();
@@ -33,11 +39,21 @@ public class EmployeeService extends Service {
         return doInTransaction(employeeRepositoryImpl::count);
     }
 
+    public EmployeeDTO getEmployeeByAccountId(String accountId) {
+        if (accountId == null) {
+            return null;
+        }
+        return doInTransaction(em -> employeeMapper.toDTO(employeeRepositoryImpl.findByAccountId(em, accountId)));
+    }
 
-    public Employee createEmployee(Employee employee, String roleId) {
+
+    public EmployeeDTO createEmployee(EmployeeDTO employeeDTO, String roleId) {
 
         return doInTransaction(entityManager -> {
-            Role role = roleService.getRoleById(entityManager, roleId);
+
+            Employee employee = employeeMapper.toEmployee(employeeDTO);
+
+            Role role = roleService.getRoleEntityById(entityManager, roleId);
             if (role == null) {
                 throw new IllegalArgumentException("Invalid role ID: " + roleId);
             }
@@ -54,21 +70,21 @@ public class EmployeeService extends Service {
             Employee employeeSave = employeeRepositoryImpl.save(entityManager, employee);
 
             // generate username
-            String username = generateUsername(employeeSave);
+            String username = generateUsername(employeeDTO);
             accountSave.setUsername(username);
 
             accountService.updateAccount(entityManager, accountSave);
 
-            return employeeSave;
+            return employeeMapper.toDTO(employeeSave);
         });
     }
 
-    public Employee getEmployeeByCitizenId(String citizenId) {
+    public EmployeeDTO getEmployeeByCitizenId(String citizenId) {
 //        return employeeRepositoryImpl.findByCitizenId(citizenId);
-        return doInTransaction(entityManager -> employeeRepositoryImpl.findByCitizenId(entityManager, citizenId));
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByCitizenId(entityManager, citizenId)));
     }
 
-    private String generateUsername(Employee entitySave) {
+    private String generateUsername(EmployeeDTO entitySave) {
         String fullName = entitySave.getFullName();
 
         String normalized = Normalizer.normalize(fullName, Normalizer.Form.NFD);
@@ -100,34 +116,36 @@ public class EmployeeService extends Service {
 //        employeeRepositoryImpl.deleteById(employeeId);
 //        doInTransactionVoid(entityManager -> employeeRepositoryImpl.deleteById(entityManager, employeeId));
 
-    public List<Employee> getAllEmployees() {
+    public List<EmployeeDTO> getAllEmployees() {
 //        return employeeRepositoryImpl.findAll();
-        return doInTransaction(employeeRepositoryImpl::findAll);
+        return doInTransaction(employeeRepositoryImpl::findAll).stream().map(employeeMapper::toDTO).toList();
     }
 
 
-    public Employee updateEmployee(Employee employee) {
+    public EmployeeDTO updateEmployee(EmployeeDTO employee) {
 
 //        return employeeRepositoryImpl.update(employee);
-        return doInTransaction(entityManager -> employeeRepositoryImpl.update(entityManager, employee));
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.update(entityManager, employeeMapper.toEmployee(employee))));
     }
 
-    public List<Employee> getEmployeeByKeyword(String keyword) {
+    public List<EmployeeDTO> getEmployeeByKeyword(String keyword) {
 //        return employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(keyword);
-        return doInTransaction(entityManager -> employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(entityManager, keyword));
+        return doInTransaction(entityManager -> employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(entityManager, keyword)).stream().map(employeeMapper::toDTO).toList();
     }
 
-    public Employee getEmployeeById(Long employeeId) {
+    public EmployeeDTO getEmployeeById(Long employeeId) {
 //        return employeeRepositoryImpl.findById(employeeId);
-        return doInTransaction(entityManager -> employeeRepositoryImpl.findById(entityManager, employeeId));
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findById(entityManager, employeeId)));
     }
 
-    public Employee existsByCitizenId(String citizenId) {
+    public EmployeeDTO existsByCitizenId(String citizenId) {
 //        return employeeRepositoryImpl.findByCitizenId(citizenId);
-        return doInTransaction(entityManager -> employeeRepositoryImpl.findByCitizenId(entityManager, citizenId));
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByCitizenId(entityManager, citizenId)));
     }
 
-    public List<Employee> findAllByRoleId(String string) {
-        return doInTransaction(entityManager -> employeeRepositoryImpl.findAllByRoleId(entityManager, string));
+    public List<EmployeeDTO> findAllByRoleId(String string) {
+        return doInTransaction(entityManager -> employeeRepositoryImpl.findAllByRoleId(entityManager, string)).stream().map(employeeMapper::toDTO).toList();
     }
+
+
 }

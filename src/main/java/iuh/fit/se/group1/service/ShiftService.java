@@ -5,12 +5,15 @@
  */
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.ShiftDTO;
 import iuh.fit.se.group1.entity.Shift;
+import iuh.fit.se.group1.mapper.ShiftMapper;
 import iuh.fit.se.group1.repository.jpa.ShiftRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description
@@ -23,56 +26,35 @@ public class ShiftService extends Service {
     private static final Logger log = LoggerFactory.getLogger(ShiftService.class);
 
     private final ShiftRepositoryImpl shiftRepositoryImpl;
+    private final ShiftMapper shiftMapper = new ShiftMapper();
 
     public ShiftService() {
         this.shiftRepositoryImpl = new ShiftRepositoryImpl();
     }
 
-    // Create a new Shift
-    public Shift createShift(Shift shift) {
-        log.info("Creating new Shift: {}", shift.getName());
-        Shift savedShift = doInTransaction(entityManager -> shiftRepositoryImpl.save(entityManager, shift));
-//        Shift savedShift = shiftRepositoryImpl.save(shift);
-        log.info("Shift created with ID: {}", savedShift.getShiftId());
-        return savedShift;
+    public ShiftDTO createShift(ShiftDTO shift) {
+        Shift savedShift = doInTransaction(entityManager -> shiftRepositoryImpl.save(entityManager, shiftMapper.toEntity(shift)));
+        return shiftMapper.toDTO(savedShift);
     }
 
-    // Find a Shift by ID
-    public Shift getShiftById(Long id) {
-        log.info("Fetching Shift by ID: {}", id);
-//        Shift shift = shiftRepositoryImpl.findById(id);
+    public ShiftDTO getShiftById(Long id) {
         Shift shift = doInTransaction(entityManager -> shiftRepositoryImpl.findById(entityManager, id));
-        if (shift != null) {
-            log.info("Shift found: {}", shift.getName());
-        } else {
-            log.warn("Shift with ID {} not found", id);
-        }
-        return shift;
+        return shiftMapper.toDTO(shift);
     }
 
     // Update an existing Shift
-    public Shift updateShift(Shift shift) {
-        log.info("Updating Shift ID {}: {}", shift.getShiftId(), shift.getName());
-//        Shift updatedShift = shiftRepositoryImpl.update(shift);
-        Shift updatedShift = doInTransaction(entityManager -> shiftRepositoryImpl.update(entityManager, shift));
-        log.info("Shift updated successfully: ID {}", updatedShift.getShiftId());
-        return updatedShift;
+    public ShiftDTO updateShift(ShiftDTO shift) {
+        Shift updatedShift = doInTransaction(entityManager -> shiftRepositoryImpl.update(entityManager, shiftMapper.toEntity(shift)));
+        return shiftMapper.toDTO(updatedShift);
     }
 
     // Delete a Shift by ID
     public void deleteShift(Long id) {
-        log.info("Deleting Shift with ID: {}", id);
-//        shiftRepositoryImpl.deleteById(id);
         doInTransactionVoid(entityManager -> shiftRepositoryImpl.deleteById(entityManager, id));
-        log.info("Shift deleted successfully: ID {}", id);
     }
 
-    // Get all Shifts
-    public List<Shift> getAllShifts() {
-//        return shiftRepositoryImpl.findAll();
-        log.info("Fetching all Shifts");
+    public List<ShiftDTO> getAllShifts() {
         List<Shift> shifts = doInTransaction(shiftRepositoryImpl::findAll);
-        log.info("Total Shifts found: {}", shifts.size());
-        return shifts;
+        return shifts.stream().map(shiftMapper::toDTO).collect(Collectors.toList());
     }
 }

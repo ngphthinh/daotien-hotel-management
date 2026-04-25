@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.config.AppLogger;
+import iuh.fit.se.group1.dto.OrderDTO;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.util.Constants;
 import iuh.fit.se.group1.util.MoneyToTextUtil;
@@ -27,6 +28,7 @@ public class JaspersoftExportService {
 
     /**
      * Get the directory where the JAR file is located
+     *
      * @return Path to the JAR directory, or current working directory if not running from JAR
      */
     private static String getJarDirectory() {
@@ -97,7 +99,8 @@ public class JaspersoftExportService {
     }
 
     public void exportOrderToPdf(Long orderId, String promotion, String paymentType, String totalPricePayment, String employeeName) {
-        Order order = orderService.getOrderById(orderId);
+        OrderDTO order = orderService.getOrderById(orderId);
+        System.out.println(order);
         String rooms = order.getBookings().stream()
                 .map(e -> e.getRoom().getRoomNumber()).collect(Collectors.joining(", "));
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -163,7 +166,7 @@ public class JaspersoftExportService {
 
     }
 
-    private JRBeanCollectionDataSource getListInvoice(Order order) {
+    private JRBeanCollectionDataSource getListInvoice(OrderDTO order) {
         return new JRBeanCollectionDataSource(orderService.getInvoiceItems(order));
     }
 

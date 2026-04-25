@@ -4,25 +4,22 @@
  */
 package iuh.fit.se.group1.ui.component.paymentv2;
 
-import iuh.fit.se.group1.entity.Employee;
-import iuh.fit.se.group1.entity.Order;
-import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.dto.OrderDTO;
 import iuh.fit.se.group1.service.OrderDetailService;
 import iuh.fit.se.group1.service.OrderService;
 import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
-import iuh.fit.se.group1.util.Constants;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author THIS PC
  */
 public class PaymentPagev2 extends javax.swing.JPanel {
@@ -32,14 +29,11 @@ public class PaymentPagev2 extends javax.swing.JPanel {
     private final OrderDetailService orderDetailService = new OrderDetailService();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private PaymentMain paymentMain;
+    @Getter
+    private EmployeeDTO currentEmployee;
 
-    private Employee currentEmployee;
 
-    public Employee getCurrentEmployee() {
-        return currentEmployee;
-    }
-
-    public void setCurrentEmployee(Employee currentEmployee) {
+    public void setCurrentEmployee(EmployeeDTO currentEmployee) {
         this.currentEmployee = currentEmployee;
         paymentMain.setCurrentEmployee(currentEmployee);
     }
@@ -60,7 +54,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
         headerShift1.getLblSubTitle().setText("");
         headerShift1.getLblTile().setText("Thanh toán hóa đơn");
-        btnNext.addActionListener(e ->{
+        btnNext.addActionListener(e -> {
             int row = tbl.getSelectedRow();
             if (row == -1) {
                 CustomDialog.showMessage(
@@ -74,13 +68,13 @@ public class PaymentPagev2 extends javax.swing.JPanel {
             }
 
 
-            Long orderId = Long.parseLong(tbl.getValueAt(row,0).toString());
+            Long orderId = Long.parseLong(tbl.getValueAt(row, 0).toString());
 
             sequencePayment1.setActiveStep(1);
-            
+
             // set hóa đơn cho bước tiếp theo
-            
-            paymentMain.setOrder(orderId, orderService,orderDetailService, surchargeDetailService);
+
+            paymentMain.setOrder(orderId, orderService, orderDetailService, surchargeDetailService);
             scrollPaneWin111.setViewportView(paymentMain);
             SwingUtilities.invokeLater(() ->
                     scrollPaneWin111.getViewport().setViewPosition(new Point(0, 0))
@@ -88,7 +82,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
         });
 
-        paymentMain.getBtnPrev().addActionListener(e->{
+        paymentMain.getBtnPrev().addActionListener(e -> {
             backStep1();
         });
 
@@ -112,7 +106,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
     }
 
-    public void setOnPayment (){
+    public void setOnPayment() {
         sequencePayment1.setActiveStep(0);
         loadDataTable();
         scrollPaneWin111.setViewportView(jPanel1);
@@ -132,14 +126,14 @@ public class PaymentPagev2 extends javax.swing.JPanel {
     private void findPendingOrders(String keyword) {
         tbl.clearData();
 
-        for (Order order : orderService.getUnpaidOrdersByKeyword(keyword)) {
+        for (OrderDTO order : orderService.getUnpaidOrdersByKeyword(keyword)) {
             displayOrderOnTable(order);
         }
     }
 
-    private void displayOrderOnTable(Order order) {
+    private void displayOrderOnTable(OrderDTO order) {
         String rooms = order.getBookings().stream()
-                .map(e ->e.getRoom().getRoomNumber())
+                .map(e -> e.getRoom().getRoomNumber())
                 .collect(Collectors.joining(", "));
 
         String checkIn = order.getBookings().get(0).getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -158,7 +152,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
     private void loadDataTable() {
         tbl.clearData();
-        for (Order order : orderService.getUnpaidOrders()) {
+        for (OrderDTO order : orderService.getUnpaidOrders()) {
             displayOrderOnTable(order);
         }
     }
@@ -209,34 +203,34 @@ public class PaymentPagev2 extends javax.swing.JPanel {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(scrollPaneWin112, javax.swing.GroupLayout.PREFERRED_SIZE, 848, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(search1, javax.swing.GroupLayout.PREFERRED_SIZE, 631, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(258, 258, 258))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(283, 283, 283))))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap(12, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(scrollPaneWin112, javax.swing.GroupLayout.PREFERRED_SIZE, 848, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(search1, javax.swing.GroupLayout.PREFERRED_SIZE, 631, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addGap(258, 258, 258))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(283, 283, 283))))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(search1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPaneWin112, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(77, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGap(24, 24, 24)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(search1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(scrollPaneWin112, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         scrollPaneWin111.setViewportView(jPanel1);
@@ -244,25 +238,25 @@ public class PaymentPagev2 extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(79, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(sequencePayment1, javax.swing.GroupLayout.DEFAULT_SIZE, 871, Short.MAX_VALUE)
-                    .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(80, Short.MAX_VALUE))
-            .addComponent(headerShift1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap(79, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(sequencePayment1, javax.swing.GroupLayout.DEFAULT_SIZE, 871, Short.MAX_VALUE)
+                                        .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                .addContainerGap(80, Short.MAX_VALUE))
+                        .addComponent(headerShift1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(headerShift1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(sequencePayment1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 541, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(37, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(17, 17, 17)
+                                .addComponent(headerShift1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(sequencePayment1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(12, 12, 12)
+                                .addComponent(scrollPaneWin111, javax.swing.GroupLayout.PREFERRED_SIZE, 541, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(37, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

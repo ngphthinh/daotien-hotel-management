@@ -1,12 +1,10 @@
 package iuh.fit.se.group1.ui.component.paymentv2;
 
 
-import iuh.fit.se.group1.dto.RoomSelection;
-import iuh.fit.se.group1.entity.Booking;
+import iuh.fit.se.group1.dto.BookingViewDTO;
 import iuh.fit.se.group1.util.Constants;
 
 import javax.swing.*;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -110,8 +108,8 @@ public class CustomTableRoom extends JTable {
 
         // Sample data (matching columns)
         Object[][] sampleData = {
-                { false, "101", "01/01/2025 14:00", "02/01/2025 12:00", 100000.0 },
-                { true, "102", "01/01/2025 15:00", "02/01/2025 12:00", 150000.0 },
+                {false, "101", "01/01/2025 14:00", "02/01/2025 12:00", 100000.0},
+                {true, "102", "01/01/2025 15:00", "02/01/2025 12:00", 150000.0},
         };
 
         for (Object[] row : sampleData) {
@@ -158,7 +156,7 @@ public class CustomTableRoom extends JTable {
     /**
      * Add new row to table
      */
-    public void addRow(boolean selected, Booking booking, double price) {
+    public void addRow(boolean selected, BookingViewDTO booking, double price) {
         DefaultTableModel model = (DefaultTableModel) getModel();
         String checkInRoom = booking.getCheckInDate()
                 .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
@@ -168,7 +166,7 @@ public class CustomTableRoom extends JTable {
                 .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 
 
-        model.addRow(new Object[] { selected, booking ,checkInRoom,checkOutRoom, price });
+        model.addRow(new Object[]{selected, booking, checkInRoom, checkOutRoom, price});
     }
 
     /**
@@ -182,14 +180,14 @@ public class CustomTableRoom extends JTable {
     /**
      * Get selected services
      */
-    public java.util.List<Booking> getSelectedRoom() {
-        java.util.List<Booking> selectedRoom = new java.util.ArrayList<>();
+    public java.util.List<BookingViewDTO> getSelectedRoom() {
+        java.util.List<BookingViewDTO> selectedRoom = new java.util.ArrayList<>();
         DefaultTableModel model = (DefaultTableModel) getModel();
 
         for (int i = 0; i < model.getRowCount(); i++) {
             Boolean isSelected = (Boolean) model.getValueAt(i, 0);
             if (isSelected != null && isSelected) {
-                Booking selected = (Booking) model.getValueAt(i, 1);
+                BookingViewDTO selected = (BookingViewDTO) model.getValueAt(i, 1);
                 selectedRoom.add(selected);
             }
         }
@@ -226,7 +224,7 @@ public class CustomTableRoom extends JTable {
     class AlternatingRowRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -260,7 +258,7 @@ public class CustomTableRoom extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -294,7 +292,7 @@ public class CustomTableRoom extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -330,7 +328,7 @@ public class CustomTableRoom extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             if (value instanceof Number) {
                 value = currencyFormat.format(((Number) value).longValue());
@@ -369,7 +367,7 @@ public class CustomTableRoom extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             if (isSelected) {
                 setBackground(SELECTION_COLOR);
@@ -401,7 +399,7 @@ public class CustomTableRoom extends JTable {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
 
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 

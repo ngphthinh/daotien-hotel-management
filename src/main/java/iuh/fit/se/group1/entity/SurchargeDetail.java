@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
+@Builder
 @IdClass(SurchargeDetail.SurchargeDetailID.class)
 public class SurchargeDetail {
 

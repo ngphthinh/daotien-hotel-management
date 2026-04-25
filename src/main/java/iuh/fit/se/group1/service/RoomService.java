@@ -1,13 +1,16 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.RoomDTO;
+import iuh.fit.se.group1.dto.RoomViewDTO;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.RoomStatus;
+import iuh.fit.se.group1.mapper.RoomMapper;
 import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.RoomTypeRepositoryImpl;
+import iuh.fit.se.group1.util.Constants;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,20 +18,23 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RoomService extends Service {
     private final RoomRepositoryImpl roomRepository;
     private final RoomTypeRepositoryImpl roomTypeRepositoryImpl = new RoomTypeRepositoryImpl();
-    private static final String SINGLE_ROOM_TYPE = "SINGLE";
-    private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
+    private final RoomMapper roomMapper;
     private final OrderService orderService = new OrderService();
 
     public RoomService() {
         this.roomRepository = new RoomRepositoryImpl();
+        this.roomMapper = new RoomMapper();
     }
 
-    public Room createRoom(Room room) {
+    public RoomViewDTO createRoom(RoomViewDTO roomViewDTO) {
         return doInTransaction(entityManager -> {
+            Room room = roomMapper.toRoom(roomViewDTO);
+
             RoomType roomType = roomTypeRepositoryImpl.findById(entityManager, room.getRoomType().getRoomTypeId()); // ensure room type exists
 
 
@@ -36,96 +42,55 @@ public class RoomService extends Service {
 
             room.setRoomType(roomType);
 
-            return roomRepository.save(entityManager, room);
+            return roomMapper.toRoomDTO(roomRepository.save(entityManager, room));
         });
 
     }
 
     public void deleteRoom(Long roomId) {
 
-//        roomRepository.deleteById(roomId);
         doInTransactionVoid(entityManager -> roomRepository.deleteById(entityManager, roomId));
     }
 
-    public List<Room> getAllRooms() {
-//        return roomRepository.findAll();
-        return doInTransaction(roomRepository::findAll);
+    public List<RoomViewDTO> getAllRooms() {
+        return doInTransaction(roomRepository::findAll).stream().map(roomMapper::toRoomDTO).collect(Collectors.toList());
     }
 
-    public Room updateRoom(Room room) {
-//        return roomRepository.update(room);
-        return doInTransaction(entityManager -> roomRepository.update(entityManager, room));
+    public RoomViewDTO updateRoom(RoomViewDTO room) {
+        Room roomEntity = roomMapper.toRoom(room);
+        return doInTransaction(entityManager -> roomMapper.toRoomDTO(roomRepository.update(entityManager, roomEntity)));
     }
 
 
     public boolean existsByRoomNumber(String roomNumber) {
-//        return roomRepository.existsByRoomNumber(roomNumber);
         return doInTransaction(entityManager -> roomRepository.existsByRoomNumber(entityManager, roomNumber));
     }
 
-    public List<Room> getRoomByKeyword(String keyword) {
-//        return roomRepository.findByRoomNumberOrId(keyword);
-        return doInTransaction(entityManager -> roomRepository.findByRoomNumberOrId(entityManager, keyword));
+    public List<RoomViewDTO> getRoomByKeyword(String keyword) {
+        return doInTransaction(entityManager -> roomRepository.findByRoomNumberOrId(entityManager, keyword)).stream().map(roomMapper::toRoomDTO).toList();
     }
 
-    public List<Room> getRoomByStatusOrRoomType(String roomTypeId, RoomStatus status) {
-//        return roomRepository.findRoomByStatusAndRoomType(roomTypeId, status);
-        return doInTransaction(entityManager -> roomRepository.findRoomByStatusAndRoomType(entityManager, roomTypeId, status));
-    }
-
-    public RoomDTO toRoomDTO(RoomType rt) {
-        if (rt == null) {
-            return null;
-        }
-        int capacity = rt.getRoomTypeId().equals(SINGLE_ROOM_TYPE) ? 2 : 4;
-
-
-        return new RoomDTO(
-                rt.getRoomTypeId(),
-                capacity,
-                rt.getHourlyRate(),
-                rt.getDailyRate(),
-                rt.getOvernightRate(),
-                rt.getAdditionalHourRate()
-        );
+    public List<RoomViewDTO> getRoomByStatusOrRoomType(String roomTypeId, RoomStatus status) {
+        return doInTransaction(entityManager -> roomRepository.findRoomByStatusAndRoomType(entityManager, roomTypeId, status)).stream().map(roomMapper::toRoomDTO).toList();
     }
 
 
     public Map<RoomDTO, Long> countAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
-//        List<Room> rooms = roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
-//
-//        RoomType singleRoomType = roomTypeRepositoryImpl.findById(SINGLE_ROOM_TYPE);
-//        RoomType doubleRoomType = roomTypeRepositoryImpl.findById(DOUBLE_ROOM_TYPE);
-//
-//        RoomDTO singleRoom = toRoomDTO(singleRoomType);
-//        RoomDTO doubleRoom = toRoomDTO(doubleRoomType);
-//
-//        Long singleRooms = rooms.stream()
-//                .filter(room -> room.getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
-//                .count();
-//
-//        Long doubleRooms = rooms.stream()
-//                .filter(room -> room.getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
-//                .count();
-//
-//        Map<RoomDTO, Long> map = new LinkedHashMap<>();
-//        map.put(singleRoom, singleRooms);
-//        map.put(doubleRoom, doubleRooms);
-//        return map;
+
         List<Room> rooms = doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE));
 
-        RoomType singleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, SINGLE_ROOM_TYPE));
-        RoomType doubleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, DOUBLE_ROOM_TYPE));
+        RoomType singleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, Constants.SINGLE_ROOM_TYPE));
+        RoomType doubleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, Constants.DOUBLE_ROOM_TYPE));
 
-        RoomDTO singleRoom = toRoomDTO(singleRoomType);
-        RoomDTO doubleRoom = toRoomDTO(doubleRoomType);
+        RoomDTO doubleRoom = roomMapper.toRoomDTO(doubleRoomType);
+        RoomDTO singleRoom = roomMapper.toRoomDTO(singleRoomType);
 
         Long singleRooms = rooms.stream()
-                .filter(room -> room.getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
+                .filter(room -> room.getRoomType().getRoomTypeId().equals(Constants.SINGLE_ROOM_TYPE))
                 .count();
 
         Long doubleRooms = rooms.stream()
-                .filter(room -> room.getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
+                .filter(room -> room.getRoomType().getRoomTypeId().equals(Constants.DOUBLE_ROOM_TYPE))
                 .count();
 
         Map<RoomDTO, Long> map = new LinkedHashMap<>();
@@ -274,14 +239,14 @@ public class RoomService extends Service {
         return result;
     }
 
-    public List<Room> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
+    public List<RoomViewDTO> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
 //        return roomRepository.findAvailableRooms(checkIn, checkOut, RoomStatus.AVAILABLE);
-        return doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE));
+        return doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE)).stream().map(roomMapper::toRoomDTO).toList();
     }
 
-    public Room getRoomByRoomId(Long roomId) {
+    public RoomViewDTO getRoomByRoomId(Long roomId) {
 //        return roomRepository.findById(roomId);
-        return doInTransaction(entityManager -> roomRepository.findById(entityManager, roomId));
+        return doInTransaction(entityManager -> roomMapper.toRoomDTO(roomRepository.findById(entityManager, roomId)));
     }
 
     public boolean canDeleteRoom(Long roomId) {
@@ -356,7 +321,7 @@ public class RoomService extends Service {
             for (Order order : ordersUsingRoom) {
                 BookingService bookingService = new BookingService();
 
-                List<Booking> bookings = doInTransaction(entityManager -> bookingService.getBookingsByOrderId(entityManager, order.getOrderId()));
+                List<Booking> bookings = doInTransaction(entityManager -> bookingService.getBookingsEntityByOrderId(entityManager, order.getOrderId()));
 
                 Booking bookingToReplace = bookings.stream()
                         .filter(b -> b.getRoom().getRoomId().equals(roomId))
@@ -391,20 +356,20 @@ public class RoomService extends Service {
         doInTransactionVoid(entityManager -> roomRepository.updateRoomStatusBatch(entityManager, roomIds, roomStatus));
     }
 
-    public List<Room> getRoomsByOrderIdAndType(long orderId, String bookingType) {
+    public List<RoomViewDTO> getRoomsByOrderIdAndType(long orderId, String bookingType) {
 //        return roomRepository.getRoomsByOrderIdAndType(orderId, bookingType);
-        return doInTransaction(entityManager -> roomRepository.getRoomsByOrderIdAndType(entityManager, orderId, bookingType));
+        return doInTransaction(entityManager -> roomRepository.getRoomsByOrderIdAndType(entityManager, orderId, bookingType)).stream().map(roomMapper::toRoomDTO).toList();
     }
 
-    public List<Room> getRoomsByBookingId(long bookingId) {
+    public List<RoomViewDTO> getRoomsByBookingId(long bookingId) {
 //        return roomRepository.getRoomsByBookingId(bookingId);
-        return doInTransaction(entityManager -> roomRepository.getRoomsByBookingId(entityManager, bookingId));
+        return doInTransaction(entityManager -> roomRepository.getRoomsByBookingId(entityManager, bookingId)).stream().map(roomMapper::toRoomDTO).toList();
 
     }
 
-    public List<Room> getAvailableRoomsByType(String roomTypeId) {
+    public List<RoomViewDTO> getAvailableRoomsByType(String roomTypeId) {
 //        return roomRepository.getAvailableRoomsByType(roomTypeId);
-        return doInTransaction(entityManager -> roomRepository.getAvailableRoomsByType(entityManager, roomTypeId));
+        return doInTransaction(entityManager -> roomRepository.getAvailableRoomsByType(entityManager, roomTypeId)).stream().map(roomMapper::toRoomDTO).toList();
     }
 
     public boolean transferRooms(long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds) {

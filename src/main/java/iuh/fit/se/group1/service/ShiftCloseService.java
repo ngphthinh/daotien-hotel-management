@@ -6,9 +6,12 @@
 package iuh.fit.se.group1.service;
 
 
+import iuh.fit.se.group1.dto.EmployeeShiftDTO;
+import iuh.fit.se.group1.dto.ShiftCloseDTO;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.ShiftClose;
+import iuh.fit.se.group1.mapper.ShiftCloseMapper;
 import iuh.fit.se.group1.repository.jpa.ShiftCloseRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository;
 
@@ -25,20 +28,18 @@ import java.util.List;
 public class ShiftCloseService extends Service {
 
     private final ShiftCloseRepositoryImpl repository;
+    private final ShiftCloseMapper shiftCloseMapper;
 
     public ShiftCloseService() {
+        this.shiftCloseMapper = new ShiftCloseMapper();
         this.repository = new ShiftCloseRepositoryImpl();
     }
 
-    public ShiftClose saveShiftClose(ShiftClose shiftClose) {
-//        return repository.save(shiftClose);
-        return doInTransaction(em -> repository.save(em, shiftClose));
+    public ShiftCloseDTO saveShiftClose(ShiftCloseDTO shiftCloseDTO) {
+        ShiftClose shiftClose = shiftCloseMapper.toShiftClose(shiftCloseDTO);
+        return doInTransaction(em -> shiftCloseMapper.toShiftCloseDTO(repository.save(em, shiftClose)));
     }
 
-    public Employee validateManager(String username, String password) {
-//        return repository.validateManager(username, password);
-        return doInTransaction(em -> repository.validateManager(em, username, password));
-    }
 
     // Tìm ShiftClose theo ID
     public ShiftClose getShiftCloseById(Long id) {
@@ -81,9 +82,12 @@ public class ShiftCloseService extends Service {
         return doInTransaction(repository::findAll);
     }
 
-    public List<ShiftClose> getShiftCloseByEmployeeShift(EmployeeShift employeeShift) {
+    public List<ShiftCloseDTO> getShiftCloseByEmployeeShift(Long employeeShiftId) {
 
-        return doInTransaction(em -> repository.findByEmployeeShift(em, employeeShift));
+        return doInTransaction(em -> repository.findByEmployeeShift(em, employeeShiftId)).stream()
+                .map(shiftCloseMapper::toShiftCloseDTO)
+                .toList()
+                ;
     }
 
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {

@@ -5,7 +5,9 @@
  */
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.DenominationDetailDTO;
 import iuh.fit.se.group1.entity.DenominationDetail;
+import iuh.fit.se.group1.mapper.DenominationDetailMapper;
 import iuh.fit.se.group1.repository.jpa.DenominationDetailRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,7 @@ import java.util.List;
 public class DenominationDetailService extends Service {
     private static final Logger log = LoggerFactory.getLogger(DenominationDetailService.class);
     private final DenominationDetailRepositoryImpl repository;
-
+    private final DenominationDetailMapper denominationDetailMapper;
     // Các mệnh giá tiền mặc định (VND)
     private static final List<Long> DEFAULT_DENOMINATIONS = Arrays.asList(
             500000L, 200000L, 100000L, 50000L, 20000L, 10000L, 5000L, 2000L, 1000L
@@ -31,46 +33,50 @@ public class DenominationDetailService extends Service {
 
     public DenominationDetailService() {
         this.repository = new DenominationDetailRepositoryImpl();
+        this.denominationDetailMapper = new DenominationDetailMapper();
     }
 
-    public void saveAll(List<DenominationDetail> details) {
+    public void saveAll(List<DenominationDetailDTO> details) {
         if (details == null || details.isEmpty()) {
             throw new IllegalArgumentException("Details list cannot be null or empty");
         }
-        for (DenominationDetail detail : details) {
+        for (DenominationDetailDTO detail : details) {
             if (detail.getEmployeeShift() == null) {
                 throw new IllegalArgumentException("EmployeeShift cannot be null for detail: " + detail);
             }
         }
+        List<DenominationDetail> detailsEntity = details.stream().map(denominationDetailMapper::toDenominationDetail).toList();
 //        repository.saveBatch(details);
         doInTransactionVoid(em -> {
-            repository.saveBatch(em, details);
+            repository.saveBatch(em, detailsEntity);
         });
     }
 
     /**
      * Lưu mới một chi tiết mệnh giá
      */
-    public DenominationDetail save(DenominationDetail detail) {
+    public DenominationDetailDTO save(DenominationDetailDTO detail) {
         if (detail == null) {
             throw new IllegalArgumentException("DenominationDetail cannot be null");
         }
         if (detail.getEmployeeShift() == null) {
             throw new IllegalArgumentException("EmployeeShift cannot be null");
         }
+        DenominationDetail entity = denominationDetailMapper.toDenominationDetail(detail);
 //        return repository.save(detail);
-        return doInTransaction(em -> repository.save(em, detail));
+        return doInTransaction(em -> denominationDetailMapper.toDTO(repository.save(em, entity)));
     }
 
     /**
      * Cập nhật thông tin mệnh giá
      */
-    public DenominationDetail update(DenominationDetail detail) {
+    public DenominationDetailDTO update(DenominationDetailDTO detail) {
         if (detail == null || detail.getDenominationDetailId() == null) {
             throw new IllegalArgumentException("Invalid DenominationDetail to update");
         }
+        DenominationDetail entity = denominationDetailMapper.toDenominationDetail(detail);
 //        return repository.update(detail);
-        return doInTransaction(em -> repository.update(em, detail));
+        return doInTransaction(em -> denominationDetailMapper.toDTO(repository.update(em, entity)));
     }
 
     /**
@@ -87,20 +93,22 @@ public class DenominationDetailService extends Service {
     /**
      * Tìm tất cả
      */
-    public List<DenominationDetail> findAll() {
+    public List<DenominationDetailDTO> findAll() {
 //        return repository.findAll();
-        return doInTransaction(repository::findAll);
+        return doInTransaction(repository::findAll).stream()
+                .map(denominationDetailMapper::toDTO)
+                .toList();
     }
 
     /**
      * Tìm theo ID
      */
-    public DenominationDetail findById(Long id) {
+    public DenominationDetailDTO findById(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Invalid ID");
         }
 //        return repository.findById(id);
-        return doInTransaction(em -> repository.findById(em, id));
+        return doInTransaction(em -> denominationDetailMapper.toDTO(repository.findById(em, id)));
     }
 
     /**

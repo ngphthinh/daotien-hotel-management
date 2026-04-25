@@ -24,6 +24,7 @@ import java.util.List;
 @EqualsAndHashCode(of = "orderId")
 @Table(name = "Orders")
 @Entity
+@Builder
 @SQLDelete(sql = "UPDATE Orders SET isDeleted = 1 WHERE orderId = ?")
 @SQLRestriction("isDeleted = 0")
 public class Order {

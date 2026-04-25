@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.dto.EmployeeShiftDTO;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
@@ -11,6 +12,7 @@ import iuh.fit.se.group1.ui.component.paymentv2.PaymentPagev2;
 import iuh.fit.se.group1.ui.component.version.CheckForVersionPanel;
 
 import iuh.fit.se.group1.util.Constants;
+import lombok.Getter;
 import raven.glasspanepopup.GlassPanePopup;
 
 import javax.swing.*;
@@ -47,15 +49,12 @@ public class MainLayout extends JPanel {
 
     private float alpha = 1f;
     private SideBar sideBar;
-    private Employee currentEmployee;
+    @Getter
+    private EmployeeDTO currentEmployee;
 
     public MainLayout() {
         init();
         setOpaque(false);
-    }
-
-    public Employee getCurrentEmployee() {
-        return currentEmployee;
     }
 
     public void setAlpha(float alpha) {
@@ -229,7 +228,7 @@ public class MainLayout extends JPanel {
         final int BUFFER_MINUTES = 10;
 
         // LẤY TẤT CẢ CA TRONG NGÀY HÔM NAY
-        List<EmployeeShift> todayShifts = employeeShiftService.getShiftsByEmployeeAndDate(
+        List<EmployeeShiftDTO> todayShifts = employeeShiftService.getShiftsByEmployeeAndDate(
                 currentEmployee.getEmployeeId(),
                 LocalDate.now()
         );
@@ -241,15 +240,15 @@ public class MainLayout extends JPanel {
         }
 
         //  LỌC RA CÁC CA CHƯA ĐÓNG
-        List<EmployeeShift> openShifts = todayShifts.stream()
-                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift).isEmpty())
+        List<EmployeeShiftDTO> openShifts = todayShifts.stream()
+                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift.getEmployeeShiftId()).isEmpty())
                 .sorted((s1, s2) -> {
                     // Parse string time để sắp xếp
                     java.time.LocalTime t1 = java.time.LocalTime.parse(s1.getShift().getStartTime());
                     java.time.LocalTime t2 = java.time.LocalTime.parse(s2.getShift().getStartTime());
                     return t1.compareTo(t2);
                 })
-                .collect(java.util.stream.Collectors.toList());
+                .toList();
 
         if (openShifts.isEmpty()) {
             Message.showMessage("Thông báo",
@@ -261,10 +260,10 @@ public class MainLayout extends JPanel {
 
         // TÌM CA CÓ THỂ ĐÓNG
         // CHỈ CHO PHÉP ĐÓNG CA ĐANG TRONG GIỜ LÀM VIỆC HOẶC BUFFER TIME
-        EmployeeShift shiftToClose = null;
-        EmployeeShift overdueShift = null;
+        EmployeeShiftDTO shiftToClose = null;
+        EmployeeShiftDTO overdueShift = null;
 
-        for (EmployeeShift shift : openShifts) {
+        for (EmployeeShiftDTO shift : openShifts) {
             try {
                 java.time.LocalTime startTime = java.time.LocalTime.parse(shift.getShift().getStartTime());
                 java.time.LocalTime endTime = java.time.LocalTime.parse(shift.getShift().getEndTime());
@@ -377,7 +376,7 @@ public class MainLayout extends JPanel {
         } else {
 
             // Kiểm tra xem có ca cũ quá hạn chưa đóng không
-            EmployeeShift oldestOpenShift = openShifts.get(0);
+            EmployeeShiftDTO oldestOpenShift = openShifts.get(0);
 
             try {
                 java.time.LocalTime oldestEndTime = java.time.LocalTime.parse(
@@ -398,7 +397,7 @@ public class MainLayout extends JPanel {
                                     "Vui lòng liên hệ quản lý để xử lý.</html>");
                 } else {
                     //  CHƯA ĐẾN GIỜ LÀM CA
-                    EmployeeShift nextShift = openShifts.get(0);
+                    EmployeeShiftDTO nextShift = openShifts.get(0);
                     String nextShiftName = nextShift.getShift().getName();
                     String nextShiftTime = nextShift.getShift().getStartTime() + " - " +
                             nextShift.getShift().getEndTime();
@@ -415,7 +414,7 @@ public class MainLayout extends JPanel {
         }
     }
 
-    private void openCloseShiftPanel(EmployeeShift openShift) {
+    private void openCloseShiftPanel(EmployeeShiftDTO openShift) {
         CloseShift closeShiftPanel = new CloseShift();
         closeShiftPanel.setCurrentEmployeeShift(openShift);
 
@@ -489,7 +488,7 @@ public class MainLayout extends JPanel {
 
     }
 
-    public void setCurrentEmployee(Employee employee) {
+    public void setCurrentEmployee(EmployeeDTO employee) {
         this.currentEmployee = employee;
         sideBar.getFooter1().setEmployeeInfo(employee);
     }

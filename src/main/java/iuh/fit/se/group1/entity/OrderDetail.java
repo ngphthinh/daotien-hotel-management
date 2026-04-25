@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
+@Builder
 @IdClass(OrderDetail.OrderDetailId.class)
 public class OrderDetail {
     private BigDecimal unitPrice;

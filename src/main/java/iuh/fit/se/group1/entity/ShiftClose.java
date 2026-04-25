@@ -15,7 +15,7 @@ import java.util.Objects;
 
 /**
  * @description
- * @author: Nguyen Tran Quoc Viet 
+ * @author: Nguyen Tran Quoc Viet
  * @version: 1.0
  * @created: 31/10/2025
  */
@@ -25,20 +25,22 @@ import java.util.Objects;
 @Getter
 @ToString
 @Entity
+@Builder
 public class ShiftClose {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long shiftCloseId;
     @ManyToOne
     @JoinColumn(name = "employeeShiftId")
     private EmployeeShift employeeShift;
     private BigDecimal totalRevenue;
-    private  BigDecimal cashInDrawer;
+    private BigDecimal cashInDrawer;
     private BigDecimal difference;
     @Column(columnDefinition = "nvarchar(255)")
     private String note;
-    private Long managerId;
+    @ManyToOne
+    @JoinColumn(name = "managerId")
+    private Employee manager;
     private LocalDateTime createdAt;
 
 }

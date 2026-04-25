@@ -1,11 +1,10 @@
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.entity.Room;
-import iuh.fit.se.group1.entity.RoomType;
+import iuh.fit.se.group1.dto.RoomTypeDTO;
+import iuh.fit.se.group1.dto.RoomViewDTO;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.service.RoomTypeService;
-import iuh.fit.se.group1.service.PropertiesService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -15,28 +14,20 @@ import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Properties;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import iuh.fit.se.group1.util.Constants;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
@@ -108,7 +99,7 @@ public class RoomManagement extends javax.swing.JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 ImportExcelService importService = new ImportExcelService();
-                List<Room> imported = importService.importRoomsFromExcel(file);
+                List<RoomViewDTO> imported = importService.importRoomsFromExcel(file);
                 if (imported != null && !imported.isEmpty()) {
                     roomService.getAllRooms().addAll(imported);
                     loadTable(roomService.getAllRooms());
@@ -216,14 +207,14 @@ public class RoomManagement extends javax.swing.JPanel {
     }
 
     private void savePricesToFile() {
-        RoomType singleType = new RoomType();
+        RoomTypeDTO singleType = new RoomTypeDTO();
         singleType.setHourlyRate(new BigDecimal(txtSingleFirstHour.getText().trim()));
         singleType.setDailyRate(new BigDecimal(txtSingleDay.getText().trim()));
         singleType.setOvernightRate(new BigDecimal(txtSingleNight.getText().trim()));
         singleType.setAdditionalHourRate(new BigDecimal(txtSingleHour.getText().trim()));
         singleType.setRoomTypeId("SINGLE");
 
-        RoomType doubleType = new RoomType();
+        RoomTypeDTO doubleType = new RoomTypeDTO();
         doubleType.setHourlyRate(new BigDecimal(txtDoubleFirstHour.getText().trim()));
         doubleType.setDailyRate(new BigDecimal(txtDoubleDay.getText().trim()));
         doubleType.setOvernightRate(new BigDecimal(txtDoubleNight.getText().trim()));
@@ -237,11 +228,11 @@ public class RoomManagement extends javax.swing.JPanel {
 
     private void loadPricesFromFile() {
         var roomType = roomTypeService.getAllRoomTypes();
-        RoomType singleType = roomType.stream()
+        RoomTypeDTO singleType = roomType.stream()
                 .filter(rt -> rt.getRoomTypeId().equals("SINGLE"))
                 .findFirst()
                 .orElse(null);
-        RoomType doubleType = roomType.stream()
+        RoomTypeDTO doubleType = roomType.stream()
                 .filter(rt -> rt.getRoomTypeId().equals("DOUBLE"))
                 .findFirst()
                 .orElse(null);
@@ -262,10 +253,10 @@ public class RoomManagement extends javax.swing.JPanel {
 
     }
 
-    private void loadTable(List<Room> rooms) {
+    private void loadTable(List<RoomViewDTO> rooms) {
         DefaultTableModel model = (DefaultTableModel) tblRoom.getTbl().getModel();
         model.setRowCount(0);
-        for (Room room : rooms) {
+        for (RoomViewDTO room : rooms) {
             model.addRow(new Object[]{
                     room.getRoomId(),
                     room.getRoomNumber(),
@@ -374,7 +365,7 @@ public class RoomManagement extends javax.swing.JPanel {
 //                    return;
 //                }
 
-                Room updatedRoom = roomService.updateRoom(createRoomFromModal(roomId, numberNew, typeNew, statusNew));
+                RoomViewDTO updatedRoom = roomService.updateRoom(createRoomFromModal(roomId, numberNew, typeNew, statusNew));
                 if (updatedRoom != null) {
                     loadTable(roomService.getAllRooms());
                     GlassPanePopup.closePopupLast();
@@ -448,7 +439,7 @@ public class RoomManagement extends javax.swing.JPanel {
             modal.getLblErrolNumberRoom().setText("Số phòng chỉ được chứa chữ số!");
             isValid = false;
         } else {
-            List<Room> existing = roomService.getRoomByKeyword(number);
+            List<RoomViewDTO> existing = roomService.getRoomByKeyword(number);
             if (existing.stream().anyMatch(r -> !roomId.equals(r.getRoomId()) && r.getRoomNumber().equals(number))) {
                 modal.getLblErrolNumberRoom().setText("Số phòng đã tồn tại!");
                 isValid = false;
@@ -460,7 +451,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
     private void setupHeaderFilters() {
         var header = tblRoom.getTbl().getTableHeader();
-        List<RoomType> types = roomTypeService.getAllRoomTypes();
+        List<RoomTypeDTO> types = roomTypeService.getAllRoomTypes();
         String[] typeItems = new String[types.size() + 1];
         typeItems[0] = "Tất cả";
         for (int i = 0; i < types.size(); i++) {
@@ -622,16 +613,16 @@ public class RoomManagement extends javax.swing.JPanel {
         });
     }
 
-    private Room createRoomFromModal(Long roomId, String number, String typeName, String statusStr) {
-        Room room = new Room();
+    private RoomViewDTO createRoomFromModal(Long roomId, String number, String typeName, String statusStr) {
+        RoomViewDTO room = new RoomViewDTO();
         room.setRoomId(roomId);
         room.setRoomNumber(number);
 
 
         if (typeName.equals("Phòng đôi")) {
-            room.setRoomType(new RoomType("DOUBLE"));
+            room.setRoomType(RoomTypeDTO.builder().roomTypeId(Constants.DOUBLE_ROOM_TYPE).build());
         } else {
-            room.setRoomType(new RoomType("SINGLE"));
+            room.setRoomType(RoomTypeDTO.builder().roomTypeId(Constants.SINGLE_ROOM_TYPE).build());
         }
 
         try {
@@ -814,8 +805,8 @@ public class RoomManagement extends javax.swing.JPanel {
                 String typeStr = (String) modal.getCmbTypeRoom().getSelectedItem();
                 String statusStr = (String) modal.getCmbStatus().getSelectedItem();
 
-                Room newRoom = createRoomFromModal(null, number, typeStr, statusStr);
-                Room saved = roomService.createRoom(newRoom);
+                RoomViewDTO newRoom = createRoomFromModal(null, number, typeStr, statusStr);
+                RoomViewDTO saved = roomService.createRoom(newRoom);
                 if (saved != null) {
                     loadTable(roomService.getAllRooms());
                     GlassPanePopup.closePopupLast();

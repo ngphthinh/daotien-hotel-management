@@ -1,9 +1,10 @@
 package iuh.fit.se.group1.service;
 
-import iuh.fit.se.group1.dto.BookingDTO;
-import iuh.fit.se.group1.dto.RoomDTO;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
+import iuh.fit.se.group1.mapper.RoomMapper;
+import iuh.fit.se.group1.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,14 +19,15 @@ public class RoomToolsService {
     private static final Logger log = LoggerFactory.getLogger(RoomToolsService.class);
     private static final String SINGLE_ROOM_TYPE = "SINGLE";
     private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
-
+    private final RoomMapper roomMapper = new RoomMapper();
     private final OrderService orderService;
     private final RoomService roomService;
     private final RoomTypeService roomTypeService;
     private final BookingService bookingService;
+//    private final RoomMapper roomMapper;
 
     public RoomToolsService() {
-
+//        this.roomMapper = new RoomMapper();
         this.bookingService = new BookingService();
         this.orderService = new OrderService();
         this.roomService = new RoomService();
@@ -40,7 +42,7 @@ public class RoomToolsService {
         return bookingService.getAllBookings();
     }
 
-    public List<Order> getAllOrders() {
+    public List<OrderDTO> getAllOrders() {
         return orderService.getAllOrdersWithRelationshipAndCompleteYet();
     }
 
@@ -57,21 +59,21 @@ public class RoomToolsService {
     /**
      * Lấy thông tin TẤT CẢ phòng theo orderId và bookingType
      */
-    public List<Room> getRoomsByOrderAndType(long orderId, BookingType bookingType) {
+    public List<RoomViewDTO> getRoomsByOrderAndType(long orderId, BookingType bookingType) {
         return roomService.getRoomsByOrderIdAndType(orderId, bookingType.name());
     }
 
     /**
      * Lấy thông tin phòng theo booking (giữ lại cho tương thích)
      */
-    public List<Room> getRoomsByBooking(long bookingId) {
+    public List<RoomViewDTO> getRoomsByBooking(long bookingId) {
         return roomService.getRoomsByBookingId(bookingId);
     }
 
     /**
      * Lấy phòng trống theo loại
      */
-    public List<Room> getAvailableRoomsByType(String roomTypeId) {
+    public List<RoomViewDTO> getAvailableRoomsByType(String roomTypeId) {
         return roomService.getAvailableRoomsByType(roomTypeId);
     }
 
@@ -107,7 +109,7 @@ public class RoomToolsService {
     /**
      * Tính phụ phí chuyển phòng với thông tin booking
      */
-    public long calculateSurcharge(List<Room> oldRooms, List<Room> newRooms,
+    public long calculateSurcharge(List<RoomViewDTO> oldRooms, List<RoomViewDTO> newRooms,
                                    BookingType bookingType, long orderId) {
         // Validate input lists
         if (oldRooms == null || oldRooms.isEmpty() || newRooms == null || newRooms.isEmpty()) {
@@ -119,8 +121,8 @@ public class RoomToolsService {
 //        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
 //                orderId, bookingType.name(), oldRooms.get(0).getRoomId());
 
-            Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
-                    orderId, bookingType.name(), oldRooms.get(0).getRoomId());
+        BookingViewDTO bookingInfo = bookingService.getBookingByOrderIdAndType(
+                orderId, bookingType.name(), oldRooms.get(0).getRoomId());
 
         if (bookingInfo == null) {
             log.error("Cannot find booking info for orderId={}, bookingType={}", orderId, bookingType);
@@ -149,14 +151,14 @@ public class RoomToolsService {
     /**
      * Tính tổng giá phòng theo loại thuê và duration
      */
-    private long calculateTotalPrice(List<Room> rooms, BookingType bookingType, int duration) {
+    private long calculateTotalPrice(List<RoomViewDTO> rooms, BookingType bookingType, int duration) {
         int bookingTypeIndex = BookingType.toIndex(bookingType);
 
-        RoomType singleRoomType = roomTypeService.getRoomTypeById(SINGLE_ROOM_TYPE);
-        RoomType doubleRoomType = roomTypeService.getRoomTypeById(DOUBLE_ROOM_TYPE);
+        RoomTypeDTO singleRoomType = roomTypeService.getRoomTypeById(Constants.SINGLE_ROOM_TYPE);
+        RoomTypeDTO doubleRoomType = roomTypeService.getRoomTypeById(Constants.DOUBLE_ROOM_TYPE);
 
-        RoomDTO singleRoomDTO = roomService.toRoomDTO(singleRoomType);
-        RoomDTO doubleRoomDTO = roomService.toRoomDTO(doubleRoomType);
+        RoomDTO singleRoomDTO = roomMapper.toRoomDTO(singleRoomType);
+        RoomDTO doubleRoomDTO = roomMapper.toRoomDTO(doubleRoomType);
 
         long singleCount = rooms.stream()
                 .filter(room -> SINGLE_ROOM_TYPE.equals(room.getRoomType().getRoomTypeId()))
@@ -180,8 +182,8 @@ public class RoomToolsService {
     /**
      * Lấy giá phòng theo loại thuê (đơn giá cơ bản)
      */
-    public long getRoomPriceByType(Room room, BookingType bookingType) {
-        RoomType roomType = room.getRoomType();
+    public long getRoomPriceByType(RoomViewDTO room, BookingType bookingType) {
+        RoomTypeDTO roomType = room.getRoomType();
         if (roomType == null) {
             return 0;
         }
@@ -214,8 +216,8 @@ public class RoomToolsService {
     /**
      * Lấy giá phòng đã tính duration để hiển thị (cho UI)
      */
-    public long getRoomPriceWithDuration(Room room, BookingType bookingType, long orderId) {
-        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
+    public long getRoomPriceWithDuration(RoomViewDTO room, BookingType bookingType, long orderId) {
+        BookingViewDTO bookingInfo = bookingService.getBookingByOrderIdAndType(
                 orderId, bookingType.name(), room.getRoomId());
 
         if (bookingInfo == null) {
@@ -227,7 +229,7 @@ public class RoomToolsService {
                 bookingInfo.getCheckOutDate(),
                 bookingType);
 
-        RoomDTO roomDTO = roomService.toRoomDTO(room.getRoomType());
+        RoomDTO roomDTO = roomMapper.toRoomDTO(room.getRoomType());
 
 
         int bookingTypeIndex = BookingType.toIndex(bookingType);
@@ -238,8 +240,8 @@ public class RoomToolsService {
      * Thực hiện chuyển phòng
      */
     public TransferResult transferRooms(long orderId,
-                                        List<Room> oldRooms,
-                                        List<Room> newRooms,
+                                        List<RoomViewDTO> oldRooms,
+                                        List<RoomViewDTO> newRooms,
                                         BookingType bookingType) {
 
         TransferResult result = new TransferResult();
@@ -257,11 +259,11 @@ public class RoomToolsService {
 
         // Lấy danh sách ID
         List<Long> oldRoomIds = oldRooms.stream()
-                .map(Room::getRoomId)
+                .map(RoomViewDTO::getRoomId)
                 .collect(Collectors.toList());
 
         List<Long> newRoomIds = newRooms.stream()
-                .map(Room::getRoomId)
+                .map(RoomViewDTO::getRoomId)
                 .collect(Collectors.toList());
 
         // Thực hiện chuyển phòng với orderId và bookingType
@@ -296,8 +298,8 @@ public class RoomToolsService {
      * 5. 1 đơn → 1 đơn (đổi phòng cùng loại)
      * Các trường hợp khác đều KHÔNG hợp lệ
      */
-    public ValidationResult validateTransfer(List<Room> oldRooms,
-                                             List<Room> newRooms,
+    public ValidationResult validateTransfer(List<RoomViewDTO> oldRooms,
+                                             List<RoomViewDTO> newRooms,
                                              BookingType bookingType) {
         ValidationResult result = new ValidationResult();
 
@@ -385,7 +387,7 @@ public class RoomToolsService {
         return result;
     }
 
-    public List<Order> findOrdersUnPendingByKeyWord(String keyword) {
+    public List<OrderDTO> findOrdersUnPendingByKeyWord(String keyword) {
         return orderService.getOrdersUnPendingByKeyWord(keyword);
     }
 
@@ -405,12 +407,12 @@ public class RoomToolsService {
         try {
             log.info("Canceling room booking - OrderId: {}, RoomId: {}, BookingType: {}",
                     orderId, roomId, bookingType);
-            Room room = roomService.getRoomByRoomId(roomId);
+            RoomViewDTO room = roomService.getRoomByRoomId(roomId);
             if (room == null) {
                 log.warn("Room not found: {}", roomId);
                 return false;
             }
-            Booking booking = bookingService.getBookingByOrderIdAndType(
+            BookingViewDTO booking = bookingService.getBookingByOrderIdAndType(
                     orderId, bookingType.name(), room.getRoomId());
 
             if (booking == null) {
@@ -422,7 +424,7 @@ public class RoomToolsService {
                     booking.getCheckOutDate(),
                     bookingType
             );
-            RoomDTO roomDTO = roomService.toRoomDTO(room.getRoomType());
+            RoomDTO roomDTO = roomMapper.toRoomDTO(room.getRoomType());
             int bookingTypeIndex = BookingType.toIndex(bookingType);
             long roomPrice = calculatePriceByTypeAndDuration(
                     bookingTypeIndex, roomDTO, (int) duration
@@ -454,7 +456,7 @@ public class RoomToolsService {
     }
 
     // Tính tiền gia hạn
-    public boolean extendRoomBooking(Long orderId, List<Room> rooms,
+    public boolean extendRoomBooking(Long orderId, List<RoomViewDTO> rooms,
                                      int extendValue, BookingType bookingType) {
         try {
             // Validate: Qua đêm không cho phép gia hạn
@@ -470,7 +472,7 @@ public class RoomToolsService {
 
             // Lấy danh sách room IDs
             List<Long> roomIds = rooms.stream()
-                    .map(Room::getRoomId)
+                    .map(RoomViewDTO::getRoomId)
                     .collect(Collectors.toList());
 
             // Tính số tiền gia hạn
@@ -510,11 +512,11 @@ public class RoomToolsService {
     /**
      * Tính số tiền gia hạn dựa trên loại booking và số lượng
      */
-    public BigDecimal calculateExtensionAmount(List<Room> rooms, BookingType bookingType,
+    public BigDecimal calculateExtensionAmount(List<RoomViewDTO> rooms, BookingType bookingType,
                                                int extendValue) {
         BigDecimal total = BigDecimal.ZERO;
 
-        for (Room room : rooms) {
+        for (RoomViewDTO room : rooms) {
             BigDecimal roomExtension = BigDecimal.ZERO;
 
             switch (bookingType) {
@@ -539,11 +541,11 @@ public class RoomToolsService {
         return total;
     }
 
-    public long calculateNewRoomPriceWithBookingDuration(Room newRoom, BookingType bookingType,
-                                                         long orderId, Room referenceOldRoom) {
+    public long calculateNewRoomPriceWithBookingDuration(RoomViewDTO newRoom, BookingType bookingType,
+                                                         long orderId, RoomViewDTO referenceOldRoom) {
 
         // Lấy thông tin booking từ phòng cũ để biết duration
-        Booking bookingInfo = bookingService.getBookingByOrderIdAndType(
+        BookingViewDTO bookingInfo = bookingService.getBookingByOrderIdAndType(
                 orderId, bookingType.name(), referenceOldRoom.getRoomId());
 
         if (bookingInfo == null) {
@@ -558,7 +560,7 @@ public class RoomToolsService {
                 bookingType);
 
         // Tính giá cho phòng mới với duration này
-        RoomDTO newRoomDTO = roomService.toRoomDTO(newRoom.getRoomType());
+        RoomDTO newRoomDTO = roomMapper.toRoomDTO(newRoom.getRoomType());
         int bookingTypeIndex = BookingType.toIndex(bookingType);
 
         return calculatePriceByTypeAndDuration(bookingTypeIndex, newRoomDTO, (int) duration);

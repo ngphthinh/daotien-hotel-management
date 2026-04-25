@@ -140,10 +140,13 @@ public class OrderRepositoryImpl extends AbstractRepositoryImpl<Order, Long> imp
 
         Order managed = em.find(Order.class, order.getOrderId());
 
+        System.out.println("Update" + order);
+
         managed.setTotalAmount(order.getTotalAmount());
         managed.setPaymentType(order.getPaymentType());
         managed.setPaymentDate(order.getPaymentDate());
 
+        System.out.println("Managed: " + managed);
         if (order.getPromotion() != null) {
             managed.setPromotion(em.getReference(
                     Promotion.class,

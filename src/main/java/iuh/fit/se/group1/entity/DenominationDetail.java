@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
@@ -13,14 +14,14 @@ import java.time.LocalDate;
 @ToString
 @EqualsAndHashCode(of = "denominationDetailId")
 @Entity
-
+@Builder
 public class DenominationDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private	Long denominationDetailId;
+    private Long denominationDetailId;
     private DenominationLabel denomination;
-    private	int quantity;
+    private int quantity;
     @ManyToOne
     @JoinColumn(name = "employeeShiftId")
     private EmployeeShift employeeShift;

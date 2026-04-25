@@ -1,23 +1,15 @@
 package iuh.fit.se.group1.repository.jpa;
 
-import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.repository.interfaces.Repository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class AbstractRepositoryImpl<T, ID> implements Repository<T, ID> {
 
-
     protected final Class<T> entityClass;
-
-
-
 
     @Override
     public T save(EntityManager em, T o) {

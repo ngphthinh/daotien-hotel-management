@@ -4,7 +4,7 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.entity.Customer;
+import iuh.fit.se.group1.dto.CustomerDTO;
 import iuh.fit.se.group1.service.CustomerService;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -17,8 +17,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -26,7 +24,6 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -41,7 +38,6 @@ import javax.swing.table.TableRowSorter;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
-import org.slf4j.LoggerFactory;
 import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.ImportExcelService;
 
@@ -68,10 +64,10 @@ public class CustomerManagement extends javax.swing.JPanel {
         loadTable(customerService.getAllCustomer());
     }
 
-    public void loadTable(List<Customer> customers) {
+    public void loadTable(List<CustomerDTO> customers) {
         DefaultTableModel modal = (DefaultTableModel) tblCustomer.getTbl().getModel();
         modal.setRowCount(0);
-        for (Customer customer : customers) {
+        for (CustomerDTO customer : customers) {
             String genderStr = customer.isGender() ? "Nữ" : "Nam";
             modal.addRow(new Object[]{
                     customer.getCustomerId(),
@@ -99,7 +95,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 ImportExcelService importService = new ImportExcelService();
-                List<Customer> imported = importService.importCustomersFromExcel(file);
+                List<CustomerDTO> imported = importService.importCustomersFromExcel(file);
                 if (imported != null && !imported.isEmpty()) {
                     customerService.getAllCustomer().addAll(imported);
                     loadTable(customerService.getAllCustomer());
@@ -143,7 +139,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                 DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
                 String code = model.getValueAt(row, 0).toString();
 
-                Customer customer = customerService.getCustomerById(code);
+                CustomerDTO customer = customerService.getCustomerById(code);
                 if (customer == null) {
                     Message.showMessage("Lỗi", "Không tìm thấy khách hàng!");
                     return;
@@ -183,7 +179,7 @@ public class CustomerManagement extends javax.swing.JPanel {
                     customer.setGender(rs.gender);
                     customer.setDateOfBirth(rs.dob);
 
-                    Customer updated = customerService.updateCustomer(customer);
+                    CustomerDTO updated = customerService.updateCustomer(customer);
                     if (updated != null) {
                         int modelRow = tblCustomer.getTbl().convertRowIndexToModel(row);
                         model.setValueAt(updated.getFullName(), modelRow, 1);
@@ -230,7 +226,7 @@ public class CustomerManagement extends javax.swing.JPanel {
             public void onView(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
                 String code = model.getValueAt(row, 0).toString();
-                Customer customer = customerService.getCustomerById(code);
+                CustomerDTO customer = customerService.getCustomerById(code);
                 if (customer == null) {
                     return;
                 }
@@ -371,12 +367,12 @@ public class CustomerManagement extends javax.swing.JPanel {
 
     private void searchCustomer() {
         String keyword = headerCustom1.getSearchText().trim();
-        List<Customer> result;
+        List<CustomerDTO> result;
 
         if (keyword.isEmpty()) {
             result = customerService.getAllCustomer();
         } else {
-            result = customerService.getAmenityByKeyword(keyword);
+            result = customerService.getCustomerByKeyword(keyword);
         }
         loadTable(result);
     }

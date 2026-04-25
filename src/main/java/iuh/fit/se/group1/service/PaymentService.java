@@ -7,6 +7,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import iuh.fit.se.group1.dto.OrderDTO;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.util.PropertiesReader;
 
@@ -36,7 +37,7 @@ public class PaymentService {
 
     }
 
-    public String createPayment(Order order) throws Exception {
+    public String createPayment(OrderDTO order) throws Exception {
 
         String orderId = "HD:" + order.getOrderId() + "_" + System.currentTimeMillis();
         String requestId = String.valueOf(System.currentTimeMillis());
@@ -45,7 +46,6 @@ public class PaymentService {
         String ipnUrl = "https://webhook.site/unique-id";
 
         BigDecimal amount = order.getTotalAmount()
-//                .subtract(order.getDeposit())
                 .setScale(0, RoundingMode.HALF_UP);
 
         String rawHash = String.format(

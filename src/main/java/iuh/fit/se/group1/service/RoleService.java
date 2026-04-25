@@ -1,22 +1,25 @@
 package iuh.fit.se.group1.service;
 
-import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.dto.RoleDTO;
 import iuh.fit.se.group1.entity.Role;
+import iuh.fit.se.group1.mapper.RoleMapper;
 import iuh.fit.se.group1.repository.jpa.RoleRepositoryImpl;
 import jakarta.persistence.EntityManager;
 
-import java.util.List;
-
 public class RoleService extends Service {
     private final RoleRepositoryImpl roleRepositoryImpl;
+    private final RoleMapper roleMapper;
 
     public RoleService() {
         this.roleRepositoryImpl = new RoleRepositoryImpl();
+        this.roleMapper = new RoleMapper();
     }
 
-    public Role createRole(Role role) {
-//        return roleRepositoryImpl.save(role);
-        return doInTransaction(entityManager -> roleRepositoryImpl.save(entityManager, role));
+    public RoleDTO createRole(RoleDTO role) {
+
+        Role roleEntity = roleMapper.toRole(role);
+
+        return doInTransaction(entityManager -> roleMapper.toDTO(roleRepositoryImpl.save(entityManager, roleEntity)));
     }
 
     public void deleteRole(String roleId) {
@@ -24,19 +27,21 @@ public class RoleService extends Service {
         doInTransactionVoid(entityManager -> roleRepositoryImpl.deleteById(entityManager, roleId));
     }
 
-    public java.util.List<Role> getAllRoles() {
+    public java.util.List<RoleDTO> getAllRoles() {
 //        return roleRepositoryImpl.findAll();
-        return doInTransaction(roleRepositoryImpl::findAll);
+        return doInTransaction(roleRepositoryImpl::findAll).stream().map(roleMapper::toDTO).toList();
     }
 
-    public Role getRoleById(EntityManager em, String roleId) {
-//        return roleRepositoryImpl.findById(roleId);
+    public Role getRoleEntityById(EntityManager em, String roleId) {
         return roleRepositoryImpl.findById(em, roleId);
     }
+    public RoleDTO getRoleById(EntityManager em, String roleId) {
+        return roleMapper.toDTO(roleRepositoryImpl.findById(em, roleId));
+    }
 
-    public Role getRoleById(String roleId) {
+    public RoleDTO getRoleById(String roleId) {
 //        return roleRepositoryImpl.findById(roleId);
-        return doInTransaction(em -> roleRepositoryImpl.findById(em, roleId));
+        return doInTransaction(em -> roleMapper.toDTO(getRoleEntityById(em, roleId)));
     }
 
     public boolean roleExists(String roleId) {

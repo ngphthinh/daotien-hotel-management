@@ -13,25 +13,26 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @Setter
-@ToString
+@Builder
+@ToString(exclude = {"employee", "shift", "shiftClose", "denominationDetails"})
 @EqualsAndHashCode(of = "employeeShiftId")
 @Entity
 public class EmployeeShift {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private	Long employeeShiftId;
+    private Long employeeShiftId;
     @ManyToOne
     @JoinColumn(name = "employeeId")
-    private	Employee employee;
+    private Employee employee;
 
     @ManyToOne
     @JoinColumn(name = "shiftId")
-    private	Shift shift;
+    private Shift shift;
     @OneToMany(mappedBy = "shiftCloseId")
     private Set<ShiftClose> shiftClose;
     private BigDecimal systemAmount;
-    private	BigDecimal actualAmount;
-    private	BigDecimal difference;
+    private BigDecimal actualAmount;
+    private BigDecimal difference;
     private LocalDate shiftDate;
     private LocalDate createdAt;
 

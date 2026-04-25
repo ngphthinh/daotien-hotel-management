@@ -1,6 +1,7 @@
 
 package iuh.fit.se.group1.ui.component.menu;
 
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.util.Constants;
@@ -18,25 +19,33 @@ public class Footer extends javax.swing.JPanel {
      */
     public Footer() {
         initComponents();
-               
+
     }
-    public void setEmployeeInfo(Employee employee) {
+
+    public void setEmployeeInfo(EmployeeDTO employee) {
         profileButton.setEmployeeInfo(employee);
     }
+
     public void updateAvatar(byte[] avatarBytes) {
         profileButton.updateAvatar(avatarBytes);
     }
+
     public void setFullName(String fullName) {
         profileButton.setFullName(fullName);
     }
+
     public void setRoleName(String roleName) {
         profileButton.setRoleName(roleName);
     }
-    public AvatarLabel geLblAvt(){
-    return profileButton.getLblAvartar();}
-    public JButton getBtnSignOut(){
+
+    public AvatarLabel geLblAvt() {
+        return profileButton.getLblAvartar();
+    }
+
+    public JButton getBtnSignOut() {
         return profileButton.getBtnSignOut();
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -54,16 +63,16 @@ public class Footer extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(profileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(profileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(profileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(profileButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

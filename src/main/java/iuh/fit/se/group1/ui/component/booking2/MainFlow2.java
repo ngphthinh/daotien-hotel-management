@@ -2,6 +2,7 @@ package iuh.fit.se.group1.ui.component.booking2;
 
 import iuh.fit.se.group1.dto.RoomDTO;
 import iuh.fit.se.group1.dto.RoomSelection;
+import iuh.fit.se.group1.dto.RoomViewDTO;
 import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.entity.RoomType;
 import iuh.fit.se.group1.enums.BookingType;
@@ -96,22 +97,22 @@ public class MainFlow2 extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl1Layout = new javax.swing.GroupLayout(pnl1);
         pnl1.setLayout(pnl1Layout);
         pnl1Layout.setHorizontalGroup(
-            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl1Layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl2, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 720, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(48, Short.MAX_VALUE))
+                pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl1Layout.createSequentialGroup()
+                                .addGap(29, 29, 29)
+                                .addGroup(pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lbl2, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lbl1, javax.swing.GroupLayout.PREFERRED_SIZE, 720, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(48, Short.MAX_VALUE))
         );
         pnl1Layout.setVerticalGroup(
-            pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl1Layout.createSequentialGroup()
-                .addGap(8, 8, 8)
-                .addComponent(lbl2)
-                .addGap(7, 7, 7)
-                .addComponent(lbl1, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
-                .addContainerGap())
+                pnl1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl1Layout.createSequentialGroup()
+                                .addGap(8, 8, 8)
+                                .addComponent(lbl2)
+                                .addGap(7, 7, 7)
+                                .addComponent(lbl1, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         btnNext.setBackground(new java.awt.Color(77, 134, 168));
@@ -156,42 +157,42 @@ public class MainFlow2 extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbl, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 480, Short.MAX_VALUE)
-                        .addComponent(lblTotalRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                            .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(pnl1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(scr)
-                        .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                                .addGap(37, 37, 37)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(lbl, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 480, Short.MAX_VALUE)
+                                                .addComponent(lblTotalRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(pnl1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(scr)
+                                                .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addContainerGap(20, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(pnl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scr, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblTotalRoom))
-                .addGap(1, 1, 1)
-                .addComponent(lblMessage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(25, 25, 25)
+                                .addComponent(pnl1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(scr, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lbl, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblTotalRoom))
+                                .addGap(1, 1, 1)
+                                .addComponent(lblMessage)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(20, 20, 20))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -219,7 +220,7 @@ public class MainFlow2 extends javax.swing.JPanel {
 
         this.btnPrev = btnPrev;
     }
-    
+
 
     public Long getPriceFromBookingTypeAndRoomType(int bookingType, RoomDTO roomDTO, int timePlus) {
         if (bookingType == 0) { // Theo giờ
@@ -249,8 +250,8 @@ public class MainFlow2 extends javax.swing.JPanel {
 
         Map<String, Long> optimizeRoomAllocation = roomService.optimizeRoomAllocation((int) singleQuantity, (int) doubleQuantity, adults, children);
 
-        if (optimizeRoomAllocation.get("unaccommodatedGuests") > 0){
-            CustomDialog.showMessage(this, "Không đủ phòng để đáp ứng số lượng khách!","Không đủ phòng", CustomDialog.MessageType.ERROR,500,200);
+        if (optimizeRoomAllocation.get("unaccommodatedGuests") > 0) {
+            CustomDialog.showMessage(this, "Không đủ phòng để đáp ứng số lượng khách!", "Không đủ phòng", CustomDialog.MessageType.ERROR, 500, 200);
             return false;
         }
 
@@ -304,7 +305,7 @@ public class MainFlow2 extends javax.swing.JPanel {
         }
 
 
-        lblTotalRoom.setText(getTotalPriceRoom((Number) tbl.getValueAt(0, 3), (Number) tbl.getValueAt(1,3)));
+        lblTotalRoom.setText(getTotalPriceRoom((Number) tbl.getValueAt(0, 3), (Number) tbl.getValueAt(1, 3)));
 
         tbl.setQuantityChangeListener((r, newQuantity) -> {
             Map<String, Integer> rs = roomService.checkRoomCapacity(adults,
@@ -335,7 +336,7 @@ public class MainFlow2 extends javax.swing.JPanel {
             }
 
             lblMessage.setText(message);
-            lblTotalRoom.setText(getTotalPriceRoom((Number) tbl.getValueAt(0, 3), (Number) tbl.getValueAt(1,3)));
+            lblTotalRoom.setText(getTotalPriceRoom((Number) tbl.getValueAt(0, 3), (Number) tbl.getValueAt(1, 3)));
         });
         return true;
     }
@@ -346,7 +347,7 @@ public class MainFlow2 extends javax.swing.JPanel {
 
     }
 
-    public java.util.List<RoomSelection> getSelectedRoom(java.util.List<Room> availableRooms) {
+    public java.util.List<RoomSelection> getSelectedRoom(java.util.List<RoomViewDTO> availableRooms) {
 
         int countSingleRoom = tbl.getValueAt(0, 5) != null ? ((Number) tbl.getValueAt(0, 5)).intValue() : 0;
         int countDoubleRoom = tbl.getValueAt(1, 5) != null ? ((Number) tbl.getValueAt(1, 5)).intValue() : 0;
@@ -354,12 +355,12 @@ public class MainFlow2 extends javax.swing.JPanel {
         java.util.List<RoomSelection> selectedRooms = new java.util.ArrayList<>();
 
 
-        for (Room room : availableRooms) {
+        for (RoomViewDTO room : availableRooms) {
             if (room.getRoomType().getRoomTypeId().equals("SINGLE") && countSingleRoom > 0) {
-                selectedRooms.add(new RoomSelection(room.getRoomId(), room.getRoomNumber(),room.getRoomTypeId()));
+                selectedRooms.add(new RoomSelection(room.getRoomId(), room.getRoomNumber(), room.getRoomType().getRoomTypeId()));
                 countSingleRoom--;
             } else if (room.getRoomType().getRoomTypeId().equals("DOUBLE") && countDoubleRoom > 0) {
-                selectedRooms.add(new RoomSelection(room.getRoomId(), room.getRoomNumber(),room.getRoomTypeId()));
+                selectedRooms.add(new RoomSelection(room.getRoomId(), room.getRoomNumber(), room.getRoomType().getRoomTypeId()));
                 countDoubleRoom--;
             }
             if (countSingleRoom == 0 && countDoubleRoom == 0) {
@@ -379,6 +380,7 @@ public class MainFlow2 extends javax.swing.JPanel {
             model.setValueAt(0, i, 5); // reset số lượng đã chọn về 0
         }
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private iuh.fit.se.group1.ui.component.custom.Button btnNext;
     private iuh.fit.se.group1.ui.component.custom.Button btnPrev;

@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.component.booking2;
 
+import iuh.fit.se.group1.dto.CustomerDTO;
 import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.service.CustomerService;
 import iuh.fit.se.group1.ui.component.custom.Button;
@@ -351,7 +352,7 @@ public class MainFlow4 extends javax.swing.JPanel {
     private void txtCitizenIdOrPassportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCitizenIdOrPassportActionPerformed
         CustomerService customerService = new CustomerService();
         String citizenId = txtCitizenIdOrPassport.getText().trim();
-        Customer existingCustomer = customerService.getCustomerByCitizenId(citizenId);
+        CustomerDTO existingCustomer = customerService.getCustomerByCitizenId(citizenId);
         if (existingCustomer != null) {
             txtFullName.setText(existingCustomer.getFullName());
             txtEmail.setText(existingCustomer.getEmail());
@@ -455,7 +456,7 @@ public class MainFlow4 extends javax.swing.JPanel {
     }
 
 
-    public Customer getCustomer(){
+    public CustomerDTO getCustomer() {
         String citizenIdOrPassport = txtCitizenIdOrPassport.getText().trim();
         String fullName = txtFullName.getText().trim();
         String email = txtEmail.getText().trim();
@@ -463,7 +464,7 @@ public class MainFlow4 extends javax.swing.JPanel {
 
         CustomerService customerService = new CustomerService();
 
-        Customer customerSaveDB = customerService.getCustomerByCitizenId(citizenIdOrPassport);
+        CustomerDTO customerSaveDB = customerService.getCustomerByCitizenId(citizenIdOrPassport);
 
         if (customerSaveDB != null) {
             boolean needUpdate = false;
@@ -492,7 +493,7 @@ public class MainFlow4 extends javax.swing.JPanel {
         }
 
         // Nếu chưa có trong DB → tạo mới
-        Customer customer = new Customer();
+        CustomerDTO customer = new CustomerDTO();
         customer.setCitizenId(citizenIdOrPassport);
         customer.setFullName(formatName(fullName));
         customer.setEmail(email);

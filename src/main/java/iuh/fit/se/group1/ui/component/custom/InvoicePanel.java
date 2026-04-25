@@ -1,9 +1,10 @@
 package iuh.fit.se.group1.ui.component.custom;
 
-import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -26,11 +27,10 @@ import java.util.List;
  * Panel hiển thị chi tiết hóa đơn đầy đủ
  */
 public class InvoicePanel extends JPanel {
-    private Order order;
-    private List<OrderDetail> orderDetails;
-    private List<SurchargeDetail> surchargeDetails;
+    @Getter
+    private OrderDTO order;
     // services to load details
-    private BookingService bookingService = new BookingService();
+    private final BookingService bookingService = new BookingService();
     private final OrderDetailService orderDetailService = new OrderDetailService();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private final PromotionService promotionService = new PromotionService();
@@ -84,14 +84,14 @@ public class InvoicePanel extends JPanel {
     private static final Color PALETTE_SELECTION = new Color(183, 225, 250);
     private static final Color PALETTE_EDIT_HIGHLIGHT = new Color(229, 247, 255);
     private JLabel lblEmployeePayment;
-    private EmployeeService employeeService = new EmployeeService();
+    private final EmployeeService employeeService = new EmployeeService();
 
     public InvoicePanel() {
         initComponents();
         setupLayout();
     }
 
-    public InvoicePanel(Order order) {
+    public InvoicePanel(OrderDTO order) {
         this();
         setOrder(order);
     }
@@ -201,13 +201,13 @@ public class InvoicePanel extends JPanel {
 
         // Customer info
         JPanel customerPanel = createInfoPanel("THÔNG TIN KHÁCH HÀNG",
-                new String[] { "Họ tên:", "Số điện thoại:", "CCCD/Passport:", "Email:" },
-                new JLabel[] { lblCustomerName, lblCustomerPhone, lblCustomerCitizenId, lblCustomerEmail });
+                new String[]{"Họ tên:", "Số điện thoại:", "CCCD/Passport:", "Email:"},
+                new JLabel[]{lblCustomerName, lblCustomerPhone, lblCustomerCitizenId, lblCustomerEmail});
 
         // Employee info
         JPanel employeePanel = createInfoPanel("NHÂN VIÊN XỬ LÝ",
-                new String[] { "Họ tên:", "Nhân viên thanh toán" },
-                new JLabel[] { lblEmployeeName, lblEmployeePayment });
+                new String[]{"Họ tên:", "Nhân viên thanh toán"},
+                new JLabel[]{lblEmployeeName, lblEmployeePayment});
 
         panel.add(customerPanel);
         panel.add(employeePanel);
@@ -333,7 +333,7 @@ public class InvoicePanel extends JPanel {
     }
 
     private void setupRoomBookingTable() {
-        String[] columns = { "Số phòng", "Loại", "Check-in", "Check-out", "Loại đặt", "Đơn giá" };
+        String[] columns = {"Số phòng", "Loại", "Check-in", "Check-out", "Loại đặt", "Đơn giá"};
         roomBookingModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -345,7 +345,7 @@ public class InvoicePanel extends JPanel {
     }
 
     private void setupAmenityTable() {
-        String[] columns = { "Dịch vụ", "Đơn giá", "Số lượng", "Thành tiền" };
+        String[] columns = {"Dịch vụ", "Đơn giá", "Số lượng", "Thành tiền"};
         amenityModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -374,7 +374,7 @@ public class InvoicePanel extends JPanel {
     }
 
     private void setupSurchargeTable() {
-        String[] columns = { "Phụ phí", "Đơn giá", "Số lượng", "Thành tiền" };
+        String[] columns = {"Phụ phí", "Đơn giá", "Số lượng", "Thành tiền"};
         surchargeModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -415,7 +415,7 @@ public class InvoicePanel extends JPanel {
         header.setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int col) {
+                                                           boolean hasFocus, int row, int col) {
                 JLabel lbl = (JLabel) super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, col);
                 lbl.setBackground(PALETTE_NAVY);
                 lbl.setForeground(Color.WHITE);
@@ -438,7 +438,7 @@ public class InvoicePanel extends JPanel {
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int column) {
+                                                           boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (isSelected) {
                     c.setBackground(PALETTE_SELECTION);
@@ -484,7 +484,7 @@ public class InvoicePanel extends JPanel {
         return label;
     }
 
-    public void setOrder(Order order) {
+    public void setOrder(OrderDTO order) {
         this.order = order;
         if (order != null) {
             updateInvoiceData();
@@ -556,7 +556,7 @@ public class InvoicePanel extends JPanel {
         }
 
         // Customer
-        Customer customer = order.getCustomer();
+        CustomerDTO customer = order.getCustomer();
         if (customer != null) {
             lblCustomerName.setText(customer.getFullName() != null ? customer.getFullName() : "-");
             lblCustomerPhone.setText(customer.getPhone() != null ? customer.getPhone() : "-");
@@ -570,7 +570,7 @@ public class InvoicePanel extends JPanel {
         }
 
         // Employee
-        Employee employee = order.getEmployee();
+        EmployeeDTO employee = order.getEmployee();
         if (employee != null) {
             lblEmployeeName.setText(employee.getFullName() != null ? employee.getFullName() : "-");
         } else {
@@ -579,7 +579,7 @@ public class InvoicePanel extends JPanel {
 
         // Employee Payment
         if (order.getEmployeePayment() != null && order.getEmployeePayment().getEmployeeId() != null) {
-            Employee employeePayment = employeeService.getEmployeeById(order.getEmployeePayment().getEmployeeId());
+            EmployeeDTO employeePayment = employeeService.getEmployeeById(order.getEmployeePayment().getEmployeeId());
             if (employeePayment != null) {
                 lblEmployeePayment.setText(employeePayment.getFullName() != null ? employeePayment.getFullName() : "-");
             } else {
@@ -609,28 +609,28 @@ public class InvoicePanel extends JPanel {
         roomBookingModel.setRowCount(0);
 
         if (order.getBookings() != null && !order.getBookings().isEmpty()) {
-            for (Booking booking : order.getBookings()) {
+            for (BookingViewDTO booking : order.getBookings()) {
                 if (booking == null) continue;
 
-                Room room = booking.getRoom();
+                RoomViewDTO room = booking.getRoom();
                 if (room == null) continue;
 
                 String roomNumber = room.getRoomNumber() != null ? room.getRoomNumber() : "-";
                 String roomTypeName = room.getRoomType() != null && room.getRoomType().getName() != null
-                    ? room.getRoomType().getName() : "-";
+                        ? room.getRoomType().getName() : "-";
                 String checkIn = booking.getCheckInDate() != null
-                    ? booking.getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                    : "-";
+                        ? booking.getCheckInDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                        : "-";
                 String checkOut = booking.getCheckOutDate() != null
-                    ? booking.getCheckOutDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                    : "-";
+                        ? booking.getCheckOutDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                        : "-";
                 String bookingType = booking.getBookingType() != null
-                    ? booking.getBookingType().getDisplayName()
-                    : "-";
+                        ? booking.getBookingType().getDisplayName()
+                        : "-";
                 BigDecimal price = BigDecimal.valueOf(bookingService.getPriceFromBooking(booking));
                 if (price == null) price = BigDecimal.ZERO;
 
-                roomBookingModel.addRow(new Object[] {
+                roomBookingModel.addRow(new Object[]{
                         roomNumber,
                         roomTypeName,
                         checkIn,
@@ -642,12 +642,12 @@ public class InvoicePanel extends JPanel {
         }
     }
 
-    private BigDecimal calculateRoomPrice(Booking booking) {
+    private BigDecimal calculateRoomPrice(BookingViewDTO booking) {
         if (booking == null || booking.getRoom() == null || booking.getRoom().getRoomType() == null) {
             return BigDecimal.ZERO;
         }
 
-        RoomType roomType = booking.getRoom().getRoomType();
+        RoomTypeDTO roomType = booking.getRoom().getRoomType();
         if (booking.getBookingType() == null) {
             return BigDecimal.ZERO;
         }
@@ -669,15 +669,15 @@ public class InvoicePanel extends JPanel {
         if (order == null || order.getOrderId() == null)
             return;
 
-        List<OrderDetail> details = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
+        List<OrderDetailDTO> details = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
         if (details != null) {
-            for (OrderDetail d : details) {
+            for (OrderDetailDTO d : details) {
                 BigDecimal unitPrice = d.getUnitPrice() != null ? d.getUnitPrice() : BigDecimal.ZERO;
                 int qty = d.getQuantity();
                 BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(qty));
                 String amenityName = d.getAmenity() != null ? d.getAmenity().getNameAmenity() : "-";
-                amenityModel.addRow(new Object[] { amenityName, Constants.VND_FORMAT.format(unitPrice), qty,
-                        Constants.VND_FORMAT.format(total) });
+                amenityModel.addRow(new Object[]{amenityName, Constants.VND_FORMAT.format(unitPrice), qty,
+                        Constants.VND_FORMAT.format(total)});
             }
         }
     }
@@ -687,17 +687,17 @@ public class InvoicePanel extends JPanel {
         if (order == null || order.getOrderId() == null)
             return;
 
-        List<SurchargeDetail> details = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
+        List<SurchargeDetailDTO> details = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
         if (details != null) {
-            for (SurchargeDetail d : details) {
+            for (SurchargeDetailDTO d : details) {
                 BigDecimal unitPrice = d.getSurcharge() != null && d.getSurcharge().getPrice() != null
                         ? d.getSurcharge().getPrice()
                         : BigDecimal.ZERO;
                 int qty = d.getQuantity();
                 BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(qty));
                 String name = d.getSurcharge() != null ? d.getSurcharge().getName() : "-";
-                surchargeModel.addRow(new Object[] { name, Constants.VND_FORMAT.format(unitPrice), qty,
-                        Constants.VND_FORMAT.format(total) });
+                surchargeModel.addRow(new Object[]{name, Constants.VND_FORMAT.format(unitPrice), qty,
+                        Constants.VND_FORMAT.format(total)});
             }
         }
     }
@@ -709,7 +709,7 @@ public class InvoicePanel extends JPanel {
             return;
         }
 
-        Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+        PromotionDTO promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
 
         if (promotion != null) {
             lblPromotionName.setText(promotion.getPromotionName() != null ? promotion.getPromotionName() : "Không áp dụng");
@@ -731,7 +731,7 @@ public class InvoicePanel extends JPanel {
             // Calculate promotion discount
             BigDecimal promotionAmount = BigDecimal.ZERO;
             if (order.getPromotion() != null && order.getPromotion().getPromotionId() != null) {
-                Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+                PromotionDTO promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
                 if (promotion != null) {
                     float discountPercent = promotion.getDiscountPercent();
                     promotionAmount = totalAmount.multiply(BigDecimal.valueOf(discountPercent / 100));
@@ -793,7 +793,7 @@ public class InvoicePanel extends JPanel {
 
         BigDecimal promotionAmount = BigDecimal.ZERO;
         if (order.getPromotion() != null && order.getPromotion().getPromotionId() != null) {
-            Promotion promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+            PromotionDTO promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
             if (promotion != null) {
                 float discountPercent = promotion.getDiscountPercent();
                 promotionAmount = roomTotal.multiply(BigDecimal.valueOf(discountPercent / 100));
@@ -815,7 +815,7 @@ public class InvoicePanel extends JPanel {
     private BigDecimal getRoomTotal() {
         BigDecimal sum = BigDecimal.ZERO;
         if (order != null && order.getBookings() != null) {
-            for (Booking b : order.getBookings()) {
+            for (BookingViewDTO b : order.getBookings()) {
                 if (b != null) {
                     sum = sum.add(calculateRoomPrice(b));
                 }
@@ -850,7 +850,4 @@ public class InvoicePanel extends JPanel {
         }
     }
 
-    public Order getOrder() {
-        return order;
-    }
 }

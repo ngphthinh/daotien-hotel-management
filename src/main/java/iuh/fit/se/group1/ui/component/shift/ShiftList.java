@@ -4,11 +4,9 @@
  */
 package iuh.fit.se.group1.ui.component.shift;
 
-import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.enums.Role;
-import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
 import iuh.fit.se.group1.service.EmployeeService;
-import iuh.fit.se.group1.service.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +68,7 @@ public class ShiftList extends JPanel {
         loadEmployeesFromDatabase();
     }
 
-    public void addNewEmployee(Employee employee) {
+    public void addNewEmployee(EmployeeDTO employee) {
         try {
             String name = employee.getFullName();
             String code = String.valueOf(employee.getEmployeeId());
@@ -129,12 +127,12 @@ public class ShiftList extends JPanel {
         }
     }
 
-    public void loadEmployees(List<Employee> employees) {
+    public void loadEmployees(List<EmployeeDTO> employees) {
         try {
             pnlEmployees.removeAll();
             pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
 
-            for (Employee e : employees) {
+            for (EmployeeDTO e : employees) {
                 String name = e.getFullName();
                 String code = String.valueOf(e.getEmployeeId());
 
@@ -196,11 +194,11 @@ public class ShiftList extends JPanel {
 
     private void loadEmployeesFromDatabase() {
         try {
-            List<Employee> employees = employeeService.findAllByRoleId(Role.RECEPTIONIST.toString());
+            List<EmployeeDTO> employees = employeeService.findAllByRoleId(Role.RECEPTIONIST.toString());
 
             pnlEmployees.removeAll();
             pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
-            for (Employee e : employees) {
+            for (EmployeeDTO e : employees) {
                 String name = e.getFullName();
                 String code = String.valueOf(e.getEmployeeId());
 

@@ -4,6 +4,7 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.service.AmenityService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
@@ -36,9 +37,6 @@ import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.service.ExportExcelService;
 
 
-
-
-
 /**
  * @author THIS PC
  */
@@ -58,10 +56,10 @@ public class AmenityManagement extends javax.swing.JPanel {
         loadTable(amenityService.getAllAmenities());
     }
 
-    private void loadTable(java.util.List<Amenity> amenities) {
+    private void loadTable(java.util.List<AmenityDTO> amenities) {
         DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
         model.setRowCount(0);
-        for (Amenity amenity : amenities) {
+        for (AmenityDTO amenity : amenities) {
             model.addRow(new Object[]{amenity.getAmenityId(), amenity.getNameAmenity(), Constants.VND_FORMAT.format(amenity.getPrice())});
         }
     }
@@ -88,10 +86,10 @@ public class AmenityManagement extends javax.swing.JPanel {
                 File file = fileChooser.getSelectedFile();
 
                 ImportExcelService importService = new ImportExcelService();
-                List<Amenity> imported = importService.importAmenitiesFromExcel(file);
+                List<AmenityDTO> imported = importService.importAmenitiesFromExcel(file);
 
                 if (imported != null && !imported.isEmpty()) {
-                    List<Amenity> allAmenities = amenityService.getAllAmenities();
+                    List<AmenityDTO> allAmenities = amenityService.getAllAmenities();
                     allAmenities.addAll(imported);
                     loadTable(allAmenities);
 
@@ -132,7 +130,11 @@ public class AmenityManagement extends javax.swing.JPanel {
                         if (!result.valid) {
                             return;
                         }
-                        Amenity entitySave = amenityService.updateAmenity(new Amenity((Long) model.getValueAt(row, 0), result.name, result.price));
+                        AmenityDTO entitySave = amenityService.updateAmenity(AmenityDTO.builder()
+                                .amenityId((Long) model.getValueAt(row, 0))
+                                .nameAmenity(result.name())
+                                .price(result.price())
+                                .build());
 
                         model.setValueAt(entitySave.getNameAmenity(), row, 1);
                         model.setValueAt(Constants.VND_FORMAT.format(entitySave.getPrice()), row, 2);
@@ -328,7 +330,10 @@ public class AmenityManagement extends javax.swing.JPanel {
     private void saveData(ServiceModal modal) {
         Valid result = getValid(modal);
         if (result.valid()) {
-            Amenity entitySave = amenityService.createAmenity(new Amenity(result.name(), result.price()));
+            AmenityDTO entitySave = amenityService.createAmenity(AmenityDTO.builder()
+                    .nameAmenity(result.name())
+                    .price(result.price())
+                    .build());
             if (entitySave == null) {
                 Message.showError("Lỗi thêm dịch vụ", "Dịch vụ với tên '" + result.name() + "' đã tồn tại!");
                 return;
@@ -366,7 +371,7 @@ public class AmenityManagement extends javax.swing.JPanel {
             valid = false;
         } else {
             try {
-                priceI = new BigDecimal(price);
+                priceI = Constants.parseVNDToBigDecimal(price);
                 if (priceI.compareTo(BigDecimal.ZERO) <= 0) {
                     modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");
                     valid = false;

@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @Getter
-//@ToString(exclude = {"order", "room"})
+@Builder
 @Entity
 public class Booking {
     @Id
@@ -28,7 +28,7 @@ public class Booking {
     @JoinColumn(name = "orderId")
     private Order order;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "roomId")
     private Room room;
     private LocalDate createdAt;

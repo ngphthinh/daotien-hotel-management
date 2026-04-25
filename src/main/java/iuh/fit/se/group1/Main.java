@@ -1,6 +1,7 @@
 package iuh.fit.se.group1;
 
 import iuh.fit.se.group1.config.InitData;
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
@@ -39,14 +40,14 @@ public class Main {
                 EmployeeService employeeService = new EmployeeService();
                 if (employeeService.count() == 0) {
                     InitData.initAllData();
-                    Employee admin = new Employee();
+                    EmployeeDTO admin = new EmployeeDTO();
                     admin.setFullName("Quản Trị Viên Admin");
                     admin.setPhone("0123456789");
                     admin.setHireDate(LocalDate.now());
                     admin.setEmail("nguyenphuocthinh0710@gmail.com");
                     admin.setGender(false);
                     admin.setCitizenId("082205000819");
-                    Employee employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
+                    EmployeeDTO employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
                     if (employee == null) {
                         System.out.println("Không tạo được tài khoản");
                     } else {

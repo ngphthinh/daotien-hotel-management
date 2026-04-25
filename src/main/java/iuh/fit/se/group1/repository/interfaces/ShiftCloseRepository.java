@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ShiftCloseRepository {
-    List<ShiftClose> findByEmployeeShift(EntityManager em,EmployeeShift employeeShift);
 
-    BigDecimal getTotalCashRevenueForShift(EntityManager em,Long employeeShiftId);
+    List<ShiftClose> findByEmployeeShift(EntityManager em, Long employeeShiftId);
 
-    Employee validateManager(EntityManager em, String username, String password);
+    BigDecimal getTotalCashRevenueForShift(EntityManager em, Long employeeShiftId);
+
 
     Employee getManagerById(Long managerId);
 

@@ -1,8 +1,6 @@
 package iuh.fit.se.group1.ui.component.custom;
 
-import iuh.fit.se.group1.dto.AmenityDTO;
-import iuh.fit.se.group1.dto.SurchargeDTO;
-import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.repository.jpa.SurchargeRepositoryImpl;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -43,7 +41,7 @@ public class OrderEditDialog extends JDialog {
     private static final Color HOVER_COLOR = new Color(230, 240, 255);
     private static final Color SELECTED_COLOR = new Color(220, 237, 255);
 
-    private final Order order;
+    private final OrderDTO order;
     private final OrderService orderService = new OrderService();
     private final OrderDetailService orderDetailService = new OrderDetailService();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
@@ -61,7 +59,7 @@ public class OrderEditDialog extends JDialog {
     private JTable tblSurcharges;
     private DefaultTableModel surchargeModel;
 
-    public OrderEditDialog(Window owner, Order order) {
+    public OrderEditDialog(Window owner, OrderDTO order) {
         super(owner, "Chỉnh sửa hóa đơn #" + (order != null ? order.getOrderId() : ""), ModalityType.APPLICATION_MODAL);
         this.order = order;
         initComponents();
@@ -189,7 +187,7 @@ public class OrderEditDialog extends JDialog {
 
         if (order != null && order.getBookings() != null && !order.getBookings().isEmpty()) {
             // Get first booking for initial dates
-            Booking firstBooking = order.getBookings().get(0);
+            BookingViewDTO firstBooking = order.getBookings().get(0);
 
             // Create single row for check-in and check-out (applies to all rooms)
             JPanel dateRow = new JPanel(new MigLayout("fill, insets 10", "[right]10[grow]20[right]10[grow]", "[]"));
@@ -238,7 +236,7 @@ public class OrderEditDialog extends JDialog {
             JPanel roomChipsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
             roomChipsPanel.setBackground(new Color(245, 248, 250));
 
-            for (Booking b : order.getBookings()) {
+            for (BookingViewDTO b : order.getBookings()) {
                 String roomNumber = b.getRoom() != null ? b.getRoom().getRoomNumber() : "?";
                 JLabel roomChip = new JLabel(" Phòng " + roomNumber + " ");
                 roomChip.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -571,10 +569,10 @@ public class OrderEditDialog extends JDialog {
         var amenityDetails = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
         if (amenityDetails != null) {
             int index = 1;
-            for (OrderDetail d : amenityDetails) {
+            for (OrderDetailDTO d : amenityDetails) {
                 Long id = d.getAmenity() != null ? d.getAmenity().getAmenityId() : null;
                 String name = d.getAmenity() != null ? d.getAmenity().getNameAmenity() : "";
-                AmenityDTO amenityDTO = new AmenityDTO(id, name, d.getUnitPrice().doubleValue(), d.getQuantity());
+                AmenityDTO amenityDTO = new AmenityDTO(id, name, d.getUnitPrice(), d.getQuantity());
                 amenityModel.addRow(new Object[]{index++, amenityDTO, d.getUnitPrice(), d.getQuantity()});
             }
         }
@@ -582,7 +580,7 @@ public class OrderEditDialog extends JDialog {
         var surchargeDetails = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
         if (surchargeDetails != null) {
             int index = 1;
-            for (SurchargeDetail s : surchargeDetails) {
+            for (SurchargeDetailDTO s : surchargeDetails) {
                 Long id = s.getSurcharge() != null ? s.getSurcharge().getSurchargeId() : null;
                 String name = s.getSurcharge() != null ? s.getSurcharge().getName() : "";
                 BigDecimal price = s.getSurcharge() != null ? s.getSurcharge().getPrice() : BigDecimal.ZERO;
@@ -604,7 +602,7 @@ public class OrderEditDialog extends JDialog {
 
         // Load available amenities from repository
         AmenityService amenityService = new AmenityService();
-        java.util.List<iuh.fit.se.group1.entity.Amenity> availableAmenities = amenityService.getAllAmenities();
+        java.util.List<AmenityDTO> availableAmenities = amenityService.getAllAmenities();
 
         List<AmenityDTO> existingAmenities = new ArrayList<>();
         for (int i = 0; i < amenityModel.getRowCount(); i++) {
@@ -622,7 +620,7 @@ public class OrderEditDialog extends JDialog {
                 amenityModel.addRow(new Object[]{
                         amenityModel.getRowCount() + 1,
                         item,
-                        BigDecimal.valueOf(item.getPrice()),
+                        item.getPrice(),
                         item.getQuantity()
                 });
             }
@@ -652,7 +650,7 @@ public class OrderEditDialog extends JDialog {
                 new SurchargeManagementPanel();
 
         SurchargeService surchargeService = new SurchargeService();
-        java.util.List<iuh.fit.se.group1.entity.Surcharge> availableSurcharges = surchargeService.getAllSurcharges();
+        java.util.List<SurchargeDTO> availableSurcharges = surchargeService.getAllSurcharges();
 
         List<SurchargeDTO> existingSurcharges = new ArrayList<>();
         for (int i = 0; i < surchargeModel.getRowCount(); i++) {
@@ -703,17 +701,17 @@ public class OrderEditDialog extends JDialog {
 
                 // Get existing amenities for comparison
                 var existingAmenities = orderDetailService.getOrderDetailsByOrderId(orderId);
-                List<OrderDetail> newDetails = new ArrayList<>();
+                List<OrderDetailDTO> newDetails = new ArrayList<>();
 
                 for (int i = 0; i < amenityModel.getRowCount(); i++) {
                     AmenityDTO amenityDTO = (AmenityDTO) amenityModel.getValueAt(i, 1);
-                    OrderDetail detail = toOrderDetails(amenityDTO);
+                    OrderDetailDTO detail = toOrderDetails(amenityDTO);
                     newDetails.add(detail);
                 }
 
                 // Update or insert amenities (keep existing IDs where possible)
-                for (OrderDetail newDetail : newDetails) {
-                    OrderDetail existing = existingAmenities.stream()
+                for (OrderDetailDTO newDetail : newDetails) {
+                    OrderDetailDTO existing = existingAmenities.stream()
                             .filter(od -> od.getAmenity().getAmenityId().equals(newDetail.getAmenity().getAmenityId()))
                             .findFirst()
                             .orElse(null);
@@ -728,7 +726,7 @@ public class OrderEditDialog extends JDialog {
                 }
 
                 // Delete removed amenities
-                for (OrderDetail existing : existingAmenities) {
+                for (OrderDetailDTO existing : existingAmenities) {
                     boolean stillExists = newDetails.stream()
                             .anyMatch(nd -> nd.getAmenity().getAmenityId().equals(existing.getAmenity().getAmenityId()));
                     if (!stillExists) {
@@ -738,18 +736,18 @@ public class OrderEditDialog extends JDialog {
 
                 // Similar logic for surcharges
                 var existingSurcharges = surchargeDetailService.getSurchargeDetailsByOrderId(orderId);
-                List<SurchargeDetail> newSurcharges = new ArrayList<>();
+                List<SurchargeDetailDTO> newSurcharges = new ArrayList<>();
 
                 for (int i = 0; i < surchargeModel.getRowCount(); i++) {
                     SurchargeDTO surchargeDTO = (SurchargeDTO) surchargeModel.getValueAt(i, 1);
-                    SurchargeDetail sd = toSurchargeDetail(surchargeDTO);
+                    SurchargeDetailDTO sd = toSurchargeDetail(surchargeDTO);
                     newSurcharges.add(sd);
                 }
 
                 // Update or insert surcharges
-                for (SurchargeDetail newSurcharge : newSurcharges) {
-                    SurchargeDetail existing = existingSurcharges.stream()
-                            .filter(sd -> sd.getSurcharge().getSurchargeId() == newSurcharge.getSurcharge().getSurchargeId())
+                for (SurchargeDetailDTO newSurcharge : newSurcharges) {
+                    SurchargeDetailDTO existing = existingSurcharges.stream()
+                            .filter(sd -> sd.getSurcharge().getSurchargeId().equals(newSurcharge.getSurcharge().getSurchargeId()))
                             .findFirst()
                             .orElse(null);
 
@@ -761,9 +759,9 @@ public class OrderEditDialog extends JDialog {
                 }
 
                 // Delete removed surcharges
-                for (SurchargeDetail existing : existingSurcharges) {
+                for (SurchargeDetailDTO existing : existingSurcharges) {
                     boolean stillExists = newSurcharges.stream()
-                            .anyMatch(ns -> ns.getSurcharge().getSurchargeId() == existing.getSurcharge().getSurchargeId());
+                            .anyMatch(ns -> ns.getSurcharge().getSurchargeId().equals(existing.getSurcharge().getSurchargeId()));
                     if (!stillExists) {
                         surchargeDetailService.deleteById(existing.getSurcharge().getSurchargeId(), orderId);
                     }
@@ -780,19 +778,19 @@ public class OrderEditDialog extends JDialog {
         }
     }
 
-    private SurchargeDetail toSurchargeDetail(SurchargeDTO surchargeDTO) {
-        SurchargeDetail detail = new SurchargeDetail();
+    private SurchargeDetailDTO toSurchargeDetail(SurchargeDTO surchargeDTO) {
+        SurchargeDetailDTO detail = new SurchargeDetailDTO();
 
-        detail.setSurcharge(new Surcharge(surchargeDTO.getSurchargeId()));
+        detail.setSurcharge(surchargeDTO);
         detail.setQuantity(surchargeDTO.getQuantity());
         return detail;
     }
 
-    private OrderDetail toOrderDetails(AmenityDTO amenityDTO) {
-        OrderDetail detail = new OrderDetail();
+    private OrderDetailDTO toOrderDetails(AmenityDTO amenityDTO) {
+        OrderDetailDTO detail = new OrderDetailDTO();
 
-        detail.setAmenity(new Amenity(amenityDTO.getId()));
-        detail.setUnitPrice(BigDecimal.valueOf(amenityDTO.getPrice()));
+        detail.setAmenity(amenityDTO);
+        detail.setUnitPrice(amenityDTO.getPrice());
         detail.setQuantity(amenityDTO.getQuantity());
         return detail;
     }
@@ -800,7 +798,7 @@ public class OrderEditDialog extends JDialog {
     private void onConvertToProcessing() {
 
         // kiểm tra thời gian hiện tại so với thời gian check-in của booking đầu tiên
-        Booking firstBooking = order.getBookings().get(0);
+        BookingViewDTO firstBooking = order.getBookings().get(0);
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(firstBooking.getCheckInDate())) {
             CustomDialog.showMessage(

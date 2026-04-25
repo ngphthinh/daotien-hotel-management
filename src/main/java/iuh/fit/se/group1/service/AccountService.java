@@ -1,5 +1,7 @@
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.AccountDTO;
+import iuh.fit.se.group1.mapper.AccountMapper;
 import jakarta.persistence.EntityManager;
 import org.mindrot.jbcrypt.BCrypt;
 import iuh.fit.se.group1.entity.Account;
@@ -11,8 +13,11 @@ import java.time.LocalDate;
 public class AccountService extends Service {
     private final AccountRepositoryImpl accountRepositoryImpl;
 
+    private final AccountMapper accountMapper;
+
     public AccountService() {
         this.accountRepositoryImpl = new AccountRepositoryImpl();
+        this.accountMapper = new AccountMapper();
     }
 
     public Account createAccount(EntityManager em, Account account) {
@@ -21,21 +26,12 @@ public class AccountService extends Service {
         return accountRepositoryImpl.save(em, account);
     }
 
-    public Account updateAccount(EntityManager em, Account account) {
-        return accountRepositoryImpl.update(em, account);
+    public AccountDTO updateAccount(EntityManager em, Account account) {
+        return accountMapper.toDTO(accountRepositoryImpl.update(em, account));
 
     }
 
     public boolean changePassword(String username, String oldPass, String newPass) {
-//        Account acc = doInTransaction(em -> accountRepositoryImpl.findByUsername(em, username));
-//        if (acc == null) return false;
-//
-//        if (!BCrypt.checkpw(oldPass, acc.getPassword())) {
-//            return false;
-//        }
-//
-//        String newHashed = BCrypt.hashpw(newPass, BCrypt.gensalt());
-//        return doInTransaction(entityManager -> accountRepositoryImpl.updatePassword(entityManager, acc.getAccountId(), newHashed));
         return doInTransaction(entityManager -> {
             Account acc = accountRepositoryImpl.findByUsername(entityManager, username);
             if (acc == null) return false;

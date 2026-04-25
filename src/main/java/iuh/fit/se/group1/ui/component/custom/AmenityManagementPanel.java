@@ -93,7 +93,7 @@ public class AmenityManagementPanel extends JPanel {
     }
 
     private void setupAvailableAmenitiesTable() {
-        String[] columnNames = { "Mã dịch vụ", "Tên dịch vụ", "Giá" };
+        String[] columnNames = {"Mã dịch vụ", "Tên dịch vụ", "Giá"};
         availableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -110,7 +110,7 @@ public class AmenityManagementPanel extends JPanel {
     }
 
     private void setupSelectedAmenitiesTable() {
-        String[] columnNames = { "STT", "Tên dịch vụ", "Giá", "SL", "Thành tiền" };
+        String[] columnNames = {"STT", "Tên dịch vụ", "Giá", "SL", "Thành tiền"};
         selectedModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -249,19 +249,19 @@ public class AmenityManagementPanel extends JPanel {
         if (selectedRow == -1) return;
 
         AmenityDTO amenityDTO = new AmenityDTO();
-        amenityDTO.setId((Long) availableModel.getValueAt(selectedRow, 0));
-        amenityDTO.setName((String) availableModel.getValueAt(selectedRow, 1));
-        BigDecimal priceObj = (BigDecimal) availableModel.getValueAt(selectedRow, 2);
-        double price = priceObj.doubleValue();
+        amenityDTO.setAmenityId((Long) availableModel.getValueAt(selectedRow, 0));
+        amenityDTO.setNameAmenity((String) availableModel.getValueAt(selectedRow, 1));
+        BigDecimal price = (BigDecimal) availableModel.getValueAt(selectedRow, 2);
+
         amenityDTO.setPrice(price);
-        Long id = amenityDTO.getId();
+        Long id = amenityDTO.getAmenityId();
 
         boolean exists = false;
         for (AmenityDTO data : selectedAmenities.values()) {
-            if (data.getId().equals(id)) {
+            if (data.getAmenityId().equals(id)) {
                 data.setQuantity(data.getQuantity() + 1);
                 exists = true;
-                showNotification("Đã tăng số lượng: " + data.getName(), ACCENT_COLOR);
+                showNotification("Đã tăng số lượng: " + data.getNameAmenity(), ACCENT_COLOR);
                 break;
             }
         }
@@ -269,10 +269,11 @@ public class AmenityManagementPanel extends JPanel {
         if (!exists) {
             amenityDTO.setQuantity(1);
             selectedAmenities.put(id.toString(), amenityDTO);
-            showNotification("Đã thêm: " + amenityDTO.getName(), ACCENT_COLOR);
+            showNotification("Đã thêm: " + amenityDTO.getNameAmenity(), ACCENT_COLOR);
         }
 
-        totalAmount += amenityDTO.getPrice();
+        totalAmount += amenityDTO.getPrice().doubleValue();
+
         updateTotalLabel();
         refreshSelectedTable();
     }
@@ -291,7 +292,7 @@ public class AmenityManagementPanel extends JPanel {
         var amenityDTO = (AmenityDTO) selectedModel.getValueAt(row, 1);
         if (amenityDTO == null) return;
 
-        String id = amenityDTO.getId().toString();
+        String id = amenityDTO.getAmenityId().toString();
         AmenityDTO data = selectedAmenities.get(id);
         if (data == null) return;
 
@@ -299,7 +300,7 @@ public class AmenityManagementPanel extends JPanel {
         editItem.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         editItem.addActionListener(e2 -> editQuantity(row, id, data));
 
-        JMenuItem deleteItem = new JMenuItem("Xóa \"" + data.getName() + "\"");
+        JMenuItem deleteItem = new JMenuItem("Xóa \"" + data.getNameAmenity() + "\"");
         deleteItem.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         deleteItem.setForeground(new Color(220, 53, 69));
         deleteItem.addActionListener(e2 -> deleteAmenity(row, id, data));
@@ -314,7 +315,7 @@ public class AmenityManagementPanel extends JPanel {
     private void editQuantity(int row, String id, AmenityDTO data) {
         String input = CustomDialog.showInput(
                 this,
-                "Nhập số lượng mới cho \"" + data.getName() + "\":",
+                "Nhập số lượng mới cho \"" + data.getNameAmenity() + "\":",
                 "Sửa số lượng",
                 CustomDialog.MessageType.INFO,
                 500, 200);
@@ -328,15 +329,15 @@ public class AmenityManagementPanel extends JPanel {
                     return;
                 }
 
-                double oldTotal = data.getPrice() * data.getQuantity();
+                double oldTotal = data.getPrice().doubleValue() * data.getQuantity();
                 data.setQuantity(newQuantity);
-                double newTotal = data.getPrice() * newQuantity;
+                double newTotal = data.getPrice().doubleValue() * newQuantity;
 
                 totalAmount = totalAmount - oldTotal + newTotal;
                 updateTotalLabel();
                 refreshSelectedTable();
 
-                showNotification("Đã cập nhật số lượng: " + data.getName() + " x" + newQuantity, ACCENT_COLOR);
+                showNotification("Đã cập nhật số lượng: " + data.getNameAmenity() + " x" + newQuantity, ACCENT_COLOR);
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Số lượng không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -346,7 +347,7 @@ public class AmenityManagementPanel extends JPanel {
 
     private void deleteAmenity(int row, String id, AmenityDTO data) {
         int opt = CustomDialog.showConfirm(this,
-                "Bạn có chắc muốn xóa \"" + data.getName() + "\"?",
+                "Bạn có chắc muốn xóa \"" + data.getNameAmenity() + "\"?",
                 "Xác nhận xóa",
                 CustomDialog.MessageType.WARNING,
                 400, 200);
@@ -354,10 +355,10 @@ public class AmenityManagementPanel extends JPanel {
         if (opt == JOptionPane.YES_OPTION) {
             selectedModel.removeRow(row);
             selectedAmenities.remove(id);
-            totalAmount -= data.getPrice() * data.getQuantity();
+            totalAmount -= data.getPrice().doubleValue() * data.getQuantity();
             updateTotalLabel();
 
-            showNotification("Đã xóa: " + data.getName(), WARNING_COLOR);
+            showNotification("Đã xóa: " + data.getNameAmenity(), WARNING_COLOR);
         }
     }
 
@@ -388,8 +389,8 @@ public class AmenityManagementPanel extends JPanel {
         selectedModel.setRowCount(0);
         int idx = 1;
         for (AmenityDTO data : selectedAmenities.values()) {
-            double total = data.getPrice() * data.getQuantity();
-            selectedModel.addRow(new Object[] {
+            double total = data.getPrice().doubleValue() * data.getQuantity();
+            selectedModel.addRow(new Object[]{
                     idx++,
                     data,
                     data.getPrice(),
@@ -433,7 +434,7 @@ public class AmenityManagementPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setBackground(HEADER_COLOR);
             setForeground(Color.WHITE);
@@ -454,7 +455,7 @@ public class AmenityManagementPanel extends JPanel {
     private class AlternatingRowRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
             if (isSelected) {
@@ -477,7 +478,7 @@ public class AmenityManagementPanel extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setFont(new Font("Segoe UI", Font.BOLD, 13));
             return this;
@@ -506,15 +507,15 @@ public class AmenityManagementPanel extends JPanel {
         return data;
     }
 
-    public void loadData(java.util.List<Amenity> availableData, java.util.List<AmenityDTO> selectedData) {
+    public void loadData(java.util.List<AmenityDTO> availableData, java.util.List<AmenityDTO> selectedData) {
         availableModel.setRowCount(0);
         selectedModel.setRowCount(0);
         selectedAmenities.clear();
         totalAmount = 0.0;
 
         if (availableData != null) {
-            for (Amenity amenity : availableData) {
-                availableModel.addRow(new Object[] {
+            for (AmenityDTO amenity : availableData) {
+                availableModel.addRow(new Object[]{
                         amenity.getAmenityId(),
                         amenity.getNameAmenity(),
                         amenity.getPrice(),
@@ -525,15 +526,15 @@ public class AmenityManagementPanel extends JPanel {
         if (selectedData != null) {
             int index = 1;
             for (AmenityDTO dto : selectedData) {
-                double total = dto.getPrice() * dto.getQuantity();
-                selectedModel.addRow(new Object[] {
+                double total = dto.getPrice().doubleValue() * dto.getQuantity();
+                selectedModel.addRow(new Object[]{
                         index++,
                         dto,
                         dto.getPrice(),
                         dto.getQuantity(),
                         total
                 });
-                selectedAmenities.put(dto.getId().toString(), dto);
+                selectedAmenities.put(dto.getAmenityId().toString(), dto);
                 totalAmount += total;
             }
         }

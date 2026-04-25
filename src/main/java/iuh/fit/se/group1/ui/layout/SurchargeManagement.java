@@ -1,9 +1,10 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt 
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java 
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.SurchargeDTO;
 import iuh.fit.se.group1.entity.Surcharge;
 import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.service.SurchargeService;
@@ -11,6 +12,7 @@ import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.SurchageModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import iuh.fit.se.group1.util.Constants;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -35,7 +37,6 @@ import raven.glasspanepopup.GlassPanePopup;
 import iuh.fit.se.group1.service.ExportExcelService;
 
 /**
- *
  * @author Windows
  */
 public class SurchargeManagement extends javax.swing.JPanel {
@@ -49,14 +50,14 @@ public class SurchargeManagement extends javax.swing.JPanel {
     public SurchargeManagement() {
         initComponents();
         custom();
-        surchargeService = new SurchargeService(); 
+        surchargeService = new SurchargeService();
         loadTable(surchargeService.getAllSurcharges());
     }
 
-    private void loadTable(List<Surcharge> allSurcharges) {
+    private void loadTable(List<SurchargeDTO> allSurcharges) {
         DefaultTableModel model = (DefaultTableModel) tblSurchage.getTbl().getModel();
         model.setRowCount(0);
-        for (Surcharge surcharge : allSurcharges) {
+        for (SurchargeDTO surcharge : allSurcharges) {
             model.addRow(new Object[]{surcharge.getSurchargeId(), surcharge.getName(), Constants.VND_FORMAT.format(surcharge.getPrice())});
         }
     }
@@ -108,35 +109,35 @@ public class SurchargeManagement extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tblSurchage, javax.swing.GroupLayout.PREFERRED_SIZE, 1200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(23, 23, 23)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnAddSurchage, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(86, 86, 86))))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(tblSurchage, javax.swing.GroupLayout.PREFERRED_SIZE, 1200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addGap(23, 23, 23)
+                                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(btnAddSurchage, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(86, 86, 86))))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnAddSurchage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnImport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addComponent(tblSurchage, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(headerCustom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(21, 21, 21)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnAddSurchage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnImport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addComponent(tblSurchage, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -158,7 +159,10 @@ public class SurchargeManagement extends javax.swing.JPanel {
             private void saveData(SurchageModal modal) {
                 Valid result = getValid(modal);
                 if (result.valid()) {
-                    Surcharge surchargeSave = surchargeService.createSurcharge(new Surcharge(result.name(), result.price()));
+                    SurchargeDTO surchargeSave = surchargeService.createSurcharge(SurchargeDTO.builder()
+                            .name(result.name())
+                            .price(result.price())
+                            .build());
                     if (surchargeSave == null) {
                         Message.showMessage("Lỗi", "Phụ phí với tên '" + result.name() + "' đã tồn tại!");
                         return;
@@ -217,7 +221,7 @@ public class SurchargeManagement extends javax.swing.JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 ImportExcelService importService = new ImportExcelService();
-                List<Surcharge> imported = importService.importSurchargesFromExcel(file);
+                List<SurchargeDTO> imported = importService.importSurchargesFromExcel(file);
                 if (imported != null && !imported.isEmpty()) {
                     surchargeService.getAllSurcharges().addAll(imported);
                     loadTable(surchargeService.getAllSurcharges());
@@ -233,19 +237,19 @@ public class SurchargeManagement extends javax.swing.JPanel {
 
         String cols[] = {"Mã phụ phí", "Tên phụ phí", "Giá phụ phí", "Chức năng"};
         DefaultTableModel model = new DefaultTableModel(cols, 0);
-        
+
         // Khởi tạo TableRowSorter cho chức năng tìm kiếm
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         tblSurchage.getTbl().setRowSorter(sorter);
         tblSurchage.getTbl().setAutoCreateRowSorter(false);
-        
+
         // Tắt sorting cho tất cả các cột
         for (int i = 0; i < cols.length; i++) {
             sorter.setSortable(i, false);
         }
-        
+
         tblSurchage.getTbl().setModel(model);
-        
+
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
@@ -271,7 +275,13 @@ public class SurchargeManagement extends javax.swing.JPanel {
                         }
                         Object idValue = model.getValueAt(row, 0);
                         System.out.println(">>> ID type: " + idValue.getClass() + " | value = " + idValue);
-                        Surcharge entitySave = surchargeService.updateSurcharge(new Surcharge((Long) model.getValueAt(row, 0), result.name, result.price));
+                        SurchargeDTO entitySave = surchargeService.updateSurcharge(
+                                SurchargeDTO.builder()
+                                        .surchargeId((Long) idValue)
+                                        .price(result.price())
+                                        .name(result.name())
+                                        .build()
+                        );
 
                         model.setValueAt(entitySave.getName(), row, 1);
                         model.setValueAt(Constants.VND_FORMAT.format(entitySave.getPrice()), row, 2);
@@ -355,7 +365,7 @@ public class SurchargeManagement extends javax.swing.JPanel {
                             // Tìm kiếm theo mã phụ phí (cột 0) hoặc tên phụ phí (cột 1)
                             Object idValue = entry.getValue(0);
                             Object nameValue = entry.getValue(1);
-                            
+
                             if (idValue != null && idValue.toString().contains(keyword)) {
                                 return true;
                             }
@@ -369,7 +379,7 @@ public class SurchargeManagement extends javax.swing.JPanel {
             }
 
         });
-        
+
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -410,7 +420,7 @@ public class SurchargeManagement extends javax.swing.JPanel {
         } else {
             try {
                 priceI = new BigDecimal(
-                         price.replaceAll("[^\\d.-]", "").trim()
+                        price.replaceAll("[^\\d.-]", "").trim()
                 );
                 if (priceI.compareTo(BigDecimal.ZERO) <= 0) {
                     modal.getLblErrolPrice().setText("Giá phải lớn hơn 0!");

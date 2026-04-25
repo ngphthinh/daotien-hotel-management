@@ -5,11 +5,10 @@
 package iuh.fit.se.group1.ui.layout;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.service.AccountService;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -52,7 +51,7 @@ public class Profile extends javax.swing.JPanel {
         setupFormPanel();
     }
 
-    public void setEmployeeInfo(Employee employee) {
+    public void setEmployeeInfo(EmployeeDTO employee) {
         if (employee == null) {
             return;
         }
