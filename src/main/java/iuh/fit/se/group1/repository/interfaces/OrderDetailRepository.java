@@ -5,6 +5,7 @@ import iuh.fit.se.group1.entity.OrderDetail;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderDetailRepository {
@@ -24,4 +25,5 @@ public interface OrderDetailRepository {
 
     void updateOrderDetailFormOrderId(EntityManager em, Long amenityId, BigDecimal unitPrice, int quantity, Long orderId);
 
+    BigDecimal getServiceRevenue(EntityManager em, LocalDateTime start, LocalDateTime end);
 }

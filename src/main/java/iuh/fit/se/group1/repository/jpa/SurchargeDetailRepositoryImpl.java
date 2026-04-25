@@ -6,6 +6,8 @@ import iuh.fit.se.group1.entity.SurchargeDetail;
 import iuh.fit.se.group1.repository.interfaces.SurchargeDetailRepository;
 import jakarta.persistence.EntityManager;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class SurchargeDetailRepositoryImpl extends AbstractRepositoryImpl<SurchargeDetail, SurchargeDetail.SurchargeDetailID> implements SurchargeDetailRepository {
@@ -21,6 +23,23 @@ public class SurchargeDetailRepositoryImpl extends AbstractRepositoryImpl<Surcha
         Order orderRef = em.getReference(Order.class, orderId);
         surchargeDetail.setOrder(orderRef);
         return em.merge(surchargeDetail);
+    }
+
+    @Override
+    public BigDecimal getSurchargeRevenue(EntityManager em, LocalDateTime start, LocalDateTime end) {
+        BigDecimal result = (BigDecimal) em.createNativeQuery("""
+                                SELECT ISNULL(SUM(s.price * sd.quantity), 0)
+                                FROM SurchargeDetail sd
+                                JOIN Surcharge s ON sd.surchargerId = s.surchargeId
+                                JOIN Orders o ON sd.orderId = o.orderId
+                                WHERE o.paymentDate IS NOT NULL
+                                AND CAST(o.paymentDate AS DATE) BETWEEN CAST(:start AS DATE) AND CAST(:end AS DATE)
+                        """)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .getSingleResult();
+
+        return result != null ? result : BigDecimal.ZERO;
     }
 
     @Override

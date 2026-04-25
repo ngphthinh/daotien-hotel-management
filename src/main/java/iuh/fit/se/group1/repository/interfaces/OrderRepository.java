@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,17 @@ public interface OrderRepository {
 
     Map<String, Integer> getBookingCountByRoomTypeAndDate(EntityManager em, LocalDate date);
 
+    BigDecimal getRevenueByDateRange(EntityManager em,
+                                     LocalDateTime startDate,
+                                     LocalDateTime endDate);
+
+    int getCurrentGuestCount(EntityManager em);
+
+    int getOrderCountByDate(EntityManager em,
+                            LocalDateTime startOfDay,
+                            LocalDateTime endOfDay);
+
+    BigDecimal getTotalOrderRevenue(EntityManager em, LocalDateTime start, LocalDateTime end);
 
     boolean addSurchargeToOrder(EntityManager em, long orderId, long surchargeAmount);
 

@@ -6,6 +6,7 @@ import iuh.fit.se.group1.repository.interfaces.OrderDetailRepository;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderDetailRepositoryImpl extends AbstractRepositoryImpl<OrderDetail, OrderDetail.OrderDetailId> implements OrderDetailRepository {
@@ -21,6 +22,22 @@ public class OrderDetailRepositoryImpl extends AbstractRepositoryImpl<OrderDetai
             em.persist(detail);
         }
         return true;
+    }
+
+    @Override
+    public BigDecimal getServiceRevenue(EntityManager em, LocalDateTime start, LocalDateTime end) {
+        BigDecimal result = (BigDecimal) em.createNativeQuery("""
+                                SELECT ISNULL(SUM(od.unitPrice * od.quantity), 0)
+                                FROM OrderDetail od
+                                JOIN Orders o ON od.orderId = o.orderId
+                                WHERE o.paymentDate IS NOT NULL
+                                AND CAST(o.paymentDate AS DATE) BETWEEN CAST(:start AS DATE) AND CAST(:end AS DATE)
+                        """)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .getSingleResult();
+
+        return result != null ? result : BigDecimal.ZERO;
     }
 
     @Override

@@ -2,6 +2,7 @@ package iuh.fit.se.group1.repository.interfaces;
 
 import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
+import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
 import jakarta.persistence.EntityManager;
@@ -10,6 +11,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository {
+
+    int countBookings(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
+
+    int countLateCheckout(EntityManager em,
+                          LocalDateTime start,
+                          LocalDateTime now,
+                          LocalDateTime standardCheckout);
+
+    int countCheckedOutToday(EntityManager em, LocalDateTime start, LocalDateTime end);
+
+    List<Object[]> getPeakHours(EntityManager entityManager, LocalDateTime startDate, LocalDateTime endDate);
+
     boolean isExistsByRoomAndDate(EntityManager em, Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate);
 
     void saveAllBookingsForOrder(EntityManager em, Order savedOrder, List<Booking> bookings);

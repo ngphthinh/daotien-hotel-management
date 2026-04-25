@@ -18,4 +18,6 @@ public interface ShiftCloseRepository {
     Employee getManagerById(Long managerId);
 
     String getManagerNameById(Long managerId);
+
+    List<Object[]> getRecentShiftNotes(EntityManager em);
 }

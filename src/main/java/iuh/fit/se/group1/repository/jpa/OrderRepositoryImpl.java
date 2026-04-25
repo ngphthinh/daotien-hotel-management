@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,21 @@ public class OrderRepositoryImpl extends AbstractRepositoryImpl<Order, Long> imp
     }
 
     @Override
+    public BigDecimal getTotalOrderRevenue(EntityManager em, LocalDateTime start, LocalDateTime end) {
+        BigDecimal result = (BigDecimal) em.createNativeQuery("""
+                                SELECT ISNULL(SUM(totalAmount), 0)
+                                FROM [Orders]
+                                WHERE paymentDate IS NOT NULL
+                                AND CAST(paymentDate AS DATE) BETWEEN CAST(:start AS DATE) AND CAST(:end AS DATE)
+                        """)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .getSingleResult();
+
+        return result != null ? result : BigDecimal.ZERO;
+    }
+
+    @Override
     public void updateDeposit(EntityManager em, Long orderId, BigDecimal deposit) {
         em.createQuery("""
                             UPDATE Order o
@@ -39,6 +55,56 @@ public class OrderRepositoryImpl extends AbstractRepositoryImpl<Order, Long> imp
                 .setParameter("deposit", deposit)
                 .setParameter("id", orderId)
                 .executeUpdate();
+    }
+
+    @Override
+    public int getOrderCountByDate(EntityManager em,
+                                   LocalDateTime startOfDay,
+                                   LocalDateTime endOfDay) {
+
+        Long result = em.createQuery("""
+                                SELECT COUNT(o)
+                                FROM Order o
+                                WHERE o.paymentDate BETWEEN :start AND :end
+                                AND o.orderType.orderTypeId = 1
+                        """, Long.class)
+                .setParameter("start", startOfDay.toLocalDate())
+                .setParameter("end", endOfDay.toLocalDate())
+                .getSingleResult();
+
+        return result.intValue();
+    }
+
+    @Override
+    public int getCurrentGuestCount(EntityManager em) {
+        Long result = em.createQuery("""
+                                SELECT COUNT(DISTINCT o.customer.customerId)
+                                FROM Order o
+                                JOIN o.bookings b
+                                WHERE b.checkInDate <= CURRENT_TIMESTAMP
+                                AND (b.checkOutDate IS NULL OR b.checkOutDate > CURRENT_TIMESTAMP)
+                                AND o.orderType.orderTypeId = 2
+                        """, Long.class)
+                .getSingleResult();
+
+        return result.intValue();
+    }
+
+    @Override
+    public BigDecimal getRevenueByDateRange(EntityManager em,
+                                            LocalDateTime startDate,
+                                            LocalDateTime endDate) {
+
+        BigDecimal result = em.createQuery("""
+                                SELECT COALESCE(SUM(o.totalAmount), 0)
+                                FROM Order o
+                                WHERE o.paymentDate BETWEEN :start AND :end
+                        """, BigDecimal.class)
+                .setParameter("start", startDate.toLocalDate())
+                .setParameter("end", endDate.toLocalDate())
+                .getSingleResult();
+
+        return result != null ? result : BigDecimal.ZERO;
     }
 
     @Override

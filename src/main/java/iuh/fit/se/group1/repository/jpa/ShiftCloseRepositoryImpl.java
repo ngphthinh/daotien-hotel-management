@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.repository.jpa;
 
+import iuh.fit.se.group1.dto.ShiftNoteDto;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.EmployeeShift;
 import iuh.fit.se.group1.entity.ShiftClose;
@@ -15,6 +16,25 @@ public class ShiftCloseRepositoryImpl extends AbstractRepositoryImpl<ShiftClose,
 
     public ShiftCloseRepositoryImpl() {
         super(ShiftClose.class);
+    }
+
+    @Override
+    public List<Object[]> getRecentShiftNotes(EntityManager em) {
+        return em.createQuery("""
+                                SELECT 
+                                    e.fullName,
+                                    s.name,
+                                    es.shiftDate,
+                                    sc.note
+                                FROM ShiftClose sc
+                                JOIN sc.employeeShift es
+                                JOIN es.employee e
+                                JOIN es.shift s
+                                WHERE sc.note IS NOT NULL AND sc.note <> ''
+                                ORDER BY sc.createdAt DESC
+                        """, Object[].class)
+                .setMaxResults(2)
+                .getResultList();
     }
 
     @Override

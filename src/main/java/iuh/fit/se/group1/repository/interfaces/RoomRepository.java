@@ -8,6 +8,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomRepository {
+    int getOccupiedRoomsByType(EntityManager em, String roomTypeId);
+
+
+    int countRoomsByStatus(EntityManager em, RoomStatus roomStatus);
+
     List<Room> findByRoomNumberOrId(EntityManager em, String keyword);
 
     List<Room> findRoomByStatusAndRoomType(EntityManager em, String roomTypeId, RoomStatus roomStatus);
@@ -18,7 +23,7 @@ public interface RoomRepository {
 
     boolean existsByRoomNumber(EntityManager em, String roomNumber);
 
-    int countTotalRooms();
+    int count(EntityManager em);
 
     int countByStatus(RoomStatus status);
 

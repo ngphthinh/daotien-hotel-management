@@ -1,8 +1,11 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.*;
+import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.enums.TimeType;
 import iuh.fit.se.group1.infrastructure.DatabaseUtil;
+import iuh.fit.se.group1.repository.interfaces.*;
+import iuh.fit.se.group1.repository.jpa.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +25,26 @@ import java.util.List;
 /**
  * Service xử lý logic dashboard nhân viên
  */
-public class DashboardService {
+public class DashboardService extends Service {
 
     private static final Logger log = LoggerFactory.getLogger(DashboardService.class);
-    private final Connection connection;
+    //    private final Connection connection;
+    private final OrderRepository orderRepository;
+    private final ShiftCloseRepository shiftCloseRepository;
+    private final OrderDetailRepository orderDetailRepo;
+    private final SurchargeDetailRepository surchargeDetailRepo;
+    private final BookingRepository bookingRepository;
+    private final RoomRepository roomRepository;
 
     public DashboardService() {
-        this.connection = DatabaseUtil.getConnection();
+//        this.connection = DatabaseUtil.getConnection();
+        this.shiftCloseRepository = new ShiftCloseRepositoryImpl();
+        this.bookingRepository = new BookingRepositoryImpl();
+        this.roomRepository = new RoomRepositoryImpl();
+        this.orderRepository = new OrderRepositoryImpl();
+        this.orderDetailRepo = new OrderDetailRepositoryImpl();
+        this.surchargeDetailRepo = new SurchargeDetailRepositoryImpl();
+
     }
 
     /**
@@ -73,128 +89,51 @@ public class DashboardService {
     /**
      * Lấy nguồn doanh thu theo loại: Dịch vụ, Phụ phí, Tiền phòng, Khác
      */
-    public List<RevenueSourceDto> getRevenueSources(LocalDateTime startDate, LocalDateTime endDate) {
-        List<RevenueSourceDto> results = new ArrayList<>();
-        BigDecimal totalRevenue = BigDecimal.ZERO;
+    public List<RevenueSourceDto> getRevenueSources(LocalDateTime start, LocalDateTime end) {
 
-        // 1. Doanh thu từ DỊCH VỤ (OrderDetail - Amenity)
-        BigDecimal serviceRevenue = BigDecimal.ZERO;
-        String sqlService = "SELECT ISNULL(SUM(od.unitPrice * od.quantity), 0) as total " +
-                           "FROM OrderDetail od " +
-                           "JOIN Orders o ON od.orderId = o.orderId " +
-                           "WHERE o.paymentDate IS NOT NULL AND CAST(o.paymentDate AS DATE) BETWEEN CAST(? AS DATE) AND CAST(? AS DATE)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sqlService)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    serviceRevenue = rs.getBigDecimal("total");
-                    if (serviceRevenue == null) serviceRevenue = BigDecimal.ZERO;
-                }
+        return doInTransaction(entityManager -> {
+            BigDecimal totalRevenue = orderRepository.getTotalOrderRevenue(entityManager, start, end);
+            BigDecimal serviceRevenue = orderDetailRepo.getServiceRevenue(entityManager, start, end);
+            BigDecimal surchargeRevenue = surchargeDetailRepo.getSurchargeRevenue(entityManager, start, end);
+            BigDecimal roomRevenue = totalRevenue.subtract(serviceRevenue).subtract(surchargeRevenue);
+            if (roomRevenue.compareTo(BigDecimal.ZERO) < 0) {
+                roomRevenue = BigDecimal.ZERO;
             }
-        } catch (SQLException e) {
-            log.error("Error getting service revenue: ", e);
-        }
 
-        // 2. Doanh thu từ PHỤ PHÍ (SurchargeDetail)
-        BigDecimal surchargeRevenue = BigDecimal.ZERO;
-        String sqlSurcharge = "SELECT ISNULL(SUM(s.price * sd.quantity), 0) as total " +
-                             "FROM SurchargeDetail sd " +
-                             "JOIN Surcharge s ON sd.surchargerId = s.surchargeId " +
-                             "JOIN Orders o ON sd.orderId = o.orderId " +
-                             "WHERE o.paymentDate IS NOT NULL AND CAST(o.paymentDate AS DATE) BETWEEN CAST(? AS DATE) AND CAST(? AS DATE)";
+            List<RevenueSourceDto> results = new ArrayList<>(List.of(
+                    new RevenueSourceDto("Tiền phòng", roomRevenue, 0),
+                    new RevenueSourceDto("Dịch vụ", serviceRevenue, 0),
+                    new RevenueSourceDto("Phụ phí", surchargeRevenue, 0)
+            ));
 
-        try (PreparedStatement ps = connection.prepareStatement(sqlSurcharge)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    surchargeRevenue = rs.getBigDecimal("total");
-                    if (surchargeRevenue == null) surchargeRevenue = BigDecimal.ZERO;
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting surcharge revenue: ", e);
-        }
-
-        // 3. Doanh thu từ TIỀN PHÒNG (totalAmount - serviceRevenue - surchargeRevenue)
-        BigDecimal totalOrderRevenue = BigDecimal.ZERO;
-        String sqlTotal = "SELECT ISNULL(SUM(totalAmount), 0) as total " +
-                         "FROM Orders " +
-                         "WHERE paymentDate IS NOT NULL AND CAST(paymentDate AS DATE) BETWEEN CAST(? AS DATE) AND CAST(? AS DATE)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sqlTotal)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    totalOrderRevenue = rs.getBigDecimal("total");
-                    if (totalOrderRevenue == null) totalOrderRevenue = BigDecimal.ZERO;
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting total order revenue: ", e);
-        }
-
-        // Tiền phòng = Tổng - Dịch vụ - Phụ phí
-        BigDecimal roomRevenue = totalOrderRevenue.subtract(serviceRevenue).subtract(surchargeRevenue);
-        if (roomRevenue.compareTo(BigDecimal.ZERO) < 0) {
-            roomRevenue = BigDecimal.ZERO;
-        }
-
-        // Tổng doanh thu
-        totalRevenue = totalOrderRevenue;
-
-        // Thêm vào kết quả
-        results.add(new RevenueSourceDto("Tiền phòng", roomRevenue, 0));
-        results.add(new RevenueSourceDto("Dịch vụ", serviceRevenue, 0));
-        results.add(new RevenueSourceDto("Phụ phí", surchargeRevenue, 0));
-
-        // Tính phần trăm
-        for (RevenueSourceDto dto : results) {
             if (totalRevenue.compareTo(BigDecimal.ZERO) > 0) {
-                double percentage = dto.getAmount()
-                    .divide(totalRevenue, 4, RoundingMode.HALF_UP)
-                    .multiply(new BigDecimal("100"))
-                    .doubleValue();
-                dto.setPercentage(percentage);
+                for (RevenueSourceDto dto : results) {
+                    double percent = dto.getAmount()
+                            .divide(totalRevenue, 4, RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal("100"))
+                            .doubleValue();
+                    dto.setPercentage(percent);
+                }
             }
-        }
 
-        return results;
+            return results;
+        });
     }
 
     /**
      * Lấy khung giờ cao điểm (top 5 giờ có nhiều booking nhất)
      */
     public List<PeakHourDto> getPeakHours(LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT TOP 5 DATEPART(HOUR, checkInDate) as hour, COUNT(*) as count " +
-                     "FROM Booking " +
-                     "WHERE checkInDate BETWEEN ? AND ? " +
-                     "GROUP BY DATEPART(HOUR, checkInDate) " +
-                     "ORDER BY count DESC";
+
+        List<Object[]> rows = doInTransaction(entityManager -> bookingRepository.getPeakHours(entityManager, startDate, endDate));
 
         List<PeakHourDto> results = new ArrayList<>();
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    int hour = rs.getInt("hour");
-                    int count = rs.getInt("count");
-                    results.add(new PeakHourDto(hour + ":00", count));
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting peak hours: ", e);
+        for (Object[] row : rows) {
+            int hour = ((Number) row[0]).intValue();
+            int count = ((Number) row[1]).intValue();
+            results.add(new PeakHourDto(hour + ":00", count));
         }
-
         return results;
     }
 
@@ -202,233 +141,114 @@ public class DashboardService {
      * Lấy trạng thái phòng hiện tại
      */
     public RoomStatusDto getRoomStatus() {
-        RoomStatusDto dto = new RoomStatusDto();
+        return doInTransaction(em -> {
 
-        // Đếm phòng đang sử dụng
-        String sql1 = "SELECT COUNT(*) FROM Room WHERE roomStatus = 'OCCUPIED' AND isDeleted = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql1);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                dto.setOccupiedRooms(rs.getInt(1));
-            }
-        } catch (SQLException e) {
-            log.error("Error counting occupied rooms: ", e);
-        }
+            RoomStatusDto dto = new RoomStatusDto();
 
-        // Đếm phòng trống
-        String sql2 = "SELECT COUNT(*) FROM Room WHERE roomStatus = 'AVAILABLE' AND isDeleted = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql2);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                dto.setAvailableRooms(rs.getInt(1));
-            }
-        } catch (SQLException e) {
-            log.error("Error counting available rooms: ", e);
-        }
+            dto.setOccupiedRooms(roomRepository.countRoomsByStatus(em, RoomStatus.OCCUPIED));
+            dto.setAvailableRooms(roomRepository.countRoomsByStatus(em, RoomStatus.AVAILABLE));
 
-        // Đếm phòng đã checkout hôm nay
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
-        String sql3 = "SELECT COUNT(*) FROM Booking " +
-                      "WHERE checkOutDate BETWEEN ? AND ? " +
-                      "AND checkOutDate IS NOT NULL";
-        try (PreparedStatement ps = connection.prepareStatement(sql3)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startOfDay));
-            ps.setTimestamp(2, Timestamp.valueOf(endOfDay));
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    dto.setCheckedOutRooms(rs.getInt(1));
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error counting checked out rooms: ", e);
-        }
+            LocalDateTime start = LocalDate.now().atStartOfDay();
+            LocalDateTime end = LocalDate.now().atTime(LocalTime.MAX);
 
-        // Đếm booking bị hủy hôm nay (giả sử có cột status hoặc cancelledAt)
-        // Nếu không có, set = 0
-        dto.setCancelledBookings(0);
+            dto.setCheckedOutRooms(
+                    bookingRepository.countCheckedOutToday(em, start, end)
+            );
 
-        return dto;
+            dto.setCancelledBookings(0);
+
+            return dto;
+        });
     }
 
     /**
      * Lấy cảnh báo
      */
     public WarningDto getWarnings() {
-        WarningDto dto = new WarningDto();
+        return doInTransaction(em -> {
 
-        // Đếm phòng trả trễ (checkout quá giờ quy định, giả sử 12:00)
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        String sql1 = "SELECT COUNT(*) FROM Booking " +
-                      "WHERE checkOutDate BETWEEN ? AND ? " +
-                      "AND checkOutDate < ? " +
-                      "AND checkOutDate IS NOT NULL";
-        try (PreparedStatement ps = connection.prepareStatement(sql1)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startOfDay));
-            ps.setTimestamp(2, Timestamp.valueOf(now));
-            ps.setTimestamp(3, Timestamp.valueOf(LocalDate.now().atTime(12, 0)));
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    dto.setLateCheckOutCount(rs.getInt(1));
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error counting late checkouts: ", e);
-        }
+            WarningDto dto = new WarningDto();
 
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime start = LocalDate.now().atStartOfDay();
+            LocalDateTime standard = LocalDate.now().atTime(12, 0);
 
-        String sql2 = "SELECT COUNT(*) FROM Room " +
-                      "WHERE roomStatus = 'OUT_OF_ORDER' AND isDeleted = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql2);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                dto.setBrokenRoomsCount(rs.getInt(1));
-            }
-        } catch (SQLException e) {
-            log.error("Error counting broken rooms: ", e);
-        }
+            dto.setLateCheckOutCount(
+                    bookingRepository.countLateCheckout(em, start, now, standard)
+            );
 
-        dto.setHasNewVersion(false);
+            dto.setBrokenRoomsCount(
+                    roomRepository.countRoomsByStatus(em, RoomStatus.OUT_OF_ORDER)
+            );
 
-        return dto;
+            dto.setHasNewVersion(false);
+
+            return dto;
+        });
     }
 
     /**
      * Lấy số phòng đang được sử dụng theo loại phòng (SINGLE hoặc DOUBLE)
+     *
      * @param roomTypeId "SINGLE" hoặc "DOUBLE"
      * @return Số phòng đang sử dụng
      */
     public int getOccupiedRoomsByType(String roomTypeId) {
-        String sql = "SELECT COUNT(*) as occupied " +
-                     "FROM Room " +
-                     "WHERE roomStatus = 'OCCUPIED' " +
-                     "AND isDeleted = 0 " +
-                     "AND roomTypeId = ?";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, roomTypeId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("occupied");
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting occupied rooms by type {}: ", roomTypeId, e);
-        }
-        return 0;
+        return doInTransaction(entityManager -> roomRepository.getOccupiedRoomsByType(entityManager, roomTypeId));
     }
 
     /**
      * Lấy tổng số phòng theo loại (SINGLE hoặc DOUBLE)
+     *
      * @param roomTypeId "SINGLE" hoặc "DOUBLE"
      * @return Tổng số phòng
      */
-    public int getTotalRoomsByType(String roomTypeId) {
-        String sql = "SELECT COUNT(*) as total " +
-                     "FROM Room " +
-                     "WHERE isDeleted = 0 " +
-                     "AND roomTypeId = ?";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, roomTypeId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total");
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting total rooms by type {}: ", roomTypeId, e);
-        }
-        return 0;
-    }
+//    public int getTotalRoomsByType(String roomTypeId) {
+//        String sql = "SELECT COUNT(*) as total " +
+//                "FROM Room " +
+//                "WHERE isDeleted = 0 " +
+//                "AND roomTypeId = ?";
+//
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setString(1, roomTypeId);
+//
+//            try (ResultSet rs = ps.executeQuery()) {
+//                if (rs.next()) {
+//                    return rs.getInt("total");
+//                }
+//            }
+//        } catch (SQLException e) {
+//            log.error("Error getting total rooms by type {}: ", roomTypeId, e);
+//        }
+//        return 0;
+//    }
 
     /**
      * Đếm số phòng sắp hết hạn (checkout trong vòng 2 giờ tới)
      */
     private int countRoomsNearExpiry(LocalDateTime fromTime, LocalDateTime toTime) {
-        String sql = "SELECT COUNT(DISTINCT b.roomId) " +
-                     "FROM Booking b " +
-                     "WHERE b.checkOutDate BETWEEN ? AND ? " +
-                     "AND b.checkOutDate IS NOT NULL";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(fromTime));
-            ps.setTimestamp(2, Timestamp.valueOf(toTime));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error counting rooms near expiry: ", e);
-        }
-        return 0;
+        return doInTransaction(entityManager -> bookingRepository.countRoomsNearExpiry(entityManager, fromTime, toTime));
     }
 
     /**
      * Đếm tổng số phòng trong hệ thống
      */
     private int countTotalRooms() {
-        String sql = "SELECT COUNT(*) FROM Room WHERE isDeleted = 0";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            log.error("Error counting total rooms: ", e);
-        }
-        return 0;
+        return doInTransaction(roomRepository::count);
     }
 
     /**
      * Đếm số lượt check-in trong khoảng thời gian
      */
     private int countCheckIns(LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT COUNT(*) FROM Booking " +
-                     "WHERE checkInDate BETWEEN ? AND ?";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error counting check-ins: ", e);
-        }
-        return 0;
+        return doInTransaction(entityManager -> bookingRepository.countCheckIns(entityManager, startDate, endDate));
     }
 
     /**
      * Đếm số lượt check-out trong khoảng thời gian
      */
     private int countCheckOuts(LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT COUNT(*) FROM Booking " +
-                     "WHERE checkOutDate BETWEEN ? AND ? " +
-                     "AND checkOutDate IS NOT NULL";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error counting check-outs: ", e);
-        }
-        return 0;
+        return doInTransaction(entityManager -> bookingRepository.countCheckOuts(entityManager, startDate, endDate));
     }
 
     /**
@@ -436,22 +256,7 @@ public class DashboardService {
      * Đếm tất cả booking được tạo trong khoảng thời gian startDate - endDate
      */
     private int countBookings(LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT COUNT(*) FROM Booking " +
-                     "WHERE createdAt BETWEEN ? AND ?";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error counting bookings: ", e);
-        }
-        return 0;
+        return doInTransaction(entityManager -> bookingRepository.countBookings(entityManager, startDate, endDate));
     }
 
     /**
@@ -494,217 +299,140 @@ public class DashboardService {
     /**
      * Lấy tổng doanh thu hôm nay
      */
-    public BigDecimal getTodayRevenue() {
-        // Query doanh thu theo paymentDate (ngày thanh toán)
-        String sql = "SELECT ISNULL(SUM(totalAmount), 0) as total " +
-                     "FROM Orders " +
-                     "WHERE paymentDate = CAST(GETDATE() AS DATE)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                BigDecimal revenue = rs.getBigDecimal("total");
-                return revenue != null ? revenue : BigDecimal.ZERO;
-            }
-        } catch (SQLException e) {
-            log.error("Error getting today revenue: ", e);
-        }
-        return BigDecimal.ZERO;
-    }
+//    public BigDecimal getTodayRevenue() {
+//        // Query doanh thu theo paymentDate (ngày thanh toán)
+//        String sql = "SELECT ISNULL(SUM(totalAmount), 0) as total " +
+//                "FROM Orders " +
+//                "WHERE paymentDate = CAST(GETDATE() AS DATE)";
+//
+//        try (PreparedStatement ps = connection.prepareStatement(sql);
+//             ResultSet rs = ps.executeQuery()) {
+//            if (rs.next()) {
+//                BigDecimal revenue = rs.getBigDecimal("total");
+//                return revenue != null ? revenue : BigDecimal.ZERO;
+//            }
+//        } catch (SQLException e) {
+//            log.error("Error getting today revenue: ", e);
+//        }
+//        return BigDecimal.ZERO;
+//    }
 
     /**
      * Lấy doanh thu theo khoảng thời gian (startDate -> endDate)
+     *
      * @param startDate Ngày bắt đầu
-     * @param endDate Ngày kết thúc
+     * @param endDate   Ngày kết thúc
      * @return Tổng doanh thu trong khoảng thời gian
      */
     public BigDecimal getRevenueByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        String sql = "SELECT ISNULL(SUM(totalAmount), 0) as total " +
-                     "FROM Orders " +
-                     "WHERE paymentDate BETWEEN CAST(? AS DATE) AND CAST(? AS DATE)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(startDate));
-            ps.setTimestamp(2, Timestamp.valueOf(endDate));
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    BigDecimal revenue = rs.getBigDecimal("total");
-                    return revenue != null ? revenue : BigDecimal.ZERO;
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting revenue by date range: ", e);
-        }
-        return BigDecimal.ZERO;
+        return doInTransaction(em ->
+                orderRepository.getRevenueByDateRange(em, startDate, endDate)
+        );
     }
 
     /**
      * Đếm số lượng khách hiện đang ở trong khách sạn
      */
     public int getCurrentGuestCount() {
-        String sql = "SELECT COUNT(DISTINCT o.customerId) as guestCount " +
-                     "FROM Orders o " +
-                     "JOIN Booking b ON o.orderId = b.orderId " +
-                     "WHERE b.checkInDate <= GETDATE() " +
-                     "AND (b.checkOutDate IS NULL OR b.checkOutDate > GETDATE()) " +
-                     "AND o.orderTypeId = 2";  // Đơn đang xử lý
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("guestCount");
-            }
-        } catch (SQLException e) {
-            log.error("Error getting current guest count: ", e);
-        }
-        return 0;
+        return doInTransaction(orderRepository::getCurrentGuestCount
+        );
     }
 
     /**
      * Lấy tổng số phòng trong khách sạn
      */
     public int getTotalRooms() {
-        String sql = "SELECT COUNT(*) as total FROM Room";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (SQLException e) {
-            log.error("Error getting total rooms: ", e);
-        }
-        return 0;
+        return doInTransaction(roomRepository::count);
     }
 
     /**
      * Lấy số phòng đang được sử dụng (roomStatus = 'OCCUPIED')
      */
     public int getOccupiedRooms() {
-        String sql = "SELECT COUNT(*) as occupied " +
-                     "FROM Room " +
-                     "WHERE roomStatus = 'OCCUPIED' AND isDeleted = 0";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("occupied");
-            }
-        } catch (SQLException e) {
-            log.error("Error getting occupied rooms: ", e);
-        }
-        return 0;
+        return doInTransaction(entityManager -> roomRepository.countRoomsByStatus(entityManager, RoomStatus.OCCUPIED));
     }
 
     /**
      * Lấy tối đa 2 ghi chú ca làm việc gần nhất từ ShiftClose
+     *
      * @return Danh sách ghi chú ca làm việc (tối đa 2 ca)
      */
     public List<ShiftNoteDto> getRecentShiftNotes() {
-        List<ShiftNoteDto> notes = new ArrayList<>();
+        return doInTransaction(em -> {
+            List<Object[]> rows = shiftCloseRepository.getRecentShiftNotes(em);
 
-        String sql = "SELECT TOP 2 " +
-                     "    e.fullName, " +
-                     "    s.name as shiftName, " +
-                     "    es.shiftDate, " +
-                     "    sc.note, " +
-                     "    sc.createdAt " +
-                     "FROM ShiftClose sc " +
-                     "JOIN EmployeeShift es ON sc.employeeShiftId = es.employeeShiftId " +
-                     "JOIN Employee e ON es.employeeId = e.employeeId " +
-                     "JOIN Shift s ON es.shiftId = s.shiftId " +
-                     "WHERE sc.note IS NOT NULL AND sc.note != '' " +
-                     "ORDER BY sc.createdAt DESC";
+            List<ShiftNoteDto> result = new ArrayList<>();
+            for (Object[] r : rows) {
+                String employeeName = (String) r[0];
+                String shiftName = (String) r[1];
+                LocalDate shiftDate = (LocalDate) r[2];
+                String note = (String) r[3];
 
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                ShiftNoteDto dto = new ShiftNoteDto();
-                dto.setEmployeeName(rs.getString("fullName"));
-                dto.setShiftName(rs.getString("shiftName"));
-
-                // Convert Date to LocalDateTime
-                java.sql.Date sqlDate = rs.getDate("shiftDate");
-                if (sqlDate != null) {
-                    dto.setShiftDate(sqlDate.toLocalDate().atStartOfDay());
-                }
-
-                dto.setNote(rs.getString("note"));
-                notes.add(dto);
+                result.add(new ShiftNoteDto(
+                        employeeName,
+                        shiftName,
+                        shiftDate != null ? shiftDate.atStartOfDay() : null,
+                        note
+                ));
             }
-
-            log.info("Retrieved {} recent shift notes", notes.size());
-
-        } catch (SQLException e) {
-            log.error("Error getting recent shift notes: ", e);
-        }
-
-        return notes;
+            return result;
+        });
     }
 
     /**
      * Lấy tổng doanh thu từ PHÒNG hôm nay
      */
-    public BigDecimal getTotalRoomRevenue() {
-        String sql = "SELECT ISNULL(SUM(o.totalAmount - " +
-                     "    ISNULL((SELECT SUM(s.price * sd.quantity) FROM SurchargeDetail sd " +
-                     "            JOIN Surcharge s ON sd.surchargerId = s.surchargeId " +
-                     "            WHERE sd.orderId = o.orderId), 0) - " +
-                     "    ISNULL((SELECT SUM(od.unitPrice * od.quantity) FROM OrderDetail od WHERE od.orderId = o.orderId), 0)), 0) as roomRevenue " +
-                     "FROM Orders o " +
-                     "WHERE o.paymentDate = CAST(GETDATE() AS DATE)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                BigDecimal revenue = rs.getBigDecimal("roomRevenue");
-                return revenue != null ? revenue : BigDecimal.ZERO;
-            }
-        } catch (SQLException e) {
-            log.error("Error getting total room revenue: ", e);
-        }
-        return BigDecimal.ZERO;
-    }
+//    public BigDecimal getTotalRoomRevenue() {
+//        String sql = "SELECT ISNULL(SUM(o.totalAmount - " +
+//                "    ISNULL((SELECT SUM(s.price * sd.quantity) FROM SurchargeDetail sd " +
+//                "            JOIN Surcharge s ON sd.surchargerId = s.surchargeId " +
+//                "            WHERE sd.orderId = o.orderId), 0) - " +
+//                "    ISNULL((SELECT SUM(od.unitPrice * od.quantity) FROM OrderDetail od WHERE od.orderId = o.orderId), 0)), 0) as roomRevenue " +
+//                "FROM Orders o " +
+//                "WHERE o.paymentDate = CAST(GETDATE() AS DATE)";
+//
+//        try (PreparedStatement ps = connection.prepareStatement(sql);
+//             ResultSet rs = ps.executeQuery()) {
+//            if (rs.next()) {
+//                BigDecimal revenue = rs.getBigDecimal("roomRevenue");
+//                return revenue != null ? revenue : BigDecimal.ZERO;
+//            }
+//        } catch (SQLException e) {
+//            log.error("Error getting total room revenue: ", e);
+//        }
+//        return BigDecimal.ZERO;
+//    }
 
     /**
      * Đếm số phòng đã bán (đã check-out) hôm nay
      */
-    public int getRoomsSoldToday() {
-        String sql = "SELECT COUNT(*) as sold " +
-                     "FROM Booking " +
-                     "WHERE CAST(checkOutDate AS DATE) = CAST(GETDATE() AS DATE)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("sold");
-            }
-        } catch (SQLException e) {
-            log.error("Error getting rooms sold today: ", e);
-        }
-        return 0;
-    }
+//    public int getRoomsSoldToday() {
+//        String sql = "SELECT COUNT(*) as sold " +
+//                "FROM Booking " +
+//                "WHERE CAST(checkOutDate AS DATE) = CAST(GETDATE() AS DATE)";
+//
+//        try (PreparedStatement ps = connection.prepareStatement(sql);
+//             ResultSet rs = ps.executeQuery()) {
+//            if (rs.next()) {
+//                return rs.getInt("sold");
+//            }
+//        } catch (SQLException e) {
+//            log.error("Error getting rooms sold today: ", e);
+//        }
+//        return 0;
+//    }
 
     /**
      * Đếm số đơn hàng đã hoàn thành hôm nay (orderTypeId = 1, paymentDate = hôm nay)
      */
     public int getTodayOrderCount() {
-        String sql = "SELECT COUNT(*) as orderCount " +
-                     "FROM Orders " +
-                     "WHERE paymentDate = CAST(GETDATE() AS DATE) " +
-                     "AND orderTypeId = 1";  // Đã hoàn thành
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.atTime(LocalTime.MAX);
 
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("orderCount");
-            }
-        } catch (SQLException e) {
-            log.error("Error getting today order count: ", e);
-        }
-        return 0;
+        return doInTransaction(em ->
+                orderRepository.getOrderCountByDate(em, start, end)
+        );
     }
 
     /**
@@ -715,73 +443,36 @@ public class DashboardService {
      * @return Số đơn hàng của ngày đó
      */
     public int getOrderCountDaysAgo(int daysAgo) {
-        String sql = "SELECT COUNT(*) as orderCount " +
-                     "FROM Orders " +
-                     "WHERE paymentDate = CAST(DATEADD(DAY, ?, GETDATE()) AS DATE) " +
-                     "AND orderTypeId = 1";  // Đã hoàn thành
+        LocalDate targetDate = LocalDate.now().minusDays(daysAgo);
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, -daysAgo);  // Trừ đi số ngày (7 → -7)
+        LocalDateTime start = targetDate.atStartOfDay();
+        LocalDateTime end = targetDate.atTime(LocalTime.MAX);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("orderCount");
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting order count {} days ago: ", daysAgo, e);
-        }
-        return 0;
+        return doInTransaction(em ->
+                orderRepository.getOrderCountByDate(em, start, end)
+        );
     }
 
-    /**
-     * Đếm TỔNG số đơn hàng trong khoảng thời gian (dùng cho DAYS_7, DAYS_30, DAYS_90)
-     *
-     * @param days Số ngày (7, 30, 90)
-     * @param isPrevious true = kỳ trước, false = kỳ hiện tại
-     * @return Tổng số đơn hàng
-     *
-     * Ví dụ với days=7:
-     * - isPrevious=false: Đếm từ hôm nay về trước 7 ngày (15/12 → 21/12)
-     * - isPrevious=true: Đếm từ 7-14 ngày trước (8/12 → 14/12)
-     */
     public int getOrderCountForPeriod(int days, boolean isPrevious) {
-        String sql;
+
+        LocalDate today = LocalDate.now();
+
+        LocalDate startDate;
+        LocalDate endDate;
 
         if (isPrevious) {
-            // Kỳ trước: từ -(days*2) đến -days
-            // Ví dụ days=7: từ -14 đến -7 (8/12 → 14/12)
-            sql = "SELECT COUNT(*) as orderCount " +
-                  "FROM Orders " +
-                  "WHERE paymentDate >= CAST(DATEADD(DAY, ?, GETDATE()) AS DATE) " +
-                  "AND paymentDate < CAST(DATEADD(DAY, ?, GETDATE()) AS DATE) " +
-                  "AND orderTypeId = 1";
+            startDate = today.minusDays(days * 2L);
+            endDate = today.minusDays(days).minusDays(1);
         } else {
-            // Kỳ hiện tại: từ -days đến hôm nay
-            // Ví dụ days=7: từ -7 đến 0 (15/12 → 21/12)
-            sql = "SELECT COUNT(*) as orderCount " +
-                  "FROM Orders " +
-                  "WHERE paymentDate >= CAST(DATEADD(DAY, ?, GETDATE()) AS DATE) " +
-                  "AND paymentDate <= CAST(GETDATE() AS DATE) " +
-                  "AND orderTypeId = 1";
+            startDate = today.minusDays(days);
+            endDate = today;
         }
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            if (isPrevious) {
-                ps.setInt(1, -(days * 2));  // Start: -14, -60, -180
-                ps.setInt(2, -days);        // End: -7, -30, -90
-            } else {
-                ps.setInt(1, -days);        // Start: -7, -30, -90
-            }
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("orderCount");
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error getting order count for period {} days (isPrevious={}): ", days, isPrevious, e);
-        }
-        return 0;
+        return doInTransaction(em ->
+                orderRepository.getOrderCountByDate(em, start, end)
+        );
     }
 }

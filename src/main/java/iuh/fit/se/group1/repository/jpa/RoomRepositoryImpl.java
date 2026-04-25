@@ -17,6 +17,37 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
         super(Room.class);
     }
 
+
+    @Override
+    public int getOccupiedRoomsByType(EntityManager em, String roomTypeId) {
+
+        Long count = em.createQuery("""
+                                SELECT COUNT(r)
+                                FROM Room r
+                                WHERE r.roomStatus = :status
+                                AND r.isDeleted = false
+                                AND r.roomType.roomTypeId = :roomTypeId
+                        """, Long.class)
+                .setParameter("status", RoomStatus.OCCUPIED)
+                .setParameter("roomTypeId", roomTypeId)
+                .getSingleResult();
+
+        return count.intValue();
+    }
+
+    @Override
+    public int countRoomsByStatus(EntityManager em, RoomStatus roomStatus) {
+
+
+        return ((Number) em.createNativeQuery("""
+                                select COUNT(*) from Room r
+                                where r.roomStatus = :status and r.isDeleted = 0
+                        """)
+                .setParameter("status", roomStatus.name())
+                .getSingleResult()).intValue();
+    }
+
+
     @Override
     public List<Room> findByRoomNumberOrId(EntityManager em, String keyword) {
 
@@ -113,8 +144,11 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
     }
 
     @Override
-    public int countTotalRooms() {
-        return 0;
+    public int count(EntityManager em) {
+        return ((Number) em.createNativeQuery("""
+                        select COUNT(*) from Room r
+                        where r.isDeleted = 0
+                """).getSingleResult()).intValue();
     }
 
     @Override
@@ -203,80 +237,80 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
     }
 
     @Override
-    public boolean transferRooms( EntityManager em,long orderId, String bookingType,
+    public boolean transferRooms(EntityManager em, long orderId, String bookingType,
                                  List<Long> oldRoomIds, List<Long> newRoomIds) {
 
-            try {
-                // 1. Lấy booking gốc
-                Booking bookingInfo = em.createQuery("""
-                                SELECT b FROM Booking b
-                                WHERE b.order.orderId = :orderId
-                                  AND b.bookingType = :bookingType
-                                  AND b.room.roomId = :roomId
-                                """, Booking.class)
-                        .setParameter("orderId", orderId)
-                        .setParameter("bookingType", BookingType.valueOf(bookingType))
-                        .setParameter("roomId", oldRoomIds.get(0))
-                        .setMaxResults(1)
-                        .getResultStream()
-                        .findFirst()
-                        .orElse(null);
+        try {
+            // 1. Lấy booking gốc
+            Booking bookingInfo = em.createQuery("""
+                            SELECT b FROM Booking b
+                            WHERE b.order.orderId = :orderId
+                              AND b.bookingType = :bookingType
+                              AND b.room.roomId = :roomId
+                            """, Booking.class)
+                    .setParameter("orderId", orderId)
+                    .setParameter("bookingType", BookingType.valueOf(bookingType))
+                    .setParameter("roomId", oldRoomIds.get(0))
+                    .setMaxResults(1)
+                    .getResultStream()
+                    .findFirst()
+                    .orElse(null);
 
-                if (bookingInfo == null) return false;
+            if (bookingInfo == null) return false;
 
-                // 2. Update phòng cũ -> AVAILABLE
-                em.createQuery("""
-                                UPDATE Room r
-                                SET r.roomStatus = :status
-                                WHERE r.roomId IN :ids
-                                """)
-                        .setParameter("status", RoomStatus.AVAILABLE)
-                        .setParameter("ids", oldRoomIds)
-                        .executeUpdate();
+            // 2. Update phòng cũ -> AVAILABLE
+            em.createQuery("""
+                            UPDATE Room r
+                            SET r.roomStatus = :status
+                            WHERE r.roomId IN :ids
+                            """)
+                    .setParameter("status", RoomStatus.AVAILABLE)
+                    .setParameter("ids", oldRoomIds)
+                    .executeUpdate();
 
-                // 3. Xóa booking cũ
-                em.createQuery("""
-                                DELETE FROM Booking b
-                                WHERE b.order.orderId = :orderId
-                                  AND b.bookingType = :bookingType
-                                  AND b.room.roomId IN :ids
-                                """)
-                        .setParameter("orderId", orderId)
-                        .setParameter("bookingType", BookingType.valueOf(bookingType))
-                        .setParameter("ids", oldRoomIds)
-                        .executeUpdate();
+            // 3. Xóa booking cũ
+            em.createQuery("""
+                            DELETE FROM Booking b
+                            WHERE b.order.orderId = :orderId
+                              AND b.bookingType = :bookingType
+                              AND b.room.roomId IN :ids
+                            """)
+                    .setParameter("orderId", orderId)
+                    .setParameter("bookingType", BookingType.valueOf(bookingType))
+                    .setParameter("ids", oldRoomIds)
+                    .executeUpdate();
 
-                // 4. Insert booking mới
-                Order orderRef = em.getReference(Order.class, orderId);
+            // 4. Insert booking mới
+            Order orderRef = em.getReference(Order.class, orderId);
 
-                for (Long roomId : newRoomIds) {
-                    Room roomRef = em.getReference(Room.class, roomId);
+            for (Long roomId : newRoomIds) {
+                Room roomRef = em.getReference(Room.class, roomId);
 
-                    Booking newBooking = new Booking();
-                    newBooking.setOrder(orderRef);
-                    newBooking.setRoom(roomRef);
-                    newBooking.setCheckInDate(bookingInfo.getCheckInDate());
-                    newBooking.setCheckOutDate(bookingInfo.getCheckOutDate());
-                    newBooking.setBookingType(BookingType.valueOf(bookingType));
-                    newBooking.setCreatedAt(LocalDate.now());
+                Booking newBooking = new Booking();
+                newBooking.setOrder(orderRef);
+                newBooking.setRoom(roomRef);
+                newBooking.setCheckInDate(bookingInfo.getCheckInDate());
+                newBooking.setCheckOutDate(bookingInfo.getCheckOutDate());
+                newBooking.setBookingType(BookingType.valueOf(bookingType));
+                newBooking.setCreatedAt(LocalDate.now());
 
-                    em.persist(newBooking);
-                }
-
-                // 5. Update phòng mới -> OCCUPIED
-                em.createQuery("""
-                                UPDATE Room r
-                                SET r.roomStatus = :status
-                                WHERE r.roomId IN :ids
-                                """)
-                        .setParameter("status", RoomStatus.OCCUPIED)
-                        .setParameter("ids", newRoomIds)
-                        .executeUpdate();
-
-                return true;
-
-            } catch (Exception e) {
-                throw new RuntimeException("Error transferring rooms", e);
+                em.persist(newBooking);
             }
+
+            // 5. Update phòng mới -> OCCUPIED
+            em.createQuery("""
+                            UPDATE Room r
+                            SET r.roomStatus = :status
+                            WHERE r.roomId IN :ids
+                            """)
+                    .setParameter("status", RoomStatus.OCCUPIED)
+                    .setParameter("ids", newRoomIds)
+                    .executeUpdate();
+
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error transferring rooms", e);
+        }
     }
 }

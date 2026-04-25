@@ -14,6 +14,7 @@ public class ShiftNoteDto {
     public ShiftNoteDto() {
     }
 
+
     public ShiftNoteDto(String employeeName, String shiftName, LocalDateTime shiftDate, String note) {
         this.employeeName = employeeName;
         this.shiftName = shiftName;

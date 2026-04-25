@@ -2,6 +2,7 @@ package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
+import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.enums.BookingType;
@@ -15,6 +16,74 @@ import java.util.List;
 public class BookingRepositoryImpl extends AbstractRepositoryImpl<Booking, Long> implements BookingRepository {
     public BookingRepositoryImpl() {
         super(Booking.class);
+    }
+
+    @Override
+    public int countBookings(EntityManager em, LocalDateTime startDate, LocalDateTime endDate) {
+        Long result = em.createQuery("""
+                                SELECT COUNT(b)
+                                FROM Booking b
+                                WHERE b.createdAt BETWEEN :start AND :end
+                        """, Long.class)
+                .setParameter("start", startDate.toLocalDate())
+                .setParameter("end", endDate.toLocalDate())
+                .getSingleResult();
+
+        return result.intValue();
+    }
+
+    @Override
+    public List<Object[]> getPeakHours(EntityManager em, LocalDateTime startDate, LocalDateTime endDate) {
+
+        return em.createNativeQuery("""
+                        SELECT TOP 5
+                               DATEPART(HOUR, checkInDate) AS hour,
+                               COUNT(*) AS total
+                        FROM Booking
+                        WHERE checkInDate BETWEEN :start AND :end
+                        GROUP BY DATEPART(HOUR, checkInDate)
+                        ORDER BY COUNT(*) DESC
+                        """)
+                .setParameter("start", startDate)
+                .setParameter("end", endDate)
+                .getResultList();
+    }
+
+
+    @Override
+    public int countCheckedOutToday(EntityManager em, LocalDateTime start, LocalDateTime end) {
+        Number result = (Number) em.createQuery("""
+                                    SELECT COUNT(b)
+                                    FROM Booking b
+                                    WHERE b.checkOutDate BETWEEN :start AND :end
+                                      AND b.checkOutDate IS NOT NULL
+                        """)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .getSingleResult();
+
+        return result.intValue();
+    }
+
+    @Override
+    public int countLateCheckout(EntityManager em,
+                                 LocalDateTime start,
+                                 LocalDateTime now,
+                                 LocalDateTime standardCheckout) {
+
+        Number result = (Number) em.createQuery("""
+                                    SELECT COUNT(b)
+                                    FROM Booking b
+                                    WHERE b.checkOutDate < :start
+                                      AND b.checkOutDate > :now
+                                      AND b.checkOutDate <= :standard
+                        """)
+                .setParameter("start", start)
+                .setParameter("now", now)
+                .setParameter("standard", standardCheckout)
+                .getSingleResult();
+
+        return result.intValue();
     }
 
     public boolean isExistsByRoomAndDate(EntityManager em, Long roomId,
