@@ -624,7 +624,7 @@ public class RoomManagement extends javax.swing.JPanel {
 
     private Room createRoomFromModal(Long roomId, String number, String typeName, String statusStr) {
         Room room = new Room();
-        room.setRoomId(roomId != null ? roomId : 0);
+        room.setRoomId(roomId);
         room.setRoomNumber(number);
 
 

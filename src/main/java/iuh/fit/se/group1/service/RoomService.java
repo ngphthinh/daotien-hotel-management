@@ -9,6 +9,7 @@ import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.repository.jpa.RoomRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.RoomTypeRepositoryImpl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,9 +28,16 @@ public class RoomService extends Service {
     }
 
     public Room createRoom(Room room) {
-//        return roomRepository.save(room);
+        return doInTransaction(entityManager -> {
+            RoomType roomType = roomTypeRepositoryImpl.findById(entityManager, room.getRoomType().getRoomTypeId()); // ensure room type exists
 
-        return doInTransaction(entityManager -> roomRepository.save(entityManager, room));
+
+            room.setCreatedAt(LocalDate.now());
+
+            room.setRoomType(roomType);
+
+            return roomRepository.save(entityManager, room);
+        });
 
     }
 
