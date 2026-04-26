@@ -21,8 +21,11 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileOutputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -109,12 +112,41 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
-            ExportExcelService.exportTableToExcel(
-                    this,
-                    tblCustomer.getTbl(),
-                    "Danh sách khách hàng",
-                    "DanhSachKhachHang"
-            );
+            try {
+                byte[] data = ExportExcelService.exportTableToExcel(
+                        tblCustomer.getTbl(),
+                        "Danh sách khách hàng",
+                        true
+                );
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Lưu file Excel");
+
+                // ✔ tên file mặc định
+                String defaultFileName = "DanhSachKhachHang_" +
+                        LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
+
+                fileChooser.setSelectedFile(new File(defaultFileName));
+
+                int result = fileChooser.showSaveDialog(this);
+
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+
+                    if (!file.getName().toLowerCase().endsWith(".xlsx")) {
+                        file = new File(file.getAbsolutePath() + ".xlsx");
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(data);
+                    }
+
+                    Message.showMessage("Thành công", "Đã lưu file: " + file.getAbsolutePath());
+                }
+
+            } catch (Exception ex) {
+                Message.showMessage("Lỗi", ex.getMessage());
+            }
         });
         headerCustom1.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý khách hàng</span>");

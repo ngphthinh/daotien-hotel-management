@@ -25,11 +25,14 @@ import raven.glasspanepopup.GlassPanePopup;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import javax.swing.event.DocumentListener;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import iuh.fit.se.group1.service.ImportExcelService;
@@ -390,12 +393,43 @@ public class AmenityManagement extends javax.swing.JPanel {
     }
 
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
-        ExportExcelService.exportTableToExcel(
-                this,
-                tblAmenity.getTbl(),
-                "Danh sách dịch vụ",
-                "DanhSachDichVu"
-        );
+
+
+        try {
+            byte[] data = ExportExcelService.exportTableToExcel(
+                    tblAmenity.getTbl(),
+                    "Danh sách dịch vụ",
+                    true
+            );
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Lưu file Excel");
+
+            // ✔ tên file mặc định
+            String defaultFileName = "DanhSachDichVu_" +
+                    LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
+
+            fileChooser.setSelectedFile(new File(defaultFileName));
+
+            int result = fileChooser.showSaveDialog(this);
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+
+                if (!file.getName().toLowerCase().endsWith(".xlsx")) {
+                    file = new File(file.getAbsolutePath() + ".xlsx");
+                }
+
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    fos.write(data);
+                }
+
+                Message.showMessage("Thành công", "Đã lưu file: " + file.getAbsolutePath());
+            }
+
+        } catch (Exception ex) {
+            Message.showMessage("Lỗi", ex.getMessage());
+        }
     }//GEN-LAST:event_btnExportActionPerformed
 
 

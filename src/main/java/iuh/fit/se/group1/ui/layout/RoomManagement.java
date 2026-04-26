@@ -14,8 +14,11 @@ import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.swing.*;
@@ -720,11 +723,41 @@ public class RoomManagement extends javax.swing.JPanel {
         btnExport.setText("Xuất excel");
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14));
         btnExport.addActionListener(e -> {
-            ExportExcelService.exportTableToExcel(
-                    this,
-                    tblRoom.getTbl(),
-                    "DanhSachPhong",
-                    "DanhSachPhong");
+            try {
+                byte[] data = ExportExcelService.exportTableToExcel(
+                        tblRoom.getTbl(),
+                        "Danh sách phòng ",
+                        true
+                );
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Lưu file Excel");
+
+                // ✔ tên file mặc định
+                String defaultFileName = "DanhSachPhong_" +
+                        LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
+
+                fileChooser.setSelectedFile(new File(defaultFileName));
+
+                int result = fileChooser.showSaveDialog(this);
+
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+
+                    if (!file.getName().toLowerCase().endsWith(".xlsx")) {
+                        file = new File(file.getAbsolutePath() + ".xlsx");
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(data);
+                    }
+
+                    Message.showMessage("Thành công", "Đã lưu file: " + file.getAbsolutePath());
+                }
+
+            } catch (Exception ex) {
+                Message.showMessage("Lỗi", ex.getMessage());
+            }
         });
 
         btnImport.setText("Tải excel");

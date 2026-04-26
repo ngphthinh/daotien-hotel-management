@@ -13,6 +13,7 @@ import iuh.fit.se.group1.ui.component.table.TableActionEvent;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import javax.swing.SwingConstants;
@@ -24,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 import iuh.fit.se.group1.util.Constants;
 
 import java.io.File;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JFileChooser;
 
@@ -106,12 +108,41 @@ public class PromotionManagement extends javax.swing.JPanel {
         btnImport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_IMPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
-            ExportExcelService.exportTableToExcel(
-                    this,
-                    tblPromotion.getTbl(),
-                    "Danh sách khuyến mãi",
-                    "DanhSachKhuyenMai"
-            );
+            try {
+                byte[] data = ExportExcelService.exportTableToExcel(
+                        tblPromotion.getTbl(),
+                        "Danh sách khuyến mãi",
+                        true
+                );
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Lưu file Excel");
+
+                // ✔ tên file mặc định
+                String defaultFileName = "DanhSachKhuyenMai_" +
+                        LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
+
+                fileChooser.setSelectedFile(new File(defaultFileName));
+
+                int result = fileChooser.showSaveDialog(this);
+
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+
+                    if (!file.getName().toLowerCase().endsWith(".xlsx")) {
+                        file = new File(file.getAbsolutePath() + ".xlsx");
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(data);
+                    }
+
+                    Message.showMessage("Thành công", "Đã lưu file: " + file.getAbsolutePath());
+                }
+
+            } catch (Exception ex) {
+                Message.showMessage("Lỗi", ex.getMessage());
+            }
         });
 
         headerCustom1.getLblTitle().setText(

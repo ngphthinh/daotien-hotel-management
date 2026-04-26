@@ -18,7 +18,10 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
@@ -204,12 +207,41 @@ public class SurchargeManagement extends javax.swing.JPanel {
         btnExport.setForeground(Color.WHITE);
         btnExport.setBorderRadius(10);
         btnExport.addActionListener(e -> {
-            ExportExcelService.exportTableToExcel(
-                    this,
-                    tblSurchage.getTbl(),
-                    "Danh sách phụ phí",
-                    "DanhSachPhuPhi"
-            );
+            try {
+                byte[] data = ExportExcelService.exportTableToExcel(
+                        tblSurchage.getTbl(),
+                        "Danh sách phụ phí",
+                        true
+                );
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Lưu file Excel");
+
+                // ✔ tên file mặc định
+                String defaultFileName = "DanhSachPhuPhi_" +
+                        LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
+
+                fileChooser.setSelectedFile(new File(defaultFileName));
+
+                int result = fileChooser.showSaveDialog(this);
+
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+
+                    if (!file.getName().toLowerCase().endsWith(".xlsx")) {
+                        file = new File(file.getAbsolutePath() + ".xlsx");
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        fos.write(data);
+                    }
+
+                    Message.showMessage("Thành công", "Đã lưu file: " + file.getAbsolutePath());
+                }
+
+            } catch (Exception ex) {
+                Message.showMessage("Lỗi", ex.getMessage());
+            }
         });
 
         btnImport.setBackground(new Color(255, 108, 3));

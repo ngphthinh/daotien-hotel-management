@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Component;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -22,6 +23,53 @@ import java.time.format.DateTimeFormatter;
  * Có thể tái sử dụng cho nhiều module khác nhau
  */
 public class ExportExcelService {
+
+    public static byte[] exportTableToExcel(JTable table, String sheetName, boolean excludeLastColumn) {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet(sheetName);
+
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle dataStyle = createDataStyle(workbook);
+
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            int columnCount = model.getColumnCount();
+
+            if (excludeLastColumn) columnCount--;
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            Cell sttCell = headerRow.createCell(0);
+            sttCell.setCellValue("STT");
+            sttCell.setCellStyle(headerStyle);
+
+            for (int i = 0; i < columnCount; i++) {
+                Cell cell = headerRow.createCell(i + 1);
+                cell.setCellValue(table.getColumnName(i));
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Data
+            for (int i = 0; i < table.getRowCount(); i++) {
+                Row row = sheet.createRow(i + 1);
+
+                row.createCell(0).setCellValue(i + 1);
+
+                for (int j = 0; j < columnCount; j++) {
+                    Object value = table.getValueAt(i, j);
+                    row.createCell(j + 1)
+                            .setCellValue(value != null ? value.toString() : "");
+                }
+            }
+
+            workbook.write(out);
+            return out.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Xuất dữ liệu từ JTable ra file Excel
@@ -88,7 +136,7 @@ public class ExportExcelService {
      * @param excludeLastColumn true nếu muốn bỏ cột cuối (cột chức năng)
      */
     public static void exportTableToExcel(TableActionEvent parent, JTable table, String sheetName,
-            String defaultFileName, boolean excludeLastColumn) {
+                                          String defaultFileName, boolean excludeLastColumn) {
         try {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Lưu file Excel");
@@ -133,7 +181,7 @@ public class ExportExcelService {
      * Thực hiện xuất dữ liệu ra file Excel với tùy chọn
      */
     private static void exportData(JTable table, String filePath, String sheetName,
-            boolean excludeLastColumn) throws IOException {
+                                   boolean excludeLastColumn) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(sheetName);
 
@@ -212,8 +260,8 @@ public class ExportExcelService {
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
             workbook.write(fileOut);
         }
-        sheet.setColumnWidth(0, 256 * 15); 
-        sheet.setColumnWidth(1, 256 * 15); 
+        sheet.setColumnWidth(0, 256 * 15);
+        sheet.setColumnWidth(1, 256 * 15);
 
         workbook.close();
     }
@@ -267,7 +315,7 @@ public class ExportExcelService {
     }
 
     public static void exportTableToExcel(RoomManagement parent, Table tblRoom, String sheetName,
-            String defaultFileName) {
+                                          String defaultFileName) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'exportTableToExcel'");
     }
