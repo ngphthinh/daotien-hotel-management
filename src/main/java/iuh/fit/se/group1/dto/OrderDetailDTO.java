@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 @Builder
-public class OrderDetailDTO {
+public class OrderDetailDTO implements Serializable {
     private BigDecimal unitPrice;
 
     private AmenityDTO amenity;

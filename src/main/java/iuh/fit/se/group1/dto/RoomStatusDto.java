@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * DTO cho trạng thái phòng
  */
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class RoomStatusDto {
+public class RoomStatusDto implements Serializable {
     private int occupiedRooms;
     private int availableRooms;
     private int checkedOutRooms;

@@ -6,13 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class BookingViewDTO {
+public class BookingViewDTO implements Serializable {
     private Long bookingId;
     private LocalDateTime checkInDate;
     private LocalDateTime checkOutDate;

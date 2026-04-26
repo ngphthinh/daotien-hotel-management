@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Data
-public class CustomerDTO {
+public class CustomerDTO implements Serializable {
     private Long customerId;
     private String fullName;
     private String phone;

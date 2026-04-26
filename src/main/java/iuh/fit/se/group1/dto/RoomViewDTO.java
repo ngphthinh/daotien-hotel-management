@@ -6,11 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class RoomViewDTO
+public class RoomViewDTO implements Serializable
 {
     private Long roomId;
     private String roomNumber;

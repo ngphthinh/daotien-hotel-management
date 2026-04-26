@@ -35,7 +35,6 @@ public class EmployeeService extends Service {
     }
 
     public int count() {
-//        return employeeRepositoryImpl.count();
         return doInTransaction(employeeRepositoryImpl::count);
     }
 
@@ -86,11 +85,6 @@ public class EmployeeService extends Service {
         });
     }
 
-    public EmployeeDTO getEmployeeByCitizenId(String citizenId) {
-//        return employeeRepositoryImpl.findByCitizenId(citizenId);
-        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByCitizenId(entityManager, citizenId)));
-    }
-
     private String generateUsername(Employee entitySave) {
         String fullName = entitySave.getFullName();
 
@@ -104,7 +98,6 @@ public class EmployeeService extends Service {
     }
 
     public void deleteEmployee(Long employeeId) {
-        // kiểm tra xem employee đang có hóa đơn có tồn tại bookng không
         doInTransactionVoid(entityManager -> {
             Employee employee = employeeRepositoryImpl.findById(entityManager, employeeId);
             if (employee == null) {
@@ -120,35 +113,29 @@ public class EmployeeService extends Service {
             employeeRepositoryImpl.deleteById(entityManager, employeeId);
         });
     }
-//        employeeRepositoryImpl.deleteById(employeeId);
-//        doInTransactionVoid(entityManager -> employeeRepositoryImpl.deleteById(entityManager, employeeId));
 
     public List<EmployeeDTO> getAllEmployees() {
-//        return employeeRepositoryImpl.findAll();
         return doInTransaction(employeeRepositoryImpl::findAll).stream().map(employeeMapper::toDTO).toList();
     }
 
 
     public EmployeeDTO updateEmployee(EmployeeDTO employee) {
 
-//        return employeeRepositoryImpl.update(employee);
         return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.update(entityManager, employeeMapper.toEmployee(employee))));
     }
 
     public List<EmployeeDTO> getEmployeeByKeyword(String keyword) {
-//        return employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(keyword);
         return doInTransaction(entityManager -> employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(entityManager, keyword)).stream().map(employeeMapper::toDTO).toList();
     }
 
     public EmployeeDTO getEmployeeById(Long employeeId) {
-//        return employeeRepositoryImpl.findById(employeeId);
         return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findById(entityManager, employeeId)));
     }
 
-    public EmployeeDTO existsByCitizenId(String citizenId) {
-//        return employeeRepositoryImpl.findByCitizenId(citizenId);
+    public EmployeeDTO getEmployeeByCitizenId(String citizenId) {
         return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByCitizenId(entityManager, citizenId)));
     }
+
 
     public List<EmployeeDTO> findAllByRoleId(String string) {
         return doInTransaction(entityManager -> employeeRepositoryImpl.findAllByRoleId(entityManager, string)).stream().map(employeeMapper::toDTO).toList();

@@ -7,11 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class OrderResult {
+public class OrderResult implements Serializable {
     private OrderDTO order;
     private SurchargeDetailDTO surchargeDetail;
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Data
-public class AmenityDTO {
+public class AmenityDTO implements Serializable {
     private Long amenityId;
     private String nameAmenity;
     private BigDecimal price;

@@ -1035,7 +1035,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
             valid = false;
         } else {
             // Kiểm tra CCCD có tồn tại không
-            EmployeeDTO existingEmployee = service.existsByCitizenId(citizenId);
+            EmployeeDTO existingEmployee = service.getEmployeeByCitizenId(citizenId);
             if (existingEmployee != null) {
                 if (currentEmployeeId != null) {
                     if (!existingEmployee.getEmployeeId().equals(currentEmployeeId)) {

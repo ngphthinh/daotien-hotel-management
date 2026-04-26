@@ -6,11 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class ShiftDTO {
+public class ShiftDTO implements Serializable {
     private Long shiftId;
     private String name;
     private String startTime;

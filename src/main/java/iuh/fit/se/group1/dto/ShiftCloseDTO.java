@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 
-public class ShiftCloseDTO {
+public class ShiftCloseDTO implements Serializable {
     private Long shiftCloseId;
     private EmployeeShiftDTO employeeShift;
     private BigDecimal totalRevenue;

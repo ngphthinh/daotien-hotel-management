@@ -1,37 +1,19 @@
 package iuh.fit.se.group1.dto;
 
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class AmenityInfo {
+import java.io.Serializable;
+import java.math.BigDecimal;
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+public class AmenityInfo implements Serializable {
     private int quantity;
     private BigDecimal price;
 
-    public AmenityInfo(int quantity, BigDecimal price) {
-        this.quantity = quantity;
-        this.price = price;
-    }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    @Override
-    public String toString() {
-        return "AmenityInfo{" +
-                "quantity=" + quantity +
-                ", price=" + price +
-                '}';
-    }
 }

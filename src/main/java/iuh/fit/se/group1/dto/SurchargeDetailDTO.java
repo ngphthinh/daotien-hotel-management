@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class SurchargeDetailDTO {
+public class SurchargeDetailDTO implements Serializable {
 
     private OrderDTO order;
 

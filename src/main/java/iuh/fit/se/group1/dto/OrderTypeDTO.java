@@ -7,13 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class OrderTypeDTO {
+public class OrderTypeDTO implements Serializable {
     private Long orderTypeId;
     private OrderBookStatus name;
 }

@@ -1,9 +1,11 @@
 package iuh.fit.se.group1.dto;
 
+import java.io.Serializable;
+
 /**
  * DTO cho khung giờ cao điểm
  */
-public class PeakHourDto {
+public class PeakHourDto  implements Serializable {
     private String hour;
     private int bookingCount;
 

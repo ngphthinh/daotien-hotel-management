@@ -6,11 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class BookingDTO {
+public class BookingDTO implements Serializable {
     public long bookingId;
     public String bookingIdDisplay;
     public String guestName;

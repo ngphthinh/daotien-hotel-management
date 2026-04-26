@@ -678,3 +678,93 @@ Apr 26, 2026 8:41:24 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Registered DejaVu Sans Bold font
 Apr 26, 2026 8:51:01 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Invoice exported successfully to: {}
+Apr 26, 2026 9:28:03 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 9:28:03 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 9:28:05 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 26, 2026 9:28:05 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 26, 2026 7:12:39 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 7:14:00 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 7:14:07 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 7:17:08 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 7:17:15 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 7:18:29 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 7:18:36 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 8:33:50 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 8:33:51 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 8:33:51 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Regular font
+Apr 26, 2026 8:33:51 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Registered DejaVu Sans Bold font
+Apr 26, 2026 8:44:27 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 8:44:30 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 8:51:50 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 8:51:55 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 9:02:29 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 9:02:33 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 9:09:15 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 9:09:19 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 9:22:55 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 9:22:59 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 9:34:42 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 9:34:47 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 9:36:14 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 9:36:18 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 9:56:38 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 9:56:45 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 10:01:47 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 10:01:50 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 10:02:56 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 10:03:00 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 10:21:56 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 10:22:00 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 10:24:54 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 10:24:57 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 10:25:54 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 10:25:58 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 10:26:21 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 10:26:21 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'
+Apr 26, 2026 10:56:14 PM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 26, 2026 10:56:17 PM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'

@@ -43,48 +43,7 @@ public class OrderService extends Service {
     }
 
     public OrderDTO createOrder(OrderDTO order, List<OrderDetailDTO> orderDetails) {
-//        EntityManager em = JPAUtil.getEntityManager();
-//        EntityTransaction tx = em.getTransaction();
-//
-//        try {
-//            tx.begin();
-//
-//            if (order == null) return null;
-//
-//            if (order.getEmployee() == null || order.getCustomer() == null
-//                    || order.getBookings() == null || order.getBookings().isEmpty()) {
-//                return null;
-//            }
-//
-//            order.setCreatedAt(LocalDate.now());
-//
-//            if (order.getOrderType().getOrderTypeId() == 2) {
-//                List<Long> roomsIdx = order.getBookings().stream()
-//                        .map(b -> b.getRoom().getRoomId())
-//                        .toList();
-//
-//                roomRepository.updateRoomStatusBatch(em, roomsIdx, RoomStatus.OCCUPIED);
-//            }
-//
-//            Order savedOrder = orderRepositoryImpl.save(em, order);
-//            if (savedOrder == null) return null;
-//
-//            bookingRepository.saveAllBookingsForOrder(em, savedOrder, order.getBookings());
-//
-//            if (orderDetailsService.saveOrderDetailsForOrder(em, savedOrder, orderDetails)) {
-//                tx.commit();
-//                return savedOrder;
-//            }
-//
-//            tx.rollback();
-//            return null;
-//
-//        } catch (Exception e) {
-//            if (tx.isActive()) tx.rollback();
-//            throw e;
-//        } finally {
-//            em.close();
-//        }
+
         return doInTransaction(entityManager -> {
             if (order == null) return null;
 

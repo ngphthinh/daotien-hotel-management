@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Data
-public class ShiftNoteDto {
+public class ShiftNoteDto implements Serializable {
     private String employeeName;
     private String shiftName;
     private LocalDateTime shiftDate;

@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class WarningDto {
+public class WarningDto  implements Serializable {
     private int lateCheckOutCount;
     private int brokenRoomsCount;
     private boolean hasNewVersion;

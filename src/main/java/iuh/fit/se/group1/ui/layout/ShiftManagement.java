@@ -67,6 +67,7 @@ public class ShiftManagement extends javax.swing.JPanel {
         loadAllEmployees();
         setupSearchListener();
 
+
     }
 
     private void loadAllEmployees() {

@@ -5,6 +5,7 @@ import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
+import iuh.fit.se.group1.network.client.AppSocketManager;
 import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.ui.swing.AdvancedSplashScreen;
 
@@ -32,35 +33,25 @@ public class Main {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
 
+        // Initialize Socket Client Connection
+        System.out.println("Initializing socket connection...");
+        if (AppSocketManager.initialize("localhost", 9999)) {
+            System.out.println("✓ Socket connected successfully!");
+        } else {
+            System.out.println("✗ Warning: Socket connection failed. Is TestServer running?");
+        }
+
+        // Add shutdown hook for cleanup
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutting down...");
+            AppSocketManager.shutdown();
+        }));
+
         CountDownLatch latch = new CountDownLatch(1);
 
-        new Thread(() -> {
-            try {
-                System.out.println("Đang tải dữ liệu ứng dụng...");
-                EmployeeService employeeService = new EmployeeService();
-                if (employeeService.count() == 0) {
-                    InitData.initAllData();
-                    EmployeeDTO admin = new EmployeeDTO();
-                    admin.setFullName("Quản Trị Viên Admin");
-                    admin.setPhone("0123456789");
-                    admin.setHireDate(LocalDate.now());
-                    admin.setEmail("nguyenphuocthinh0710@gmail.com");
-                    admin.setGender(false);
-                    admin.setCitizenId("082205000819");
-                    EmployeeDTO employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
-                    if (employee == null) {
-                        System.out.println("Không tạo được tài khoản");
-                    } else {
-                        System.out.println(employee);
-                    }
-                }
 
-                System.out.println("Hoàn tất tải dữ liệu!");
-            } finally {
-                latch.countDown(); // báo hiệu xong
-            }
-        }).start();
 
+        latch.countDown();
         // Hiển thị splash screen
         SwingUtilities.invokeLater(() -> {
             new AdvancedSplashScreen(latch).setVisible(true);

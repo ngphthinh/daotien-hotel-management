@@ -1,8 +1,9 @@
 package iuh.fit.se.group1.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class RoomDTO {
+public class RoomDTO implements Serializable {
     private String roomType;
     private int capacity;
     private BigDecimal hourlyRate;

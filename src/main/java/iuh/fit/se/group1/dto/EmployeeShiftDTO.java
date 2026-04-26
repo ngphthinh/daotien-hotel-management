@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
@@ -18,7 +19,7 @@ import java.util.Set;
 @Builder
 @Data
 @NoArgsConstructor
-public class EmployeeShiftDTO {
+public class EmployeeShiftDTO implements Serializable {
     private Long employeeShiftId;
     private EmployeeDTO employee;
     private ShiftDTO shift;

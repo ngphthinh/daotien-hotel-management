@@ -6,11 +6,14 @@ package iuh.fit.se.group1.ui.component.shift;
 
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.enums.Role;
-import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.ClientSocketManager;
+import iuh.fit.se.group1.network.client.SocketFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,8 @@ import java.util.List;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import javax.imageio.ImageIO;
 
 import org.imgscalr.Scalr;
@@ -27,13 +32,16 @@ import org.imgscalr.Scalr;
  */
 public class ShiftList extends JPanel {
 
-    private final EmployeeService employeeService = new EmployeeService();
     private static final Logger log = LoggerFactory.getLogger(ShiftList.class);
 
     /**
      * Creates new form ShiftList
      */
+
+    private final SocketFacade socket;
+
     public ShiftList() {
+        this.socket = new SocketFacade(ClientSocketManager.getInstance());
         initComponents();
         custom();
         loadEmployeesFromDatabase();
@@ -193,61 +201,25 @@ public class ShiftList extends JPanel {
     }
 
     private void loadEmployeesFromDatabase() {
-        try {
-            List<EmployeeDTO> employees = employeeService.findAllByRoleId(Role.RECEPTIONIST.toString());
+        // Load employees in background thread
+        new Thread(() -> {
+            try {
+                Response response = socket.getEmployee().getEmployeesByRoleId(Role.RECEPTIONIST.toString());
 
-            pnlEmployees.removeAll();
-            pnlEmployees.setAlignmentY(Component.TOP_ALIGNMENT);
-            for (EmployeeDTO e : employees) {
-                String name = e.getFullName();
-                String code = String.valueOf(e.getEmployeeId());
+                if (response.getCode() == 200) {
+                    @SuppressWarnings("unchecked")
+                    List<EmployeeDTO> employees = (List<EmployeeDTO>) response.getData();
 
-                // Nếu có ảnh base64 trong DB
-                BufferedImage image = null;
-                try {
-                    if (e.getAvt() != null && e.getAvt().length > 0) {
-                        image = ImageIO.read(new ByteArrayInputStream(e.getAvt()));
-                    } else {
-                        URL defaultImg = getClass().getResource("/images/meomeo.jpg");
-                        if (defaultImg != null) {
-                            image = ImageIO.read(defaultImg);
-                        }
-                    }
-                } catch (Exception ex) {
-                    log.error("Error loading image for employee {}", name, ex);
+                    SwingUtilities.invokeLater(() -> {
+                        loadEmployees(employees);
+                    });
+                } else {
+                    log.error("Failed to load employees: {}", response.getMessage());
                 }
-                ShiftProfile shiftProfile = new ShiftProfile();
-                shiftProfile.getLblName().setText(name);
-                shiftProfile.updateEmployeeCodeLabel(code);
-                shiftProfile.setAlignmentX(Component.LEFT_ALIGNMENT);
-                shiftProfile.setMaximumSize(new Dimension(303, 72));
-                shiftProfile.setMinimumSize(new Dimension(0, 72));
-
-                if (image != null) {
-                    BufferedImage resized = Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, 60, 60);
-                    shiftProfile.getAvatarLabel().setImage(resized);
-                }
-
-                pnlEmployees.add(shiftProfile);
-                JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-                separator.setAlignmentX(Component.LEFT_ALIGNMENT);
-                separator.setMaximumSize(new Dimension(303, 1));
-                separator.setForeground(new Color(180, 180, 180));
-                separator.setBackground(new Color(180, 180, 180));
-                separator.setOpaque(true);
-                pnlEmployees.add(separator);
-
-                shiftProfile.addMouseListener(shiftProfile);
+            } catch (IOException | ExecutionException | InterruptedException | TimeoutException e) {
+                log.error("Error loading employees from socket: ", e);
             }
-
-            pnlEmployees.revalidate();
-            pnlEmployees.repaint();
-            SwingUtilities.invokeLater(() -> {
-                scrollPaneWin111.getVerticalScrollBar().setValue(0);
-            });
-        } catch (Exception ex) {
-            log.error("Error loading employees: ", ex);
-        }
+        }).start();
     }
 
     @Override
