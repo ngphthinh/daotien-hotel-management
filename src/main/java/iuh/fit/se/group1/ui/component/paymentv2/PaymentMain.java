@@ -14,6 +14,7 @@ import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.payment.CashPaymentModal;
 import iuh.fit.se.group1.ui.component.payment.TransferPaymentModal;
 import iuh.fit.se.group1.util.Constants;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
@@ -21,6 +22,7 @@ import raven.glasspanepopup.GlassPanePopup;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.*;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -35,14 +37,35 @@ import java.util.stream.Collectors;
  * @author THIS PC
  */
 public class PaymentMain extends javax.swing.JPanel {
+    @Getter
     private EmployeeDTO currentEmployee;
     private OrderService orderService;
     private OrderDTO currentOrder = null;
     private JaspersoftExportService jaspersoftExportService = new JaspersoftExportService();
     private PromotionService promotionService = new PromotionService();
+    private static final String OUTPUT_DIR = getJarDirectory() + File.separator + "hoadon";
 
-    public EmployeeDTO getCurrentEmployee() {
-        return currentEmployee;
+    private static String getJarDirectory() {
+        try {
+            String jarPath = JaspersoftExportService.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI()
+                    .getPath();
+
+            File jarFile = new File(jarPath);
+
+            // If running from JAR, get parent directory
+            if (jarFile.isFile()) {
+                return jarFile.getParent();
+            }
+            // If running from IDE (classes directory), use current working directory
+            return System.getProperty("user.dir");
+        } catch (Exception e) {
+            AppLogger.info("Could not determine JAR location, using current directory: {}", e.getMessage());
+            return System.getProperty("user.dir");
+        }
     }
 
     public void setCurrentEmployee(EmployeeDTO currentEmployee) {
@@ -750,15 +773,30 @@ public class PaymentMain extends javax.swing.JPanel {
             String promotionStr = lblPromotion.getText();
             saveOrder();
             GlassPanePopup.closePopupAll();
-            jaspersoftExportService.exportOrderToPdf(
+
+            byte[] filePdf = jaspersoftExportService.exportOrderToPdf(
                     order,
                     promotionStr,
                     PaymentType.CASH.getName(),
                     totalPricePayment,
                     currentEmployee.getFullName()
             );
+            generateOrder(order, filePdf);
+
         });
     }//GEN-LAST:event_btnCashActionPerformed
+
+    private void generateOrder(Long order, byte[] filePdf) {
+        String fileName = "hoadon_" + order + "_" +
+                currentOrder.getPaymentDate().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".pdf";
+        String filePath = OUTPUT_DIR + File.separator + fileName;
+        File file = new File(filePath);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(filePdf);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     private void saveOrder() {
         currentOrder.setEmployeePayment(currentEmployee);
@@ -875,13 +913,14 @@ public class PaymentMain extends javax.swing.JPanel {
                         String promotionStr = lblPromotion.getText();
                         currentOrder.setEmployeePayment(currentEmployee);
                         saveOrder();
-                        jaspersoftExportService.exportOrderToPdf(
+                        byte[] filePdf = jaspersoftExportService.exportOrderToPdf(
                                 order,
                                 promotionStr,
                                 PaymentType.E_WALLET.getName(),
                                 totalPricePayment,
                                 currentEmployee.getFullName()
                         );
+                        generateOrder(order, filePdf);
                     } else {
                         CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING, 700, 200);
                     }

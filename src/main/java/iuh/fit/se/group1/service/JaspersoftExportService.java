@@ -98,7 +98,7 @@ public class JaspersoftExportService {
         }
     }
 
-    public void exportOrderToPdf(Long orderId, String promotion, String paymentType, String totalPricePayment, String employeeName) {
+    public byte[] exportOrderToPdf(Long orderId, String promotion, String paymentType, String totalPricePayment, String employeeName) {
         OrderDTO order = orderService.getOrderById(orderId);
         System.out.println(order);
         String rooms = order.getBookings().stream()
@@ -156,8 +156,9 @@ public class JaspersoftExportService {
                     order.getPaymentDate().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".pdf";
             String filePath = OUTPUT_DIR + File.separator + fileName;
 
-            JasperExportManager.exportReportToPdfFile(print, filePath);
-            AppLogger.info("Invoice exported successfully to: {}", filePath);
+//            JasperExportManager.exportReportToPdfFile(print, filePath);
+            return JasperExportManager.exportReportToPdf(print);
+//            AppLogger.info("Invoice exported successfully to: {}", filePath);
 
         } catch (Exception e) {
             AppLogger.info("Lỗi khi xuất báo cáo hóa đơn: {}", e.getMessage());
