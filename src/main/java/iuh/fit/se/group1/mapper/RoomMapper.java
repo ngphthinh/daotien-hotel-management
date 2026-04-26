@@ -20,6 +20,7 @@ public class RoomMapper {
                 .roomId(room.getRoomId())
                 .roomNumber(room.getRoomNumber())
                 .roomType(this.roomTypeMapper.toRoomTypeDTO(room.getRoomType()))
+                .roomStatus(room.getRoomStatus())
                 .build();
     }
 
@@ -30,6 +31,7 @@ public class RoomMapper {
                 .roomId(roomDTO.getRoomId())
                 .roomNumber(roomDTO.getRoomNumber())
                 .roomType(this.roomTypeMapper.toRoomType(roomDTO.getRoomType()))
+                .roomStatus(roomDTO.getRoomStatus())
                 .build();
     }
 

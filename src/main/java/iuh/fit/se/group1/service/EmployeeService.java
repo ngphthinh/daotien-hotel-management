@@ -69,11 +69,18 @@ public class EmployeeService extends Service {
             employee.setAccount(accountSave);
             Employee employeeSave = employeeRepositoryImpl.save(entityManager, employee);
 
+
+            System.out.println("Sau khi luu employee" + employeeMapper.toDTO(employee));
+            System.out.println("Sau khi luu account" + accountSave);
             // generate username
-            String username = generateUsername(employeeDTO);
+            String username = generateUsername(employeeSave);
             accountSave.setUsername(username);
 
+            System.out.println("Username sau khi generate: " + accountSave.getUsername());
+
             accountService.updateAccount(entityManager, accountSave);
+
+            System.out.println("Account sau khi update: " + accountSave);
 
             return employeeMapper.toDTO(employeeSave);
         });
@@ -84,7 +91,7 @@ public class EmployeeService extends Service {
         return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByCitizenId(entityManager, citizenId)));
     }
 
-    private String generateUsername(EmployeeDTO entitySave) {
+    private String generateUsername(Employee entitySave) {
         String fullName = entitySave.getFullName();
 
         String normalized = Normalizer.normalize(fullName, Normalizer.Form.NFD);

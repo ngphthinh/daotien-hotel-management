@@ -14,6 +14,7 @@ public class AbstractRepositoryImpl<T, ID> implements Repository<T, ID> {
     @Override
     public T save(EntityManager em, T o) {
         em.persist(o);
+        em.flush();
         return o;
     }
 
