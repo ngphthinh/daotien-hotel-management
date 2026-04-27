@@ -1,8 +1,7 @@
 package iuh.fit.se.group1.handler;
 
 import iuh.fit.se.group1.dispatcher.RequestHandler;
-import iuh.fit.se.group1.dto.OrderDTO;
-import iuh.fit.se.group1.dto.OrderDetailDTO;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +41,12 @@ public class OrderHandler implements RequestHandler {
                 case ORDER_UPDATE_STATUS_PAID -> handleUpdateStatusPaid(request);
                 case ORDER_UPDATE_DEPOSIT -> handleUpdateDeposit(request);
                 case ORDER_DELETE -> handleDelete(request);
+                case ORDER_GET_REVENUE_BETWEEN_DATES -> handleGetRevenueBetweenDates(request);
+                case ORDER_GET_REVENUE_BETWEEN_DATES_BY_ROOM_TYPE -> handleGetRevenueBetweenDatesByRoomType(request);
+                case ORDER_GET_REVENUE_BETWEEN_DATES_BOOKING_COUNT -> handleGetRevenueBetweenDatesBookingCount(request);
+                case ORDER_CREATE_RECORD -> handleCreateRecord(request);
+                case ORDER_UPDATE_TOTAL_PRICE -> handleUpdateTotalPrice(request);
+                case MOVE_BOOKING_TO_ORDER -> handleMoveBookingToOrder(request);
                 default -> Response.builder()
                         .code(400)
                         .message("Invalid command")
@@ -54,6 +60,85 @@ public class OrderHandler implements RequestHandler {
                     .build();
         }
     }
+
+    private Response handleMoveBookingToOrder(Request request) {
+
+        MoveRequestBooking moveRequestBooking = (MoveRequestBooking) request.getRequest();
+        orderService.moveBookingsToOrder(moveRequestBooking.getOrderId(), moveRequestBooking.getBookingIdsToMove());
+        return Response.builder()
+                .code(200)
+                .message("Move booking to order successfully")
+                .build();
+
+    }
+
+    private Response handleUpdateTotalPrice(Request request) {
+        OrderUpdatePriceRequest updatePriceRequest = (OrderUpdatePriceRequest) request.getRequest();
+        orderService.updateOrderTotalAmount(updatePriceRequest.getOrderId(), updatePriceRequest.getTotalPrice());
+        return Response.builder()
+                .code(200)
+                .message("Total price updated")
+                .build();
+    }
+
+    private Response handleCreateRecord(Request request) {
+
+
+        OrderDTO orderDTO = orderService.createOrderRecord((OrderDTO) request.getRequest());
+        return Response.builder()
+                .code(201)
+                .message("Order record created successfully")
+                .data(orderDTO)
+                .build();
+    }
+
+    private Response handleGetRevenueBetweenDatesBookingCount(Request request) {
+
+        LocalDate date = (LocalDate) request.getRequest();
+
+        return Response.builder()
+                .code(200)
+                .message("Get revenue between Dates booking count")
+                .data(BookingCount.builder().bookingCount(orderService.getBookingCountByRoomTypeAndDate(date)).build())
+                .build();
+
+
+    }
+
+
+    private Response handleGetRevenueBetweenDatesByRoomType(Request request) {
+
+        DateRangeRequest dateRangeRequest = (DateRangeRequest) request.getRequest();
+
+        Map<String, BigDecimal> map = orderService.getRevenueByRoomType(dateRangeRequest.getFrom(), dateRangeRequest.getTo());
+
+
+        return Response.builder()
+                .code(200)
+                .message("Get revenue between Dates booking count")
+                .data(RevenueDTO.builder()
+                        .revenueByDate(map)
+                        .build())
+                .build();
+
+    }
+
+    private Response handleGetRevenueBetweenDates(Request request) {
+
+        DateRangeRequest dateRangeRequest = (DateRangeRequest) request.getRequest();
+
+        BigDecimal value = orderService.getTotalRevenueBetweenDates(dateRangeRequest.getFrom(), dateRangeRequest.getTo());
+
+
+        return Response.builder()
+                .code(200)
+                .message("Get revenue between Dates booking count")
+                .data(value)
+                .build();
+
+
+    }
+
 
     private Response handleGetById(Request request) {
         Long orderId = (Long) request.getRequest();
@@ -209,14 +294,14 @@ public class OrderHandler implements RequestHandler {
 
         try {
             OrderDTO created = orderService.createOrder(orderDTO, orderDetails != null ? orderDetails : List.of());
-            
+
             if (created == null) {
                 return Response.builder()
                         .code(400)
                         .message("Failed to create order - missing required fields")
                         .build();
             }
-            
+
             return Response.builder()
                     .code(201)
                     .message("Order created successfully")

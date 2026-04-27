@@ -1,6 +1,9 @@
 package iuh.fit.se.group1.ui.component.custom;
 
 import iuh.fit.se.group1.dto.*;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
@@ -22,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import javax.swing.JFormattedTextField;
 import javax.swing.text.NumberFormatter;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Panel hiển thị chi tiết hóa đơn đầy đủ
@@ -84,7 +88,7 @@ public class InvoicePanel extends JPanel {
     private static final Color PALETTE_SELECTION = new Color(183, 225, 250);
     private static final Color PALETTE_EDIT_HIGHLIGHT = new Color(229, 247, 255);
     private JLabel lblEmployeePayment;
-    private final EmployeeService employeeService = new EmployeeService();
+    private final EmployeeServiceClient employeeService = SocketFacade.getInstance().getEmployee();
 
     public InvoicePanel() {
         initComponents();
@@ -487,7 +491,13 @@ public class InvoicePanel extends JPanel {
     public void setOrder(OrderDTO order) {
         this.order = order;
         if (order != null) {
-            updateInvoiceData();
+            try {
+                updateInvoiceData();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -543,7 +553,7 @@ public class InvoicePanel extends JPanel {
         }
     }
 
-    private void updateInvoiceData() {
+    private void updateInvoiceData() throws Exception {
         if (order == null) return;
 
         // Header
@@ -579,7 +589,15 @@ public class InvoicePanel extends JPanel {
 
         // Employee Payment
         if (order.getEmployeePayment() != null && order.getEmployeePayment().getEmployeeId() != null) {
-            EmployeeDTO employeePayment = employeeService.getEmployeeById(order.getEmployeePayment().getEmployeeId());
+            Response response = employeeService.getEmployeeById(order.getEmployeePayment().getEmployeeId());
+
+            if (response != null && response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Không thể tải thông tin nhân viên thanh toán: " + response.getMessage(),
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            EmployeeDTO employeePayment = (EmployeeDTO) Objects.requireNonNull(response).getData();
             if (employeePayment != null) {
                 lblEmployeePayment.setText(employeePayment.getFullName() != null ? employeePayment.getFullName() : "-");
             } else {

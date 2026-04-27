@@ -7,6 +7,8 @@ package iuh.fit.se.group1.ui.component.paymentv2;
 import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.enums.PaymentType;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.SurchargeManagementPanel;
@@ -39,7 +41,7 @@ import java.util.stream.Collectors;
 public class PaymentMain extends javax.swing.JPanel {
     @Getter
     private EmployeeDTO currentEmployee;
-    private OrderService orderService;
+    private OrderServiceClient orderService;
     private OrderDTO currentOrder = null;
     private JaspersoftExportService jaspersoftExportService = new JaspersoftExportService();
     private PromotionService promotionService = new PromotionService();
@@ -743,10 +745,17 @@ public class PaymentMain extends javax.swing.JPanel {
     private void btnCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCashActionPerformed
         backStep3Action.run();
         double totalPayment = Constants.parseVND(lblTotalPricePayment.getText());
-        if (!setupBookingPayment()) {
-            AppLogger.info(getClass() + " Lỗi nghen ");
-            return;
+
+        try {
+            if (!setupBookingPayment()) {
+                AppLogger.info(getClass() + " Lỗi nghen ");
+                return;
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi thiết lập thanh toán cho các booking. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
+
         var modal = new CashPaymentModal(totalPayment);
 
 
@@ -801,7 +810,22 @@ public class PaymentMain extends javax.swing.JPanel {
     private void saveOrder() {
         currentOrder.setEmployeePayment(currentEmployee);
         saveSurchargesByOrderId(currentOrder.getOrderId());
-        orderService.updateOrderStatusToPaid(currentOrder);
+        try {
+
+            Response response = orderService.updateOrderStatusToPaid(currentOrder);
+
+            if (response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this,
+                        "Lỗi khi cập nhật trạng thái đơn hàng. Vui lòng thử lại sau!",
+                        "Thông báo lỗi",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            CustomDialog.showMessage(null, "Lỗi khi lưu đơn hàng. Vui lòng thử lại sau!", "Thông báo lỗi", CustomDialog.MessageType.ERROR, 380, 200);
+        }
         resetPanel();
         backStep1Action.run();
     }
@@ -854,9 +878,14 @@ public class PaymentMain extends javax.swing.JPanel {
     private void bntTranferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntTranferActionPerformed
         PaymentService paymentService = new PaymentService();
         backStep3Action.run();
-        if (!setupBookingPayment()) {
-            AppLogger.info(getClass() + " Lỗi nghen ");
-            return;
+        try {
+            if (!setupBookingPayment()) {
+                AppLogger.info(getClass() + " Lỗi nghen ");
+                return;
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi thiết lập thanh toán cho các booking. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
         currentOrder.setPromotion(promotion);
         currentOrder.setPaymentType(PaymentType.E_WALLET);
@@ -903,7 +932,7 @@ public class PaymentMain extends javax.swing.JPanel {
                     String responseCheck = paymentService.queryPayment(orderId);
                     String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
                     String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
-                    if ("0".equals(responseCodeCheck)) {
+                    if ("0" .equals(responseCodeCheck)) {
                         CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS, 380, 200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
@@ -935,7 +964,7 @@ public class PaymentMain extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_bntTranferActionPerformed
 
-    private boolean setupBookingPayment() {
+    private boolean setupBookingPayment() throws Exception {
 
         Set<BookingViewDTO> selectedBookings =
                 new HashSet<>(tblRoom.getSelectedRoom());
@@ -974,7 +1003,17 @@ public class PaymentMain extends javax.swing.JPanel {
         newOrderRecord.setDeposit(java.math.BigDecimal.ZERO);
         newOrderRecord.setTotalAmount(java.math.BigDecimal.ZERO);
 
-        OrderDTO createdOrder = orderService.createOrderRecord(newOrderRecord);
+        Response response = orderService.createOrderRecord(newOrderRecord);
+
+        if (response.getCode() != 201) {
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tạo đơn mới cho phần còn lại của phòng. Vui lòng thử lại.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        OrderDTO createdOrder = (OrderDTO) response.getData();
         if (createdOrder == null) {
             CustomDialog.showMessage(this, "Không thể tạo đơn mới cho phần còn lại của phòng", "Lỗi", CustomDialog.MessageType.ERROR, 400, 180);
             return false;
@@ -986,7 +1025,14 @@ public class PaymentMain extends javax.swing.JPanel {
                 .toList();
 
         // Move booking rows in DB to the new order id
-        orderService.moveBookingsToOrder(createdOrder.getOrderId(), bookingIdsToMove);
+        response = orderService.moveBookingsToOrder(createdOrder.getOrderId(), bookingIdsToMove);
+        if (response.getCode() != 201) {
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi chuyển booking sang đơn mới. Vui lòng thử lại.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
         // --- Calculate totals for both orders ---
         // Original total of current order (may include room + amenity + surcharge)
@@ -997,8 +1043,14 @@ public class PaymentMain extends javax.swing.JPanel {
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
 
-        orderService.updateOrderTotalAmount(createdOrder.getOrderId(), totalRemainingRooms);
-
+        response = orderService.updateOrderTotalAmount(createdOrder.getOrderId(), totalRemainingRooms);
+        if (response.getCode() != 201) {
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tạo đơn mới cho phần còn lại của phòng. Vui lòng thử lại.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
         java.math.BigDecimal newPaidOrderTotal = originalTotal.subtract(totalRemainingRooms);
         if (newPaidOrderTotal.compareTo(java.math.BigDecimal.ZERO) < 0) {
@@ -1015,7 +1067,17 @@ public class PaymentMain extends javax.swing.JPanel {
         currentOrder.setBookings(new ArrayList<>(selectedBookings));
 
         // Refresh currentOrder from DB to ensure consistent state (optional)
-        this.currentOrder = orderService.getOrderById(currentOrder.getOrderId());
+
+        response = orderService.getOrderById(currentOrder.getOrderId());
+        if (response.getCode() != 201 || response == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tải lại đơn hàng sau khi cập nhật. Vui lòng thử lại.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        this.currentOrder = (OrderDTO) response.getData();
 
         // done
         return true;
@@ -1218,10 +1280,18 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
 
-    public void setOrder(Long orderId, OrderService orderService, OrderDetailService orderDetailService,
-                         SurchargeDetailService surchargeDetailService) {
+    public void setOrder(Long orderId, OrderServiceClient orderService, OrderDetailService orderDetailService,
+                         SurchargeDetailService surchargeDetailService) throws Exception {
         this.orderService = orderService;
-        OrderDTO order = orderService.getOrderById(orderId);
+
+        Response response = orderService.getOrderById(orderId);
+
+        if (response.getCode() != 200) {
+            log.error("Failed to fetch order details for orderId {}: {}", orderId, response.getMessage());
+            return;
+        }
+
+        OrderDTO order = (OrderDTO) response.getData();
         this.currentOrder = order;
 
         String bookingTypeStr = order.getBookings().get(0).getBookingType().getDisplayName();

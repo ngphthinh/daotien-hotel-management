@@ -8,8 +8,12 @@ import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.OrderDTO;
-import iuh.fit.se.group1.service.EmployeeService;
-import iuh.fit.se.group1.service.OrderService;
+//import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
+//import iuh.fit.se.group1.service.OrderService;
+import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.InvoicePanel;
 import iuh.fit.se.group1.ui.component.custom.OrderEditDialog;
@@ -24,6 +28,7 @@ import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -40,10 +45,14 @@ import javax.swing.RowFilter;
  */
 public class OrderManagement extends javax.swing.JPanel {
 
-    private final OrderService orderService;
+    private final OrderServiceClient orderService;
     private String currentTypeFilter = "Tất cả";
     private DateChooser dateChooser;
     private LocalDate selectedDate;
+
+    static final int GET_ALL = 0;
+    static final int GET_WITH_RELATIONSHIP = 1;
+    static final int GET_BY_KEYWORD = 2;
 
     /**
      * Creates new form OrderManagement
@@ -51,7 +60,7 @@ public class OrderManagement extends javax.swing.JPanel {
     public OrderManagement() {
         initComponents();
         custom();
-        orderService = new OrderService();
+        orderService = SocketFacade.getInstance().getOrder();
         selectedDate = LocalDate.now(); // Default to today
         loadData();
     }
@@ -60,7 +69,7 @@ public class OrderManagement extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
         model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
 
-        for (OrderDTO order : orderService.getAllOrdersWithRelationship()) {
+        for (OrderDTO order : fetchData(GET_WITH_RELATIONSHIP, null)) {
 
             if (!order.getBookings().isEmpty() && order.getBookings() != null) {
 
@@ -103,11 +112,38 @@ public class OrderManagement extends javax.swing.JPanel {
         }
     }
 
+    public java.util.List<OrderDTO> fetchData(int type, String filter) {
+        try {
+
+            Response response = null;
+            if (type == GET_ALL) {
+                response = orderService.getAllOrders();
+            } else if (type == GET_WITH_RELATIONSHIP) {
+                response = orderService.getAllOrdersWithRelationship();
+            } else if (type == GET_BY_KEYWORD) {
+                response = orderService.searchOrdersByKeyword(filter);
+            }
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + (response != null ? response.getCode() : "No response"));
+                return null;
+
+            }
+
+            return (java.util.List<OrderDTO>) response.getData();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+    }
+
     public void loadOrdersByDate(LocalDate date) {
         DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
         model.setRowCount(0);
 
-        for (OrderDTO order : orderService.getAllOrders()) {
+        for (OrderDTO order : fetchData(GET_ALL, null)) {
             // Lọc theo orderDate (ngày tạo đơn)
             LocalDate orderDate = order.getOrderDate().toLocalDate();
 
@@ -211,7 +247,15 @@ public class OrderManagement extends javax.swing.JPanel {
 
 
                     Long id = Long.valueOf(tblOrder.getTbl().getModel().getValueAt(modelRow, 0).toString());
-                    OrderDTO order = orderService.getOrderById(id);
+
+                    Response response = orderService.getOrderById(id);
+
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(null, response.getMessage());
+                        return;
+                    }
+
+                    OrderDTO order = (OrderDTO) response.getData();
                     if (order == null) {
                         JOptionPane.showMessageDialog(OrderManagement.this,
                                 "Không tìm thấy hóa đơn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -255,9 +299,18 @@ public class OrderManagement extends javax.swing.JPanel {
                 if (confirm == JOptionPane.YES_OPTION) {
                     Long id = Long.valueOf(tblOrder.getTbl().getModel().getValueAt(
                             tblOrder.getTbl().convertRowIndexToModel(row), 0).toString());
-                    orderService.deleteOrderById(id);
-                    loadData();
+                    try {
+                        Response response = orderService.deleteOrderById(id);
+                        if (response.getCode() != 200) {
+                            JOptionPane.showMessageDialog(null, response.getMessage());
+                            return;
+                        }
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Lỗi khi xóa hóa đơn: " + e.getMessage());
+                        return;
+                    }
                 }
+                loadData();
             }
 
             @Override
@@ -268,7 +321,14 @@ public class OrderManagement extends javax.swing.JPanel {
                     System.out.println("View row: " + modelRow);
 
                     Long id = Long.valueOf(tblOrder.getTbl().getModel().getValueAt(modelRow, 0).toString());
-                    OrderDTO order = orderService.getOrderById(id);
+                    Response response = orderService.getOrderById(id);
+
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(null, response.getMessage());
+                        return;
+                    }
+
+                    OrderDTO order = (OrderDTO) response.getData();
 
                     if (order == null) {
                         JOptionPane.showMessageDialog(OrderManagement.this,
@@ -277,8 +337,19 @@ public class OrderManagement extends javax.swing.JPanel {
                     }
 
 
-                    EmployeeService employeeService = new EmployeeService();
-                    EmployeeDTO employee = employeeService.getEmployeeById(order.getEmployee().getEmployeeId());
+                    EmployeeServiceClient employeeService = SocketFacade.getInstance().getEmployee();
+                    response = null;
+                    try {
+                        response = employeeService.getEmployeeById(order.getEmployee().getEmployeeId());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (response != null && response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                        return;
+                    }
+
+                    EmployeeDTO employee = (EmployeeDTO) Objects.requireNonNull(response).getData();
                     order.setEmployee(employee);
 
                     InvoicePanel invoicePanel = new InvoicePanel(order);
@@ -298,6 +369,7 @@ public class OrderManagement extends javax.swing.JPanel {
         };
 
         setupHeaderFilters();
+
         setupDateChooser();
 
         addMouseListener(new MouseAdapter() {
@@ -308,28 +380,85 @@ public class OrderManagement extends javax.swing.JPanel {
         });
 
         tblOrder.setTableActionColumn(tblOrder.getTbl(), 8, event, true);
-        tblOrder.getTbl().getColumnModel().getColumn(0).setPreferredWidth(70); // chiều rộng mong muốn
-        tblOrder.getTbl().getColumnModel().getColumn(1).setPreferredWidth(200);
-        tblOrder.getTbl().getColumnModel().getColumn(2).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(3).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(4).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(5).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(6).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(7).setPreferredWidth(150);
-        tblOrder.getTbl().getColumnModel().getColumn(8).setPreferredWidth(150);
+        tblOrder.getTbl().
 
-        tblOrder.getTbl().addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int col = tblOrder.getTbl().columnAtPoint(e.getPoint());
+                getColumnModel().
 
-                if (col == 8) {
-                    tblOrder.getTbl().setCursor(Cursor.getDefaultCursor().getPredefinedCursor(Cursor.HAND_CURSOR));
-                } else {
-                    tblOrder.getTbl().setCursor(Cursor.getDefaultCursor());
-                }
-            }
-        });
+                getColumn(0).
+
+                setPreferredWidth(70); // chiều rộng mong muốn
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(1).
+
+                setPreferredWidth(200);
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(2).
+
+                setPreferredWidth(150);
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(3).
+
+                setPreferredWidth(150);
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(4).
+
+                setPreferredWidth(150);
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(5).
+
+                setPreferredWidth(150);
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(6).
+
+                setPreferredWidth(150);
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(7).
+
+                setPreferredWidth(150);
+        tblOrder.getTbl().
+
+                getColumnModel().
+
+                getColumn(8).
+
+                setPreferredWidth(150);
+
+        tblOrder.getTbl().
+
+                addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                    @Override
+                    public void mouseMoved(MouseEvent e) {
+                        int col = tblOrder.getTbl().columnAtPoint(e.getPoint());
+
+                        if (col == 8) {
+                            tblOrder.getTbl().setCursor(Cursor.getDefaultCursor().getPredefinedCursor(Cursor.HAND_CURSOR));
+                        } else {
+                            tblOrder.getTbl().setCursor(Cursor.getDefaultCursor());
+                        }
+                    }
+                });
+
         setupOrderTableColumnAlignment(tblOrder.getTbl());
     }
 
@@ -370,7 +499,7 @@ public class OrderManagement extends javax.swing.JPanel {
     }
 
     private void handleSearch(String searchText) {
-        java.util.List<OrderDTO> orders = orderService.searchOrdersByKeyword(searchText);
+        java.util.List<OrderDTO> orders = fetchData(GET_BY_KEYWORD, searchText);
         DefaultTableModel model = (DefaultTableModel) tblOrder.getTbl().getModel();
         model.setRowCount(0); // Xóa dữ liệu hiện tại trong bảng
 

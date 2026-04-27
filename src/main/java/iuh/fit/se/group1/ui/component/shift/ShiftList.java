@@ -7,7 +7,6 @@ package iuh.fit.se.group1.ui.component.shift;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.network.Response;
-import iuh.fit.se.group1.network.client.ClientSocketManager;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ public class ShiftList extends JPanel {
     private final SocketFacade socket;
 
     public ShiftList() {
-        this.socket = new SocketFacade(ClientSocketManager.getInstance());
+        this.socket = SocketFacade.getInstance();
         initComponents();
         custom();
         loadEmployeesFromDatabase();

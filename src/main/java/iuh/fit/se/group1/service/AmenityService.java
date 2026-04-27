@@ -2,9 +2,7 @@ package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.entity.Amenity;
-import iuh.fit.se.group1.mapper.AccountMapper;
 import iuh.fit.se.group1.mapper.AmenityMapper;
-import iuh.fit.se.group1.repository.interfaces.AccountRepository;
 import iuh.fit.se.group1.repository.jpa.AmenityRepositoryImpl;
 import jakarta.persistence.EntityManager;
 

@@ -9,7 +9,6 @@ import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.mapper.BookingMapper;
-import iuh.fit.se.group1.mapper.OrderDetailMapper;
 import iuh.fit.se.group1.mapper.OrderMapper;
 import iuh.fit.se.group1.repository.jpa.BookingRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
@@ -30,14 +29,12 @@ public class OrderService extends Service {
     private final BookingRepository bookingRepository = new BookingRepositoryImpl();
     private final BookingMapper bookingMapper = new BookingMapper();
     private final OrderMapper orderMapper;
-    private final OrderDetailMapper orderDetailMapper;
     private final BookingService bookingService = new BookingService();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
     public OrderService() {
         this.orderMapper = new OrderMapper();
         this.orderDetailsService = new OrderDetailService();
-        this.orderDetailMapper = new OrderDetailMapper();
         this.orderRepositoryImpl = new OrderRepositoryImpl();
         this.roomRepository = new RoomRepositoryImpl();
     }

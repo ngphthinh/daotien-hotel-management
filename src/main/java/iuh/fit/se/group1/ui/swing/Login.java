@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.*;
 
 import iuh.fit.se.group1.dto.AccountDTO;
+import iuh.fit.se.group1.dto.EmailRequest;
 import iuh.fit.se.group1.dto.EmployeeDTO;
-import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.network.client.ClientSocketManager;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
@@ -53,10 +53,10 @@ public class Login extends javax.swing.JFrame {
     private JButton btnEye = new JButton();
     private String currentLoginUsername; // Track current logged-in user for logout
 
-    private final SocketFacade socketFacade;
+    private SocketFacade socketFacade;
 
-    public Login(SocketFacade socketFacade) {
-        this.socketFacade = socketFacade;
+    public Login() {
+        this.socketFacade = SocketFacade.getInstance();
         Image icon = Toolkit.getDefaultToolkit()
                 .getImage(getClass().getResource("/images/logo64.png"));
 
@@ -537,16 +537,28 @@ public class Login extends javax.swing.JFrame {
                     .replace("{{site_name}}", "Đào Tiên Hotel")
                     .replace("{{current_year}}", String.valueOf(LocalDate.now().getYear()));
 
-        } catch (IOException e) {
+
+            Response response = socketFacade.getEmail().sendEmail(EmailRequest.builder()
+                    .to(employee.getEmail())
+                    .subject("Đặt lại mật khẩu - Hệ thống quản lý khách sạn Đào Tiên")
+                    .email(html)
+                    .build());
+
+            if (response.getCode() == 200) {
+                JOptionPane.showMessageDialog(this,
+                        "Mật khẩu đã được đặt lại. Vui lòng check email của bạn!",
+                        "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Đã có lỗi xảy ra khi gửi email: " + response.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        // For now, we'll skip email sending since it's not part of socket server
-        // TODO: Implement email sending through socket or local service
-        JOptionPane.showMessageDialog(this,
-                "Mật khẩu đã được đặt lại. Vui lòng check email của bạn!",
-                "Thành công",
-                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void enableLogin(boolean action) {
@@ -607,7 +619,7 @@ public class Login extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Nimbus" .equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -619,8 +631,7 @@ public class Login extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            SocketFacade socketFacade = new SocketFacade(ClientSocketManager.getInstance());
-            Login login = new Login(socketFacade);
+            Login login = new Login();
             login.setVisible(true);
             login.setExtendedState(JFrame.MAXIMIZED_BOTH);
         });

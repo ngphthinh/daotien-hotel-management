@@ -1,8 +1,9 @@
 package iuh.fit.se.group1.network.client;
 
-import iuh.fit.se.group1.network.client.service.AuthServiceClient;
-import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
+import iuh.fit.se.group1.network.client.service.*;
 import lombok.Getter;
+
+import java.net.Socket;
 
 //import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 //@Getter
@@ -10,12 +11,25 @@ import lombok.Getter;
 public class SocketFacade {
     private final AuthServiceClient auth;
     private final EmployeeServiceClient employee;
-//    public final OrderServiceClient order;
+    private final EmailServiceClient email;
+    private final AmenityServiceClient amenity;
+    public final OrderServiceClient order;
 
     public SocketFacade(ClientSocketManager socket) {
         this.auth = new AuthServiceClient(socket);
         this.employee = new EmployeeServiceClient(socket);
-//        this.order = new OrderServiceClient(socket);
+        this.email = new EmailServiceClient(socket);
+        this.amenity = new AmenityServiceClient(socket);
+        this.order = new OrderServiceClient(socket);
+    }
+
+    private static SocketFacade instance;
+
+    public static SocketFacade getInstance() {
+        if (instance == null) {
+            instance = new SocketFacade(ClientSocketManager.getInstance());
+        }
+        return instance;
     }
 
 }

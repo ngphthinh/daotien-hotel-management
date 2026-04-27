@@ -1,7 +1,5 @@
 package iuh.fit.se.group1.ui.swing;
 
-import iuh.fit.se.group1.network.client.ClientSocketManager;
-import iuh.fit.se.group1.network.client.SocketFacade;
 
 import javax.swing.*;
 import java.awt.*;
@@ -168,8 +166,7 @@ public class AdvancedSplashScreen extends JWindow {
 
     private void showMainApplication() {
         SwingUtilities.invokeLater(() -> {
-            SocketFacade socketFacade = new SocketFacade(ClientSocketManager.getInstance());
-            Login login = new Login(socketFacade);
+            Login login = new Login();
             login.setVisible(true);
         });
     }
@@ -177,7 +174,7 @@ public class AdvancedSplashScreen extends JWindow {
     public static void main(String[] args) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Nimbus" .equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

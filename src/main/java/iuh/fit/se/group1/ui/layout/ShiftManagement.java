@@ -9,7 +9,9 @@ import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.EmployeeShiftDTO;
 import iuh.fit.se.group1.dto.ShiftDTO;
-import iuh.fit.se.group1.service.EmployeeService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
 import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.service.ShiftCloseService;
 import iuh.fit.se.group1.service.ShiftService;
@@ -25,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 
 import org.imgscalr.Scalr;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -35,10 +38,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static iuh.fit.se.group1.ui.layout.EmployeeManagement.GET_ALL;
+import static iuh.fit.se.group1.ui.layout.EmployeeManagement.GET_BY_KEYWORD;
 
 
 /**
@@ -50,7 +57,7 @@ public class ShiftManagement extends javax.swing.JPanel {
     private ShiftService shiftService;
     private List<ShiftDTO> shifts;
     private EmployeeShiftService employeeShiftService;
-    private EmployeeService employeeService;
+    private EmployeeServiceClient employeeService;
 
     /**
      * Creates new form ShiftManagement
@@ -59,7 +66,7 @@ public class ShiftManagement extends javax.swing.JPanel {
         initComponents();
         shiftService = new ShiftService();
         employeeShiftService = new EmployeeShiftService();
-        employeeService = new EmployeeService();
+        employeeService = SocketFacade.getInstance().getEmployee();
         loadShiftsFromDatabase();
         setupDateChooser();
         setupShiftCardButtons();
@@ -72,7 +79,15 @@ public class ShiftManagement extends javax.swing.JPanel {
 
     private void loadAllEmployees() {
         try {
-            List<EmployeeDTO> employees = employeeService.getAllEmployees();
+            Response response = employeeService.getAllAmenities();
+
+            if (response.getCode() != 200) {
+                log.error("Failed to load employees: Server returned HTTP Status {}", response.getCode());
+                Message.showMessageNoCancel("Lỗi", "Không thể tải danh sách nhân viên: Server trả về mã " + response.getCode());
+                return;
+            }
+
+            List<EmployeeDTO> employees = (List<EmployeeDTO>) response.getData();
             if (employees != null && !employees.isEmpty()) {
                 shiftList.loadEmployees(employees);
                 log.info("Loaded {} employees into ShiftList", employees.size());
@@ -109,15 +124,34 @@ public class ShiftManagement extends javax.swing.JPanel {
         }
     }
 
+    public List<EmployeeDTO> fetchData(int type, String filter) {
+        try {
+            Response response = null;
+            if (type == GET_ALL) {
+                response = employeeService.getAllAmenities();
+
+            } else if (type == GET_BY_KEYWORD) {
+                response = employeeService.getEmployeeByKeyword(filter);
+            }
+            if (response != null && response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return null;
+            }
+            return (List<EmployeeDTO>) response.getData();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void handleSearch() {
         try {
             String keyword = search.getText().trim();
             List<EmployeeDTO> filteredEmployees;
 
             if (keyword.isEmpty()) {
-                filteredEmployees = employeeService.getAllEmployees();
+                filteredEmployees = fetchData(GET_ALL, null);
             } else {
-                filteredEmployees = employeeService.getEmployeeByKeyword(keyword);
+                filteredEmployees = fetchData(GET_BY_KEYWORD, keyword);
             }
 
             shiftList.loadEmployees(filteredEmployees);
@@ -237,7 +271,18 @@ public class ShiftManagement extends javax.swing.JPanel {
                 if (employeesInShift != null && !employeesInShift.isEmpty()) {
                     for (int j = 0; j < Math.min(2, employeesInShift.size()); j++) {
                         EmployeeShiftDTO es = employeesInShift.get(j);
-                        EmployeeDTO employee = employeeService.getEmployeeById(es.getEmployee().getEmployeeId());
+                        Response response = null;
+                        try {
+                            response = employeeService.getEmployeeById(es.getEmployee().getEmployeeId());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        if (response != null && response.getCode() != 200) {
+                            JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                            return;
+                        }
+
+                        EmployeeDTO employee = (EmployeeDTO) Objects.requireNonNull(response).getData();
                         if (employee == null) continue;
 
                         String employeeName = employee.getFullName();

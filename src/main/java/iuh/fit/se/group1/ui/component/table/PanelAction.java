@@ -37,7 +37,11 @@ public class PanelAction extends javax.swing.JPanel {
     public void initEvent(TableActionEvent event, int row) {
         btnEdit.addActionListener(ae -> {
             stopEditingIfNeeded();
-            event.onEdit(row);
+            try {
+                event.onEdit(row);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi thực hiện hành động: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         btnDelete.addActionListener(ae -> {
@@ -51,7 +55,9 @@ public class PanelAction extends javax.swing.JPanel {
         });
     }
 
-    /** Dừng chế độ chỉnh sửa cell nếu đang edit */
+    /**
+     * Dừng chế độ chỉnh sửa cell nếu đang edit
+     */
     private void stopEditingIfNeeded() {
         // Lấy JTable chứa panel này
         Component c = SwingUtilities.getAncestorOfClass(JTable.class, this);

@@ -5,7 +5,9 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.dto.*;
-import iuh.fit.se.group1.service.OrderService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.service.SurchargeService;
@@ -14,20 +16,18 @@ import iuh.fit.se.group1.ui.component.booking2.MainFlow2;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow3;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow4;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow5;
-import iuh.fit.se.group1.ui.component.booking2.MainFlow5;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -37,11 +37,12 @@ import java.util.function.Consumer;
  */
 public class BookingPage extends javax.swing.JPanel {
 
-    private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
+    private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private List<RoomSelection> selectedRooms;
-    private SurchargeService surchargeService = new SurchargeService();
+    private final SurchargeService surchargeService = new SurchargeService();
+    @Setter
     private EmployeeDTO currentEmployee;
-    private OrderService orderService = new OrderService();
+    private final OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
     private RoomService roomService = new RoomService();
     private MainFlow3 mainFlow3;
     private MainFlow2 mainFlow2;
@@ -50,10 +51,6 @@ public class BookingPage extends javax.swing.JPanel {
 
     private static final String[] bookingType = {"Theo giờ", "Theo ngày", "Qua đêm"};
 
-
-    public void setCurrentEmployee(EmployeeDTO employee) {
-        this.currentEmployee = employee;
-    }
 
     /**
      * Creates new form BookingPage
@@ -163,7 +160,11 @@ public class BookingPage extends javax.swing.JPanel {
         });
 
         mainFlow5.getBtnComplete().addActionListener(e -> {
-            createOrder();
+            try {
+                createOrder();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
 
@@ -196,7 +197,7 @@ public class BookingPage extends javax.swing.JPanel {
         });
     }
 
-    private void createOrder() {
+    private void createOrder() throws Exception {
 
         var orderRs = mainFlow5.buildOrder(currentEmployee, mainFlow4.getCustomer(), selectedRooms, surchargeService);
 
@@ -210,7 +211,20 @@ public class BookingPage extends javax.swing.JPanel {
             return orderDetail;
         }).toList();
 
-        var orderSave = orderService.createOrder(order, orderDetails);
+        Response response = orderService.createOrder(order, orderDetails);
+
+        if (response.getCode() != 200) {
+            CustomDialog.showMessage(
+                    null,
+                    "Tạo đơn đặt phòng thất bại: " + response.getMessage(),
+                    "Lỗi",
+                    CustomDialog.MessageType.ERROR,
+                    400, 200
+            );
+            return;
+        }
+
+        var orderSave = (OrderDTO) response.getData();
 
         SurchargeDetailDTO surchargeDetail = orderRs.getSurchargeDetail();
 

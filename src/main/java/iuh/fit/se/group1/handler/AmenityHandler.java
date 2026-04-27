@@ -28,7 +28,7 @@ public class AmenityHandler implements RequestHandler {
         try {
             return switch (commandType) {
                 case AMENITY_GET_BY_ID -> handleGetById(request);
-                case AMENITY_GET_BY_ALL -> handleGetAll();
+                case AMENITY_GET_ALL -> handleGetAll();
                 case AMENITY_GET_BY_KEYWORDS -> handleGetByKeywords(request);
                 case AMENITY_CREATE -> handleCreate(request);
                 case AMENITY_UPDATE -> handleUpdate(request);

@@ -8,16 +8,18 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.dto.AccountDTO;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.RoleDTO;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.CellStyle;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
 
 import iuh.fit.se.group1.enums.Role;
-import iuh.fit.se.group1.service.EmployeeService;
+//import iuh.fit.se.group1.service.EmployeeService;
 import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
@@ -35,11 +37,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -76,17 +79,43 @@ import iuh.fit.se.group1.service.ImportExcelService;
 public class EmployeeManagement extends javax.swing.JPanel {
 
     private static final Logger log = LoggerFactory.getLogger(EmployeeManagement.class);
-    private final EmployeeService employeeService;
+    private final EmployeeServiceClient employeeService;
     private final RoleService roleService;
     private int activeFilterColumn = -1;
     private ShiftList shiftList;
 
+    static final int GET_ALL = 1;
+    static final int GET_BY_KEYWORD = 2;
+//    private static final int GET_BY_ = 3;
+
     public EmployeeManagement() {
         initComponents();
         custom();
-        employeeService = new EmployeeService();
+        employeeService = SocketFacade.getInstance().getEmployee();
         roleService = new RoleService();
-        loadTable(employeeService.getAllEmployees());
+        loadTable(fetchData(GET_ALL, ""));
+    }
+    
+
+    public List<EmployeeDTO> fetchData(int type, String filter) {
+
+
+        try {
+            Response response = null;
+            if (type == GET_ALL) {
+                response = employeeService.getAllAmenities();
+
+            } else if (type == GET_BY_KEYWORD) {
+                response = employeeService.getEmployeeByKeyword(filter);
+            }
+            if (response != null && response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return null;
+            }
+            return (List<EmployeeDTO>) response.getData();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void custom() {
@@ -116,8 +145,8 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 ImportExcelService importService = new ImportExcelService();
                 List<EmployeeDTO> imported = importService.importEmployeesFromExcel(file);
                 if (imported != null && !imported.isEmpty()) {
-                    employeeService.getAllEmployees().addAll(imported);
-                    loadTable(employeeService.getAllEmployees());
+                    fetchData(GET_ALL, "").addAll(imported);
+                    loadTable(fetchData(GET_ALL, ""));
                     Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
                 } else {
                     Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
@@ -154,12 +183,21 @@ public class EmployeeManagement extends javax.swing.JPanel {
         });
         TableActionEvent event = new TableActionEvent() {
             @Override
-            public void onEdit(int row) {
+            public void onEdit(int row) throws Exception {
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
                 Long employeeId = (Long) model.getValueAt(row, 0);
 
                 // Lấy thông tin đầy đủ từ database
-                EmployeeDTO employee = employeeService.getEmployeeById(employeeId);
+
+                Response response = employeeService.getEmployeeById(employeeId);
+
+                if (response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                    return;
+
+                }
+
+                EmployeeDTO employee = (EmployeeDTO) response.getData();
 
                 if (employee == null) {
                     Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
@@ -194,74 +232,89 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 modal.saveData(ae -> {
-                    var result = getValid(modal, employeeId); // ✅ Truyền thêm employeeId
-                    if (!result.valid) {
-                        return;
-                    }
-                    String title = "Xác nhận cập nhật nhân viên";
-                    String message = "Bạn có chắc chắn muốn cập nhật nhân viên này không?";
-                    Message.showConfirm(title, message, () -> {
-                        String genderSelected = (String) modal.getCmbGender().getSelectedItem();
-                        boolean gender = "Nữ".equals(genderSelected);
-
-                        String roleSelected = (String) modal.getCmbPosition().getSelectedItem();
-                        String roleId = roleSelected.equalsIgnoreCase("Nhân viên quản lý")
-                                ? Role.MANAGER.toString()
-                                : Role.RECEPTIONIST.toString();
-
-                        RoleDTO newRole = roleService.getRoleById(roleId);
-                        if (newRole == null) {
-                            Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
+                    try {
+                        var result = getValid(modal, employeeId); // ✅ Truyền thêm employeeId
+                        if (!result.valid) {
                             return;
                         }
+                        String title = "Xác nhận cập nhật nhân viên";
+                        String message = "Bạn có chắc chắn muốn cập nhật nhân viên này không?";
+                        Message.showConfirm(title, message, () -> {
+                            String genderSelected = (String) modal.getCmbGender().getSelectedItem();
+                            boolean gender = "Nữ" .equals(genderSelected);
 
-                        EmployeeDTO employeeUpdate = new EmployeeDTO();
-                        employeeUpdate.setEmployeeId(employeeId);
-                        employeeUpdate.setFullName(result.fullName);
-                        employeeUpdate.setPhone(result.phone);
-                        employeeUpdate.setEmail(result.email);
-                        employeeUpdate.setCitizenId(result.citizenId);
-                        employeeUpdate.setHireDate(result.hireDate);
-                        employeeUpdate.setGender(gender);
+                            String roleSelected = (String) modal.getCmbPosition().getSelectedItem();
+                            String roleId = roleSelected.equalsIgnoreCase("Nhân viên quản lý")
+                                    ? Role.MANAGER.toString()
+                                    : Role.RECEPTIONIST.toString();
 
-                        if (employee.getAccount() != null) {
-                            AccountDTO accountToUpdate = employee.getAccount();
-                            accountToUpdate.setRole(newRole);
-                            employeeUpdate.setAccount(accountToUpdate);
-                        } else {
-                            Message.showMessage("Lỗi", "Nhân viên không có tài khoản!");
-                            return;
-                        }
+                            RoleDTO newRole = roleService.getRoleById(roleId);
+                            if (newRole == null) {
+                                Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
+                                return;
+                            }
 
-                        AvatarLabel avt = modal.getAvatarLabel();
-                        if (avt != null) {
-                            byte[] avtBytes = avt.getImageAsBytes("jpg");
-                            if (avtBytes != null && avtBytes.length > 0) {
-                                employeeUpdate.setAvt(avtBytes);
-                                log.info("Avatar updated for employee: {}", employeeId);
+                            EmployeeDTO employeeUpdate = new EmployeeDTO();
+                            employeeUpdate.setEmployeeId(employeeId);
+                            employeeUpdate.setFullName(result.fullName);
+                            employeeUpdate.setPhone(result.phone);
+                            employeeUpdate.setEmail(result.email);
+                            employeeUpdate.setCitizenId(result.citizenId);
+                            employeeUpdate.setHireDate(result.hireDate);
+                            employeeUpdate.setGender(gender);
+
+                            if (employee.getAccount() != null) {
+                                AccountDTO accountToUpdate = employee.getAccount();
+                                accountToUpdate.setRole(newRole);
+                                employeeUpdate.setAccount(accountToUpdate);
+                            } else {
+                                Message.showMessage("Lỗi", "Nhân viên không có tài khoản!");
+                                return;
+                            }
+
+                            AvatarLabel avt = modal.getAvatarLabel();
+                            if (avt != null) {
+                                byte[] avtBytes = avt.getImageAsBytes("jpg");
+                                if (avtBytes != null && avtBytes.length > 0) {
+                                    employeeUpdate.setAvt(avtBytes);
+                                    log.info("Avatar updated for employee: {}", employeeId);
+                                } else {
+                                    employeeUpdate.setAvt(employee.getAvt());
+                                }
                             } else {
                                 employeeUpdate.setAvt(employee.getAvt());
                             }
-                        } else {
-                            employeeUpdate.setAvt(employee.getAvt());
-                        }
 
-                        EmployeeDTO entitySave = employeeService.updateEmployee(employeeUpdate);
+                            Response responseUpdate = null;
+                            try {
+                                responseUpdate = employeeService.updateEmployee(employeeUpdate);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                            if (responseUpdate.getCode() != 200) {
+                                JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + responseUpdate.getCode() + ": " + responseUpdate.getMessage());
+                                return;
+                            }
 
-                        String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
-                        String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
-                                ? entitySave.getAccount().getRole().getRoleName()
-                                : "N/A";
+                            EmployeeDTO entitySave = (EmployeeDTO) responseUpdate.getData();
 
-                        model.setValueAt(entitySave.getFullName(), row, 1);
-                        model.setValueAt(genderStr2, row, 2);
-                        model.setValueAt(roleName2, row, 3);
-                        model.setValueAt(entitySave.getPhone(), row, 4);
+                            String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
+                            String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
+                                    ? entitySave.getAccount().getRole().getRoleName()
+                                    : "N/A";
 
-                        Message.showMessage("Thành công", "Cập nhật nhân viên thành công!");
-                        loadTable(employeeService.getAllEmployees());
-                        GlassPanePopup.closePopupLast();
-                    });
+                            model.setValueAt(entitySave.getFullName(), row, 1);
+                            model.setValueAt(genderStr2, row, 2);
+                            model.setValueAt(roleName2, row, 3);
+                            model.setValueAt(entitySave.getPhone(), row, 4);
+
+                            Message.showMessage("Thành công", "Cập nhật nhân viên thành công!");
+                            loadTable(fetchData(GET_ALL, ""));
+                            GlassPanePopup.closePopupLast();
+                        });
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 });
 
 
@@ -309,8 +362,21 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
                 Long employeeId = (Long) model.getValueAt(row, 0);
 
+
                 // Lấy thông tin đầy đủ từ database
-                EmployeeDTO employee = employeeService.getEmployeeById(employeeId);
+
+                Response response = null;
+                try {
+                    response = employeeService.getEmployeeById(employeeId);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                if (response != null && response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                    return;
+                }
+
+                EmployeeDTO employee = (EmployeeDTO) Objects.requireNonNull(response).getData();
 
                 if (employee == null) {
                     Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
@@ -400,20 +466,20 @@ public class EmployeeManagement extends javax.swing.JPanel {
             public void insertUpdate(DocumentEvent e) {
                 String text = headerCustom2.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(employeeService.getAllEmployees());
+                    loadTable(fetchData(GET_ALL, ""));
                     return;
                 }
-                loadTable(employeeService.getEmployeeByKeyword(text));
+                loadTable(fetchData(GET_ALL, text));
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 String text = headerCustom2.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(employeeService.getAllEmployees());
+                    loadTable(fetchData(GET_ALL, ""));
                     return;
                 }
-                loadTable(employeeService.getEmployeeByKeyword(text));
+                loadTable(fetchData(GET_ALL, text));
             }
 
             @Override
@@ -786,7 +852,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
     }
 
     private void exportAllEmployeesToExcel() {
-        List<EmployeeDTO> employees = employeeService.getAllEmployees();
+        List<EmployeeDTO> employees = fetchData(GET_ALL, "");
         if (employees == null || employees.isEmpty()) {
             Message.showMessage("Thông báo", "Không có nhân viên để xuất Excel!");
             return;
@@ -864,68 +930,79 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
 
     private boolean saveData(InfoEmployeeModal modal) {
-        Valid result = getValid(modal, null);
-        if (!result.valid) {
-            return false;
-        }
-
-
         try {
-            int position = modal.getCmbPosition().getSelectedIndex();
-            String roleId;
-            if (position == 0) {
-                roleId = Role.RECEPTIONIST.toString();
-            } else {
-                roleId = Role.MANAGER.toString();
-            }
-            EmployeeDTO employee = new EmployeeDTO();
-            employee.setFullName(result.fullName);
-            employee.setPhone(result.phone);
-            employee.setEmail(result.email);
-            employee.setGender(result.gender);
-            employee.setCitizenId(result.citizenId);
-            employee.setHireDate(result.hireDate);
-            AvatarLabel avatarLabel = modal.getAvatarLabel();
-            if (avatarLabel != null) {
-                byte[] avtBytes = avatarLabel.getImageAsBytes("jpg");
-                if (avtBytes != null && avtBytes.length > 0) {
-                    employee.setAvt(avtBytes);
-                    log.info("Avatar set for new employee, size: {} bytes", avtBytes.length);
-                } else {
-                    log.warn("No avatar data from AvatarLabel");
-                }
-            } else {
-                log.warn("AvatarLabel is null in modal");
-            }
-            EmployeeDTO employeeSave = employeeService.createEmployee(employee, roleId);
-
-            if (employeeSave == null) {
-                Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
+            Valid result = getValid(modal, null);
+            if (!result.valid) {
                 return false;
             }
 
-            DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
-            String genderStr = employeeSave.isGender() ? "Nữ" : "Nam";
 
-            System.out.println(employeeSave);
+            try {
+                int position = modal.getCmbPosition().getSelectedIndex();
+                String roleId;
+                if (position == 0) {
+                    roleId = Role.RECEPTIONIST.toString();
+                } else {
+                    roleId = Role.MANAGER.toString();
+                }
+                EmployeeDTO employee = new EmployeeDTO();
+                employee.setFullName(result.fullName);
+                employee.setPhone(result.phone);
+                employee.setEmail(result.email);
+                employee.setGender(result.gender);
+                employee.setCitizenId(result.citizenId);
+                employee.setHireDate(result.hireDate);
+                AvatarLabel avatarLabel = modal.getAvatarLabel();
+                if (avatarLabel != null) {
+                    byte[] avtBytes = avatarLabel.getImageAsBytes("jpg");
+                    if (avtBytes != null && avtBytes.length > 0) {
+                        employee.setAvt(avtBytes);
+                        log.info("Avatar set for new employee, size: {} bytes", avtBytes.length);
+                    } else {
+                        log.warn("No avatar data from AvatarLabel");
+                    }
+                } else {
+                    log.warn("AvatarLabel is null in modal");
+                }
+
+                Response response = employeeService.createEmployee(employee, roleId);
+                if (response.getCode() != 201) {
+                    JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                    return false;
+                }
+                EmployeeDTO employeeSave = (EmployeeDTO) response.getData();
+
+                if (employeeSave == null) {
+                    Message.showMessage("Lỗi", "Không thể tạo nhân viên!");
+                    return false;
+                }
+
+                DefaultTableModel model = (DefaultTableModel) tblEmployee.getTbl().getModel();
+                String genderStr = employeeSave.isGender() ? "Nữ" : "Nam";
+
+                System.out.println(employeeSave);
 
 
-            model.addRow(new Object[]{
-                    employeeSave.getEmployeeId(),
-                    employeeSave.getFullName(),
-                    genderStr,
-                    employeeSave.getAccount().getRole().getRoleName(),
-                    employeeSave.getPhone()
-            });
-            if (shiftList != null) {
-                shiftList.addNewEmployee(employeeSave);
-                log.info("Notified ShiftList about new employee: {}", employeeSave.getFullName());
+                model.addRow(new Object[]{
+                        employeeSave.getEmployeeId(),
+                        employeeSave.getFullName(),
+                        genderStr,
+                        employeeSave.getAccount().getRole().getRoleName(),
+                        employeeSave.getPhone()
+                });
+                if (shiftList != null) {
+                    shiftList.addNewEmployee(employeeSave);
+                    log.info("Notified ShiftList about new employee: {}", employeeSave.getFullName());
+                }
+                Message.showMessage("Thành công", "Thêm nhân viên thành công!");
+                return true;
+            } catch (Exception e) {
+                log.error("Error creating employee: ", e);
+                Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
+                return false;
             }
-            Message.showMessage("Thành công", "Thêm nhân viên thành công!");
-            return true;
-        } catch (Exception e) {
-            log.error("Error creating employee: ", e);
-            Message.showMessage("Lỗi", "Có lỗi xảy ra: " + e.getMessage());
+        } catch (Exception ex) {
+            log.error("Error creating employee: ", ex);
             return false;
         }
     }
@@ -976,7 +1053,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
     }
 
-    private static Valid getValid(InfoEmployeeModal modal, Long currentEmployeeId) {
+    private static Valid getValid(InfoEmployeeModal modal, Long currentEmployeeId) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         String name = modal.getTxtName().getText().trim();
         String phone = modal.getTxtPhone().getText().trim();
         String citizenId = modal.getTxtCitizen().getText().trim();
@@ -984,7 +1061,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
         String hireDateStr = modal.getTxtHireDate().getText().trim();
         boolean gender = modal.getCmbGender().getSelectedItem() != null
                 && modal.getCmbGender().getSelectedItem().toString().equalsIgnoreCase("Nữ");
-        EmployeeService service = new EmployeeService();
         Color white = Color.WHITE;
         modal.getLblErrolName().setForeground(white);
         modal.getLblErrolPhone().setForeground(white);
@@ -1035,7 +1111,15 @@ public class EmployeeManagement extends javax.swing.JPanel {
             valid = false;
         } else {
             // Kiểm tra CCCD có tồn tại không
-            EmployeeDTO existingEmployee = service.getEmployeeByCitizenId(citizenId);
+
+            Response response = SocketFacade.getInstance().getEmployee().getEmployeeByCitizenId(citizenId);
+
+            if (response.getCode() != 200) {
+                JOptionPane.showMessageDialog(modal, "Lỗi kiểm tra CCCD: " + response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return new Valid(name, false, gender, phone, citizenId, email, null);
+            }
+
+            EmployeeDTO existingEmployee = (EmployeeDTO) response.getData();
             if (existingEmployee != null) {
                 if (currentEmployeeId != null) {
                     if (!existingEmployee.getEmployeeId().equals(currentEmployeeId)) {

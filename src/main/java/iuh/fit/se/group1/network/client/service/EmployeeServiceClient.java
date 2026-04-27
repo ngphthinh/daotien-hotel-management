@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.network.client.service;
 
+import iuh.fit.se.group1.dto.EmployeeCreateRequest;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
@@ -13,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class EmployeeServiceClient {
+public class EmployeeServiceClient implements ServiceClient {
 
     private final ClientSocketManager socket;
 
@@ -53,12 +54,7 @@ public class EmployeeServiceClient {
     }
 
     public Response getEmployeeByCitizenId(String citizenId) throws IOException, ExecutionException, InterruptedException, TimeoutException {
-        Request req = Request.builder()
-                .commandType(CommandType.EMPLOYEE_GET_BY_CITIZEN_ID)
-                .request(citizenId)
-                .build();
-
-        return socket.send(req).get(30, TimeUnit.SECONDS);
+        return null;
     }
 
     public Response getEmployeesByRoleId(String roleId) throws IOException, ExecutionException, InterruptedException, TimeoutException {
@@ -68,5 +64,50 @@ public class EmployeeServiceClient {
                 .build();
 
         return socket.send(req).get(30, TimeUnit.SECONDS);
+    }
+
+    public Response createEmployee(EmployeeDTO employee, String roleId) throws Exception {
+        return socket.send(Request.builder()
+                .commandType(CommandType.EMPLOYEE_CREATE)
+                .request(EmployeeCreateRequest.builder()
+                        .employee(employee)
+                        .roleId(roleId)
+                        .build())
+                .build()).get();
+
+    }
+
+    public Response getAllAmenities() throws Exception {
+        return socket.send(Request.builder()
+                .commandType(CommandType.EMPLOYEE_GET_ALL)
+                .build()).get();
+    }
+
+    public Response getEmployeeByKeyword(String filter) throws Exception {
+        return socket.send(Request.builder()
+                .commandType(CommandType.EMPLOYEE_GET_BY_KEYWORDS)
+                .request(filter)
+                .build()).get();
+    }
+
+    public Response getEmployeeById(Long employeeId) throws Exception {
+        return socket.send(Request.builder()
+                .commandType(CommandType.EMPLOYEE_GET_BY_ID)
+                .request(employeeId)
+                .build()).get();
+    }
+
+    public Response updateEmployee(EmployeeDTO employeeUpdate) throws Exception {
+        return socket.send(Request.builder()
+                .commandType(CommandType.EMPLOYEE_UPDATE)
+                .request(employeeUpdate)
+                .build()).get();
+    }
+
+    public Response deleteEmployee(Long id) throws Exception {
+        return socket.send(Request.builder()
+                .commandType(CommandType.EMPLOYEE_DELETE)
+                .request(id)
+                .build()).get();
     }
 }

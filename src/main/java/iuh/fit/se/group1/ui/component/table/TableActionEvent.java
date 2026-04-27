@@ -9,7 +9,7 @@ package iuh.fit.se.group1.ui.component.table;
  * @author vietn
  */
 public interface TableActionEvent {
-    void onEdit(int row);
+    void onEdit(int row) throws Exception;
     void onDelete(int row);
     default void onView(int row) {}
 }

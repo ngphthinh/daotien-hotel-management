@@ -8,8 +8,10 @@ import iuh.fit.se.group1.dto.DenominationDetailDTO;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.EmployeeShiftDTO;
 import iuh.fit.se.group1.dto.ShiftCloseDTO;
-import iuh.fit.se.group1.entity.DenominationDetail;
 import iuh.fit.se.group1.enums.DenominationLabel;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.AuthServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.*;
@@ -37,7 +39,7 @@ public class CloseShift extends javax.swing.JPanel {
     private EmployeeShiftDTO currentEmployeeShift;
     private BigDecimal totalRevenue = BigDecimal.ZERO;
     private ConfirmInfoModal confirmModal;
-    private final AuthenticateService authenticateService;
+    private final AuthServiceClient authenticateService;
     // Timer
     private Timer autoRefreshTimer;
     private BigDecimal openingCash = new BigDecimal("5000000");
@@ -45,7 +47,7 @@ public class CloseShift extends javax.swing.JPanel {
     private Runnable onCloseShiftSuccess;
 
     public CloseShift() {
-        this.authenticateService = new AuthenticateService();
+        this.authenticateService = SocketFacade.getInstance().getAuth();
         this.employeeShiftService = new EmployeeShiftService();
         this.denominationDetailService = new DenominationDetailService();
         this.shiftCloseService = new ShiftCloseService();
@@ -128,7 +130,15 @@ public class CloseShift extends javax.swing.JPanel {
                     return;
                 }
 
-                EmployeeDTO manager = authenticateService.validateManager(username, password);
+                Response response = authenticateService.validateManager(username, password);
+
+                if (response.getCode() != 200) {
+                    Message.showMessage("Lỗi", "Sai tài khoản hoặc mật khẩu!\nHoặc tài khoản không phải Manager!");
+                    SwingUtilities.invokeLater(() -> confirmModal.clearFields());
+                    return;
+                }
+
+                EmployeeDTO manager = (EmployeeDTO) response.getData();
 
                 if (manager != null) {
                     GlassPanePopup.closePopupLast();
@@ -138,6 +148,8 @@ public class CloseShift extends javax.swing.JPanel {
                     Message.showMessage("Lỗi", "Sai tài khoản hoặc mật khẩu!\nHoặc tài khoản không phải Manager!");
                     SwingUtilities.invokeLater(() -> confirmModal.clearFields());
                 }
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             } finally {
                 Timer resetTimer = new Timer(500, evt -> {
                     confirmModal.setProcessing(false);

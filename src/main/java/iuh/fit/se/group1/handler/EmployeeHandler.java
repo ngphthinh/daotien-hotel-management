@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.handler;
 
 import iuh.fit.se.group1.dispatcher.RequestHandler;
+import iuh.fit.se.group1.dto.EmployeeCreateRequest;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class EmployeeHandler implements RequestHandler {
@@ -26,7 +26,7 @@ public class EmployeeHandler implements RequestHandler {
             return switch (commandType) {
                 case EMPLOYEE_GET_BY_ID -> handleGetById(request);
                 case EMPLOYEE_GET_BY_ACCOUNT_ID -> handleGetByAccountId(request);
-                case EMPLOYEE_GET_BY_ALL -> handleGetAll();
+                case EMPLOYEE_GET_ALL -> handleGetAll();
                 case EMPLOYEE_GET_BY_KEYWORDS -> handleGetByKeywords(request);
                 case EMPLOYEE_GET_BY_CITIZEN_ID -> handleGetByCitizenId(request);
                 case EMPLOYEE_GET_BY_ROLE_ID -> handleGetByRoleId(request);
@@ -95,29 +95,6 @@ public class EmployeeHandler implements RequestHandler {
                 .build();
     }
 
-    private Response handleGetByCitizen(Request request) {
-        String citizenId = request.getRequest().toString();
-        if (citizenId == null || citizenId.isEmpty()) {
-            return Response.builder()
-                    .code(400)
-                    .message("Citizen ID cannot be null or empty")
-                    .build();
-        }
-
-        EmployeeDTO employee = employeeService.getEmployeeByCitizenId(citizenId);
-        if (employee == null) {
-            return Response.builder()
-                    .code(404)
-                    .message("Employee not found with Citizen ID: " + citizenId)
-                    .build();
-        }
-
-        return Response.builder()
-                .code(200)
-                .message("Get employee by citizen ID successfully")
-                .data(employee)
-                .build();
-    }
 
     private Response handleGetAll() {
         List<EmployeeDTO> employees = employeeService.getAllEmployees();
@@ -214,17 +191,9 @@ public class EmployeeHandler implements RequestHandler {
     }
 
     private Response handleCreate(Request request) {
-        Object obj = request.getRequest();
-        if (!(obj instanceof Map)) {
-            return Response.builder()
-                    .code(400)
-                    .message("Invalid request format for create employee")
-                    .build();
-        }
-
-        Map<String, Object> requestData = (Map<String, Object>) obj;
-        EmployeeDTO employeeDTO = (EmployeeDTO) requestData.get("employee");
-        String roleId = (String) requestData.get("roleId");
+        EmployeeCreateRequest employeeCreateRequest = (EmployeeCreateRequest) request.getRequest();
+        EmployeeDTO employeeDTO = employeeCreateRequest.getEmployee();
+        String roleId = employeeCreateRequest.getRoleId();
 
         if (employeeDTO == null || roleId == null) {
             return Response.builder()

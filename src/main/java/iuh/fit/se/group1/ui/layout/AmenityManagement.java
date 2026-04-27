@@ -5,8 +5,9 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.dto.AmenityDTO;
-import iuh.fit.se.group1.entity.Amenity;
-import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.AmenityServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -46,7 +47,9 @@ import iuh.fit.se.group1.service.ExportExcelService;
 public class AmenityManagement extends javax.swing.JPanel {
 
     private static final Logger log = LoggerFactory.getLogger(AmenityManagement.class);
-    private final AmenityService amenityService;
+    //    private final AmenityService amenityService;
+    private final SocketFacade socketFacade;
+    private final AmenityServiceClient amenityService;
 
     /**
      * Creates new form AmenityManagement
@@ -54,9 +57,24 @@ public class AmenityManagement extends javax.swing.JPanel {
     public AmenityManagement() {
         initComponents();
         custom();
-        amenityService = new AmenityService();
 
-        loadTable(amenityService.getAllAmenities());
+        socketFacade = SocketFacade.getInstance();
+        amenityService = socketFacade.getAmenity();
+//        amenityService = new AmenityService();
+
+        try {
+
+            Response response = amenityService.getAllAmenities();
+            if (response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return;
+            }
+
+
+            loadTable((List<AmenityDTO>) response.getData());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void loadTable(java.util.List<AmenityDTO> amenities) {
@@ -92,9 +110,23 @@ public class AmenityManagement extends javax.swing.JPanel {
                 List<AmenityDTO> imported = importService.importAmenitiesFromExcel(file);
 
                 if (imported != null && !imported.isEmpty()) {
-                    List<AmenityDTO> allAmenities = amenityService.getAllAmenities();
-                    allAmenities.addAll(imported);
-                    loadTable(allAmenities);
+
+                    try {
+
+                        Response response = amenityService.getAllAmenities();
+                        if (response.getCode() != 200) {
+                            JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                            return;
+                        }
+
+
+                        List<AmenityDTO> allAmenities = (List<AmenityDTO>) response.getData();
+                        allAmenities.addAll(imported);
+                        loadTable(allAmenities);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
 
                     Message.showInfo("Thành công", "Đã import " + imported.size() + " dịch vụ từ Excel!");
                 } else {
@@ -133,16 +165,31 @@ public class AmenityManagement extends javax.swing.JPanel {
                         if (!result.valid) {
                             return;
                         }
-                        AmenityDTO entitySave = amenityService.updateAmenity(AmenityDTO.builder()
-                                .amenityId((Long) model.getValueAt(row, 0))
-                                .nameAmenity(result.name())
-                                .price(result.price())
-                                .build());
 
-                        model.setValueAt(entitySave.getNameAmenity(), row, 1);
-                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getPrice()), row, 2);
+                        try {
+                            Response response = amenityService.updateAmenity(AmenityDTO.builder()
+                                    .amenityId((Long) model.getValueAt(row, 0))
+                                    .nameAmenity(result.name())
+                                    .price(result.price())
+                                    .build());
 
-                        GlassPanePopup.closePopupLast();
+
+                            if (response.getCode() != 200) {
+                                JOptionPane.showMessageDialog(null, response.getMessage(), "Lỗi cập nhật dịch vụ", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            AmenityDTO entitySave = (AmenityDTO) response.getData();
+
+                            model.setValueAt(entitySave.getNameAmenity(), row, 1);
+                            model.setValueAt(Constants.VND_FORMAT.format(entitySave.getPrice()), row, 2);
+
+                            GlassPanePopup.closePopupLast();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+
                     });
                 });
 
@@ -172,7 +219,17 @@ public class AmenityManagement extends javax.swing.JPanel {
                         model.removeRow(rowDelete);
 
                         // Xóa trong database
-                        amenityService.deleteAmenity(id);
+                        try {
+                            Response response = amenityService.deleteAmenity(id);
+                            if (response.getCode() != 200) {
+                                JOptionPane.showMessageDialog(null, response.getMessage(), "Lỗi xóa dịch vụ", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+
                     }
                 });
             }
@@ -206,20 +263,20 @@ public class AmenityManagement extends javax.swing.JPanel {
             public void insertUpdate(DocumentEvent e) {
                 String text = headerCustom.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(amenityService.getAllAmenities());
+                    fetchData();
                     return;
                 }
-                loadTable(amenityService.getAmenityByKeyword(text));
+                fetchData();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 String text = headerCustom.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(amenityService.getAllAmenities());
+                    fetchData();
                     return;
                 }
-                loadTable(amenityService.getAmenityByKeyword(text));
+                fetchData();
             }
 
             @Override
@@ -228,6 +285,19 @@ public class AmenityManagement extends javax.swing.JPanel {
             }
 
         });
+    }
+
+    public void fetchData() {
+        try {
+            Response response = amenityService.getAllAmenities();
+            if (response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return;
+            }
+            loadTable((List<AmenityDTO>) response.getData());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -333,17 +403,30 @@ public class AmenityManagement extends javax.swing.JPanel {
     private void saveData(ServiceModal modal) {
         Valid result = getValid(modal);
         if (result.valid()) {
-            AmenityDTO entitySave = amenityService.createAmenity(AmenityDTO.builder()
-                    .nameAmenity(result.name())
-                    .price(result.price())
-                    .build());
-            if (entitySave == null) {
-                Message.showError("Lỗi thêm dịch vụ", "Dịch vụ với tên '" + result.name() + "' đã tồn tại!");
-                return;
+            Response response = null;
+            try {
+                response = amenityService.createAmenity(AmenityDTO.builder()
+                        .nameAmenity(result.name())
+                        .price(result.price())
+                        .build());
+
+
+                if (response.getCode() != 201) {
+                    JOptionPane.showMessageDialog(this, response.getMessage(), "Lỗi thêm dịch vụ", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                AmenityDTO entitySave = (AmenityDTO) response.getData();
+                if (entitySave == null) {
+                    Message.showError("Lỗi thêm dịch vụ", "Dịch vụ với tên '" + result.name() + "' đã tồn tại!");
+                    return;
+                }
+                DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
+                model.addRow(new Object[]{entitySave.getAmenityId(), entitySave.getNameAmenity(), Constants.VND_FORMAT.format(entitySave.getPrice())});
+                GlassPanePopup.closePopupLast();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            DefaultTableModel model = (DefaultTableModel) tblAmenity.getTbl().getModel();
-            model.addRow(new Object[]{entitySave.getAmenityId(), entitySave.getNameAmenity(), Constants.VND_FORMAT.format(entitySave.getPrice())});
-            GlassPanePopup.closePopupLast();
         }
     }
 

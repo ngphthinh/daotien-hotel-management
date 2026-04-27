@@ -5,11 +5,12 @@
 package iuh.fit.se.group1.ui.component.booking2;
 
 import iuh.fit.se.group1.dto.AmenityDTO;
-import iuh.fit.se.group1.service.AmenityService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.AmenityServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Button;
-import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 
-import java.awt.*;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,20 @@ import java.util.List;
  */
 public class MainFlow3 extends javax.swing.JPanel {
 
-    private AmenityService amenityService = new AmenityService();
+    private final AmenityServiceClient amenityService = SocketFacade.getInstance().getAmenity();
+
+    public List<AmenityDTO> fetchData() {
+        try {
+            Response response = amenityService.getAllAmenities();
+            if (response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return null;
+            }
+            return (List<AmenityDTO>) response.getData();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Creates new form MainFlow3
@@ -28,7 +42,8 @@ public class MainFlow3 extends javax.swing.JPanel {
 
         var model = (CustomTable2.CustomTable2Model) tbl.getModel();
         model.clear();
-        amenityService.getAllAmenities().forEach(amenity ->
+
+        fetchData().forEach(amenity ->
                 model.addRow(new Object[]{
                         false,
                         amenity,

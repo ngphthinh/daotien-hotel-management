@@ -1,7 +1,9 @@
 package iuh.fit.se.group1.ui.component.custom;
 
 import iuh.fit.se.group1.dto.*;
-import iuh.fit.se.group1.repository.jpa.SurchargeRepositoryImpl;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.AmenityServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
@@ -47,7 +49,7 @@ public class OrderEditDialog extends JDialog {
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
+    private final AmenityServiceClient amenityService;
     // UI components
     private JTextField txtCustomerName;
     private JTextField txtPhone;
@@ -66,6 +68,8 @@ public class OrderEditDialog extends JDialog {
         loadExistingDetails();
         setSize(1000, 700);
         setLocationRelativeTo(owner);
+
+        amenityService = SocketFacade.getInstance().getAmenity();
     }
 
     private void initComponents() {
@@ -601,8 +605,8 @@ public class OrderEditDialog extends JDialog {
                 new AmenityManagementPanel();
 
         // Load available amenities from repository
-        AmenityService amenityService = new AmenityService();
-        java.util.List<AmenityDTO> availableAmenities = amenityService.getAllAmenities();
+//        AmenityService amenityService = new AmenityService();
+        java.util.List<AmenityDTO> availableAmenities = fetchData();
 
         List<AmenityDTO> existingAmenities = new ArrayList<>();
         for (int i = 0; i < amenityModel.getRowCount(); i++) {
@@ -631,6 +635,19 @@ public class OrderEditDialog extends JDialog {
         dialog.setSize(1000, 700);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+    }
+
+    public List<AmenityDTO> fetchData() {
+        try {
+            Response response = amenityService.getAllAmenities();
+            if (response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return null;
+            }
+            return (List<AmenityDTO>) response.getData();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void onRemoveAmenity() {
