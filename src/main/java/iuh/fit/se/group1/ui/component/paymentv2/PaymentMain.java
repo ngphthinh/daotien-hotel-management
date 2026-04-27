@@ -8,6 +8,8 @@ import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.BookingServiceClient;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
@@ -740,7 +742,7 @@ public class PaymentMain extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private BookingService bookingService = new BookingService();
+    private BookingServiceClient bookingService = SocketFacade.getInstance().getBooking();
 
     private void btnCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCashActionPerformed
         backStep3Action.run();
@@ -1039,7 +1041,19 @@ public class PaymentMain extends javax.swing.JPanel {
         java.math.BigDecimal originalTotal = currentOrder.getTotalAmount() != null ? currentOrder.getTotalAmount() : java.math.BigDecimal.ZERO;
 
         java.math.BigDecimal totalRemainingRooms = remainingBookings.stream()
-                .map(b -> java.math.BigDecimal.valueOf(bookingService.getPriceFromBooking(b)))
+                .map(b -> {
+                    try {
+                        Response res = bookingService.getPriceFromBooking(b);
+
+                        if (res.getCode() != 200) {
+                            throw new RuntimeException("Lỗi khi lấy giá từ booking id: " + b.getBookingId());
+                        }
+
+                        return (BigDecimal) res.getData();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
 
@@ -1250,7 +1264,7 @@ public class PaymentMain extends javax.swing.JPanel {
             String bookingType,
             List<BookingViewDTO> selectedRoom,
             BigDecimal deposit,
-            BigDecimal totalPrice) {
+            BigDecimal totalPrice) throws Exception {
 
 //        lblCheckOut.setText(checkOut);
         lblBookingType.setText(bookingType);
@@ -1269,7 +1283,18 @@ public class PaymentMain extends javax.swing.JPanel {
                 System.out.println(roomType);
             }
 
-            tblRoom.addRow(true, booking, bookingService.getPriceFromBooking(booking));
+            Response response = bookingService.getPriceFromBooking(booking);
+
+            if (response != null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(null, "The booking was not successful. Please try again later." + response.getMessage(), "Booking Error", JOptionPane.ERROR_MESSAGE);
+                return;
+
+            }
+
+            double value = (double) response.getData();
+
+
+            tblRoom.addRow(true, booking, value);
         }
 
 

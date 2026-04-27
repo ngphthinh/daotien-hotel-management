@@ -81,6 +81,8 @@ public class TestServer {
         registry.register(CommandType.ORDER_UPDATE_TOTAL_PRICE, orderHandler);
         registry.register(CommandType.ORDER_UPDATE_DEPOSIT, orderHandler);
         registry.register(CommandType.MOVE_BOOKING_TO_ORDER, orderHandler);
+        registry.register(CommandType.ORDER_RE_CALCULATE_TOTAL_PRICE, orderHandler);
+        registry.register(CommandType.ORDER_UPDATE_ORDER_TYPE, orderHandler);
 
 
     }

@@ -140,4 +140,21 @@ public class OrderServiceClient implements ServiceClient {
                 .build()).get();
 
     }
+
+    public Response recalculateOrderTotal(Long orderId) throws Exception {
+        return clientSocketManager.send(Request.builder()
+                .commandType(CommandType.ORDER_RE_CALCULATE_TOTAL_PRICE)
+                .request(orderId)
+                .build()).get();
+    }
+
+    public Response updateOrderType(Long orderId, long orderTypeID) throws Exception {
+        return clientSocketManager.send(Request.builder()
+                .commandType(CommandType.ORDER_UPDATE_ORDER_TYPE)
+                .request(OrderUpdateOrderTypeRequest.builder()
+                        .orderId(orderId)
+                        .orderTypeID(orderTypeID)
+                        .build())
+                .build()).get();
+    }
 }

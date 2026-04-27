@@ -3,6 +3,7 @@ package iuh.fit.se.group1.ui.component.custom;
 import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.BookingServiceClient;
 import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
@@ -34,7 +35,7 @@ public class InvoicePanel extends JPanel {
     @Getter
     private OrderDTO order;
     // services to load details
-    private final BookingService bookingService = new BookingService();
+    private final BookingServiceClient bookingService = SocketFacade.getInstance().getBooking();
     private final OrderDetailService orderDetailService = new OrderDetailService();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private final PromotionService promotionService = new PromotionService();
@@ -623,7 +624,7 @@ public class InvoicePanel extends JPanel {
         updateSummary();
     }
 
-    private void updateRoomBookings() {
+    private void updateRoomBookings() throws Exception {
         roomBookingModel.setRowCount(0);
 
         if (order.getBookings() != null && !order.getBookings().isEmpty()) {
@@ -645,7 +646,14 @@ public class InvoicePanel extends JPanel {
                 String bookingType = booking.getBookingType() != null
                         ? booking.getBookingType().getDisplayName()
                         : "-";
-                BigDecimal price = BigDecimal.valueOf(bookingService.getPriceFromBooking(booking));
+                Response response = bookingService.getPriceFromBooking(booking);
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Không thể tải giá phòng: " + (response != null ? response.getMessage() : "No response"),
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                BigDecimal price = (BigDecimal) response.getData();
                 if (price == null) price = BigDecimal.ZERO;
 
                 roomBookingModel.addRow(new Object[]{

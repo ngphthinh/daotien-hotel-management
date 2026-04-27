@@ -788,3 +788,7 @@ Apr 27, 2026 10:02:27 AM iuh.fit.se.group1.config.AppLogger info
 INFO: Attempting login - Username: '{}'
 Apr 27, 2026 10:02:27 AM iuh.fit.se.group1.config.AppLogger info
 INFO: LOGIN SUCCESS: '{}'
+Apr 27, 2026 10:04:36 AM iuh.fit.se.group1.config.AppLogger info
+INFO: Attempting login - Username: '{}'
+Apr 27, 2026 10:04:36 AM iuh.fit.se.group1.config.AppLogger info
+INFO: LOGIN SUCCESS: '{}'

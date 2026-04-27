@@ -15,11 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Handler for Order-related requests
- * Processes commands: GET_BY_ID, GET_ALL, GET_ALL_WITH_RELATIONSHIP, GET_UNPAID,
- * GET_UNPAID_BY_KEYWORD, SEARCH_BY_KEYWORD, CREATE, UPDATE_STATUS_PAID, UPDATE_DEPOSIT, DELETE
- */
+
 @RequiredArgsConstructor
 public class OrderHandler implements RequestHandler {
     private static final Logger log = LoggerFactory.getLogger(OrderHandler.class);
@@ -47,6 +43,8 @@ public class OrderHandler implements RequestHandler {
                 case ORDER_CREATE_RECORD -> handleCreateRecord(request);
                 case ORDER_UPDATE_TOTAL_PRICE -> handleUpdateTotalPrice(request);
                 case MOVE_BOOKING_TO_ORDER -> handleMoveBookingToOrder(request);
+                case ORDER_RE_CALCULATE_TOTAL_PRICE -> handleReCalculateTotalPrice(request);
+                case ORDER_UPDATE_ORDER_TYPE -> handleUpdateOrderType(request);
                 default -> Response.builder()
                         .code(400)
                         .message("Invalid command")
@@ -59,6 +57,25 @@ public class OrderHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private Response handleUpdateOrderType(Request request) {
+        OrderUpdateOrderTypeRequest updateTypeRequest = (OrderUpdateOrderTypeRequest) request.getRequest();
+        orderService.updateOrderType(updateTypeRequest.getOrderId(), updateTypeRequest.getOrderTypeID());
+        return Response.builder()
+                .code(200)
+                .message("Order type updated successfully")
+                .build();
+    }
+
+    private Response handleReCalculateTotalPrice(Request request) {
+        Long id = (Long) request.getRequest();
+
+        orderService.recalculateOrderTotal(id);
+        return Response.builder()
+                .code(200)
+                .message("Order has been recalculated")
+                .build();
     }
 
     private Response handleMoveBookingToOrder(Request request) {

@@ -1,8 +1,10 @@
 package iuh.fit.se.group1.ui.component.chart;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import iuh.fit.se.group1.service.CustomerService;
-import iuh.fit.se.group1.service.OrderService;
+import iuh.fit.se.group1.dto.BookingCount;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.dashboard.DateCalculator;
 import raven.chart.ChartLegendRenderer;
@@ -15,14 +17,13 @@ import java.text.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Map;
 
 public class LineBookingTrendChart extends JPanel {
 
-    private final OrderService orderService;
+    private final OrderServiceClient orderService;
 
     public LineBookingTrendChart() {
-        this.orderService = new OrderService();
+        this.orderService = SocketFacade.getInstance().getOrder();
         initComponents();
     }
 
@@ -38,11 +39,11 @@ public class LineBookingTrendChart extends JPanel {
         lineChart.putClientProperty(FlatClientProperties.STYLE, ""
                 + "border:5,5,5,5,$Component.borderColor,,20");
         add(lineChart);
-        lineChart.setPreferredSize(new Dimension(1040,290));
+        lineChart.setPreferredSize(new Dimension(1040, 290));
         createLineChartData(7);
     }
 
-    public void createLineChartData(LocalDate startDate, LocalDate endDate) {
+    public void createLineChartData(LocalDate startDate, LocalDate endDate) throws Exception {
         DefaultCategoryDataset<String, String> categoryDataset = new DefaultCategoryDataset<>();
 
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -52,7 +53,7 @@ public class LineBookingTrendChart extends JPanel {
                     "Vui lòng chọn khoảng thời gian lớn hơn 1 ngày!",
                     "Cảnh báo",
                     CustomDialog.MessageType.WARNING,
-                    800,200);
+                    800, 200);
             return;
         }
 
@@ -65,8 +66,15 @@ public class LineBookingTrendChart extends JPanel {
             String dateStr = currentDate.format(df);
 
             // Lấy số lượng booking theo loại phòng cho ngày này
-            Map<String, Integer> bookingCount = orderService.getBookingCountByRoomTypeAndDate(currentDate);
 
+
+            Response response = orderService.getBookingCountByRoomTypeAndDate(currentDate);
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu booking cho ngày " + currentDate + ": " + (response != null ? response.getMessage() : "No response"), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            BookingCount count = (BookingCount) response.getData();
+            var bookingCount = count.getBookingCount();
             int singleRoomCount = bookingCount.getOrDefault("Phòng đơn", 0);
             int doubleRoomCount = bookingCount.getOrDefault("Phòng đôi", 0);
 
@@ -99,7 +107,12 @@ public class LineBookingTrendChart extends JPanel {
         LocalDate startDate = endDate.minusDays(dateRange - 1);
 
         // Gọi method chính với startDate và endDate
-        createLineChartData(startDate, endDate);
+        try {
+            createLineChartData(startDate, endDate);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 
     private void updateChartWithData(DefaultCategoryDataset<String, String> categoryDataset, double chartMaxValue) {

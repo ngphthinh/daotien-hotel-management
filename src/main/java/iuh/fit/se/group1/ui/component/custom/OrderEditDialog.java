@@ -4,6 +4,7 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.AmenityServiceClient;
+import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
@@ -44,7 +45,7 @@ public class OrderEditDialog extends JDialog {
     private static final Color SELECTED_COLOR = new Color(220, 237, 255);
 
     private final OrderDTO order;
-    private final OrderService orderService = new OrderService();
+    private final OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
     private final OrderDetailService orderDetailService = new OrderDetailService();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
@@ -785,7 +786,13 @@ public class OrderEditDialog extends JDialog {
                 }
 
                 // Recalculate and update order total price
-                orderService.recalculateOrderTotal(orderId);
+                Response response = orderService.recalculateOrderTotal(orderId);
+
+                if (response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật tổng giá: " + response.getMessage());
+                    return;
+                }
+
             }
 
             CustomDialog.showMessage(this, "Lưu thông tin hóa đơn thành công!", "Thành công", CustomDialog.MessageType.SUCCESS, 400, 180);
@@ -841,7 +848,22 @@ public class OrderEditDialog extends JDialog {
         if (confirm == JOptionPane.OK_OPTION) {
             try {
                 // Change orderTypeId from 3 (Pre-booking) to 2 (Processing)
-                orderService.updateOrderType(order.getOrderId(), 2L);
+                final long PROCESSING_TYPE_ID = 2L;
+
+                Response response = orderService.updateOrderType(order.getOrderId(), PROCESSING_TYPE_ID);
+                if (response.getCode() != 200) {
+                    CustomDialog.showMessage(
+                            this,
+                            "Lỗi khi chuyển trạng thái hóa đơn: " + response.getMessage(),
+                            "Lỗi",
+                            CustomDialog.MessageType.ERROR,
+                            500,
+                            200
+                    );
+                    return;
+                }
+
+                response = null;
 
                 // Update room status to OCCUPIED
                 RoomService roomService = new RoomService();
