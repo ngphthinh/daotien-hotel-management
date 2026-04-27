@@ -42,32 +42,30 @@ public class ShiftCloseService extends Service {
 
 
     // Tìm ShiftClose theo ID
-    public ShiftClose getShiftCloseById(Long id) {
+    public ShiftCloseDTO getShiftCloseById(Long id) {
         if (id == null) return null;
-//        return repository.findById(id);
-        return doInTransaction(em -> repository.findById(em, id));
+        return doInTransaction(em -> shiftCloseMapper.toShiftCloseDTO(repository.findById(em, id)));
     }
 
     // Cập nhật ShiftClose
-    public ShiftClose updateShiftClose(ShiftClose shiftClose) {
-        if (shiftClose == null || shiftClose.getShiftCloseId() == null) {
-            throw new IllegalArgumentException("ShiftClose hoặc shiftCloseId không được null");
+    public ShiftCloseDTO updateShiftClose(ShiftCloseDTO shiftCloseDTO) {
+        if (shiftCloseDTO == null || shiftCloseDTO.getShiftCloseId() == null) {
+            throw new IllegalArgumentException("ShiftClose or shiftCloseId must be not null");
         }
-        if (shiftClose.getDifference() == null
-                && shiftClose.getCashInDrawer() != null
-                && shiftClose.getTotalRevenue() != null) {
+        if (shiftCloseDTO.getDifference() == null
+                && shiftCloseDTO.getCashInDrawer() != null
+                && shiftCloseDTO.getTotalRevenue() != null) {
 
             BigDecimal moneyOpenShift = new BigDecimal("5000000");
-
-            // Tiền chênh lệch = Tiền trong két - (Doanh thu + 5,000,000)
-            BigDecimal difference = shiftClose.getCashInDrawer()
-                    .subtract(shiftClose.getTotalRevenue().add(moneyOpenShift));
-            shiftClose.setDifference(difference);
+            BigDecimal difference = shiftCloseDTO.getCashInDrawer()
+                    .subtract(shiftCloseDTO.getTotalRevenue().add(moneyOpenShift));
+            shiftCloseDTO.setDifference(difference);
         }
 
-//        return repository.update(shiftClose);
-        return doInTransaction(em -> repository.update(em, shiftClose));
+        ShiftClose shiftClose = shiftCloseMapper.toShiftClose(shiftCloseDTO);
+        return doInTransaction(em -> shiftCloseMapper.toShiftCloseDTO(repository.save(em, shiftClose)));
     }
+
 
     // Xóa ShiftClose theo ID
     public void deleteShiftClose(Long id) {
@@ -77,9 +75,11 @@ public class ShiftCloseService extends Service {
     }
 
     // Lấy tất cả ShiftClose
-    public List<ShiftClose> getAllShiftClose() {
+    public List<ShiftCloseDTO> getAllShiftClose() {
 //        return repository.findAll();
-        return doInTransaction(repository::findAll);
+        return doInTransaction(repository::findAll).stream()
+                .map(shiftCloseMapper::toShiftCloseDTO)
+                .toList();
     }
 
     public List<ShiftCloseDTO> getShiftCloseByEmployeeShift(Long employeeShiftId) {

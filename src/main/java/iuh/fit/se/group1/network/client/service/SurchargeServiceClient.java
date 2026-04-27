@@ -5,15 +5,10 @@ import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.ClientSocketManager;
-
-import java.io.IOException;
-
+import lombok.RequiredArgsConstructor;
+@RequiredArgsConstructor
 public class SurchargeServiceClient implements ServiceClient{
     private final ClientSocketManager clientSocketManager;
-
-     public SurchargeServiceClient(ClientSocketManager clientSocketManager) {
-        this.clientSocketManager = clientSocketManager;
-    }
 
      public Response getAllSurcharges() throws Exception {
         return clientSocketManager.send(Request.builder()
