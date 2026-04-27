@@ -65,5 +65,11 @@ public enum CommandType implements Serializable {
 
     EMAIL_SEND,
 
-
+    SURCHARGE_GET_BY_ID,
+    SURCHARGE_GET_ALL,
+    SURCHARGE_GET_BY_NAME,
+    SURCHARGE_GET_BY_KEYWORDS,
+    SURCHARGE_CREATE,
+    SURCHARGE_UPDATE,
+    SURCHARGE_DELETE
 }
