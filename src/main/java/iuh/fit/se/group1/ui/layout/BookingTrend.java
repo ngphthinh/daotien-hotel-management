@@ -9,8 +9,8 @@ import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.enums.TimeType;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.DashboardServiceClient;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
-import iuh.fit.se.group1.service.DashboardService;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -28,14 +28,14 @@ import java.util.Map;
 public class BookingTrend extends javax.swing.JPanel {
 
     private final OrderServiceClient orderService;
-    private final DashboardService dashboardService;
+    private final DashboardServiceClient dashboardService;
 
     /**
      * Creates new form BookingTrend
      */
     public BookingTrend() {
         this.orderService = SocketFacade.getInstance().getOrder();
-        this.dashboardService = new DashboardService();
+        this.dashboardService = SocketFacade.getInstance().getDashboard();
         initComponents();
         headerChart1.getjLabel1().setText(
                 "<html><span style='color:white;'>Quản lý thống kê</span>"
@@ -151,7 +151,15 @@ public class BookingTrend extends javax.swing.JPanel {
             @Override
             protected List<PeakHourDto> doInBackground() {
                 try {
-                    peakHours = dashboardService.getPeakHours(start, end);
+
+                    Response response = dashboardService.getPeakHours(start, end);
+                    if (response == null || response.getCode() != 200) {
+//                        throw new Exception("Failed to load peak hours data: " + (response != null ? response.getMessage() : "No response"));
+                        JOptionPane.showMessageDialog(BookingTrend.this, "Lỗi khi tải dữ liệu khung giờ cao điểm: " + (response != null ? response.getMessage() : "No response"), "Error", JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    }
+
+                    peakHours = (List<PeakHourDto>) response.getData();
                 } catch (Exception e) {
                     System.err.println("Error loading peak hours data: " + e.getMessage());
                     e.printStackTrace();

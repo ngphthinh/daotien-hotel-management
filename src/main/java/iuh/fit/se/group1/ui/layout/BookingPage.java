@@ -214,6 +214,7 @@ public class BookingPage extends javax.swing.JPanel {
         Response response = orderService.createOrder(order, orderDetails);
 
         if (response.getCode() != 200) {
+            System.out.println(response);
             CustomDialog.showMessage(
                     null,
                     "Tạo đơn đặt phòng thất bại: " + response.getMessage(),

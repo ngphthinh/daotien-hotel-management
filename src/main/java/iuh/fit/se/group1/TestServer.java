@@ -2,7 +2,6 @@ package iuh.fit.se.group1;
 
 import iuh.fit.se.group1.dispatcher.Dispatcher;
 import iuh.fit.se.group1.dispatcher.HandlerRegistry;
-import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.handler.*;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.network.CommandType;
@@ -25,6 +24,9 @@ public class TestServer {
         CustomerService customerService = new CustomerService();
 
         OrderDetailService orderDetailService = new OrderDetailService();
+        RoleService roleService = new RoleService();
+        DenominationDetailService denominationDetailService = new DenominationDetailService();
+        DashboardService dashboardService = new DashboardService();
         HandlerRegistry registry = new HandlerRegistry();
 
 
@@ -34,9 +36,11 @@ public class TestServer {
         EmployeeHandler employeeHandler = new EmployeeHandler(employeeService);
         AmenityHandler amenityHandler = new AmenityHandler(amenityService);
         OrderHandler orderHandler = new OrderHandler(orderService);
-
+        DashboardHandler dashboardHandler = new DashboardHandler(dashboardService);
+        DenominationDetailHandler denominationDetailHandler = new DenominationDetailHandler(denominationDetailService);
         EmailHandler emailHandler = new EmailHandler(emailSenderService);
         OrderDetailHandler orderDetailHandler = new OrderDetailHandler(orderDetailService);
+        RoleHandler roleHandler = new RoleHandler(roleService);
         registerAuth(registry, authenticateHandler);
         registerEmployee(registry, employeeHandler);
         registerAmenity(registry, amenityHandler);
@@ -45,9 +49,29 @@ public class TestServer {
         registerBooking(registry, bookingHandler);
         registerCustomer(registry, customerHandler);
         registerOrderDetail(registry, orderDetailHandler);
+        registerRole(registry, roleHandler);
+        registerDashboard(registry, dashboardHandler);
+        registerDenominationDetail(registry, denominationDetailHandler);
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
+    }
+
+    private static void registerDenominationDetail(HandlerRegistry registry, DenominationDetailHandler denominationDetailHandler) {
+        registry.register(CommandType.DEMOMINATION_AVAILABLE, denominationDetailHandler);
+        registry.register(CommandType.DEMOMINATION_AVAILABLE, denominationDetailHandler);
+    }
+
+    private static void registerDashboard(HandlerRegistry registry, DashboardHandler dashboardHandler) {
+        registry.register(CommandType.DASHBOARD_PEAK_HOURS, dashboardHandler);
+        registry.register(CommandType.DASHBOARD_GET_DATA, dashboardHandler);
+        registry.register(CommandType.DASHBOARD_GET_ROOMS, dashboardHandler);
+        registry.register(CommandType.DASHBOARD_ORDER_STATISTICS, dashboardHandler);
+        registry.register(CommandType.DASHBOARD_GET_DATA_EMPLOYEE, dashboardHandler);
+    }
+
+    private static void registerRole(HandlerRegistry registry, RoleHandler roleHandler) {
+        registry.register(CommandType.ROLE_GET_BY_ID, roleHandler);
     }
 
     private static void registerOrderDetail(HandlerRegistry registry, OrderDetailHandler orderDetailHandler) {
@@ -66,8 +90,6 @@ public class TestServer {
         registry.register(CommandType.CUSTOMER_GET_ALL, customerHandler);
         registry.register(CommandType.CUSTOMER_GET_BY_KEYWORDS, customerHandler);
         registry.register(CommandType.CUSTOMER_GET_BY_CITIZEN, customerHandler);
-
-
     }
 
     private static void registerBooking(HandlerRegistry registry, BookingHandler bookingHandler) {

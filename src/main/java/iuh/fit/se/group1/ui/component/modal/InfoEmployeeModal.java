@@ -6,7 +6,6 @@ package iuh.fit.se.group1.ui.component.modal;
 
 import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
-import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
@@ -143,7 +142,7 @@ public class InfoEmployeeModal extends javax.swing.JPanel {
         this.avatarLabel = avatarLabel;
     }
     private DateChooser dateChooser;
-    public InfoEmployeeModal(RoleService roleService) {
+    public InfoEmployeeModal() {
         initComponents();
         btnClose.setIcon(FontIcon.of(FontAwesomeSolid.TIMES, 18, Color.white));
         cmbGender.removeAllItems();

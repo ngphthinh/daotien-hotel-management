@@ -1,11 +1,11 @@
-package iuh.fit.se.group1.service;
+package iuh.fit.se.group1.network.client.service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class PaymentSuggestionService {
+public class PaymentSuggestionServiceClient {
 
     public List<Integer> getPaymentOptions(int totalThousand) {
         Set<Integer> options = new TreeSet<>();

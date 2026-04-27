@@ -3,8 +3,6 @@ package iuh.fit.se.group1.network.client;
 import iuh.fit.se.group1.network.client.service.*;
 import lombok.Getter;
 
-import java.net.Socket;
-
 //import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 //@Getter
 @Getter
@@ -17,6 +15,9 @@ public class SocketFacade {
     private final BookingServiceClient booking;
     private final CustomerServiceClient customer;
     private final OrderDetailServiceClient orderDetail;
+    private final RoleServiceClient role;
+    private final DashboardServiceClient dashboard;
+    private final DenominationDetailServiceClient denominationDetail;
 
     public SocketFacade(ClientSocketManager socket) {
         this.auth = new AuthServiceClient(socket);
@@ -27,6 +28,9 @@ public class SocketFacade {
         this.booking = new BookingServiceClient(socket);
         this.customer = new CustomerServiceClient(socket);
         this.orderDetail = new OrderDetailServiceClient(socket);
+        this.role = new RoleServiceClient(socket);
+        this.dashboard = new DashboardServiceClient(socket);
+        this.denominationDetail = new DenominationDetailServiceClient(socket);
     }
 
     private static SocketFacade instance;

@@ -288,19 +288,9 @@ public class OrderHandler implements RequestHandler {
     }
 
     private Response handleCreate(Request request) {
-        Object obj = request.getRequest();
-        if (!(obj instanceof Map)) {
-            return Response.builder()
-                    .code(400)
-                    .message("Invalid request format for create order")
-                    .build();
-        }
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> requestData = (Map<String, Object>) obj;
-        OrderDTO orderDTO = (OrderDTO) requestData.get("order");
-        @SuppressWarnings("unchecked")
-        List<OrderDetailDTO> orderDetails = (List<OrderDetailDTO>) requestData.get("orderDetails");
+        CreateOrderRequest obj = (CreateOrderRequest) request.getRequest();
+        OrderDTO orderDTO = obj.getOrder();
+        List<OrderDetailDTO> orderDetails = obj.getOrderDetails();
 
         if (orderDTO == null) {
             return Response.builder()
@@ -320,7 +310,7 @@ public class OrderHandler implements RequestHandler {
             }
 
             return Response.builder()
-                    .code(201)
+                    .code(200)
                     .message("Order created successfully")
                     .data(created)
                     .build();

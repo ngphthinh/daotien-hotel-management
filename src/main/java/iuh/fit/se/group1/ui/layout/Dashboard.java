@@ -4,14 +4,17 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.dto.DashboardSummaryDto;
-import iuh.fit.se.group1.dto.PeakHourDto;
-import iuh.fit.se.group1.dto.RevenueSourceDto;
-import iuh.fit.se.group1.dto.WarningDto;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.enums.TimeType;
-import iuh.fit.se.group1.service.DashboardService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.ClientSocketManager;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.DashboardServiceClient;
+import iuh.fit.se.group1.ui.component.chart.CardLiquid;
+import iuh.fit.se.group1.ui.component.dashboard.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -21,17 +24,18 @@ import java.util.List;
 import java.util.Locale;
 
 /**
-<<<<<<< HEAD
-import iuh.fit.se.group1.ui.component.raven.chart.ModelChart;
- *
-=======
+ * <<<<<<< HEAD
+ * import iuh.fit.se.group1.ui.component.raven.chart.ModelChart;
+ * <p>
+ * =======
  * Dashboard với chức năng load dữ liệu thật
->>>>>>> 5d7ee2afcdde6fdbf72aa0b8988b00da6c42f147
+ * >>>>>>> 5d7ee2afcdde6fdbf72aa0b8988b00da6c42f147
+ *
  * @author THIS PC
  */
-public class Dashboard extends javax.swing.JPanel {
+public class Dashboard extends JPanel {
 
-    private final DashboardService dashboardService;
+    private final DashboardServiceClient dashboardService;
     private final NumberFormat currencyFormat;
 
     /**
@@ -39,7 +43,7 @@ public class Dashboard extends javax.swing.JPanel {
      */
     public Dashboard() {
 
-        this.dashboardService = new DashboardService();
+        this.dashboardService = SocketFacade.getInstance().getDashboard();
         this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
         initComponents(); // GIỮ NGUYÊN - không đụng chạm
@@ -89,6 +93,7 @@ public class Dashboard extends javax.swing.JPanel {
 
     /**
      * Refresh dashboard data với TimeType cụ thể
+     *
      * @param timeType Loại thời gian cần load
      */
     public void refreshData(TimeType timeType) {
@@ -111,17 +116,23 @@ public class Dashboard extends javax.swing.JPanel {
             @Override
             protected Void doInBackground() {
                 try {
-                    summaryData = dashboardService.getDashboardData(timeType);
+                    Response response = dashboardService.getDashboardData(timeType);
 
-                    LocalDateTime startDate = getStartDateForTimeType(timeType);
-                    LocalDateTime endDate = LocalDateTime.now();
-                    revenueSources = dashboardService.getRevenueSources(startDate, endDate);
-                    peakHours = dashboardService.getPeakHours(startDate, endDate);
-                    warnings = dashboardService.getWarnings();
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(null, "Invalid response from server. Check again.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    }
 
-                    // Lấy doanh thu theo time range đã chọn, không phải chỉ hôm nay
-                    periodRevenue = dashboardService.getRevenueByDateRange(startDate, endDate);
-                    currentGuestCount = dashboardService.getCurrentGuestCount();
+                    DashboardDTO dashboardDTO = (DashboardDTO) response.getData();
+
+                    summaryData = dashboardDTO.getSummaryData();
+
+                    revenueSources = dashboardDTO.getRevenueSources();
+                    peakHours = dashboardDTO.getPeakHours();
+                    warnings = dashboardDTO.getWarnings();
+
+                    periodRevenue = dashboardDTO.getPeriodRevenue();
+                    currentGuestCount = dashboardDTO.getCurrentGuestCount();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -153,11 +164,16 @@ public class Dashboard extends javax.swing.JPanel {
 
             private LocalDateTime getStartDateForTimeType(TimeType type) {
                 switch (type) {
-                    case TODAY: return LocalDate.now().atStartOfDay();
-                    case DAYS_7: return LocalDate.now().minusDays(7).atStartOfDay();
-                    case DAYS_30: return LocalDate.now().minusDays(30).atStartOfDay();
-                    case DAYS_90: return LocalDate.now().minusDays(90).atStartOfDay();
-                    default: return LocalDate.now().atStartOfDay();
+                    case TODAY:
+                        return LocalDate.now().atStartOfDay();
+                    case DAYS_7:
+                        return LocalDate.now().minusDays(7).atStartOfDay();
+                    case DAYS_30:
+                        return LocalDate.now().minusDays(30).atStartOfDay();
+                    case DAYS_90:
+                        return LocalDate.now().minusDays(90).atStartOfDay();
+                    default:
+                        return LocalDate.now().atStartOfDay();
                 }
             }
         };
@@ -173,13 +189,13 @@ public class Dashboard extends javax.swing.JPanel {
         // Card 1: Số lượng PHÒNG TRỐNG - Có vòng tròn + message "X/Y phòng"
         int availableRooms = totalRooms - data.getRoomsNearExpiry();
         pnlListCard1.getRoomOccupancyRateCard().setPercentage(
-            availableRooms, totalRooms); // Tự động set message "X/Y phòng"
+                availableRooms, totalRooms); // Tự động set message "X/Y phòng"
         pnlListCard1.getRoomOccupancyRateCard().setLblValue(
-            availableRooms + " PHÒNG");
+                availableRooms + " PHÒNG");
 
         // Card 2: TỈ LỆ ĐẶT PHÒNG - KHÔNG có vòng tròn, message "Số lượt đặt phòng"
         pnlListCard1.getBookingRateCard().setLblValue(
-            data.getBookingCount() + " LƯỢT");
+                data.getBookingCount() + " LƯỢT");
         pnlListCard1.getBookingRateCard().setMessage("Số lượt đặt phòng"); // Ẩn vòng tròn
 
         // Card 3: DOANH THU - KHÔNG có vòng tròn
@@ -189,40 +205,49 @@ public class Dashboard extends javax.swing.JPanel {
         // Tính % so với target (giả sử target 10 triệu/ngày)
         BigDecimal revenueTarget = new BigDecimal("10000000");
         int revenuePercentage = revenue.compareTo(BigDecimal.ZERO) > 0
-            ? revenue.multiply(new BigDecimal("100"))
-                     .divide(revenueTarget, 0, java.math.RoundingMode.HALF_UP)
-                     .intValue()
-            : 0;
+                ? revenue.multiply(new BigDecimal("100"))
+                .divide(revenueTarget, 0, RoundingMode.HALF_UP)
+                .intValue()
+                : 0;
         revenuePercentage = Math.min(100, Math.max(0, revenuePercentage));
 
         pnlListCard1.getRevenueCard().setPercentage(
-            revenuePercentage, 100); // % so với target
+                revenuePercentage, 100); // % so với target
 
         // Hiển thị doanh thu THẬT với format tiền VN
         pnlListCard1.getRevenueCard().setLblValue(
-            currencyFormat.format(revenue));
+                currencyFormat.format(revenue));
         pnlListCard1.getRevenueCard().setMessage("Doanh thu"); // Ẩn vòng tròn
 
         // Card 4: Số lượng CHECK-IN - KHÔNG có vòng tròn
         pnlListCard1.getNumberCheckInCard().setPercentage(
-            data.getCheckInCount(), 30); // Target 30 lượt
+                data.getCheckInCount(), 30); // Target 30 lượt
         pnlListCard1.getNumberCheckInCard().setLblValue(
-            data.getCheckInCount() + " LƯỢT");
+                data.getCheckInCount() + " LƯỢT");
         pnlListCard1.getNumberCheckInCard().setMessage("Số lượt check-in"); // Ẩn vòng tròn
     }
 
     /**
      * Cập nhật CardLiquid 1: Phòng đang sử dụng
      */
-    private void updateCardLiquid1(BigDecimal revenue, TimeType timeType) {
+    private void updateCardLiquid1(BigDecimal revenue, TimeType timeType) throws Exception {
         // Lấy tổng số phòng đang được sử dụng (OCCUPIED)
-        int occupiedRooms = dashboardService.getOccupiedRooms();
-        int totalRooms = dashboardService.getTotalRooms();
+
+        Response response = dashboardService.getRooms();
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Failed to fetch room data. Check again.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        CountRoomDashboard countRoomDashboard = (CountRoomDashboard) response.getData();
+
+        int occupiedRooms = countRoomDashboard.getOccupiedRooms();
+        int totalRooms = countRoomDashboard.getTotalRooms();
 
         // Tính % phòng đang sử dụng
         int percentage = totalRooms > 0
-            ? (occupiedRooms * 100) / totalRooms
-            : 0;
+                ? (occupiedRooms * 100) / totalRooms
+                : 0;
 
         cardLiquid1.setTitle("PHÒNG ĐANG SỬ DỤNG");
         cardLiquid1.setDescription(occupiedRooms + "/" + totalRooms + " phòng");
@@ -232,40 +257,22 @@ public class Dashboard extends javax.swing.JPanel {
     /**
      * Cập nhật CardLiquid 2: Số hóa đơn hôm nay
      */
-    private void updateCardLiquid2(int guestCount, TimeType currentTimeType) {
+    private void updateCardLiquid2(int guestCount, TimeType currentTimeType) throws Exception {
         // Đếm số hóa đơn hôm nay
-        int todayOrders = dashboardService.getTodayOrderCount();
+        Response res = dashboardService.getOrderStatistics(currentTimeType);
 
-        // So sánh với ngày trước đó để tính %
-        int previousOrders = 0;
-        double changePercentage = 0;
-
-        switch (currentTimeType) {
-            case TODAY:
-                // So sánh với cùng ngày tuần trước (7 ngày trước)
-                previousOrders = dashboardService.getOrderCountDaysAgo(7);
-                break;
-
-            case DAYS_7:
-                // So sánh tổng 7 ngày hiện tại với tổng 7 ngày trước đó
-                todayOrders = dashboardService.getOrderCountForPeriod(7, false);
-                previousOrders = dashboardService.getOrderCountForPeriod(7, true);
-                break;
-
-            case DAYS_30:
-                // So sánh tổng 30 ngày hiện tại với tổng 30 ngày trước đó
-                todayOrders = dashboardService.getOrderCountForPeriod(30, false);
-                previousOrders = dashboardService.getOrderCountForPeriod(30, true);
-                break;
-
-            case DAYS_90:
-                // So sánh tổng 90 ngày hiện tại với tổng 90 ngày trước đó
-                todayOrders = dashboardService.getOrderCountForPeriod(90, false);
-                previousOrders = dashboardService.getOrderCountForPeriod(90, true);
-                break;
+        if (res == null || res.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Failed to fetch order statistics.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
+        OrderStatisticsResponse orderStatistics = (OrderStatisticsResponse) res.getData();
+
+        int todayOrders = orderStatistics.getCurrentOrders();
+        int previousOrders = orderStatistics.getPreviousOrders();
+
         // Tính % thay đổi
+        double changePercentage = 0;
         if (previousOrders > 0) {
             changePercentage = ((double) (todayOrders - previousOrders) / previousOrders) * 100;
         } else if (todayOrders > 0) {
@@ -294,19 +301,19 @@ public class Dashboard extends javax.swing.JPanel {
         // Tạo mô tả chi tiết về mốc thời gian so sánh
         switch (currentTimeType) {
             case TODAY:
-                description = "Hôm nay: " + todayOrders  + comparisonInfo;
+                description = "Hôm nay: " + todayOrders + comparisonInfo;
                 comparisonDetail = "-" + previousOrders + " hóa đơn  (cùng ngày tuần trước)";
                 break;
             case DAYS_7:
-                description = "7 ngày: " + todayOrders  + comparisonInfo;
+                description = "7 ngày: " + todayOrders + comparisonInfo;
                 comparisonDetail = "- " + previousOrders + " hóa đơn (7 ngày trước đó)";
                 break;
             case DAYS_30:
-                description = "30 ngày: " + todayOrders +  comparisonInfo;
+                description = "30 ngày: " + todayOrders + comparisonInfo;
                 comparisonDetail = "- " + previousOrders + " hóa đơn (30 ngày trước đó)";
                 break;
             case DAYS_90:
-                description = "90 ngày: " + todayOrders  + comparisonInfo;
+                description = "90 ngày: " + todayOrders + comparisonInfo;
                 comparisonDetail = "- " + previousOrders + " hóa đơn (90 ngày trước đó)";
                 break;
         }
@@ -328,84 +335,84 @@ public class Dashboard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlListCard1 = new iuh.fit.se.group1.ui.component.dashboard.PnlListCard();
-        headerDashboard1 = new iuh.fit.se.group1.ui.component.dashboard.HeaderDashboard();
-        pnlFooter = new javax.swing.JPanel();
-        panelWarning1 = new iuh.fit.se.group1.ui.component.dashboard.PanelWarning();
-        cardLiquid1 = new iuh.fit.se.group1.ui.component.chart.CardLiquid();
-        cardLiquid2 = new iuh.fit.se.group1.ui.component.chart.CardLiquid();
-        revenueChart1 = new iuh.fit.se.group1.ui.component.dashboard.RevenueChart();
-        lineChartPanel1 = new iuh.fit.se.group1.ui.component.dashboard.LineChartPanel();
+        pnlListCard1 = new PnlListCard();
+        headerDashboard1 = new HeaderDashboard();
+        pnlFooter = new JPanel();
+        panelWarning1 = new PanelWarning();
+        cardLiquid1 = new CardLiquid();
+        cardLiquid2 = new CardLiquid();
+        revenueChart1 = new RevenueChart();
+        lineChartPanel1 = new LineChartPanel();
 
-        setBackground(new java.awt.Color(241, 241, 241));
-        setForeground(new java.awt.Color(241, 241, 241));
+        setBackground(new Color(241, 241, 241));
+        setForeground(new Color(241, 241, 241));
 
-        pnlFooter.setBackground(new java.awt.Color(241, 241, 241));
+        pnlFooter.setBackground(new Color(241, 241, 241));
 
-        javax.swing.GroupLayout pnlFooterLayout = new javax.swing.GroupLayout(pnlFooter);
+        GroupLayout pnlFooterLayout = new GroupLayout(pnlFooter);
         pnlFooter.setLayout(pnlFooterLayout);
         pnlFooterLayout.setHorizontalGroup(
-            pnlFooterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlFooterLayout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addComponent(panelWarning1, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(51, 51, 51)
-                .addComponent(cardLiquid1, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(47, 47, 47)
-                .addComponent(cardLiquid2, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                pnlFooterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlFooterLayout.createSequentialGroup()
+                                .addGap(27, 27, 27)
+                                .addComponent(panelWarning1, GroupLayout.PREFERRED_SIZE, 315, GroupLayout.PREFERRED_SIZE)
+                                .addGap(51, 51, 51)
+                                .addComponent(cardLiquid1, GroupLayout.PREFERRED_SIZE, 352, GroupLayout.PREFERRED_SIZE)
+                                .addGap(47, 47, 47)
+                                .addComponent(cardLiquid2, GroupLayout.PREFERRED_SIZE, 354, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlFooterLayout.setVerticalGroup(
-            pnlFooterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlFooterLayout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addGroup(pnlFooterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(cardLiquid2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cardLiquid1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelWarning1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                pnlFooterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlFooterLayout.createSequentialGroup()
+                                .addGap(0, 0, 0)
+                                .addGroup(pnlFooterLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(cardLiquid2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(cardLiquid1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(panelWarning1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlListCard1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(headerDashboard1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(pnlFooter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(revenueChart1, javax.swing.GroupLayout.PREFERRED_SIZE, 376, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(56, 56, 56)
-                .addComponent(lineChartPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 707, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(pnlListCard1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(headerDashboard1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(12, 12, 12)
+                                .addComponent(pnlFooter, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(revenueChart1, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE)
+                                .addGap(56, 56, 56)
+                                .addComponent(lineChartPanel1, GroupLayout.PREFERRED_SIZE, 707, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headerDashboard1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlListCard1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lineChartPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(revenueChart1, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE))
-                .addGap(0, 0, 0)
-                .addComponent(pnlFooter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(headerDashboard1, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnlListCard1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(lineChartPanel1, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                        .addComponent(revenueChart1, GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE))
+                                .addGap(0, 0, 0)
+                                .addComponent(pnlFooter, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private iuh.fit.se.group1.ui.component.chart.CardLiquid cardLiquid1;
-    private iuh.fit.se.group1.ui.component.chart.CardLiquid cardLiquid2;
-    private iuh.fit.se.group1.ui.component.dashboard.HeaderDashboard headerDashboard1;
-    private iuh.fit.se.group1.ui.component.dashboard.LineChartPanel lineChartPanel1;
-    private iuh.fit.se.group1.ui.component.dashboard.PanelWarning panelWarning1;
-    private javax.swing.JPanel pnlFooter;
-    private iuh.fit.se.group1.ui.component.dashboard.PnlListCard pnlListCard1;
-    private iuh.fit.se.group1.ui.component.dashboard.RevenueChart revenueChart1;
+    private CardLiquid cardLiquid1;
+    private CardLiquid cardLiquid2;
+    private HeaderDashboard headerDashboard1;
+    private LineChartPanel lineChartPanel1;
+    private PanelWarning panelWarning1;
+    private JPanel pnlFooter;
+    private PnlListCard pnlListCard1;
+    private RevenueChart revenueChart1;
     // End of variables declaration//GEN-END:variables
 }

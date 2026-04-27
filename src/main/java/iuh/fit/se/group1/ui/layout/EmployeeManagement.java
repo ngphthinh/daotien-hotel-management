@@ -11,6 +11,7 @@ import iuh.fit.se.group1.dto.RoleDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
+import iuh.fit.se.group1.network.client.service.RoleServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -19,8 +20,6 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import java.io.*;
 
 import iuh.fit.se.group1.enums.Role;
-//import iuh.fit.se.group1.service.EmployeeService;
-import iuh.fit.se.group1.service.RoleService;
 import iuh.fit.se.group1.ui.component.custom.AvatarLabel;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
@@ -80,7 +79,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
     private static final Logger log = LoggerFactory.getLogger(EmployeeManagement.class);
     private final EmployeeServiceClient employeeService;
-    private final RoleService roleService;
+    private final RoleServiceClient roleService;
     private int activeFilterColumn = -1;
     private ShiftList shiftList;
 
@@ -92,10 +91,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
         initComponents();
         custom();
         employeeService = SocketFacade.getInstance().getEmployee();
-        roleService = new RoleService();
+        roleService = SocketFacade.getInstance().getRole();
         loadTable(fetchData(GET_ALL, ""));
     }
-    
+
 
     public List<EmployeeDTO> fetchData(int type, String filter) {
 
@@ -204,7 +203,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     return;
                 }
 
-                InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
+                InfoEmployeeModal modal = new InfoEmployeeModal();
                 modal.getLblTitle().setText("Cập nhật nhân viên");
                 modal.getBtnSave().setText("Cập nhật");
 
@@ -240,77 +239,85 @@ public class EmployeeManagement extends javax.swing.JPanel {
                         String title = "Xác nhận cập nhật nhân viên";
                         String message = "Bạn có chắc chắn muốn cập nhật nhân viên này không?";
                         Message.showConfirm(title, message, () -> {
-                            String genderSelected = (String) modal.getCmbGender().getSelectedItem();
-                            boolean gender = "Nữ" .equals(genderSelected);
+                            try {
+                                String genderSelected = (String) modal.getCmbGender().getSelectedItem();
+                                boolean gender = "Nữ".equals(genderSelected);
 
-                            String roleSelected = (String) modal.getCmbPosition().getSelectedItem();
-                            String roleId = roleSelected.equalsIgnoreCase("Nhân viên quản lý")
-                                    ? Role.MANAGER.toString()
-                                    : Role.RECEPTIONIST.toString();
+                                String roleSelected = (String) modal.getCmbPosition().getSelectedItem();
+                                String roleId = roleSelected.equalsIgnoreCase("Nhân viên quản lý")
+                                        ? Role.MANAGER.toString()
+                                        : Role.RECEPTIONIST.toString();
+                                Response res = roleService.getRoleById(roleId);
+                                if (res.getCode() != 200) {
+                                    JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + res.getCode() + ": " + response.getMessage());
+                                    return;
+                                }
+                                RoleDTO newRole = (RoleDTO) res.getData();
+                                if (newRole == null) {
+                                    Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
+                                    return;
+                                }
 
-                            RoleDTO newRole = roleService.getRoleById(roleId);
-                            if (newRole == null) {
-                                Message.showMessage("Lỗi", "Không tìm thấy vai trò!");
-                                return;
-                            }
+                                EmployeeDTO employeeUpdate = new EmployeeDTO();
+                                employeeUpdate.setEmployeeId(employeeId);
+                                employeeUpdate.setFullName(result.fullName);
+                                employeeUpdate.setPhone(result.phone);
+                                employeeUpdate.setEmail(result.email);
+                                employeeUpdate.setCitizenId(result.citizenId);
+                                employeeUpdate.setHireDate(result.hireDate);
+                                employeeUpdate.setGender(gender);
 
-                            EmployeeDTO employeeUpdate = new EmployeeDTO();
-                            employeeUpdate.setEmployeeId(employeeId);
-                            employeeUpdate.setFullName(result.fullName);
-                            employeeUpdate.setPhone(result.phone);
-                            employeeUpdate.setEmail(result.email);
-                            employeeUpdate.setCitizenId(result.citizenId);
-                            employeeUpdate.setHireDate(result.hireDate);
-                            employeeUpdate.setGender(gender);
+                                if (employee.getAccount() != null) {
+                                    AccountDTO accountToUpdate = employee.getAccount();
+                                    accountToUpdate.setRole(newRole);
+                                    employeeUpdate.setAccount(accountToUpdate);
+                                } else {
+                                    Message.showMessage("Lỗi", "Nhân viên không có tài khoản!");
+                                    return;
+                                }
 
-                            if (employee.getAccount() != null) {
-                                AccountDTO accountToUpdate = employee.getAccount();
-                                accountToUpdate.setRole(newRole);
-                                employeeUpdate.setAccount(accountToUpdate);
-                            } else {
-                                Message.showMessage("Lỗi", "Nhân viên không có tài khoản!");
-                                return;
-                            }
-
-                            AvatarLabel avt = modal.getAvatarLabel();
-                            if (avt != null) {
-                                byte[] avtBytes = avt.getImageAsBytes("jpg");
-                                if (avtBytes != null && avtBytes.length > 0) {
-                                    employeeUpdate.setAvt(avtBytes);
-                                    log.info("Avatar updated for employee: {}", employeeId);
+                                AvatarLabel avt = modal.getAvatarLabel();
+                                if (avt != null) {
+                                    byte[] avtBytes = avt.getImageAsBytes("jpg");
+                                    if (avtBytes != null && avtBytes.length > 0) {
+                                        employeeUpdate.setAvt(avtBytes);
+                                        log.info("Avatar updated for employee: {}", employeeId);
+                                    } else {
+                                        employeeUpdate.setAvt(employee.getAvt());
+                                    }
                                 } else {
                                     employeeUpdate.setAvt(employee.getAvt());
                                 }
-                            } else {
-                                employeeUpdate.setAvt(employee.getAvt());
-                            }
 
-                            Response responseUpdate = null;
-                            try {
-                                responseUpdate = employeeService.updateEmployee(employeeUpdate);
+                                Response responseUpdate = null;
+                                try {
+                                    responseUpdate = employeeService.updateEmployee(employeeUpdate);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                                if (responseUpdate.getCode() != 200) {
+                                    JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + responseUpdate.getCode() + ": " + responseUpdate.getMessage());
+                                    return;
+                                }
+
+                                EmployeeDTO entitySave = (EmployeeDTO) responseUpdate.getData();
+
+                                String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
+                                String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
+                                        ? entitySave.getAccount().getRole().getRoleName()
+                                        : "N/A";
+
+                                model.setValueAt(entitySave.getFullName(), row, 1);
+                                model.setValueAt(genderStr2, row, 2);
+                                model.setValueAt(roleName2, row, 3);
+                                model.setValueAt(entitySave.getPhone(), row, 4);
+
+                                Message.showMessage("Thành công", "Cập nhật nhân viên thành công!");
+                                loadTable(fetchData(GET_ALL, ""));
+                                GlassPanePopup.closePopupLast();
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
-                            if (responseUpdate.getCode() != 200) {
-                                JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + responseUpdate.getCode() + ": " + responseUpdate.getMessage());
-                                return;
-                            }
-
-                            EmployeeDTO entitySave = (EmployeeDTO) responseUpdate.getData();
-
-                            String genderStr2 = entitySave.isGender() ? "Nữ" : "Nam";
-                            String roleName2 = entitySave.getAccount() != null && entitySave.getAccount().getRole() != null
-                                    ? entitySave.getAccount().getRole().getRoleName()
-                                    : "N/A";
-
-                            model.setValueAt(entitySave.getFullName(), row, 1);
-                            model.setValueAt(genderStr2, row, 2);
-                            model.setValueAt(roleName2, row, 3);
-                            model.setValueAt(entitySave.getPhone(), row, 4);
-
-                            Message.showMessage("Thành công", "Cập nhật nhân viên thành công!");
-                            loadTable(fetchData(GET_ALL, ""));
-                            GlassPanePopup.closePopupLast();
                         });
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -383,7 +390,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                     return;
                 }
 
-                InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
+                InfoEmployeeModal modal = new InfoEmployeeModal();
                 modal.getLblTitle().setText("Thông tin nhân viên");
                 modal.getBtnSave().setText("Xong");
 
@@ -823,7 +830,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
 
     private void btnAddEmployeeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddEmployeeActionPerformed
 
-        InfoEmployeeModal modal = new InfoEmployeeModal(roleService);
+        InfoEmployeeModal modal = new InfoEmployeeModal();
         modal.getLblCode().setVisible(false);
         modal.getLblStatus().setText("Hãy chọn avatar!");
         modal.getLblStatus().setForeground(Color.red);

@@ -4,7 +4,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import javax.swing.*;
 
-import iuh.fit.se.group1.service.PaymentSuggestionService;
+import iuh.fit.se.group1.network.client.service.PaymentSuggestionServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -65,7 +65,7 @@ public class CashPaymentModal extends JPanel {
         pnlMoney.setLayout(new GridLayout(2, 4, 10, 10));
         pnlMoney.setBackground(new Color(129, 129, 129));
 
-        PaymentSuggestionService service = new PaymentSuggestionService();
+        PaymentSuggestionServiceClient service = new PaymentSuggestionServiceClient();
         int totalThousand = (int) Math.ceil(totalToPay / 1000.0);
 
         java.util.List<Integer> suggestions = service.getPaymentOptions(totalThousand);

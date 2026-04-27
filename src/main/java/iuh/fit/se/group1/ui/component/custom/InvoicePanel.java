@@ -654,8 +654,7 @@ public class InvoicePanel extends JPanel {
                     return;
                 }
 
-                BigDecimal price = (BigDecimal) response.getData();
-                if (price == null) price = BigDecimal.ZERO;
+                BigDecimal price = toBigDecimal(response.getData());
 
                 roomBookingModel.addRow(new Object[]{
                         roomNumber,
@@ -666,6 +665,38 @@ public class InvoicePanel extends JPanel {
                         price
                 });
             }
+        }
+    }
+
+    private BigDecimal toBigDecimal(Object value) {
+        if (value == null) {
+            return BigDecimal.ZERO;
+        }
+        if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        }
+        if (value instanceof Number) {
+            try {
+                // Use toString() to preserve exact representation for integral types
+                return new BigDecimal(value.toString());
+            } catch (Exception ex) {
+                return BigDecimal.ZERO;
+            }
+        }
+
+        String s = value.toString().trim();
+        if (s.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        // Support formatted currency strings like "50,000" / "50.000 ₫" / "VND 50000"
+        String normalized = s.replaceAll("[^\\d.-]", "");
+        if (normalized.isEmpty() || "-".equals(normalized) || ".".equals(normalized) || "-.".equals(normalized)) {
+            return BigDecimal.ZERO;
+        }
+        try {
+            return new BigDecimal(normalized);
+        } catch (Exception ex) {
+            return BigDecimal.ZERO;
         }
     }
 

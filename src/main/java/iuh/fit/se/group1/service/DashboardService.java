@@ -22,13 +22,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Service xử lý logic dashboard nhân viên
- */
 public class DashboardService extends Service {
 
     private static final Logger log = LoggerFactory.getLogger(DashboardService.class);
-    //    private final Connection connection;
     private final OrderRepository orderRepository;
     private final ShiftCloseRepository shiftCloseRepository;
     private final OrderDetailRepository orderDetailRepo;
@@ -37,7 +33,6 @@ public class DashboardService extends Service {
     private final RoomRepository roomRepository;
 
     public DashboardService() {
-//        this.connection = DatabaseUtil.getConnection();
         this.shiftCloseRepository = new ShiftCloseRepositoryImpl();
         this.bookingRepository = new BookingRepositoryImpl();
         this.roomRepository = new RoomRepositoryImpl();
@@ -453,6 +448,32 @@ public class DashboardService extends Service {
         );
     }
 
+    public OrderStatisticsResponse getOrderStatistics(TimeType timeType) {
+        int current = 0;
+        int previous = 0;
+
+        switch (timeType) {
+            case TODAY -> {
+                current = getTodayOrderCount();
+                previous = getOrderCountDaysAgo(7);
+            }
+            case DAYS_7 -> {
+                current = getOrderCountForPeriod(7, false);
+                previous = getOrderCountForPeriod(7, true);
+            }
+            case DAYS_30 -> {
+                current = getOrderCountForPeriod(30, false);
+                previous = getOrderCountForPeriod(30, true);
+            }
+            case DAYS_90 -> {
+                current = getOrderCountForPeriod(90, false);
+                previous = getOrderCountForPeriod(90, true);
+            }
+        }
+
+        return new OrderStatisticsResponse(current, previous);
+    }
+
     public int getOrderCountForPeriod(int days, boolean isPrevious) {
 
         LocalDate today = LocalDate.now();
@@ -474,5 +495,59 @@ public class DashboardService extends Service {
         return doInTransaction(em ->
                 orderRepository.getOrderCountByDate(em, start, end)
         );
+    }
+
+    public CountRoomDashboard getCountRooms() {
+        return CountRoomDashboard.builder()
+                .occupiedRooms(getOccupiedRooms())
+                .totalRooms(getTotalRooms())
+                .build();
+
+    }
+
+    public DashboardDTO getDashboardDataAll(TimeType timeType) {
+        LocalDateTime startDate = getStartDateForTimeType(timeType);
+        LocalDateTime endDate = LocalDateTime.now();
+
+        return DashboardDTO.builder()
+                .currentGuestCount(getCurrentGuestCount())
+                .periodRevenue(getRevenueByDateRange(startDate, endDate))
+                .summaryData(getDashboardSummary(startDate, endDate))
+                .revenueSources(getRevenueSources(startDate, endDate))
+                .peakHours(getPeakHours(startDate, endDate))
+                .warnings(getWarnings())
+                .build();
+
+
+    }
+
+    public DashboardEmployeeDTO getDashboardEmployee(TimeType timeType) {
+        LocalDateTime startDate = getStartDateForTimeType(timeType);
+        LocalDateTime endDate = LocalDateTime.now();
+
+        return DashboardEmployeeDTO.builder()
+                .summaryData(getDashboardSummary(startDate, endDate))
+                .revenueSources(getRevenueSources(startDate, endDate))
+                .peakHours(getPeakHours(startDate, endDate))
+                .warnings(getWarnings())
+                .roomStatus(getRoomStatus())
+                .shiftNotes(getRecentShiftNotes())
+                .build();
+    }
+
+
+    private LocalDateTime getStartDateForTimeType(TimeType type) {
+        switch (type) {
+            case TODAY:
+                return LocalDate.now().atStartOfDay();
+            case DAYS_7:
+                return LocalDate.now().minusDays(7).atStartOfDay();
+            case DAYS_30:
+                return LocalDate.now().minusDays(30).atStartOfDay();
+            case DAYS_90:
+                return LocalDate.now().minusDays(90).atStartOfDay();
+            default:
+                return LocalDate.now().atStartOfDay();
+        }
     }
 }

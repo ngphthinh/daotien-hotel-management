@@ -4,14 +4,11 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.dto.DashboardSummaryDto;
-import iuh.fit.se.group1.dto.PeakHourDto;
-import iuh.fit.se.group1.dto.RevenueSourceDto;
-import iuh.fit.se.group1.dto.RoomStatusDto;
-import iuh.fit.se.group1.dto.ShiftNoteDto;
-import iuh.fit.se.group1.dto.WarningDto;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.enums.TimeType;
-import iuh.fit.se.group1.service.DashboardService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.DashboardServiceClient;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -25,6 +22,7 @@ import java.util.Locale;
 
 /**
  * Dashboard nhân viên với dữ liệu thật từ database
+ *
  * @author THIS PC
  */
 public class DashboardEmployee extends javax.swing.JPanel {
@@ -34,14 +32,14 @@ public class DashboardEmployee extends javax.swing.JPanel {
     private static final Color NUMBER_CHECKOUT = new Color(239, 180, 46);
     private static final Color MONEY_OPEN_SHIFT = new Color(13, 200, 7);
 
-    private final DashboardService dashboardService;
+    private final DashboardServiceClient dashboardService;
     private final NumberFormat currencyFormat;
 
     /**
      * Creates new form DashboardEmployee
      */
     public DashboardEmployee() {
-        this.dashboardService = new DashboardService();
+        this.dashboardService = SocketFacade.getInstance().getDashboard();
         this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
         initComponents();
@@ -58,22 +56,22 @@ public class DashboardEmployee extends javax.swing.JPanel {
     private void setupCardIcons() {
         // Card 1: Phòng sắp hết hạn
         pnlListCard1.getRoomOccupancyRateCard().setLblIconRate(
-            FontIcon.of(FontAwesomeSolid.CLOCK, 24, ALMOST_OUT_OF_TIME));
+                FontIcon.of(FontAwesomeSolid.CLOCK, 24, ALMOST_OUT_OF_TIME));
         pnlListCard1.getRoomOccupancyRateCard().setTitle("SỐ PHÒNG SẮP HẾT HẠN");
 
         // Card 2: Check-in
         pnlListCard1.getNumberCheckInCard().setLblIconRate(
-            FontIcon.of(FontAwesomeSolid.MAP_MARKER_ALT, 24, NUMBER_CHECKIN));
+                FontIcon.of(FontAwesomeSolid.MAP_MARKER_ALT, 24, NUMBER_CHECKIN));
         pnlListCard1.getNumberCheckInCard().setTitle("LƯỢT KHÁCH CHECKIN");
 
         // Card 3: Check-out
         pnlListCard1.getRevenueCard().setLblIconRate(
-            FontIcon.of(FontAwesomeSolid.KEY, 24, NUMBER_CHECKOUT));
+                FontIcon.of(FontAwesomeSolid.KEY, 24, NUMBER_CHECKOUT));
         pnlListCard1.getRevenueCard().setTitle("LƯỢT KHÁCH CHECKOUT");
 
         // Card 4: Tiền mở ca
         pnlListCard1.getBookingRateCard().setLblIconRate(
-            FontIcon.of(FontAwesomeSolid.MONEY_CHECK, 24, MONEY_OPEN_SHIFT));
+                FontIcon.of(FontAwesomeSolid.MONEY_CHECK, 24, MONEY_OPEN_SHIFT));
         pnlListCard1.getBookingRateCard().setTitle("TIỀN KHI MỞ CA");
         pnlListCard1.getBookingRateCard().getLblRoomCount().setForeground(Color.white);
     }
@@ -95,24 +93,37 @@ public class DashboardEmployee extends javax.swing.JPanel {
             protected Void doInBackground() {
                 try {
                     // Lấy summary data
-                    summaryData = dashboardService.getDashboardData(timeType);
+                    Response response = dashboardService.getDashboardDataEmployee(timeType);
+
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(
+                                DashboardEmployee.this,
+                                "Lỗi khi tải dữ liệu dashboard: " + response.getMessage(),
+                                "Lỗi",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return null;
+                    }
+
+                    DashboardEmployeeDTO dashboardEmployeeDTO = (DashboardEmployeeDTO) response.getData();
+
+                    summaryData = dashboardEmployeeDTO.getSummaryData();
 
                     // Lấy nguồn doanh thu
                     LocalDateTime startDate = getStartDateForTimeType(timeType);
                     LocalDateTime endDate = LocalDateTime.now();
-                    revenueSources = dashboardService.getRevenueSources(startDate, endDate);
+                    revenueSources = dashboardEmployeeDTO.getRevenueSources();
 
                     // Lấy khung giờ cao điểm
-                    peakHours = dashboardService.getPeakHours(startDate, endDate);
-
+                    peakHours = dashboardEmployeeDTO.getPeakHours();
                     // Lấy trạng thái phòng
-                    roomStatus = dashboardService.getRoomStatus();
+                    roomStatus = dashboardEmployeeDTO.getRoomStatus();
 
                     // Lấy cảnh báo
-                    warnings = dashboardService.getWarnings();
+                    warnings = dashboardEmployeeDTO.getWarnings();
 
                     // Lấy ghi chú ca gần nhất
-                    shiftNotes = dashboardService.getRecentShiftNotes();
+                    shiftNotes = dashboardEmployeeDTO.getShiftNotes();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -156,10 +167,10 @@ public class DashboardEmployee extends javax.swing.JPanel {
                 } catch (Exception e) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(
-                        DashboardEmployee.this,
-                        "Lỗi khi tải dữ liệu dashboard: " + e.getMessage(),
-                        "Lỗi",
-                        JOptionPane.ERROR_MESSAGE
+                            DashboardEmployee.this,
+                            "Lỗi khi tải dữ liệu dashboard: " + e.getMessage(),
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE
                     );
                 }
             }
@@ -188,24 +199,24 @@ public class DashboardEmployee extends javax.swing.JPanel {
     private void updateDashboardUI(DashboardSummaryDto data) {
         // Card 1: Phòng sắp hết hạn
         pnlListCard1.getRoomOccupancyRateCard().setMessage(
-            data.getRoomsNearExpiry() + "/" + data.getTotalRooms() + " phòng");
+                data.getRoomsNearExpiry() + "/" + data.getTotalRooms() + " phòng");
         pnlListCard1.getRoomOccupancyRateCard().setLblValue(
-            data.getRoomsNearExpiry() + " PHÒNG");
+                data.getRoomsNearExpiry() + " PHÒNG");
 
         // Card 2: Check-in
         pnlListCard1.getNumberCheckInCard().setMessage("Lượt checkin");
         pnlListCard1.getNumberCheckInCard().setLblValue(
-            data.getCheckInCount() + " LƯỢT");
+                data.getCheckInCount() + " LƯỢT");
 
         // Card 3: Check-out
         pnlListCard1.getRevenueCard().setMessage("Lượt checkout");
         pnlListCard1.getRevenueCard().setLblValue(
-            data.getCheckOutCount() + " LƯỢT");
+                data.getCheckOutCount() + " LƯỢT");
 
         // Card 4: Tiền mở ca
         pnlListCard1.getBookingRateCard().setMessage("Ca gần nhất");
         pnlListCard1.getBookingRateCard().setLblValue(
-            currencyFormat.format(data.getOpenShiftCash()));
+                currencyFormat.format(data.getOpenShiftCash()));
     }
 
     /**
@@ -256,41 +267,41 @@ public class DashboardEmployee extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(headerDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(revenueChart, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lineChartPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 713, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(cardNote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(statusRoomCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(panelWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(42, 42, 42))
-            .addComponent(pnlListCard1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(headerDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(33, 33, 33)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(revenueChart, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(lineChartPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 713, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(cardNote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(statusRoomCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(panelWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(42, 42, 42))
+                        .addComponent(pnlListCard1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headerDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnlListCard1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(revenueChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lineChartPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cardNote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(statusRoomCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(headerDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(pnlListCard1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(revenueChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(lineChartPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(cardNote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(statusRoomCard, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(panelWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

@@ -779,7 +779,8 @@ public class PaymentMain extends javax.swing.JPanel {
             currentOrder.setPromotion(promotion);
             currentOrder.setPaymentType(PaymentType.CASH);
             currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())).add(BigDecimal.valueOf(Constants.parseVND(lblDeposit.getText()))));
-            currentOrder.setPaymentDate(LocalDate.now());
+            LocalDate paymentDate = LocalDate.now();
+            currentOrder.setPaymentDate(paymentDate);
             Long order = currentOrder.getOrderId();
             String totalPricePayment = lblTotalPricePayment.getText();
             String promotionStr = lblPromotion.getText();
@@ -793,14 +794,15 @@ public class PaymentMain extends javax.swing.JPanel {
                     totalPricePayment,
                     currentEmployee.getFullName()
             );
-            generateOrder(order, filePdf);
+            generateOrder(order, paymentDate, filePdf);
 
         });
     }//GEN-LAST:event_btnCashActionPerformed
 
-    private void generateOrder(Long order, byte[] filePdf) {
+    private void generateOrder(Long order, LocalDate paymentDate, byte[] filePdf) {
+        LocalDate safePaymentDate = paymentDate != null ? paymentDate : LocalDate.now();
         String fileName = "hoadon_" + order + "_" +
-                currentOrder.getPaymentDate().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".pdf";
+                safePaymentDate.format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".pdf";
         String filePath = OUTPUT_DIR + File.separator + fileName;
         File file = new File(filePath);
         try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -940,6 +942,8 @@ public class PaymentMain extends javax.swing.JPanel {
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
                         currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())).add(BigDecimal.valueOf(Constants.parseVND(lblDeposit.getText()))));
+                        LocalDate paymentDate = LocalDate.now();
+                        currentOrder.setPaymentDate(paymentDate);
                         Long order = currentOrder.getOrderId();
                         String totalPricePayment = lblTotalPricePayment.getText();
                         String promotionStr = lblPromotion.getText();
@@ -952,7 +956,7 @@ public class PaymentMain extends javax.swing.JPanel {
                                 totalPricePayment,
                                 currentEmployee.getFullName()
                         );
-                        generateOrder(order, filePdf);
+                        generateOrder(order, paymentDate, filePdf);
                     } else {
                         CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING, 700, 200);
                     }
@@ -1318,6 +1322,7 @@ public class PaymentMain extends javax.swing.JPanel {
         }
 
         OrderDTO order = (OrderDTO) response.getData();
+        log.info("Fetched order details for orderId {}: {}", orderId, order);
         this.currentOrder = order;
 
         String bookingTypeStr = order.getBookings().get(0).getBookingType().getDisplayName();

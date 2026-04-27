@@ -12,6 +12,7 @@ import iuh.fit.se.group1.enums.DenominationLabel;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.AuthServiceClient;
+import iuh.fit.se.group1.network.client.service.DenominationDetailServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.*;
@@ -34,7 +35,7 @@ import java.util.List;
 public class CloseShift extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(CloseShift.class);
     private EmployeeShiftService employeeShiftService;
-    private DenominationDetailService denominationDetailService;
+    private final DenominationDetailServiceClient denominationDetailService;
     private final ShiftCloseService shiftCloseService;
     private EmployeeShiftDTO currentEmployeeShift;
     private BigDecimal totalRevenue = BigDecimal.ZERO;
@@ -49,16 +50,21 @@ public class CloseShift extends javax.swing.JPanel {
     public CloseShift() {
         this.authenticateService = SocketFacade.getInstance().getAuth();
         this.employeeShiftService = new EmployeeShiftService();
-        this.denominationDetailService = new DenominationDetailService();
+        this.denominationDetailService = SocketFacade.getInstance().getDenominationDetail();
         this.shiftCloseService = new ShiftCloseService();
         this.confirmModal = new ConfirmInfoModal();
         initComponents();
         configureTextFields();
         initIcons();
-        initMoneyLabels();
+
         clearForm();
         setupConfirmModal();
         setupAutoRefresh();
+        try {
+            initMoneyLabels();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -240,9 +246,16 @@ public class CloseShift extends javax.swing.JPanel {
         btnClose.setIcon(FontIcon.of(FontAwesomeSolid.CHECK_CIRCLE, 20, Color.WHITE));
     }
 
-    private void initMoneyLabels() {
-        denominationDetailService = new DenominationDetailService();
-        List<Long> denominations = denominationDetailService.getAvailableDenominations();
+    private void initMoneyLabels() throws Exception {
+
+        Response response = denominationDetailService.getAvailableDenominations();
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Không thể tải mệnh giá từ server. Sử dụng mặc định.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        List<Long> denominations = (List<Long>) response.getData();
         Money[] moneyPanels = {money1, money2, money3, money4, money5, money6, money7, money8, money9};
 
         for (int i = 0; i < Math.min(denominations.size(), moneyPanels.length); i++) {
@@ -417,7 +430,7 @@ public class CloseShift extends javax.swing.JPanel {
         this.onCloseShiftSuccess = callback;
     }
 
-    public void saveData() {
+    public void saveData() throws Exception {
         if (currentEmployeeShift == null) {
             Message.showMessage("Lỗi", "Không tìm thấy thông tin ca làm việc!");
             return;
@@ -427,7 +440,7 @@ public class CloseShift extends javax.swing.JPanel {
         GlassPanePopup.showPopup(confirmModal);
     }
 
-    private void saveDenominationDetails() {
+    private void saveDenominationDetails() throws Exception {
         List<DenominationDetailDTO> details = new ArrayList<>();
         Money[] moneyPanels = {money1, money2, money3, money4, money5, money6, money7, money8, money9};
         DenominationLabel[] labels = {
@@ -462,8 +475,11 @@ public class CloseShift extends javax.swing.JPanel {
         }
 
         if (!details.isEmpty()) {
-            DenominationDetailService service = new DenominationDetailService();
-            service.saveAll(details);
+            Response response = denominationDetailService.saveAll(details);
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi lưu chi tiết mệnh giá: " + (response != null ? response.getMessage() : "No response from server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             log.info("Saved {} denomination details", details.size());
         }
     }
@@ -854,7 +870,11 @@ public class CloseShift extends javax.swing.JPanel {
         btnClose.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
+                try {
+                    btnCloseActionPerformed(evt);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -903,7 +923,7 @@ public class CloseShift extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRealityActionPerformed
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) throws Exception {
         saveData();
     }
 
