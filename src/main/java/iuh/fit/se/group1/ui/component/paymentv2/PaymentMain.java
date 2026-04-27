@@ -1285,7 +1285,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
             Response response = bookingService.getPriceFromBooking(booking);
 
-            if (response != null || response.getCode() != 200) {
+            if (response == null || response.getCode() != 200) {
                 JOptionPane.showMessageDialog(null, "The booking was not successful. Please try again later." + response.getMessage(), "Booking Error", JOptionPane.ERROR_MESSAGE);
                 return;
 

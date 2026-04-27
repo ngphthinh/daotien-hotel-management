@@ -80,8 +80,8 @@ public class BookingTrend extends javax.swing.JPanel {
             LocalDate start = LocalDate.parse(headerChart1.getTxtFromDate().getText(), formatter);
             LocalDate end = LocalDate.parse(headerChart1.getTxtToDate().getText(), formatter);
 
-            lineBookingTrendChart1.createLineChartData(start, end);
             try {
+                lineBookingTrendChart1.createLineChartData(start, end);
                 updateCardData(start, end);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());

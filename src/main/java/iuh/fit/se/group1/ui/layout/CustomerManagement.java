@@ -5,7 +5,9 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.dto.CustomerDTO;
-import iuh.fit.se.group1.service.CustomerService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.CustomerServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
@@ -27,10 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.RowFilter;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -44,7 +43,6 @@ import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.ImportExcelService;
 
 import java.io.File;
-import javax.swing.JFileChooser;
 
 import raven.glasspanepopup.GlassPanePopup;
 
@@ -53,17 +51,41 @@ import raven.glasspanepopup.GlassPanePopup;
  */
 public class CustomerManagement extends javax.swing.JPanel {
 
-    private CustomerService customerService;
+    private final CustomerServiceClient customerService;
+
+    static final int GET_ALL = 1;
+    static final int GET_BY_KEYWORD = 2;
 
     public CustomerManagement() {
         initComponents();
         custom();
-        customerService = new CustomerService();
-        loadTable(customerService.getAllCustomer());
+        customerService = SocketFacade.getInstance().getCustomer();
+        loadTable(fetchData(GET_ALL, null));
     }
 
+    public List<CustomerDTO> fetchData(int type, String filter) {
+        try {
+            Response response = null;
+            if (type == GET_ALL) {
+                response = customerService.getAllCustomer();
+
+            } else if (type == GET_BY_KEYWORD) {
+                response = customerService.getCustomerByKeyword(filter);
+            }
+            if (response != null && response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return null;
+            }
+            assert response != null;
+            return (List<CustomerDTO>) response.getData();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public void loadData() {
-        loadTable(customerService.getAllCustomer());
+        loadTable(fetchData(GET_ALL, null));
     }
 
     public void loadTable(List<CustomerDTO> customers) {
@@ -99,8 +121,8 @@ public class CustomerManagement extends javax.swing.JPanel {
                 ImportExcelService importService = new ImportExcelService();
                 List<CustomerDTO> imported = importService.importCustomersFromExcel(file);
                 if (imported != null && !imported.isEmpty()) {
-                    customerService.getAllCustomer().addAll(imported);
-                    loadTable(customerService.getAllCustomer());
+                    fetchData(GET_ALL, null).addAll(imported);
+                    loadTable(fetchData(GET_ALL, null));
                     Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
                 } else {
                     Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
@@ -166,11 +188,17 @@ public class CustomerManagement extends javax.swing.JPanel {
 
         tblCustomer.setTableActionColumn(tblCustomer.getTbl(), 6, new TableActionEvent() {
             @Override
-            public void onEdit(int row) {
+            public void onEdit(int row) throws Exception {
                 DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
                 String code = model.getValueAt(row, 0).toString();
+                Response response = customerService.getCustomerById(Long.valueOf(code));
 
-                CustomerDTO customer = customerService.getCustomerById(code);
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(null, "Lỗi khi tìm kiếm khách hàng: " + response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                CustomerDTO customer = (CustomerDTO) response.getData();
                 if (customer == null) {
                     Message.showMessage("Lỗi", "Không tìm thấy khách hàng!");
                     return;
@@ -210,23 +238,36 @@ public class CustomerManagement extends javax.swing.JPanel {
                     customer.setGender(rs.gender);
                     customer.setDateOfBirth(rs.dob);
 
-                    CustomerDTO updated = customerService.updateCustomer(customer);
-                    if (updated != null) {
-                        int modelRow = tblCustomer.getTbl().convertRowIndexToModel(row);
-                        model.setValueAt(updated.getFullName(), modelRow, 1);
-                        model.setValueAt(updated.isGender() ? "Nam" : "Nữ", modelRow, 2);
-                        model.setValueAt(updated.getEmail(), modelRow, 3);
-                        model.setValueAt(updated.getCitizenId(), modelRow, 4);
-                        model.setValueAt(updated.getPhone(), modelRow, 5);
+                    try {
+                        Response res = customerService.updateCustomer(customer);
+                        if (res == null || res.getCode() != 200) {
+                            JOptionPane.showMessageDialog(null, "Lỗi khi cập nhật khách hàng: " + (res != null ? res.getMessage() : "Không nhận được phản hồi từ server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
 
-                        GlassPanePopup.closePopupLast();
-                    } else {
-                        Message.showMessage("Lỗi", "Cập nhật khách hàng thất bại!");
+
+                        CustomerDTO updated = (CustomerDTO) res.getData();
+                        if (updated != null) {
+                            int modelRow = tblCustomer.getTbl().convertRowIndexToModel(row);
+                            model.setValueAt(updated.getFullName(), modelRow, 1);
+                            model.setValueAt(updated.isGender() ? "Nam" : "Nữ", modelRow, 2);
+                            model.setValueAt(updated.getEmail(), modelRow, 3);
+                            model.setValueAt(updated.getCitizenId(), modelRow, 4);
+                            model.setValueAt(updated.getPhone(), modelRow, 5);
+
+                            GlassPanePopup.closePopupLast();
+                        } else {
+                            Message.showMessage("Lỗi", "Cập nhật khách hàng thất bại!");
+                        }
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Lỗi khi cập nhật khách hàng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                 });
 
                 modal.closeModel(ae -> GlassPanePopup.closePopupLast());
                 GlassPanePopup.showPopup(modal);
+
             }
 
             @Override
@@ -243,7 +284,19 @@ public class CustomerManagement extends javax.swing.JPanel {
 
                     if (rowDelete >= 0) {
                         Long id = (Long) model.getValueAt(rowDelete, 0);
-                        boolean isSuccess = customerService.deleteCustomer(id);
+                        Response response = null;
+                        try {
+                            response = customerService.deleteCustomer(id);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        if (response.getCode() != 200) {
+                            Message.showMessage("Lỗi", "Lỗi khi xóa khách hàng: " + (response != null ? response.getMessage() : "Không nhận được phản hồi từ server"));
+                            return;
+                        }
+
+                        boolean isSuccess = true;
                         if (!isSuccess) {
                             CustomDialog.showMessage(null, "Không thể xóa khách hàng này vì đang có hóa đơn liên quan!", "Lỗi", CustomDialog.MessageType.ERROR, 500, 300);
                         } else {
@@ -257,7 +310,16 @@ public class CustomerManagement extends javax.swing.JPanel {
             public void onView(int row) {
                 DefaultTableModel model = (DefaultTableModel) tblCustomer.getTbl().getModel();
                 String code = model.getValueAt(row, 0).toString();
-                CustomerDTO customer = customerService.getCustomerById(code);
+
+                Response response = null;
+
+                try {
+                    response = customerService.getCustomerById(Long.valueOf(code));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                CustomerDTO customer = (CustomerDTO) response.getData();
                 if (customer == null) {
                     return;
                 }
@@ -401,9 +463,9 @@ public class CustomerManagement extends javax.swing.JPanel {
         List<CustomerDTO> result;
 
         if (keyword.isEmpty()) {
-            result = customerService.getAllCustomer();
+            result = fetchData(GET_ALL, null);
         } else {
-            result = customerService.getCustomerByKeyword(keyword);
+            result = fetchData(GET_BY_KEYWORD, keyword);
         }
         loadTable(result);
     }

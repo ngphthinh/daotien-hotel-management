@@ -20,9 +20,14 @@ public class TestServer {
         OrderService orderService = new OrderService();
 
         EmailSenderService emailSenderService = new EmailSenderService();
+        BookingService bookingService = new BookingService();
+        CustomerService customerService = new CustomerService();
 
         HandlerRegistry registry = new HandlerRegistry();
 
+
+        CustomerHandler customerHandler = new CustomerHandler(customerService);
+        BookingHandler bookingHandler = new BookingHandler(bookingService);
         AuthenticateHandler authenticateHandler = new AuthenticateHandler(authenticateService, accountService);
         EmployeeHandler employeeHandler = new EmployeeHandler(employeeService);
         AmenityHandler amenityHandler = new AmenityHandler(amenityService);
@@ -35,9 +40,27 @@ public class TestServer {
         registerAmenity(registry, amenityHandler);
         registerOrder(registry, orderHandler);
         registerEmail(registry, emailHandler);
+        registerBooking(registry, bookingHandler);
+        registerCustomer(registry, customerHandler);
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
+    }
+
+    private static void registerCustomer(HandlerRegistry registry, CustomerHandler customerHandler) {
+        registry.register(CommandType.CUSTOMER_GET_BY_ID, customerHandler);
+        registry.register(CommandType.CUSTOMER_CREATE, customerHandler);
+        registry.register(CommandType.CUSTOMER_UPDATE, customerHandler);
+        registry.register(CommandType.CUSTOMER_DELETE, customerHandler);
+        registry.register(CommandType.CUSTOMER_GET_ALL, customerHandler);
+        registry.register(CommandType.CUSTOMER_GET_BY_KEYWORDS, customerHandler);
+        registry.register(CommandType.CUSTOMER_GET_BY_CITIZEN, customerHandler);
+
+
+    }
+
+    private static void registerBooking(HandlerRegistry registry, BookingHandler bookingHandler) {
+        registry.register(CommandType.BOOKING_GET_PRICE_FROM_BOOKING, bookingHandler);
     }
 
     private static void registerEmployee(HandlerRegistry registry, EmployeeHandler employeeHandler) {
@@ -80,7 +103,7 @@ public class TestServer {
         registry.register(CommandType.ORDER_CREATE_RECORD, orderHandler);
         registry.register(CommandType.ORDER_UPDATE_TOTAL_PRICE, orderHandler);
         registry.register(CommandType.ORDER_UPDATE_DEPOSIT, orderHandler);
-        registry.register(CommandType.MOVE_BOOKING_TO_ORDER, orderHandler);
+        registry.register(CommandType.ORDER_MOVE_BOOKING_TO_ORDER, orderHandler);
         registry.register(CommandType.ORDER_RE_CALCULATE_TOTAL_PRICE, orderHandler);
         registry.register(CommandType.ORDER_UPDATE_ORDER_TYPE, orderHandler);
 

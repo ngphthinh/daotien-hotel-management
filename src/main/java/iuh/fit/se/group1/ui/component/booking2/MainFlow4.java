@@ -5,15 +5,15 @@
 package iuh.fit.se.group1.ui.component.booking2;
 
 import iuh.fit.se.group1.dto.CustomerDTO;
-import iuh.fit.se.group1.entity.Customer;
-import iuh.fit.se.group1.service.CustomerService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.CustomerServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.TextField;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
+import jakarta.persistence.JoinColumn;
 
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -52,6 +52,8 @@ public class MainFlow4 extends javax.swing.JPanel {
     public MainFlow4() {
         initComponents();
     }
+
+    private final CustomerServiceClient customerService = SocketFacade.getInstance().getCustomer();
 
     public boolean validateInput() {
 
@@ -216,7 +218,11 @@ public class MainFlow4 extends javax.swing.JPanel {
         txtCitizenIdOrPassport.setBorderRadius(5);
         txtCitizenIdOrPassport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCitizenIdOrPassportActionPerformed(evt);
+                try {
+                    txtCitizenIdOrPassportActionPerformed(evt);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -349,10 +355,18 @@ public class MainFlow4 extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtCitizenIdOrPassportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCitizenIdOrPassportActionPerformed
-        CustomerService customerService = new CustomerService();
+    private void txtCitizenIdOrPassportActionPerformed(java.awt.event.ActionEvent evt) throws Exception {//GEN-FIRST:event_txtCitizenIdOrPassportActionPerformed
+
         String citizenId = txtCitizenIdOrPassport.getText().trim();
-        CustomerDTO existingCustomer = customerService.getCustomerByCitizenId(citizenId);
+
+        Response response = customerService.getCustomerByCitizenId(citizenId);
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tìm kiếm khách hàng: " + response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        CustomerDTO existingCustomer = (CustomerDTO) response.getData();
         if (existingCustomer != null) {
             txtFullName.setText(existingCustomer.getFullName());
             txtEmail.setText(existingCustomer.getEmail());
@@ -457,55 +471,69 @@ public class MainFlow4 extends javax.swing.JPanel {
 
 
     public CustomerDTO getCustomer() {
-        String citizenIdOrPassport = txtCitizenIdOrPassport.getText().trim();
-        String fullName = txtFullName.getText().trim();
-        String email = txtEmail.getText().trim();
-        String phone = txtPhone.getText().trim();
+        try {
+            String citizenIdOrPassport = txtCitizenIdOrPassport.getText().trim();
+            String fullName = txtFullName.getText().trim();
+            String email = txtEmail.getText().trim();
+            String phone = txtPhone.getText().trim();
+            Response response = customerService.getCustomerByCitizenId(citizenIdOrPassport);
 
-        CustomerService customerService = new CustomerService();
-
-        CustomerDTO customerSaveDB = customerService.getCustomerByCitizenId(citizenIdOrPassport);
-
-        if (customerSaveDB != null) {
-            boolean needUpdate = false;
-
-            txtFullName.setText(customerSaveDB.getFullName());
-            txtEmail.setText(customerSaveDB.getEmail());
-            txtPhone.setText(customerSaveDB.getPhone());
-            DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String dobStr = customerSaveDB.getDateOfBirth().format(outputFormat);
-            txtDob.setText(dobStr);
-
-            if (!customerSaveDB.getEmail().equals(email)) {
-                customerSaveDB.setEmail(email);
-                needUpdate = true;
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi tìm kiếm khách hàng: " + response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return null;
             }
 
-            if (!customerSaveDB.getPhone().equals(phone)) {
-                customerSaveDB.setPhone(phone);
-                needUpdate = true;
+            CustomerDTO customerSaveDB = (CustomerDTO) response.getData();
+
+            if (customerSaveDB != null) {
+                boolean needUpdate = false;
+
+                txtFullName.setText(customerSaveDB.getFullName());
+                txtEmail.setText(customerSaveDB.getEmail());
+                txtPhone.setText(customerSaveDB.getPhone());
+                DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                String dobStr = customerSaveDB.getDateOfBirth().format(outputFormat);
+                txtDob.setText(dobStr);
+
+                if (!customerSaveDB.getEmail().equals(email)) {
+                    customerSaveDB.setEmail(email);
+                    needUpdate = true;
+                }
+
+                if (!customerSaveDB.getPhone().equals(phone)) {
+                    customerSaveDB.setPhone(phone);
+                    needUpdate = true;
+                }
+
+                if (needUpdate) {
+                    response = customerService.updateCustomer(customerSaveDB);
+                    if (response == null || response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật thông tin khách hàng: " + response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    }
+                    return (CustomerDTO) response.getData();
+                }
+                return customerSaveDB;
             }
 
-            if (needUpdate) {
-                return customerService.updateCustomer(customerSaveDB);
-            }
-            return customerSaveDB;
+            // Nếu chưa có trong DB → tạo mới
+            CustomerDTO customer = new CustomerDTO();
+            customer.setCitizenId(citizenIdOrPassport);
+            customer.setFullName(formatName(fullName));
+            customer.setEmail(email);
+            customer.setPhone(phone);
+
+            DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate dob = LocalDate.parse(txtDob.getText().trim(), inputFormat);
+
+            customer.setDateOfBirth(dob);
+            customer.setGender(rdoGender.getSelectedGender());
+
+            return customer;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xử lý thông tin khách hàng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return null;
         }
-
-        // Nếu chưa có trong DB → tạo mới
-        CustomerDTO customer = new CustomerDTO();
-        customer.setCitizenId(citizenIdOrPassport);
-        customer.setFullName(formatName(fullName));
-        customer.setEmail(email);
-        customer.setPhone(phone);
-
-        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dob = LocalDate.parse(txtDob.getText().trim(), inputFormat);
-
-        customer.setDateOfBirth(dob);
-        customer.setGender(rdoGender.getSelectedGender());
-
-        return customer;
     }
 
 

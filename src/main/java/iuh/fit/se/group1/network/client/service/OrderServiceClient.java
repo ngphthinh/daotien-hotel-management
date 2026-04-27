@@ -132,7 +132,7 @@ public class OrderServiceClient implements ServiceClient {
     public Response moveBookingsToOrder(Long orderId, List<Long> bookingIdsToMove) throws Exception {
 
         return clientSocketManager.send(Request.builder()
-                .commandType(CommandType.MOVE_BOOKING_TO_ORDER)
+                .commandType(CommandType.ORDER_MOVE_BOOKING_TO_ORDER)
                 .request(MoveRequestBooking.builder()
                         .orderId(orderId)
                         .bookingIdsToMove(bookingIdsToMove)

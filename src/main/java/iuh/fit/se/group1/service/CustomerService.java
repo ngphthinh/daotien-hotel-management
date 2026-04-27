@@ -28,9 +28,6 @@ public class CustomerService extends Service {
     }
 
     public boolean deleteCustomer(Long customerId) {
-//        customerRepository.deleteById(customerId);
-        // kiểm tra xem customer đang có hóa đơn có tồn tại bookng không
-
 
         return doInTransaction(entityManager ->
                 {
@@ -48,33 +45,26 @@ public class CustomerService extends Service {
 
 
     public List<CustomerDTO> getAllCustomer() {
-//        return customerRepository.findAll();
         return doInTransaction(customerRepository::findAll).stream().map(customerMapper::toDTO).collect(Collectors.toList());
     }
 
 
     public List<CustomerDTO> getCustomerByKeyword(String keyword) {
-//        return customerRepository.findByCustomerNameOrId(keyword);
         return doInTransaction(entityManager -> customerRepository.findByCustomerNameOrId(entityManager, keyword).stream().map(customerMapper::toDTO).collect(Collectors.toList()));
     }
 
-    public CustomerDTO getCustomerById(String idStr) {
-        try {
-            Long id = Long.parseLong(idStr);
-//            return customerRepository.findById(id);
-            return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.findById(entityManager, id)));
-        } catch (NumberFormatException e) {
-            return null;
-        }
+    public CustomerDTO getCustomerById(Long id) {
+
+        return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.findById(entityManager, id)));
+
+
     }
 
     public CustomerDTO updateCustomer(CustomerDTO customer) {
-//        return customerRepository.update(customer);
         return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.save(entityManager, customerMapper.toCustomer(customer))));
     }
 
     public CustomerDTO getCustomerByCitizenId(String citizenId) {
-//        return customerRepository.findByCitizenId(citizenId);
         return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.findByCitizenId(entityManager, citizenId)));
     }
 

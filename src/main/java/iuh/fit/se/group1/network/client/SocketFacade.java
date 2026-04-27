@@ -15,6 +15,7 @@ public class SocketFacade {
     private final AmenityServiceClient amenity;
     private final OrderServiceClient order;
     private final BookingServiceClient booking;
+    private final CustomerServiceClient customer;
 
     public SocketFacade(ClientSocketManager socket) {
         this.auth = new AuthServiceClient(socket);
@@ -23,6 +24,7 @@ public class SocketFacade {
         this.amenity = new AmenityServiceClient(socket);
         this.order = new OrderServiceClient(socket);
         this.booking = new BookingServiceClient(socket);
+        this.customer = new CustomerServiceClient(socket);
     }
 
     private static SocketFacade instance;

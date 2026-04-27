@@ -42,7 +42,7 @@ public class OrderHandler implements RequestHandler {
                 case ORDER_GET_REVENUE_BETWEEN_DATES_BOOKING_COUNT -> handleGetRevenueBetweenDatesBookingCount(request);
                 case ORDER_CREATE_RECORD -> handleCreateRecord(request);
                 case ORDER_UPDATE_TOTAL_PRICE -> handleUpdateTotalPrice(request);
-                case MOVE_BOOKING_TO_ORDER -> handleMoveBookingToOrder(request);
+                case ORDER_MOVE_BOOKING_TO_ORDER -> handleMoveBookingToOrder(request);
                 case ORDER_RE_CALCULATE_TOTAL_PRICE -> handleReCalculateTotalPrice(request);
                 case ORDER_UPDATE_ORDER_TYPE -> handleUpdateOrderType(request);
                 default -> Response.builder()
