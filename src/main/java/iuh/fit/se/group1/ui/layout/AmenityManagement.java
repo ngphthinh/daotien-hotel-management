@@ -8,6 +8,7 @@ import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.AmenityServiceClient;
+import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.ServiceModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -17,6 +18,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
 import iuh.fit.se.group1.util.Constants;
+import iuh.fit.se.group1.util.ExportUtil;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
@@ -35,10 +37,6 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import iuh.fit.se.group1.service.ImportExcelService;
-
-import iuh.fit.se.group1.service.ExportExcelService;
 
 
 /**
@@ -106,14 +104,23 @@ public class AmenityManagement extends javax.swing.JPanel {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
 
-                ImportExcelService importService = new ImportExcelService();
-                List<AmenityDTO> imported = importService.importAmenitiesFromExcel(file);
+                ImportExportExcelServiceClient importService = socketFacade.getImportExportExcel();
 
-                if (imported != null && !imported.isEmpty()) {
+                try {
+                    Response response = importService.importAmenitiesFromExcel(file);
 
-                    try {
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                        return;
+                    }
 
-                        Response response = amenityService.getAllAmenities();
+                    List<AmenityDTO> imported = (List<AmenityDTO>) response.getData();
+
+
+                    if (imported != null && !imported.isEmpty()) {
+
+
+                        response = amenityService.getAllAmenities();
                         if (response.getCode() != 200) {
                             JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
                             return;
@@ -123,14 +130,14 @@ public class AmenityManagement extends javax.swing.JPanel {
                         List<AmenityDTO> allAmenities = (List<AmenityDTO>) response.getData();
                         allAmenities.addAll(imported);
                         loadTable(allAmenities);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+
+
+                        Message.showInfo("Thành công", "Đã import " + imported.size() + " dịch vụ từ Excel!");
+                    } else {
+                        Message.showError("Lỗi import", "Không có dữ liệu hợp lệ trong file Excel!");
                     }
-
-
-                    Message.showInfo("Thành công", "Đã import " + imported.size() + " dịch vụ từ Excel!");
-                } else {
-                    Message.showError("Lỗi import", "Không có dữ liệu hợp lệ trong file Excel!");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -479,11 +486,9 @@ public class AmenityManagement extends javax.swing.JPanel {
 
 
         try {
-            byte[] data = ExportExcelService.exportTableToExcel(
-                    tblAmenity.getTbl(),
-                    "Danh sách dịch vụ",
-                    true
-            );
+
+
+            byte[] data = ExportUtil.exportTableToExcel(tblAmenity.getTbl(), "Danh sách dịch vụ", true);
 
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Lưu file Excel");

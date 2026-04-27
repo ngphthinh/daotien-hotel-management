@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class ExportExcelService {
 
-    public static byte[] exportTableToExcel(JTable table, String sheetName, boolean excludeLastColumn) {
+    public byte[] exportTableToExcel(JTable table, String sheetName, boolean excludeLastColumn) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
@@ -79,7 +79,7 @@ public class ExportExcelService {
      * @param sheetName       Tên sheet trong Excel
      * @param defaultFileName Tên file mặc định (không bao gồm extension)
      */
-    public static void exportTableToExcel(Component parent, JTable table, String sheetName, String defaultFileName) {
+    public void exportTableToExcel(Component parent, JTable table, String sheetName, String defaultFileName) {
         try {
             // Tạo file chooser với thư mục mặc định là Desktop hoặc Documents
             JFileChooser fileChooser = new JFileChooser();
@@ -135,8 +135,8 @@ public class ExportExcelService {
      * @param defaultFileName   Tên file mặc định
      * @param excludeLastColumn true nếu muốn bỏ cột cuối (cột chức năng)
      */
-    public static void exportTableToExcel(TableActionEvent parent, JTable table, String sheetName,
-                                          String defaultFileName, boolean excludeLastColumn) {
+    public void exportTableToExcel(TableActionEvent parent, JTable table, String sheetName,
+                                   String defaultFileName, boolean excludeLastColumn) {
         try {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Lưu file Excel");
@@ -173,15 +173,15 @@ public class ExportExcelService {
     /**
      * Thực hiện xuất dữ liệu ra file Excel
      */
-    private static void exportData(JTable table, String filePath, String sheetName) throws IOException {
+    private void exportData(JTable table, String filePath, String sheetName) throws IOException {
         exportData(table, filePath, sheetName, true); // Mặc định bỏ cột cuối
     }
 
     /**
      * Thực hiện xuất dữ liệu ra file Excel với tùy chọn
      */
-    private static void exportData(JTable table, String filePath, String sheetName,
-                                   boolean excludeLastColumn) throws IOException {
+    private void exportData(JTable table, String filePath, String sheetName,
+                            boolean excludeLastColumn) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(sheetName);
 
@@ -269,7 +269,7 @@ public class ExportExcelService {
     /**
      * Tạo style cho header
      */
-    private static CellStyle createHeaderStyle(Workbook workbook) {
+    private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle headerStyle = workbook.createCellStyle();
 
         // Font
@@ -299,7 +299,7 @@ public class ExportExcelService {
     /**
      * Tạo style cho data cells
      */
-    private static CellStyle createDataStyle(Workbook workbook) {
+    private CellStyle createDataStyle(Workbook workbook) {
         CellStyle dataStyle = workbook.createCellStyle();
 
         // Borders
@@ -314,9 +314,5 @@ public class ExportExcelService {
         return dataStyle;
     }
 
-    public static void exportTableToExcel(RoomManagement parent, Table tblRoom, String sheetName,
-                                          String defaultFileName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'exportTableToExcel'");
-    }
+
 }

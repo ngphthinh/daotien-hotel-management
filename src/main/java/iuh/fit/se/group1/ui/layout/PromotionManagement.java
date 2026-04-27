@@ -5,7 +5,9 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.dto.PromotionDTO;
-import iuh.fit.se.group1.service.ImportExcelService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.service.PromotionService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
@@ -16,10 +18,9 @@ import java.awt.Cursor;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import iuh.fit.se.group1.util.Constants;
@@ -27,15 +28,14 @@ import iuh.fit.se.group1.util.Constants;
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javax.swing.JFileChooser;
 
+import iuh.fit.se.group1.util.ExportUtil;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import raven.glasspanepopup.GlassPanePopup;
-import iuh.fit.se.group1.service.ExportExcelService;
 
 /**
  * @author Windows
@@ -90,17 +90,29 @@ public class PromotionManagement extends javax.swing.JPanel {
         btnImport.addActionListener(ev -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                ImportExcelService importService = new ImportExcelService();
-                List<PromotionDTO> imported = importService.importPromotionsFromExcel(file);
-                if (imported != null && !imported.isEmpty()) {
-                    promotionService.getAllPromotions().addAll(imported);
-                    loadTable(promotionService.getAllPromotions());
-                    Message.showMessage("Thành công", "Đã import " + imported.size() + " khuyến mãi!");
-                } else {
-                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+            try {
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    ImportExportExcelServiceClient importService = SocketFacade.getInstance().getImportExportExcel();
+
+                    Response response = importService.importPromotionsFromExcel(file);
+                    if (response == null || response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(this, "Lỗi khi import file: " + (response != null ? response.getMessage() : "Không nhận được phản hồi từ server"), "Lỗi import Excel", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    List<PromotionDTO> imported = (List<PromotionDTO>) response.getData();
+                    if (imported != null && !imported.isEmpty()) {
+                        promotionService.getAllPromotions().addAll(imported);
+                        loadTable(promotionService.getAllPromotions());
+                        Message.showMessage("Thành công", "Đã import " + imported.size() + " khuyến mãi!");
+                    } else {
+                        Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                    }
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi import file: " + e.getMessage(), "Lỗi import Excel", JOptionPane.ERROR_MESSAGE);
+                return;
             }
         });
 
@@ -109,11 +121,7 @@ public class PromotionManagement extends javax.swing.JPanel {
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
             try {
-                byte[] data = ExportExcelService.exportTableToExcel(
-                        tblPromotion.getTbl(),
-                        "Danh sách khuyến mãi",
-                        true
-                );
+                byte[] data = ExportUtil.exportTableToExcel(tblPromotion.getTbl(), "Danh sách khuyến mãi", true);
 
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Lưu file Excel");

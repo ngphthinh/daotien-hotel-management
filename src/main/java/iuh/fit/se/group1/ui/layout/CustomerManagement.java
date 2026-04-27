@@ -37,9 +37,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import iuh.fit.se.group1.util.ExportUtil;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
-import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.ImportExcelService;
 
 import java.io.File;
@@ -134,11 +134,9 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnExport.setIcon(FontIcon.of(FontAwesomeSolid.FILE_EXPORT, 17, Color.WHITE), SwingConstants.RIGHT);
         btnExport.addActionListener(e -> {
             try {
-                byte[] data = ExportExcelService.exportTableToExcel(
-                        tblCustomer.getTbl(),
-                        "Danh sách khách hàng",
-                        true
-                );
+
+
+                byte[] data = ExportUtil.exportTableToExcel(tblCustomer.getTbl(), "Danh sách khách hàng", true);
 
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Lưu file Excel");

@@ -18,6 +18,7 @@ public class SocketFacade {
     private final RoleServiceClient role;
     private final DashboardServiceClient dashboard;
     private final DenominationDetailServiceClient denominationDetail;
+    private final ImportExportExcelServiceClient importExportExcel;
 
     public SocketFacade(ClientSocketManager socket) {
         this.auth = new AuthServiceClient(socket);
@@ -31,6 +32,7 @@ public class SocketFacade {
         this.role = new RoleServiceClient(socket);
         this.dashboard = new DashboardServiceClient(socket);
         this.denominationDetail = new DenominationDetailServiceClient(socket);
+        this.importExportExcel = new ImportExportExcelServiceClient(socket);
     }
 
     private static SocketFacade instance;

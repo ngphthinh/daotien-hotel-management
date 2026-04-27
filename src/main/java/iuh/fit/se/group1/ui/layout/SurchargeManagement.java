@@ -5,7 +5,6 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.dto.SurchargeDTO;
-import iuh.fit.se.group1.entity.Surcharge;
 import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.service.SurchargeService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
@@ -32,12 +31,12 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+import iuh.fit.se.group1.util.ExportUtil;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
-import iuh.fit.se.group1.service.ExportExcelService;
 
 /**
  * @author Windows
@@ -208,7 +207,7 @@ public class SurchargeManagement extends javax.swing.JPanel {
         btnExport.setBorderRadius(10);
         btnExport.addActionListener(e -> {
             try {
-                byte[] data = ExportExcelService.exportTableToExcel(
+                byte[] data = ExportUtil.exportTableToExcel(
                         tblSurchage.getTbl(),
                         "Danh sách phụ phí",
                         true

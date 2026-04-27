@@ -31,10 +31,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import iuh.fit.se.group1.util.Constants;
+import iuh.fit.se.group1.util.ExportUtil;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
-import iuh.fit.se.group1.service.ExportExcelService;
 import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 
@@ -724,7 +724,7 @@ public class RoomManagement extends javax.swing.JPanel {
         btnExport.setFont(new java.awt.Font("Segoe UI", 1, 14));
         btnExport.addActionListener(e -> {
             try {
-                byte[] data = ExportExcelService.exportTableToExcel(
+                byte[] data = ExportUtil.exportTableToExcel(
                         tblRoom.getTbl(),
                         "Danh sách phòng ",
                         true
