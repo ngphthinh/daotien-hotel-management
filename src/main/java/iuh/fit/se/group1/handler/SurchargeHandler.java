@@ -44,7 +44,7 @@ public class SurchargeHandler implements RequestHandler {
 
     private Response handleGetByName(Request request) {
         String name= (String) request.getRequest();
-        if(name==null||name.isBlank()){
+        if(name==null){
             return Response.builder()
                     .code(400)
                     .message("Surcharge name cannot be null or blank")
@@ -66,14 +66,14 @@ public class SurchargeHandler implements RequestHandler {
 
     private Response handleGetByKeywords(Request request) {
         String keyword= (String) request.getRequest();
-        if(keyword==null||keyword.isBlank()){
+        if(keyword==null){
             return Response.builder()
                     .code(400)
                     .message("Keyword cannot be null or blank")
                     .build();
         }
         List<SurchargeDTO> surcharges= surchargeService.getSurchargeByKeyword(keyword);
-        if(surcharges==null||surcharges.isEmpty()){
+        if(surcharges==null){
             return Response.builder()
                     .code(404)
                     .message("No surcharges found matching keyword: " + keyword)

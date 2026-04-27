@@ -8,6 +8,7 @@ import iuh.fit.se.group1.dto.CustomerDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.CustomerServiceClient;
+import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
@@ -40,7 +41,6 @@ import javax.swing.table.TableRowSorter;
 import iuh.fit.se.group1.util.ExportUtil;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
-import iuh.fit.se.group1.service.ImportExcelService;
 
 import java.io.File;
 
@@ -116,17 +116,30 @@ public class CustomerManagement extends javax.swing.JPanel {
         btnImport.addActionListener(ev -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                ImportExcelService importService = new ImportExcelService();
-                List<CustomerDTO> imported = importService.importCustomersFromExcel(file);
-                if (imported != null && !imported.isEmpty()) {
-                    fetchData(GET_ALL, null).addAll(imported);
-                    loadTable(fetchData(GET_ALL, null));
-                    Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
-                } else {
-                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+            try {
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    ImportExportExcelServiceClient importService = SocketFacade.getInstance().getImportExportExcel();
+
+                    Response response = importService.importCustomersFromExcel(file);
+
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + "\nMessage: " + response.getMessage(), "Lỗi import Excel", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+
+                    List<CustomerDTO> imported = (List<CustomerDTO>) response.getData();
+                    if (imported != null && !imported.isEmpty()) {
+                        fetchData(GET_ALL, null).addAll(imported);
+                        loadTable(fetchData(GET_ALL, null));
+                        Message.showMessage("Thành công", "Đã import " + imported.size() + " khách hàng!");
+                    } else {
+                        Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                    }
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi import file: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 

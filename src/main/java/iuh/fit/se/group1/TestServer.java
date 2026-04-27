@@ -6,6 +6,7 @@ import iuh.fit.se.group1.handler.*;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.SocketServer;
+import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.service.*;
 
 public class TestServer {
@@ -27,6 +28,11 @@ public class TestServer {
         RoleService roleService = new RoleService();
         DenominationDetailService denominationDetailService = new DenominationDetailService();
         DashboardService dashboardService = new DashboardService();
+
+        ImportExcelService importExcelService = new ImportExcelService();
+        ExportExcelService exportExcelService = new ExportExcelService();
+
+
         HandlerRegistry registry = new HandlerRegistry();
 
 
@@ -41,6 +47,7 @@ public class TestServer {
         EmailHandler emailHandler = new EmailHandler(emailSenderService);
         OrderDetailHandler orderDetailHandler = new OrderDetailHandler(orderDetailService);
         RoleHandler roleHandler = new RoleHandler(roleService);
+        ImportExportHandler exportHandler = new ImportExportHandler(exportExcelService, importExcelService);
         registerAuth(registry, authenticateHandler);
         registerEmployee(registry, employeeHandler);
         registerAmenity(registry, amenityHandler);
@@ -52,14 +59,25 @@ public class TestServer {
         registerRole(registry, roleHandler);
         registerDashboard(registry, dashboardHandler);
         registerDenominationDetail(registry, denominationDetailHandler);
+        registerImportExport(registry, exportHandler);
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
     }
 
+    private static void registerImportExport(HandlerRegistry registry, ImportExportHandler exportHandler) {
+        registry.register(CommandType.EXPORT_EXCEL, exportHandler);
+        registry.register(CommandType.IMPORT_SURCHARGES, exportHandler);
+        registry.register(CommandType.IMPORT_AMENITIES, exportHandler);
+        registry.register(CommandType.IMPORT_PROMOTIONS, exportHandler);
+        registry.register(CommandType.IMPORT_CUSTOMERS, exportHandler);
+        registry.register(CommandType.IMPORT_EMPLOYEES, exportHandler);
+        registry.register(CommandType.IMPORT_ROOMS, exportHandler);
+    }
+
     private static void registerDenominationDetail(HandlerRegistry registry, DenominationDetailHandler denominationDetailHandler) {
-        registry.register(CommandType.DEMOMINATION_AVAILABLE, denominationDetailHandler);
-        registry.register(CommandType.DEMOMINATION_AVAILABLE, denominationDetailHandler);
+        registry.register(CommandType.DENOMINATION_AVAILABLE, denominationDetailHandler);
+        registry.register(CommandType.DENOMINATION_DETAIL_SAVE_ALL, denominationDetailHandler);
     }
 
     private static void registerDashboard(HandlerRegistry registry, DashboardHandler dashboardHandler) {

@@ -5,7 +5,9 @@
 package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.dto.SurchargeDTO;
-import iuh.fit.se.group1.service.ImportExcelService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.service.SurchargeService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.SurchageModal;
@@ -22,10 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javax.swing.JFileChooser;
-import javax.swing.JTable;
-import javax.swing.RowFilter;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -249,17 +248,25 @@ public class SurchargeManagement extends javax.swing.JPanel {
         btnImport.addActionListener(ev -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                ImportExcelService importService = new ImportExcelService();
-                List<SurchargeDTO> imported = importService.importSurchargesFromExcel(file);
-                if (imported != null && !imported.isEmpty()) {
-                    surchargeService.getAllSurcharges().addAll(imported);
-                    loadTable(surchargeService.getAllSurcharges());
-                    Message.showMessage("Thành công", "Đã import " + imported.size() + " phụ phí!");
-                } else {
-                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+            try {
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    ImportExportExcelServiceClient importService = SocketFacade.getInstance().getImportExportExcel();
+
+                    Response response = importService.importSurchargesFromExcel(file);
+
+                    List<SurchargeDTO> imported = (List<SurchargeDTO>) response.getData();
+                    if (imported != null && !imported.isEmpty()) {
+                        surchargeService.getAllSurcharges().addAll(imported);
+                        loadTable(surchargeService.getAllSurcharges());
+                        Message.showMessage("Thành công", "Đã import " + imported.size() + " phụ phí!");
+                    } else {
+                        Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                    }
                 }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi nhập Excel", JOptionPane.ERROR_MESSAGE);
+
             }
         });
         btnAddSurchage.setIcon(FontIcon.of(FontAwesomeSolid.PLUS, 17, Color.WHITE), SwingConstants.RIGHT);

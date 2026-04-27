@@ -5,7 +5,6 @@ import iuh.fit.se.group1.dto.DenominationDetailDTO;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
-import iuh.fit.se.group1.network.client.service.AuthServiceClient;
 import iuh.fit.se.group1.service.DenominationDetailService;
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +19,7 @@ public class DenominationDetailHandler implements RequestHandler {
         CommandType commandType = request.getCommandType();
         try {
             return switch (commandType) {
-                case DEMOMINATION_AVAILABLE -> handleGetAvailableDenominations(request);
+                case DENOMINATION_AVAILABLE -> handleGetAvailableDenominations(request);
                 case DENOMINATION_DETAIL_SAVE_ALL -> handleSaveAll(request);
 
                 default -> Response.builder()

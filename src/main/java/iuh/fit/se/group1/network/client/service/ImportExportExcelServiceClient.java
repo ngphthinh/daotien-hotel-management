@@ -44,4 +44,33 @@ public class ImportExportExcelServiceClient implements ServiceClient {
                 .commandType(CommandType.IMPORT_PROMOTIONS)
                 .build()).get();
     }
+
+    public Response importCustomersFromExcel(File file) throws Exception {
+        return socket.send(Request.builder()
+                .request(ImportRequest.builder().file(file).build())
+                .commandType(CommandType.IMPORT_CUSTOMERS)
+                .build()).get();
+    }
+
+    public Response importEmployeesFromExcel(File file) throws Exception {
+        return socket.send(Request.builder()
+                .request(ImportRequest.builder().file(file).build())
+                .commandType(CommandType.IMPORT_EMPLOYEES)
+                .build()).get();
+    }
+
+
+    public Response importRoomsFromExcel(File file) throws Exception {
+        return socket.send(Request.builder()
+                .request(ImportRequest.builder().file(file).build())
+                .commandType(CommandType.IMPORT_ROOMS)
+                .build()).get();
+    }
+
+    public Response importSurchargesFromExcel(File file) throws Exception {
+        return socket.send(Request.builder()
+                .request(ImportRequest.builder().file(file).build())
+                .commandType(CommandType.IMPORT_SURCHARGES)
+                .build()).get();
+    }
 }

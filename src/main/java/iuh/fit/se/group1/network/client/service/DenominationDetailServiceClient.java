@@ -15,7 +15,7 @@ public class DenominationDetailServiceClient implements ServiceClient {
 
     public Response getAvailableDenominations() throws Exception {
         return socket.send(Request.builder()
-                .commandType(CommandType.DEMOMINATION_AVAILABLE)
+                .commandType(CommandType.DENOMINATION_AVAILABLE)
 
                 .build()).get();
     }

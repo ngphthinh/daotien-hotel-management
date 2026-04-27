@@ -3,6 +3,9 @@ package iuh.fit.se.group1.ui.layout;
 import iuh.fit.se.group1.dto.RoomTypeDTO;
 import iuh.fit.se.group1.dto.RoomViewDTO;
 import iuh.fit.se.group1.enums.RoomStatus;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.service.RoomService;
 import iuh.fit.se.group1.service.RoomTypeService;
 import iuh.fit.se.group1.ui.component.custom.Button;
@@ -35,7 +38,6 @@ import iuh.fit.se.group1.util.ExportUtil;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import raven.glasspanepopup.GlassPanePopup;
-import iuh.fit.se.group1.service.ImportExcelService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 
 public class RoomManagement extends javax.swing.JPanel {
@@ -99,17 +101,30 @@ public class RoomManagement extends javax.swing.JPanel {
         btnImport.addActionListener(ev -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                ImportExcelService importService = new ImportExcelService();
-                List<RoomViewDTO> imported = importService.importRoomsFromExcel(file);
-                if (imported != null && !imported.isEmpty()) {
-                    roomService.getAllRooms().addAll(imported);
-                    loadTable(roomService.getAllRooms());
-                    Message.showMessage("Thành công", "Đã import " + imported.size() + " phòng!");
-                } else {
-                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+            try {
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    ImportExportExcelServiceClient importService = SocketFacade.getInstance().getImportExportExcel();
+
+                    Response response = importService.importRoomsFromExcel(file);
+
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + "\nMessage: " + response.getMessage(), "Lỗi import Excel", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    List<RoomViewDTO> imported = (List<RoomViewDTO>) response.getData();
+                    if (imported != null && !imported.isEmpty()) {
+                        roomService.getAllRooms().addAll(imported);
+                        loadTable(roomService.getAllRooms());
+                        Message.showMessage("Thành công", "Đã import " + imported.size() + " phòng!");
+                    } else {
+                        Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 

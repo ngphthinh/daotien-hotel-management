@@ -11,6 +11,7 @@ import iuh.fit.se.group1.dto.RoleDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
+import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.network.client.service.RoleServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -73,7 +74,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import raven.glasspanepopup.GlassPanePopup;
 
-import iuh.fit.se.group1.service.ImportExcelService;
 
 public class EmployeeManagement extends javax.swing.JPanel {
 
@@ -139,17 +139,30 @@ public class EmployeeManagement extends javax.swing.JPanel {
         btnImport.addActionListener(ev -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                ImportExcelService importService = new ImportExcelService();
-                List<EmployeeDTO> imported = importService.importEmployeesFromExcel(file);
-                if (imported != null && !imported.isEmpty()) {
-                    fetchData(GET_ALL, "").addAll(imported);
-                    loadTable(fetchData(GET_ALL, ""));
-                    Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
-                } else {
-                    Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+            try {
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    ImportExportExcelServiceClient importService = SocketFacade.getInstance().getImportExportExcel();
+
+                    Response response = importService.importEmployeesFromExcel(file);
+
+                    if (response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + response.getMessage());
+                        return;
+                    }
+
+                    List<EmployeeDTO> imported = (List<EmployeeDTO>) response.getData();
+                    if (imported != null && !imported.isEmpty()) {
+                        fetchData(GET_ALL, "").addAll(imported);
+                        loadTable(fetchData(GET_ALL, ""));
+                        Message.showMessage("Thành công", "Đã import " + imported.size() + " nhân viên!");
+                    } else {
+                        Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
+                    }
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error importing Excel file: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+
             }
         });
 
