@@ -2,6 +2,7 @@ package iuh.fit.se.group1;
 
 import iuh.fit.se.group1.dispatcher.Dispatcher;
 import iuh.fit.se.group1.dispatcher.HandlerRegistry;
+import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.handler.*;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.network.CommandType;
@@ -23,6 +24,7 @@ public class TestServer {
         BookingService bookingService = new BookingService();
         CustomerService customerService = new CustomerService();
 
+        OrderDetailService orderDetailService = new OrderDetailService();
         HandlerRegistry registry = new HandlerRegistry();
 
 
@@ -34,7 +36,7 @@ public class TestServer {
         OrderHandler orderHandler = new OrderHandler(orderService);
 
         EmailHandler emailHandler = new EmailHandler(emailSenderService);
-
+        OrderDetailHandler orderDetailHandler = new OrderDetailHandler(orderDetailService);
         registerAuth(registry, authenticateHandler);
         registerEmployee(registry, employeeHandler);
         registerAmenity(registry, amenityHandler);
@@ -42,9 +44,18 @@ public class TestServer {
         registerEmail(registry, emailHandler);
         registerBooking(registry, bookingHandler);
         registerCustomer(registry, customerHandler);
+        registerOrderDetail(registry, orderDetailHandler);
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
+    }
+
+    private static void registerOrderDetail(HandlerRegistry registry, OrderDetailHandler orderDetailHandler) {
+        registry.register(CommandType.ORDER_DETAIL_CREATE, orderDetailHandler);
+        registry.register(CommandType.ORDER_DETAIL_GET_BY_ID, orderDetailHandler);
+        registry.register(CommandType.ORDER_DETAIL_DELETE_BY_ID, orderDetailHandler);
+        registry.register(CommandType.ORDER_DETAIL_FROM_ORDER, orderDetailHandler);
+        registry.register(CommandType.ORDER_DETAIL_UPDATE_FROM_ORDER, orderDetailHandler);
     }
 
     private static void registerCustomer(HandlerRegistry registry, CustomerHandler customerHandler) {

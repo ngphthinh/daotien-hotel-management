@@ -4,6 +4,7 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.AmenityServiceClient;
+import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -46,7 +47,7 @@ public class OrderEditDialog extends JDialog {
 
     private final OrderDTO order;
     private final OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
-    private final OrderDetailService orderDetailService = new OrderDetailService();
+    private final OrderDetailServiceClient orderDetailService = SocketFacade.getInstance().getOrderDetail();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -65,12 +66,17 @@ public class OrderEditDialog extends JDialog {
     public OrderEditDialog(Window owner, OrderDTO order) {
         super(owner, "Chỉnh sửa hóa đơn #" + (order != null ? order.getOrderId() : ""), ModalityType.APPLICATION_MODAL);
         this.order = order;
+        amenityService = SocketFacade.getInstance().getAmenity();
         initComponents();
-        loadExistingDetails();
+        try {
+            loadExistingDetails();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         setSize(1000, 700);
         setLocationRelativeTo(owner);
 
-        amenityService = SocketFacade.getInstance().getAmenity();
     }
 
     private void initComponents() {
@@ -566,12 +572,21 @@ public class OrderEditDialog extends JDialog {
     }
 
     // Data loading
-    private void loadExistingDetails() {
+    private void loadExistingDetails() throws Exception {
         if (order == null) return;
         amenityModel.setRowCount(0);
         surchargeModel.setRowCount(0);
 
-        var amenityDetails = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
+        Response response = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Order Not Found or Server Error: " + (response != null ? response.getMessage() : "No response"));
+            return;
+
+        }
+
+
+        var amenityDetails = (List<OrderDetailDTO>) response.getData();
         if (amenityDetails != null) {
             int index = 1;
             for (OrderDetailDTO d : amenityDetails) {
@@ -718,7 +733,16 @@ public class OrderEditDialog extends JDialog {
                 Long orderId = order.getOrderId();
 
                 // Get existing amenities for comparison
-                var existingAmenities = orderDetailService.getOrderDetailsByOrderId(orderId);
+
+                Response response = orderDetailService.getOrderDetailsByOrderId(orderId);
+                if (response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                    return;
+
+                }
+
+                //noinspection unchecked
+                List<OrderDetailDTO> existingAmenities = (List<OrderDetailDTO>) response.getData();
                 List<OrderDetailDTO> newDetails = new ArrayList<>();
 
                 for (int i = 0; i < amenityModel.getRowCount(); i++) {
@@ -736,10 +760,16 @@ public class OrderEditDialog extends JDialog {
 
                     if (existing != null) {
                         // Update existing
-                        orderDetailService.updateOrderDetailFormOrderId(existing.getAmenity().getAmenityId(), newDetail.getUnitPrice(), newDetail.getQuantity(), orderId);
+                        response = orderDetailService.updateOrderDetailFormOrderId(existing.getAmenity().getAmenityId(), newDetail.getUnitPrice(), newDetail.getQuantity(), orderId);
+                        if (response.getCode() != 200) {
+                            JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                        }
                     } else {
                         // Insert new
-                        orderDetailService.save(newDetail, orderId);
+                        response = orderDetailService.save(newDetail, orderId);
+                        if (response.getCode() != 200) {
+                            JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                        }
                     }
                 }
 
@@ -786,7 +816,7 @@ public class OrderEditDialog extends JDialog {
                 }
 
                 // Recalculate and update order total price
-                Response response = orderService.recalculateOrderTotal(orderId);
+                response = orderService.recalculateOrderTotal(orderId);
 
                 if (response.getCode() != 200) {
                     JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật tổng giá: " + response.getMessage());

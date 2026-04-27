@@ -17,7 +17,6 @@ public class Dispatcher {
         System.out.println("Dispatching command: " + req.getCommandType());
 
         if (handler == null) {
-//            return new Response(400, null, "Unknown action");
             return Response.builder()
                     .data(null)
                     .code(400)

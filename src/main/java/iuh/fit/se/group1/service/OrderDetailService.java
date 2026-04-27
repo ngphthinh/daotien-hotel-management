@@ -5,7 +5,6 @@ import iuh.fit.se.group1.entity.Amenity;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.OrderDetail;
 import iuh.fit.se.group1.mapper.OrderDetailMapper;
-import iuh.fit.se.group1.repository.interfaces.OrderRepository;
 import iuh.fit.se.group1.repository.jpa.OrderDetailRepositoryImpl;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;

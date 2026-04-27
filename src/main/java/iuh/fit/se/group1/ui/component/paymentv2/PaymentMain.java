@@ -10,6 +10,7 @@ import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.BookingServiceClient;
+import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
@@ -934,7 +935,7 @@ public class PaymentMain extends javax.swing.JPanel {
                     String responseCheck = paymentService.queryPayment(orderId);
                     String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
                     String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
-                    if ("0" .equals(responseCodeCheck)) {
+                    if ("0".equals(responseCodeCheck)) {
                         CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS, 380, 200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
@@ -1305,7 +1306,7 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
 
-    public void setOrder(Long orderId, OrderServiceClient orderService, OrderDetailService orderDetailService,
+    public void setOrder(Long orderId, OrderServiceClient orderService, OrderDetailServiceClient orderDetailService,
                          SurchargeDetailService surchargeDetailService) throws Exception {
         this.orderService = orderService;
 
@@ -1327,7 +1328,13 @@ public class PaymentMain extends javax.swing.JPanel {
                 order.getTotalAmount());
         setupCustomer(order.getCustomer());
 
-        List<AmenityDTO> amenityDTOS = orderDetailService.getOrderDetailsByOrderId(orderId).stream()
+        response = orderDetailService.getOrderDetailsByOrderId(orderId);
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Failed to fetch order details: " + response.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        List<OrderDetailDTO> orderDetailDTOS = (List<OrderDetailDTO>) response.getData();
+        List<AmenityDTO> amenityDTOS = orderDetailDTOS.stream()
                 .filter(od -> od.getAmenity() != null)
                 .map(od -> {
                     AmenityDTO amenity = od.getAmenity();

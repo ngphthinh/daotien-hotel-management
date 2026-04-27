@@ -8,8 +8,8 @@ import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.OrderDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
-import iuh.fit.se.group1.service.OrderDetailService;
 import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
 
     private final OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
-    private final OrderDetailService orderDetailService = new OrderDetailService();
+    private final OrderDetailServiceClient orderDetailService = SocketFacade.getInstance().getOrderDetail();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private PaymentMain paymentMain;
     @Getter
@@ -172,16 +172,16 @@ public class PaymentPagev2 extends javax.swing.JPanel {
     private void loadDataTable() {
         tbl.clearData();
         try {
-               Response response = orderService.getUnpaidOrders();
-               if (response.getCode() != 200) {
-                   JOptionPane.showMessageDialog(this, response.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                   return;
-               }
+            Response response = orderService.getUnpaidOrders();
+            if (response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, response.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-               for (OrderDTO order : (java.util.List<OrderDTO>) response.getData()) {
-                   displayOrderOnTable(order);
-               }
-        }catch (Exception ex) {
+            for (OrderDTO order : (java.util.List<OrderDTO>) response.getData()) {
+                displayOrderOnTable(order);
+            }
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi tải dữ liệu hóa đơn: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

@@ -5,6 +5,7 @@ import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.BookingServiceClient;
 import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
+import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
@@ -36,7 +37,7 @@ public class InvoicePanel extends JPanel {
     private OrderDTO order;
     // services to load details
     private final BookingServiceClient bookingService = SocketFacade.getInstance().getBooking();
-    private final OrderDetailService orderDetailService = new OrderDetailService();
+    private final OrderDetailServiceClient orderDetailService = SocketFacade.getInstance().getOrderDetail();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private final PromotionService promotionService = new PromotionService();
     // Header components
@@ -690,12 +691,21 @@ public class InvoicePanel extends JPanel {
         }
     }
 
-    private void updateAmenities() {
+    private void updateAmenities() throws Exception {
         amenityModel.setRowCount(0);
         if (order == null || order.getOrderId() == null)
             return;
 
-        List<OrderDetailDTO> details = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
+        Response response = orderDetailService.getOrderDetailsByOrderId(order.getOrderId());
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Không thể tải chi tiết dịch vụ: " + (response != null ? response.getMessage() : "No response"),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //noinspection unchecked
+        List<OrderDetailDTO> details = (List<OrderDetailDTO>) response.getData();
         if (details != null) {
             for (OrderDetailDTO d : details) {
                 BigDecimal unitPrice = d.getUnitPrice() != null ? d.getUnitPrice() : BigDecimal.ZERO;
