@@ -19,7 +19,7 @@ public class SurchargeDetailService extends Service {
         this.surchargeDetailMapper = new SurchargeDetailMapper();
     }
 
-    public SurchargeDetailDTO save(SurchargeDetailDTO surchargeDetailDTO, Long orderId) {
+    public SurchargeDetailDTO save(SurchargeDetailDTO surchargeDetailDTO, long orderId) {
 
 //        boolean exists = surchargeDetailRepositoryImpl.existsBySurchargeIdAndOrderId(surchargeDetail.getSurcharge().getSurchargeId(), orderId);
 
@@ -39,13 +39,13 @@ public class SurchargeDetailService extends Service {
 
     }
 
-    public List<SurchargeDetailDTO> getSurchargeDetailsByOrderId(Long orderId) {
+    public List<SurchargeDetailDTO> getSurchargeDetailsByOrderId(long orderId) {
 //        return surchargeDetailRepositoryImpl.findSurchargeDetailsByOrderId(orderId);
         return doInTransaction(entityManager -> surchargeDetailRepositoryImpl.findSurchargeDetailsByOrderId(entityManager, orderId)).stream().map(surchargeDetailMapper::toDTO)
                 .toList();
     }
 
-    public void saveWithOrderId(Long orderId, List<SurchargeDetailDTO> surchargesToSaveDtos) {
+    public void saveWithOrderId(long orderId, List<SurchargeDetailDTO> surchargesToSaveDtos) {
 //        for (SurchargeDetail surchargeDetail : surchargesToSave) {
 //            if (!surchargeDetailRepositoryImpl.existsBySurchargeIdAndOrderId(surchargeDetail.getSurcharge().getSurchargeId(), orderId)) {
 //                surchargeDetailRepositoryImpl.save(surchargeDetail, orderId);
@@ -68,28 +68,28 @@ public class SurchargeDetailService extends Service {
         });
     }
 
-    public void deleteByOrderId(Long orderId) {
+    public void deleteByOrderId(long orderId) {
 //        surchargeDetailRepositoryImpl.deleteByOrderId(orderId);
         doInTransactionVoid(entityManager -> surchargeDetailRepositoryImpl.deleteByOrderId(entityManager, orderId));
     }
 
-    public boolean saveByOrderId(Long orderId, List<SurchargeDetailDTO> surchargeDetailsDtos) {
+    public boolean saveByOrderId(long orderId, List<SurchargeDetailDTO> surchargeDetailsDtos) {
         List<SurchargeDetail> surchargeDetails = surchargeDetailsDtos.stream().map(surchargeDetailMapper::toSurchargeDetail).toList();
 //        return surchargeDetailRepositoryImpl.saveByOrderId(orderId, surchargeDetails);
         return doInTransaction(entityManager -> surchargeDetailRepositoryImpl.saveByOrderId(entityManager, orderId, surchargeDetails));
     }
 
-    public void deleteById(long surchargeId, Long orderId) {
+    public void deleteById(long surchargeId, long orderId) {
 //        surchargeDetailRepositoryImpl.deleteById(surchargeId, orderId);
         doInTransactionVoid(entityManager -> surchargeDetailRepositoryImpl.deleteById(entityManager, surchargeId, orderId));
     }
 
-    public void deleteById(Long orderId) {
+    public void deleteById(long orderId) {
 //        surchargeDetailRepositoryImpl.deleteById(orderId);
         doInTransactionVoid(entityManager -> surchargeDetailRepositoryImpl.deleteById(entityManager, orderId));
     }
 
-    public void updateSurchargeDetail(Long surchargeId, int quantity, Long orderId) {
+    public void updateSurchargeDetail(long surchargeId, int quantity,long orderId) {
 //        surchargeDetailRepositoryImpl.updateSurchargeDetail(surchargeId, quantity, orderId);
         doInTransactionVoid(entityManager -> surchargeDetailRepositoryImpl.updateSurchargeDetail(entityManager, surchargeId, quantity, orderId));
 
