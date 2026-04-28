@@ -11,11 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
-/**
- * Handler for Amenity-related requests
- * Processes commands: GET_BY_ID, GET_BY_ALL, GET_BY_KEYWORDS, CREATE, UPDATE, DELETE
- */
 @RequiredArgsConstructor
 public class AmenityHandler implements RequestHandler {
     private static final Logger log = LoggerFactory.getLogger(AmenityHandler.class);
@@ -136,7 +131,7 @@ public class AmenityHandler implements RequestHandler {
             }
             
             return Response.builder()
-                    .code(201)
+                    .code(200)
                     .message("Amenity created successfully")
                     .data(created)
                     .build();

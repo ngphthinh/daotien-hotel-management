@@ -103,11 +103,12 @@ public class PromotionHandler implements RequestHandler {
                     .message("Promotion not found with ID: " + promotionDTO.getPromotionId())
                     .build();
         }
-        return Response.builder()
+        Response response = Response.builder()
                 .code(200)
                 .message("Promotion updated successfully")
                 .data(updatedPromotion)
                 .build();
+        return response;
     }
 
     private Response handleDelete(Request request) {
@@ -120,10 +121,13 @@ public class PromotionHandler implements RequestHandler {
         }
         try{
             promotionService.deletePromotion(promotionId);
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Promotion deleted successfully")
                     .build();
+
+            return response;
         } catch (Exception e) {
             log.error("Error deleting promotion with ID: {}", promotionId, e);
             return Response.builder()
@@ -150,11 +154,14 @@ public class PromotionHandler implements RequestHandler {
                         .message("Failed to create promotion")
                         .build();
             }
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Promotion created successfully")
                     .data(createdPromotion)
                     .build();
+
+            return response;
         } catch (Exception e) {
             log.error("Error creating promotion: {}", promotionDTO, e);
             return Response.builder()

@@ -19,7 +19,6 @@ import javax.swing.*;
 import iuh.fit.se.group1.dto.AccountDTO;
 import iuh.fit.se.group1.dto.EmailRequest;
 import iuh.fit.se.group1.dto.EmployeeDTO;
-import iuh.fit.se.group1.network.client.ClientSocketManager;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.ui.component.modal.SendResetCodeModal;
@@ -581,11 +580,13 @@ public class Login extends javax.swing.JFrame {
 
     private void performLogout() {
         // Call logout on server
-        if (currentLoginUsername != null && !currentLoginUsername.isEmpty()) {
+        String username = currentLoginUsername;
+
+        if (username != null && !username.isEmpty()) {
             new Thread(() -> {
                 try {
-                    socketFacade.getAuth().logout(currentLoginUsername);
-                    log.info("User '{}' logged out", currentLoginUsername);
+                    log.info("User '{}' logged out", username);
+                    socketFacade.getAuth().logout(username);
                 } catch (IOException e) {
                     log.error("Error calling logout API", e);
                 } catch (Exception e) {
@@ -595,6 +596,7 @@ public class Login extends javax.swing.JFrame {
         }
 
         currentLoginUsername = null;
+
         signIn = false;
         clearLogin();
         animatorBody.start();
@@ -619,7 +621,7 @@ public class Login extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus" .equals(info.getName())) {
+                if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

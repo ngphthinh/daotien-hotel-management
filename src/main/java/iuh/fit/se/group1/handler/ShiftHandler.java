@@ -109,7 +109,7 @@ public class ShiftHandler implements RequestHandler {
                         .build();
             }
             return Response.builder()
-                .code(201)
+                .code(200)
                 .message("Shift created successfully")
                 .data(createdShift)
                 .build();

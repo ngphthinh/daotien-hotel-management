@@ -5,11 +5,9 @@ import iuh.fit.se.group1.dto.CustomerDTO;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
-import iuh.fit.se.group1.repository.interfaces.CustomerRepository;
 import iuh.fit.se.group1.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 
-import java.lang.ref.ReferenceQueue;
 
 @RequiredArgsConstructor
 public class CustomerHandler implements RequestHandler {
@@ -63,20 +61,29 @@ public class CustomerHandler implements RequestHandler {
 
     private Response handleDelete(Request request) {
         Long customerId = (Long) request.getRequest();
-        return Response.builder()
+        Response response = Response.builder()
                 .code(200)
                 .message("Customer with ID " + customerId + " deleted")
-                .data(customerService.deleteCustomer(customerId))
                 .build();
+
+
+
+        return response;
     }
 
     private Response handleUpdate(Request request) {
         CustomerDTO customerDTO = (CustomerDTO) request.getRequest();
-        return Response.builder()
+        CustomerDTO updated = customerService.updateCustomer(customerDTO);
+
+        Response response = Response.builder()
                 .code(200)
                 .message("Customer with ID " + customerDTO.getCustomerId() + " updated")
-                .data(customerService.updateCustomer(customerDTO))
+                .data(updated)
                 .build();
+
+
+
+        return response;
     }
 
     private Response handleGetAll(Request request) {
@@ -99,10 +106,14 @@ public class CustomerHandler implements RequestHandler {
 
     private Response handleCreate(Request request) {
         CustomerDTO customerDTO = (CustomerDTO) request.getRequest();
-        return Response.builder()
+        CustomerDTO created = customerService.createCustomer(customerDTO);
+
+        Response response = Response.builder()
                 .code(200)
                 .message("Customer created successfully")
-                .data(customerService.createCustomer(customerDTO))
+                .data(created)
                 .build();
+
+        return response;
     }
 }

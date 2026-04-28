@@ -260,7 +260,7 @@ public class EmployeeShiftHandler implements RequestHandler {
                         .build();
             }
             return Response.builder()
-                    .code(201)
+                    .code(200)
                     .message("Employee shift created successfully")
                     .data(createdEmployeeShift)
                     .build();

@@ -4,7 +4,6 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.*;
-import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
@@ -45,7 +44,7 @@ public class OrderEditDialog extends JDialog {
     private final OrderDTO order;
     private final OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
     private final OrderDetailServiceClient orderDetailService = SocketFacade.getInstance().getOrderDetail();
-    private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
+    private final SurchargeDetailServiceClient surchargeDetailService = SocketFacade.getInstance().getSurchargeDetail();
 
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private final AmenityServiceClient amenityService;
@@ -600,7 +599,13 @@ public class OrderEditDialog extends JDialog {
             }
         }
 
-        var surchargeDetails = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
+        response = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Surcharge details not found or Server Error: " + (response != null ? response.getMessage() : "No response"));
+            return;
+        }
+
+        List<SurchargeDetailDTO> surchargeDetails = (List<SurchargeDetailDTO>) response.getData();
         if (surchargeDetails != null) {
             int index = 1;
             for (SurchargeDetailDTO s : surchargeDetails) {
@@ -792,8 +797,14 @@ public class OrderEditDialog extends JDialog {
                     }
                 }
 
+                response = surchargeDetailService.getSurchargeDetailsByOrderId(orderId);
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                    return;
+                }
+
                 // Similar logic for surcharges
-                var existingSurcharges = surchargeDetailService.getSurchargeDetailsByOrderId(orderId);
+                List<SurchargeDetailDTO> existingSurcharges = (List<SurchargeDetailDTO>) response.getData();
                 List<SurchargeDetailDTO> newSurcharges = new ArrayList<>();
 
                 for (int i = 0; i < surchargeModel.getRowCount(); i++) {
@@ -810,9 +821,21 @@ public class OrderEditDialog extends JDialog {
                             .orElse(null);
 
                     if (existing != null) {
-                        surchargeDetailService.updateSurchargeDetail(existing.getSurcharge().getSurchargeId(), newSurcharge.getQuantity(), orderId);
+                        Response responseUpdate = surchargeDetailService.updateSurchargeDetail(existing.getSurcharge().getSurchargeId(), newSurcharge.getQuantity(), orderId);
+                        if (responseUpdate == null || responseUpdate.getCode() != 200) {
+                            JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + responseUpdate.getCode() + ": " + responseUpdate.getMessage());
+                            return;
+                        }
                     } else {
-                        surchargeDetailService.save(newSurcharge, orderId);
+                        Response responseCreate = surchargeDetailService.save(newSurcharge, orderId);
+
+                        if (responseCreate == null || responseCreate.getCode() != 200) {
+
+                            JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + responseCreate.getCode() + ": " + responseCreate.getMessage());
+                            return;
+                        }
+
+
                     }
                 }
 
@@ -821,7 +844,13 @@ public class OrderEditDialog extends JDialog {
                     boolean stillExists = newSurcharges.stream()
                             .anyMatch(ns -> ns.getSurcharge().getSurchargeId().equals(existing.getSurcharge().getSurchargeId()));
                     if (!stillExists) {
-                        surchargeDetailService.deleteById(existing.getSurcharge().getSurchargeId(), orderId);
+                        Response responseDelete = surchargeDetailService.deleteById(existing.getSurcharge().getSurchargeId(), orderId);
+
+                        if (responseDelete == null || responseDelete.getCode() != 200) {
+                            JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + responseDelete.getCode() + ": " + responseDelete.getMessage());
+                            return;
+                        }
+
                     }
                 }
 

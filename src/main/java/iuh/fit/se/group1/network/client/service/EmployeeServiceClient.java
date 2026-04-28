@@ -46,7 +46,10 @@ public class EmployeeServiceClient implements ServiceClient {
     }
 
     public Response getEmployeeByCitizenId(String citizenId) throws IOException, ExecutionException, InterruptedException, TimeoutException {
-        return null;
+        return socket.send(Request.builder()
+                .commandType(CommandType.EMPLOYEE_GET_BY_CITIZEN_ID)
+                .request(citizenId)
+                .build()).get(30, TimeUnit.SECONDS);
     }
 
     public Response getEmployeesByRoleId(String roleId) throws IOException, ExecutionException, InterruptedException, TimeoutException {

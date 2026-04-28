@@ -5,7 +5,6 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
-import iuh.fit.se.group1.repository.interfaces.RoomRepository;
 import iuh.fit.se.group1.service.RoomService;
 import lombok.RequiredArgsConstructor;
 
@@ -158,9 +157,11 @@ public class RoomHandler implements RequestHandler {
 
             var res = roomService.updateRoom(req);
 
-            return Response.builder().code(200)
+            Response response = Response.builder().code(200)
                     .message("Update room successfully")
                     .data(res).build();
+
+            return response;
 
         } catch (Exception e) {
             return Response.builder().code(500)
@@ -174,10 +175,13 @@ public class RoomHandler implements RequestHandler {
 
             roomService.deleteRoom(roomId);
 
-            return Response.builder()
+            Response response = Response.builder()
                     .code(200)
                     .message("Delete room successfully")
                     .build();
+
+
+            return response;
 
         } catch (Exception e) {
             return Response.builder().code(500)

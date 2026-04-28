@@ -486,10 +486,10 @@ public class EmployeeManagement extends javax.swing.JPanel {
             public void insertUpdate(DocumentEvent e) {
                 String text = headerCustom2.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(fetchData(GET_ALL, ""));
+                    loadTable(fetchData(GET_BY_KEYWORD, ""));
                     return;
                 }
-                loadTable(fetchData(GET_ALL, text));
+                loadTable(fetchData(GET_BY_KEYWORD, text));
             }
 
             @Override
@@ -986,7 +986,7 @@ public class EmployeeManagement extends javax.swing.JPanel {
                 }
 
                 Response response = employeeService.createEmployee(employee, roleId);
-                if (response.getCode() != 201) {
+                if (response.getCode() != 200) {
                     JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
                     return false;
                 }
@@ -1133,11 +1133,6 @@ public class EmployeeManagement extends javax.swing.JPanel {
             // Kiểm tra CCCD có tồn tại không
 
             Response response = SocketFacade.getInstance().getEmployee().getEmployeeByCitizenId(citizenId);
-
-            if (response.getCode() != 200) {
-                JOptionPane.showMessageDialog(modal, "Lỗi kiểm tra CCCD: " + response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return new Valid(name, false, gender, phone, citizenId, email, null);
-            }
 
             EmployeeDTO existingEmployee = (EmployeeDTO) response.getData();
             if (existingEmployee != null) {

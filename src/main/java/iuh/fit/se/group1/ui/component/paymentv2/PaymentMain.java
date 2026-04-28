@@ -10,7 +10,6 @@ import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.*;
-import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.SurchargeManagementPanel;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -42,7 +41,7 @@ public class PaymentMain extends javax.swing.JPanel {
     private EmployeeDTO currentEmployee;
     private OrderServiceClient orderService;
     private OrderDTO currentOrder = null;
-    private JaspersoftExportServiceClient jaspersoftExportService = SocketFacade.getInstance().getJaspersoftExport();
+    private final JaspersoftExportServiceClient jaspersoftExportService = SocketFacade.getInstance().getJaspersoftExport();
     private final PromotionServiceClient promotionService = SocketFacade.getInstance().getPromotion();
     private static final String OUTPUT_DIR = getJarDirectory() + File.separator + "hoadon";
     private static final String PAYMENT_SUCCESS = "0";
@@ -77,8 +76,8 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
     private static final String SURCHARGE_CHECKOUT = "Phụ thu trả phòng trễ";
-    private SurchargeServiceClient surchargeService = SocketFacade.getInstance().getSurcharge();
-    private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
+    private final SurchargeServiceClient surchargeService = SocketFacade.getInstance().getSurcharge();
+    private final SurchargeDetailServiceClient surchargeDetailService = SocketFacade.getInstance().getSurchargeDetail();
     private static final long SURCHARGE_HOLIDAY = 50_000;
     private static final Logger log = LoggerFactory.getLogger(PaymentMain.class);
     private PromotionDTO promotion = null;
@@ -891,7 +890,18 @@ public class PaymentMain extends javax.swing.JPanel {
             surchargesToSave.add(surchargeDetail);
         }
 
-        surchargeDetailService.saveWithOrderId(orderId, surchargesToSave);
+        Response response = null;
+        try {
+            response = surchargeDetailService.saveWithOrderId(orderId, surchargesToSave);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi lưu phụ phí. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+
+        }
 
     }
 
@@ -1057,7 +1067,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
         Response response = orderService.createOrderRecord(newOrderRecord);
 
-        if (response.getCode() != 201) {
+        if (response.getCode() != 200) {
             JOptionPane.showMessageDialog(this,
                     "Lỗi khi tạo đơn mới cho phần còn lại của phòng. Vui lòng thử lại.",
                     "Lỗi",
@@ -1078,7 +1088,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
         // Move booking rows in DB to the new order id
         response = orderService.moveBookingsToOrder(createdOrder.getOrderId(), bookingIdsToMove);
-        if (response.getCode() != 201) {
+        if (response.getCode() != 200) {
             JOptionPane.showMessageDialog(this,
                     "Lỗi khi chuyển booking sang đơn mới. Vui lòng thử lại.",
                     "Lỗi",
@@ -1108,7 +1118,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
 
         response = orderService.updateOrderTotalAmount(createdOrder.getOrderId(), totalRemainingRooms);
-        if (response.getCode() != 201) {
+        if (response.getCode() != 200) {
             JOptionPane.showMessageDialog(this,
                     "Lỗi khi tạo đơn mới cho phần còn lại của phòng. Vui lòng thử lại.",
                     "Lỗi",
@@ -1133,7 +1143,7 @@ public class PaymentMain extends javax.swing.JPanel {
         // Refresh currentOrder from DB to ensure consistent state (optional)
 
         response = orderService.getOrderById(currentOrder.getOrderId());
-        if (response.getCode() != 201 || response == null) {
+        if (response == null ||response.getCode() != 200 ) {
             JOptionPane.showMessageDialog(this,
                     "Lỗi khi tải lại đơn hàng sau khi cập nhật. Vui lòng thử lại.",
                     "Lỗi",
@@ -1370,7 +1380,7 @@ public class PaymentMain extends javax.swing.JPanel {
 
 
     public void setOrder(Long orderId, OrderServiceClient orderService, OrderDetailServiceClient orderDetailService,
-                         SurchargeDetailService surchargeDetailService) throws Exception {
+                         SurchargeDetailServiceClient surchargeDetailService) throws Exception {
         this.orderService = orderService;
 
         Response response = orderService.getOrderById(orderId);
@@ -1411,7 +1421,17 @@ public class PaymentMain extends javax.swing.JPanel {
                 })
                 .toList();
         setAmenity(amenityDTOS);
-        List<SurchargeDTO> surchargeDTOS = surchargeDetailService.getSurchargeDetailsByOrderId(orderId).stream()
+
+        response = orderDetailService.getOrderDetailsByOrderId(orderId);
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Failed to fetch order details: " + response.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        List<SurchargeDetailDTO> surchargeDetailDTOS = (List<SurchargeDetailDTO>) response.getData();
+
+        List<SurchargeDTO> surchargeDTOS = surchargeDetailDTOS.stream()
                 .map(e -> {
                     SurchargeDTO surcharge = e.getSurcharge();
                     SurchargeDTO dto = new SurchargeDTO();

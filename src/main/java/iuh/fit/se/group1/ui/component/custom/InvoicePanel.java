@@ -3,10 +3,7 @@ package iuh.fit.se.group1.ui.component.custom;
 import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
-import iuh.fit.se.group1.network.client.service.BookingServiceClient;
-import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
-import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
-import iuh.fit.se.group1.network.client.service.PromotionServiceClient;
+import iuh.fit.se.group1.network.client.service.*;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
@@ -39,7 +36,7 @@ public class InvoicePanel extends JPanel {
     // services to load details
     private final BookingServiceClient bookingService = SocketFacade.getInstance().getBooking();
     private final OrderDetailServiceClient orderDetailService = SocketFacade.getInstance().getOrderDetail();
-    private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
+    private final SurchargeDetailServiceClient surchargeDetailService = SocketFacade.getInstance().getSurchargeDetail();
     private final PromotionServiceClient promotionService = SocketFacade.getInstance().getPromotion();
     // Header components
     private JLabel lblInvoiceTitle;
@@ -763,7 +760,19 @@ public class InvoicePanel extends JPanel {
         if (order == null || order.getOrderId() == null)
             return;
 
-        List<SurchargeDetailDTO> details = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
+        Response response = null;
+        try {
+            response = surchargeDetailService.getSurchargeDetailsByOrderId(order.getOrderId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Không thể tải chi tiết phụ phí: " + (response != null ? response.getMessage() : "No response"),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        List<SurchargeDetailDTO> details = (List<SurchargeDetailDTO>) response.getData();
         if (details != null) {
             for (SurchargeDetailDTO d : details) {
                 BigDecimal unitPrice = d.getSurcharge() != null && d.getSurcharge().getPrice() != null

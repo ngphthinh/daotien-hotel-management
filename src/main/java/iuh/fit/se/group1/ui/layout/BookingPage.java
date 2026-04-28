@@ -9,8 +9,8 @@ import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
 import iuh.fit.se.group1.network.client.service.RoomServiceClient;
+import iuh.fit.se.group1.network.client.service.SurchargeDetailServiceClient;
 import iuh.fit.se.group1.network.client.service.SurchargeServiceClient;
-import iuh.fit.se.group1.service.SurchargeDetailService;
 import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow2;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow3;
@@ -37,7 +37,7 @@ import java.util.function.Consumer;
  */
 public class BookingPage extends javax.swing.JPanel {
 
-    private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
+    private final SurchargeDetailServiceClient surchargeDetailService = SocketFacade.getInstance().getSurchargeDetail();
     private List<RoomSelection> selectedRooms;
     private final SurchargeServiceClient surchargeService = SocketFacade.getInstance().getSurcharge();
     @Setter

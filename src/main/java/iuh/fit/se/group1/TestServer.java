@@ -41,6 +41,7 @@ public class TestServer {
         RoomToolsService roomToolsService = new RoomToolsService();
         EmployeeShiftService employeeShiftService = new EmployeeShiftService();
         PaymentService paymentService = new PaymentService();
+        SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
 
         RoomService roomService = new RoomService();
@@ -67,6 +68,7 @@ public class TestServer {
         JaspersoftExportHandler jaspersoftExportHandler = new JaspersoftExportHandler(jaspersoftExportService);
         RoomToolsHandler roomToolsHandler = new RoomToolsHandler(roomToolsService);
         EmployeeShiftHandler employeeShiftHandler = new EmployeeShiftHandler(employeeShiftService);
+        SurchargeDetailHandler surchargeDetailHandler = new SurchargeDetailHandler(surchargeDetailService);
 
         PaymentHandler paymentHandler = new PaymentHandler(paymentService);
         RoomHandler roomHandler = new RoomHandler(roomService);
@@ -95,10 +97,19 @@ public class TestServer {
         registerRoom(registry, roomHandler);
         registerEmployeeShift(registry, employeeShiftHandler);
         registerPayment(registry, paymentHandler);
+        registerSurchargeDetail(registry, surchargeDetailHandler);
 
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
+    }
+
+    private static void registerSurchargeDetail(HandlerRegistry registry, SurchargeDetailHandler surchargeDetailHandler) {
+        registry.register(CommandType.SURCHARGE_DETAIL_GET_BY_ORDER, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_CREATE, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_UPDATE, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_DELETE, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_CREATE_LIST, surchargeDetailHandler);
     }
 
     private static void registerPayment(HandlerRegistry registry, PaymentHandler paymentHandler) {

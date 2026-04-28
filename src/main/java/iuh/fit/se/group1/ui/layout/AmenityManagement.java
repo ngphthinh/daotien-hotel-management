@@ -418,7 +418,7 @@ public class AmenityManagement extends javax.swing.JPanel {
                         .build());
 
 
-                if (response.getCode() != 201) {
+                if (response.getCode() != 200) {
                     JOptionPane.showMessageDialog(this, response.getMessage(), "Lỗi thêm dịch vụ", JOptionPane.ERROR_MESSAGE);
                     return;
                 }

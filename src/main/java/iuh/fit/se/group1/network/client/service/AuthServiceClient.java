@@ -6,9 +6,11 @@ import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.ClientSocketManager;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class AuthServiceClient implements ServiceClient {
 
     private final ClientSocketManager socket;

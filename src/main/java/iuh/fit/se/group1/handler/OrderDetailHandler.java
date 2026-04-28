@@ -8,10 +8,7 @@ import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.service.OrderDetailService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
-import javax.swing.*;
 
 @RequiredArgsConstructor
 public class OrderDetailHandler implements RequestHandler {
@@ -53,10 +50,12 @@ public class OrderDetailHandler implements RequestHandler {
                     req.getOrderId()
             );
 
-            return Response.builder()
+            Response response = Response.builder()
                     .code(200)
                     .message("Order Detail updated successfully")
                     .build();
+
+            return response;
 
         } catch (Exception e) {
             return Response.builder()
@@ -90,10 +89,12 @@ public class OrderDetailHandler implements RequestHandler {
 
             orderDetailService.deleteById(req.getAmenityId(), req.getOrderId());
 
-            return Response.builder()
+            Response response = Response.builder()
                     .code(200)
                     .message("Order has been deleted")
                     .build();
+
+            return response;
 
         } catch (Exception e) {
             return Response.builder()
@@ -126,11 +127,15 @@ public class OrderDetailHandler implements RequestHandler {
         try {
             OrderDetailCreateRequest data = (OrderDetailCreateRequest) request.getRequest();
 
-            return Response.builder()
-                    .data(orderDetailService.save(data.getOrderDetail(), data.getOrderId()))
+            var createdDetail = orderDetailService.save(data.getOrderDetail(), data.getOrderId());
+
+            Response response = Response.builder()
+                    .data(createdDetail)
                     .message("Order detail created successfully")
                     .code(200)
                     .build();
+
+            return response;
 
         } catch (Exception e) {
             return Response.builder()

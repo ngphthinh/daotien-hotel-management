@@ -150,7 +150,7 @@ public class OrderHandler implements RequestHandler {
 
         OrderDTO orderDTO = orderService.createOrderRecord((OrderDTO) request.getRequest());
         return Response.builder()
-                .code(201)
+                .code(200)
                 .message("Order record created successfully")
                 .data(orderDTO)
                 .build();
@@ -356,11 +356,13 @@ public class OrderHandler implements RequestHandler {
                         .build();
             }
 
-            return Response.builder()
+            Response response = Response.builder()
                     .code(200)
                     .message("Order created successfully")
                     .data(created)
                     .build();
+
+            return response;
         } catch (Exception e) {
             return Response.builder()
                     .code(400)
@@ -416,10 +418,12 @@ public class OrderHandler implements RequestHandler {
 
         try {
             orderService.updateOrderDeposit(orderId, deposit);
-            return Response.builder()
+
+            Response response = Response.builder()
                     .code(200)
                     .message("Order deposit updated successfully")
                     .build();
+            return response;
         } catch (Exception e) {
             return Response.builder()
                     .code(400)

@@ -22,8 +22,8 @@ public class SurchargeHandler implements RequestHandler {
         CommandType commandType = request.getCommandType();
         try {
             return switch (commandType) {
-                case SURCHARGE_GET_BY_ID -> handleGetById(request);
                 case SURCHARGE_GET_ALL -> handleGetAll();
+                case SURCHARGE_GET_BY_ID -> handleGetById(request);
                 case SURCHARGE_CREATE -> handleCreate(request);
                 case SURCHARGE_UPDATE -> handleUpdate(request);
                 case SURCHARGE_DELETE -> handleDelete(request);
@@ -97,10 +97,15 @@ public class SurchargeHandler implements RequestHandler {
         }
         try {
             surchargeService.deleteSurcharge(surchargeId);
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Surcharge deleted successfully")
                     .build();
+
+
+
+            return response;
         } catch (Exception e) {
             log.error("Error deleting surcharge with ID: {}", surchargeId, e);
             return Response.builder()
@@ -119,12 +124,18 @@ public class SurchargeHandler implements RequestHandler {
                     .build();
         }
         try {
-
-            return Response.builder()
+            SurchargeDTO updated = surchargeService.updateSurcharge(surchargeDTO);
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Surcharge updated successfully")
-                    .data(surchargeService.updateSurcharge(surchargeDTO))
+                    .data(updated)
                     .build();
+
+            // 🔔 BROADCAST: Thông báo surcharge được update
+
+
+            return response;
         } catch (Exception e) {
             log.error("Error updating surcharge with ID: {}", surchargeDTO.getSurchargeId(), e);
             return Response.builder()
@@ -150,11 +161,16 @@ public class SurchargeHandler implements RequestHandler {
                         .message("Failed to create surcharge")
                         .build();
             }
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Surcharge created successfully")
                     .data(surchargeCreated)
                     .build();
+
+
+
+            return response;
         } catch (Exception e) {
             log.error("Error creating surcharge: {}", surchargeDTO, e);
             return Response.builder()

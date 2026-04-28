@@ -10,7 +10,7 @@ import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
-import iuh.fit.se.group1.service.SurchargeDetailService;
+import iuh.fit.se.group1.network.client.service.SurchargeDetailServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import lombok.Getter;
 
@@ -29,7 +29,7 @@ public class PaymentPagev2 extends javax.swing.JPanel {
 
     private final OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
     private final OrderDetailServiceClient orderDetailService = SocketFacade.getInstance().getOrderDetail();
-    private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
+    private final SurchargeDetailServiceClient surchargeDetailService = SocketFacade.getInstance().getSurchargeDetail();
     private PaymentMain paymentMain;
     @Getter
     private EmployeeDTO currentEmployee;

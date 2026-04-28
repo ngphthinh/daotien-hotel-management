@@ -15,7 +15,6 @@ import iuh.fit.se.group1.network.client.ClientSocketManager;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 @RequiredArgsConstructor
 public class PaymentServiceClient implements ServiceClient {
