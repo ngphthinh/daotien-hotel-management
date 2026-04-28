@@ -1,9 +1,5 @@
 package iuh.fit.se.group1.service;
 
-import iuh.fit.se.group1.ui.component.custom.message.Message;
-import iuh.fit.se.group1.ui.component.table.Table;
-import iuh.fit.se.group1.ui.component.table.TableActionEvent;
-import iuh.fit.se.group1.ui.layout.RoomManagement;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -71,104 +67,8 @@ public class ExportExcelService {
         }
     }
 
-    /**
-     * Xuất dữ liệu từ JTable ra file Excel
-     *
-     * @param parent          Component cha (để hiển thị dialog)
-     * @param table           JTable chứa dữ liệu cần xuất
-     * @param sheetName       Tên sheet trong Excel
-     * @param defaultFileName Tên file mặc định (không bao gồm extension)
-     */
-    public void exportTableToExcel(Component parent, JTable table, String sheetName, String defaultFileName) {
-        try {
-            // Tạo file chooser với thư mục mặc định là Desktop hoặc Documents
-            JFileChooser fileChooser = new JFileChooser();
 
-            // Set thư mục mặc định là Desktop
-            String userHome = System.getProperty("user.home");
-            java.io.File desktopDir = new java.io.File(userHome, "Desktop");
-            if (!desktopDir.exists()) {
-                desktopDir = new java.io.File(userHome, "Documents");
-            }
-            fileChooser.setCurrentDirectory(desktopDir);
 
-            fileChooser.setDialogTitle("Lưu file Excel");
-
-            // Tên file mặc định với ngày hiện tại
-            String fileName = defaultFileName + "_" +
-                    LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
-            fileChooser.setSelectedFile(new java.io.File(desktopDir, fileName));
-
-            // Chỉ cho phép file .xlsx
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx");
-            fileChooser.setFileFilter(filter);
-
-            int userSelection = fileChooser.showSaveDialog(parent);
-
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
-                java.io.File fileToSave = fileChooser.getSelectedFile();
-                String filePath = fileToSave.getAbsolutePath();
-
-                // Đảm bảo file có đuôi .xlsx
-                if (!filePath.toLowerCase().endsWith(".xlsx")) {
-                    filePath += ".xlsx";
-                }
-
-                // Xuất dữ liệu
-                exportData(table, filePath, sheetName);
-
-                Message.showMessage("Thành công",
-                        "Xuất file Excel thành công!\nĐường dẫn: " + filePath);
-            }
-        } catch (Exception e) {
-            Message.showMessage("Lỗi", "Không thể xuất file Excel: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Xuất dữ liệu từ JTable với cấu hình tùy chỉnh
-     *
-     * @param parent            Component cha
-     * @param table             JTable chứa dữ liệu
-     * @param sheetName         Tên sheet
-     * @param defaultFileName   Tên file mặc định
-     * @param excludeLastColumn true nếu muốn bỏ cột cuối (cột chức năng)
-     */
-    public void exportTableToExcel(TableActionEvent parent, JTable table, String sheetName,
-                                   String defaultFileName, boolean excludeLastColumn) {
-        try {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Lưu file Excel");
-
-            String fileName = defaultFileName + "_" +
-                    LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".xlsx";
-            fileChooser.setSelectedFile(new java.io.File(fileName));
-
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx");
-            fileChooser.setFileFilter(filter);
-
-            Component tableActionEvent = null;
-            int userSelection = fileChooser.showSaveDialog(tableActionEvent);
-
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
-                java.io.File fileToSave = fileChooser.getSelectedFile();
-                String filePath = fileToSave.getAbsolutePath();
-
-                if (!filePath.toLowerCase().endsWith(".xlsx")) {
-                    filePath += ".xlsx";
-                }
-
-                exportData(table, filePath, sheetName, excludeLastColumn);
-
-                Message.showMessage("Thành công",
-                        "Xuất file Excel thành công!\nĐường dẫn: " + filePath);
-            }
-        } catch (Exception e) {
-            Message.showMessage("Lỗi", "Không thể xuất file Excel: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Thực hiện xuất dữ liệu ra file Excel
