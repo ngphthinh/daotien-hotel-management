@@ -2,8 +2,10 @@ package iuh.fit.se.group1.enums;
 
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter
-public enum DenominationLabel {
+public enum DenominationLabel implements Serializable {
     VND_1000(1000L),
     VND_2000(2000L),
     VND_5000(5000L),

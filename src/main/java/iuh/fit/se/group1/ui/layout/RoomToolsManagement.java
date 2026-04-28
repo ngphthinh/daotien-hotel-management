@@ -1,11 +1,12 @@
 package iuh.fit.se.group1.ui.layout;
 
-import iuh.fit.se.group1.dto.OrderDTO;
-import iuh.fit.se.group1.dto.OrderTypeDTO;
-import iuh.fit.se.group1.dto.RoomViewDTO;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.OrderBookStatus;
-import iuh.fit.se.group1.service.RoomToolsService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.OrderServiceClient;
+import iuh.fit.se.group1.network.client.service.RoomToolsServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.modal.ExtendBookingModal;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
@@ -34,10 +35,10 @@ public class RoomToolsManagement extends JPanel {
     private JButton btnRemoveRoom, btnClearAll;
     private JLabel lblBookingType;
 
-    private final RoomToolsService service;
+    private final RoomToolsServiceClient service;
 
     private List<OrderDTO> orders = new ArrayList<>();
-
+    private OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
     private Map<String, RoomViewDTO> currentRoomsMap = new HashMap<>();
     private List<RoomViewDTO> selectedOldRooms = new ArrayList<>();
     private List<RoomViewDTO> selectedNewRooms = new ArrayList<>();
@@ -47,9 +48,13 @@ public class RoomToolsManagement extends JPanel {
 
     public RoomToolsManagement() {
         setLayout(new BorderLayout());
-        this.service = new RoomToolsService();
+        this.service = SocketFacade.getInstance().getRoomTools();
         initComponents();
-        loadBookingsFromDatabase();
+        try {
+            loadBookingsFromDatabase();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         setVisible(true);
     }
 
@@ -145,7 +150,11 @@ public class RoomToolsManagement extends JPanel {
 
         tblBookings.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblBookings.getSelectedRow() != -1) {
-                loadSelectedBooking();
+                try {
+                    loadSelectedBooking();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         ScrollPaneWin11 scrollPane = new ScrollPaneWin11(tblBookings);
@@ -262,7 +271,11 @@ public class RoomToolsManagement extends JPanel {
                 int row = tblCurrentRooms.rowAtPoint(e.getPoint());
 
                 if (column == 3 && row >= 0) {
-                    handleCancelRoom(row);
+                    try {
+                        handleCancelRoom(row);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
@@ -331,7 +344,11 @@ public class RoomToolsManagement extends JPanel {
                 currentBookingType,
                 () -> {
                     GlassPanePopup.closePopupLast();
-                    loadSelectedBooking();
+                    try {
+                        loadSelectedBooking();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 },
                 () -> {
                     GlassPanePopup.closePopupLast();
@@ -341,7 +358,7 @@ public class RoomToolsManagement extends JPanel {
         GlassPanePopup.showPopup(extendPanel);
     }
 
-    private void handleCancelRoom(int row) {
+    private void handleCancelRoom(int row) throws Exception {
         if (currentBooking == null || row < 0 || row >= currentRoomsModel.getRowCount()) {
             return;
         }
@@ -362,9 +379,19 @@ public class RoomToolsManagement extends JPanel {
             return;
         }
 
-        long roomPrice = service.getRoomPriceWithDuration(roomToCancel, currentBookingType,
+        Response response = service.getRoomPriceWithDuration(roomToCancel, currentBookingType,
                 currentBooking.getOrderId());
 
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Không thể lấy giá phòng! Vui lòng thử lại.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        long roomPrice = (long) response.getData();
         String message = String.format(
                 "<div style='line-height: 1.8;'>" +
                         "<b style='font-size: 15px;'>Xác nhận hủy đặt phòng?</b><br><br>" +
@@ -387,12 +414,22 @@ public class RoomToolsManagement extends JPanel {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                boolean success = service.cancelRoomBooking(
+                response = service.cancelRoomBooking(
                         currentBooking.getOrderId(),
                         roomToCancel.getRoomId(),
                         currentBookingType);
 
-                if (success) {
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Không thể hủy phòng! Vui lòng thử lại.",
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+
+                if (true) {
                     currentRoomsModel.removeRow(row);
                     currentRoomsMap.remove(roomNumber);
                     selectedOldRooms.removeIf(r -> r.getRoomNumber().equals(roomNumber));
@@ -548,7 +585,13 @@ public class RoomToolsManagement extends JPanel {
         JButton btnConfirm = createStyledButton("Xác nhận chuyển", new Color(16, 185, 129), 150, 40);
 
         btnCancel.addActionListener(e -> resetForm());
-        btnConfirm.addActionListener(e -> performTransfer());
+        btnConfirm.addActionListener(e -> {
+            try {
+                performTransfer();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         pnlButtons.add(btnCancel);
         pnlButtons.add(btnConfirm);
@@ -614,8 +657,14 @@ public class RoomToolsManagement extends JPanel {
         }
     }
 
-    private void loadBookingsFromDatabase() {
-        orders = service.getAllOrders();
+    private void loadBookingsFromDatabase() throws Exception {
+        Response response = orderService.getAllOrdersWithRelationshipAndCompleteYet();
+        if (response == null || response.getCode() != 200) {
+            throw new Exception("Server returned the error code : " + response.getCode() + " with message: " + response.getMessage());
+
+        }
+
+        orders = (List<OrderDTO>) response.getData();
         loadBookingsToTable();
     }
 
@@ -633,7 +682,7 @@ public class RoomToolsManagement extends JPanel {
         }
     }
 
-    private void loadSelectedBooking() {
+    private void loadSelectedBooking() throws Exception {
         int row = tblBookings.getSelectedRow();
         if (row == -1)
             return;
@@ -652,14 +701,26 @@ public class RoomToolsManagement extends JPanel {
                 typeDisplay, currentOrderType.getName()));
         lblBookingType.setForeground(new Color(5, 150, 105));
 
-        List<RoomViewDTO> rooms = service.getRoomsByOrderAndType(currentBooking.getOrderId(), currentBookingType);
+        Response response = service.getRoomsByOrderAndType(currentBooking.getOrderId(), currentBookingType);
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Server returned the error code : " + response.getCode() + " with message: " + response.getMessage());
+            return;
+        }
+
+        List<RoomViewDTO> rooms = (List<RoomViewDTO>) response.getData();
 
         currentRoomsMap.clear();
         currentRoomsModel.setRowCount(0);
 
         for (RoomViewDTO room : rooms) {
             currentRoomsMap.put(room.getRoomNumber(), room);
-            long price = service.getRoomPriceWithDuration(room, currentBookingType, currentBooking.getOrderId());
+            response = service.getRoomPriceWithDuration(room, currentBookingType, currentBooking.getOrderId());
+            if (response == null || response.getCode() != 200) {
+                throw new RuntimeException("Lỗi khi lấy giá phòng: " + (response != null ? response.getMessage() : "No response from server"));
+
+            }
+            long price = (long) response.getData();
             currentRoomsModel.addRow(new Object[]{
                     room.getRoomNumber(),
                     room.getRoomType().getName(),
@@ -726,7 +787,19 @@ public class RoomToolsManagement extends JPanel {
             return;
         }
 
-        List<RoomViewDTO> available = service.getAvailableRoomsByType(roomTypeId);
+        Response response = null;
+        try {
+            response = service.getAvailableRoomsByType(roomTypeId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Server returned the error code : " + response.getCode() + " with message: " + response.getMessage());
+            return;
+        }
+
+        List<RoomViewDTO> available = (List<RoomViewDTO>) response.getData();
 
         if (available.isEmpty()) {
             String typeName = roomTypeId.equals("SINGLE") ? "Phòng đơn" : "Phòng đôi";
@@ -753,16 +826,50 @@ public class RoomToolsManagement extends JPanel {
 
     private long calculateNewRoomPrice(RoomViewDTO newRoom) {
         if (currentBooking == null || currentBookingType == null || selectedOldRooms.isEmpty()) {
-            return service.getRoomPriceByType(newRoom, currentBookingType);
+            Response response = null;
+            try {
+                response = service.getRoomPriceByType(newRoom, currentBookingType);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            if (response == null || response.getCode() != 200) {
+                throw new RuntimeException("Server returned the error code : " + response.getCode() + " with message: " + response.getMessage());
+
+            }
+            return (long) response.getData();
         }
 
         RoomViewDTO referenceRoom = selectedOldRooms.get(0);
-        return service.calculateNewRoomPriceWithBookingDuration(
-                newRoom, currentBookingType, currentBooking.getOrderId(), referenceRoom);
+        Response response = null;
+        try {
+            response = service.calculateNewRoomPriceWithBookingDuration(
+                    newRoom, currentBookingType, currentBooking.getOrderId(), referenceRoom);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response == null || response.getCode() != 200) {
+            throw new RuntimeException("Server returned the error code : " + response.getCode() + " with message: " + response.getMessage());
+        }
+
+        return (long) response.getData();
     }
 
     public void loadData() {
-        orders = service.getAllOrders();
+        Response response = null;
+        try {
+            response = orderService.getAllOrdersWithRelationshipAndCompleteYet();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        if (response == null || response.getCode() != 200) {
+            throw new RuntimeException("Server returned the error code : " + response.getCode() + " with message: " + response.getMessage());
+
+        }
+
+        orders = (List<OrderDTO>) response.getData();
         bookingsModel.setRowCount(0);
 
         for (OrderDTO order : orders) {
@@ -960,8 +1067,19 @@ public class RoomToolsManagement extends JPanel {
             return;
         }
 
-        long surcharge = service.calculateSurcharge(selectedOldRooms, selectedNewRooms,
-                currentBookingType, currentBooking.getOrderId());
+        Response response = null;
+        try {
+            response = service.calculateSurcharge(selectedOldRooms, selectedNewRooms,
+                    currentBookingType, currentBooking.getOrderId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response == null || response.getCode() != 200) {
+            throw new RuntimeException("Lỗi khi tính phụ phí: " + (response != null ? response.getMessage() : "No response from server"));
+        }
+
+        long surcharge = (long) response.getData();
 
         if (surcharge > 0) {
             txtTotalSurcharge.setText(String.format("+%,dđ", surcharge));
@@ -977,11 +1095,27 @@ public class RoomToolsManagement extends JPanel {
 
     private void searchBooking() {
         String keyword = txtSearch.getText().trim();
-        orders = service.findOrdersUnPendingByKeyWord(keyword);
+
+        Response response = null;
+        try {
+            response = orderService.findOrdersUnPendingByKeyWord(keyword);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tìm kiếm! Vui lòng thử lại.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        orders = response.getData() != null ? (List<OrderDTO>) response.getData() : new ArrayList<>();
         loadBookingsToTable();
     }
 
-    private void performTransfer() {
+    private void performTransfer() throws Exception {
         if (currentBooking == null) {
             CustomDialog.showMessage(this,
                     "Chọn booking trước!",
@@ -990,17 +1124,40 @@ public class RoomToolsManagement extends JPanel {
             return;
         }
 
-        var validation = service.validateTransfer(selectedOldRooms, selectedNewRooms, currentBookingType);
-        if (!validation.valid) {
+        Response response = service.validateTransfer(selectedOldRooms, selectedNewRooms, currentBookingType);
+
+        if (response == null || response.getCode() != 200) {
             CustomDialog.showMessage(this,
-                    validation.message,
+                    "Lỗi khi xác thực chuyển phòng! Vui lòng thử lại.",
+                    "Lỗi",
+                    CustomDialog.MessageType.ERROR, 400, 220);
+            return;
+
+        }
+
+        ValidationResult validation = (ValidationResult) response.getData();
+        if (!validation.isValid()) {
+            CustomDialog.showMessage(this,
+                    validation.getMessage(),
                     "Thông báo",
                     CustomDialog.MessageType.WARNING, 500, 300);
             return;
         }
 
-        long surcharge = service.calculateSurcharge(selectedOldRooms, selectedNewRooms,
+        response = service.calculateSurcharge(selectedOldRooms, selectedNewRooms,
                 currentBookingType, currentBooking.getOrderId());
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Lỗi khi tính phụ phí! Vui lòng thử lại.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+
+        }
+
+        long surcharge = (long) response.getData();
 
         String oldRoomNumbers = selectedOldRooms.stream()
                 .map(RoomViewDTO::getRoomNumber)
@@ -1022,13 +1179,14 @@ public class RoomToolsManagement extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, message, "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             BookingType bookingType = currentBooking.getBookings().get(0).getBookingType();
-            RoomToolsService.TransferResult result = service.transferRooms(
+            response = service.transferRooms(
                     currentBooking.getOrderId(),
                     selectedOldRooms,
                     selectedNewRooms,
                     bookingType);
+            TransferResult result = (TransferResult) response.getData();
 
-            if (result.success) {
+            if (result.isSuccess()) {
                 String successMsg = String.format(
                         "<b>CHUYỂN PHÒNG THÀNH CÔNG!</b><br><br>" +
                                 "Từ: <b>%s</b> (%d phòng)<br>" +
@@ -1038,8 +1196,8 @@ public class RoomToolsManagement extends JPanel {
                         oldRoomNumbers, selectedOldRooms.size(),
                         newRoomNumbers, selectedNewRooms.size(),
                         currentBookingType.getDisplayName(),
-                        result.surcharge >= 0 ? "Đã thu phụ phí" : "Đã hoàn lại",
-                        Math.abs(result.surcharge));
+                        result.getSurcharge() >= 0 ? "Đã thu phụ phí" : "Đã hoàn lại",
+                        Math.abs(result.getSurcharge()));
 
                 CustomDialog.showMessage(
                         this,
@@ -1054,7 +1212,7 @@ public class RoomToolsManagement extends JPanel {
             } else {
                 CustomDialog.showMessage(
                         this,
-                        "Chuyển phòng thất bại! " + result.message,
+                        "Chuyển phòng thất bại! " + result.getMessage(),
                         "Thất bại",
                         CustomDialog.MessageType.ERROR,
                         500,

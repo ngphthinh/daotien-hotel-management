@@ -2,9 +2,11 @@ package iuh.fit.se.group1.ui.layout;
 
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.EmployeeShiftDTO;
-import iuh.fit.se.group1.entity.EmployeeShift;
+import iuh.fit.se.group1.dto.ShiftCloseDTO;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.ShiftCloseServiceClient;
 import iuh.fit.se.group1.service.EmployeeShiftService;
-import iuh.fit.se.group1.service.ShiftCloseService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
@@ -222,7 +224,7 @@ public class MainLayout extends JPanel {
             return;
         }
         EmployeeShiftService employeeShiftService = new EmployeeShiftService();
-        ShiftCloseService shiftCloseService = new ShiftCloseService();
+        ShiftCloseServiceClient shiftCloseService = SocketFacade.getInstance().getShiftClose();
 
         //  THỜI GIAN DƯ SAU KHI KẾT THÚC CA (10 phút)
         final int BUFFER_MINUTES = 10;
@@ -239,9 +241,21 @@ public class MainLayout extends JPanel {
             return;
         }
 
+
         //  LỌC RA CÁC CA CHƯA ĐÓNG
         List<EmployeeShiftDTO> openShifts = todayShifts.stream()
-                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift.getEmployeeShiftId()).isEmpty())
+                .filter(shift -> {
+                    Response response = null;
+                    try {
+                        response = shiftCloseService.getShiftCloseByEmployeeShift(shift.getEmployeeShiftId());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (response == null || response.getCode() != 200) {
+                        throw new RuntimeException("Lỗi kết nối đến dịch vụ kiểm tra ca làm việc!");
+                    }
+                    return ((List<ShiftCloseDTO>) response.getData()).isEmpty();
+                })
                 .sorted((s1, s2) -> {
                     // Parse string time để sắp xếp
                     java.time.LocalTime t1 = java.time.LocalTime.parse(s1.getShift().getStartTime());
@@ -445,7 +459,11 @@ public class MainLayout extends JPanel {
     }
 
     public void saveData() {
-        closeShift.saveData();
+        try {
+            closeShift.saveData();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

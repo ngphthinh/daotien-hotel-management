@@ -45,6 +45,8 @@ public class OrderHandler implements RequestHandler {
                 case ORDER_MOVE_BOOKING_TO_ORDER -> handleMoveBookingToOrder(request);
                 case ORDER_RE_CALCULATE_TOTAL_PRICE -> handleReCalculateTotalPrice(request);
                 case ORDER_UPDATE_ORDER_TYPE -> handleUpdateOrderType(request);
+                case ORDER_GET_ALL_WITH_RELATIONSHIP_COMPLETE_YET -> handleGetAllWithRelationshipAndCompleteYet();
+                case ORDER_GET_UN_PENDING_BY_KEYWORD -> handleGetOrdersUnPendingByKeyWord(request);
                 default -> Response.builder()
                         .code(400)
                         .message("Invalid command")
@@ -52,6 +54,51 @@ public class OrderHandler implements RequestHandler {
             };
         } catch (Exception e) {
             log.error("Error handling order request: {}", commandType, e);
+            return Response.builder()
+                    .code(500)
+                    .message("Internal server error: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    private Response handleGetOrdersUnPendingByKeyWord(Request request) {
+        try {
+            String keyword = request.getRequest().toString();
+            return Response.builder()
+                    .code(200)
+                    .message("Get unpending order by keyword")
+                    .data(orderService.getOrdersUnPendingByKeyWord(keyword))
+                    .build();
+
+
+        } catch (Exception e) {
+            log.error("Error handling order request: {}", request, e);
+            return Response.builder()
+                    .code(500)
+                    .message("Internal server error: " + e.getMessage())
+                    .build();
+        }
+
+    }
+
+    private Response handleGetAllWithRelationshipAndCompleteYet() {
+        try {
+            List<OrderDTO> orders = orderService.getAllOrdersWithRelationshipAndCompleteYet();
+
+            if (orders == null || orders.isEmpty()) {
+                return Response.builder()
+                        .code(200)
+                        .message("No orders found")
+                        .data(List.of())
+                        .build();
+            }
+
+            return Response.builder()
+                    .code(200)
+                    .message("Get all orders with relationship and complete yet successfully")
+                    .data(orders)
+                    .build();
+        } catch (Exception e) {
             return Response.builder()
                     .code(500)
                     .message("Internal server error: " + e.getMessage())

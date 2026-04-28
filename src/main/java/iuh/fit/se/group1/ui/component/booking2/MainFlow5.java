@@ -6,10 +6,12 @@ package iuh.fit.se.group1.ui.component.booking2;
 
 import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.service.SurchargeService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.service.SurchargeServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.util.Constants;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -788,7 +790,7 @@ public class MainFlow5 extends javax.swing.JPanel {
             EmployeeDTO currentEmployee,
             CustomerDTO customer,
             List<RoomSelection> selectedRooms,
-            SurchargeService surchargeService) {
+            SurchargeServiceClient surchargeService) throws Exception {
 
         OrderDTO order = new OrderDTO();
         order.setCustomer(customer);
@@ -835,7 +837,16 @@ public class MainFlow5 extends javax.swing.JPanel {
         if (lblSurchargeHoliday.getText().equals("N/a") || lblSurchargeHoliday.getText().equals("Không có")) {
             return new OrderResult(order, null);
         }
-        SurchargeDTO surchargeHoliday = surchargeService.getSurchargeByName(lblSurchargeHolidayName.getText().trim());
+
+        Response response = surchargeService.getSurchargeByName(lblSurchargeHolidayName.getText().trim());
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lấy thông tin phụ thu ngày lễ từ server: " + (response != null ? response.getMessage() : "No response"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException("Lỗi khi lấy thông tin phụ thu ngày lễ");
+
+        }
+
+        SurchargeDTO surchargeHoliday = (SurchargeDTO) response.getData();
 
         SurchargeDetailDTO surchargeDetail = new SurchargeDetailDTO();
         surchargeDetail.setSurcharge(surchargeHoliday);

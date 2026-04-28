@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.enums;
 
-public enum PaymentType {
+import java.io.Serializable;
+
+public enum PaymentType implements Serializable {
     CASH("Tiền mặt"),
     E_WALLET("Chuyển khoản");
     private final String name;

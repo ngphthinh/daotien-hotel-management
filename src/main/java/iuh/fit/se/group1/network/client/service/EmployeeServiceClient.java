@@ -22,14 +22,6 @@ public class EmployeeServiceClient implements ServiceClient {
         this.socket = socket;
     }
 
-    public Response getById(Long id) throws Exception {
-        Request req = Request.builder()
-                .commandType(CommandType.EMPLOYEE_GET_BY_ID)
-                .request(id)
-                .build();
-
-        return socket.send(req).get(30, TimeUnit.SECONDS);
-    }
 
     public Response create(EmployeeDTO dto, String roleId) throws Exception {
         Map<String, Object> data = new HashMap<>();

@@ -9,9 +9,7 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
-import iuh.fit.se.group1.network.client.service.BookingServiceClient;
-import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
-import iuh.fit.se.group1.network.client.service.OrderServiceClient;
+import iuh.fit.se.group1.network.client.service.*;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.SurchargeManagementPanel;
@@ -29,11 +27,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,13 +42,13 @@ public class PaymentMain extends javax.swing.JPanel {
     private EmployeeDTO currentEmployee;
     private OrderServiceClient orderService;
     private OrderDTO currentOrder = null;
-    private JaspersoftExportService jaspersoftExportService = new JaspersoftExportService();
-    private PromotionService promotionService = new PromotionService();
+    private JaspersoftExportServiceClient jaspersoftExportService = SocketFacade.getInstance().getJaspersoftExport();
+    private final PromotionServiceClient promotionService = SocketFacade.getInstance().getPromotion();
     private static final String OUTPUT_DIR = getJarDirectory() + File.separator + "hoadon";
 
     private static String getJarDirectory() {
         try {
-            String jarPath = JaspersoftExportService.class
+            String jarPath = JaspersoftExportServiceClient.class
                     .getProtectionDomain()
                     .getCodeSource()
                     .getLocation()
@@ -80,7 +76,7 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
     private static final String SURCHARGE_CHECKOUT = "Phụ thu trả phòng trễ";
-    private SurchargeService surchargeService = new SurchargeService();
+    private SurchargeServiceClient surchargeService = SocketFacade.getInstance().getSurcharge();
     private SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private static final long SURCHARGE_HOLIDAY = 50_000;
     private static final Logger log = LoggerFactory.getLogger(PaymentMain.class);
@@ -574,7 +570,11 @@ public class PaymentMain extends javax.swing.JPanel {
         btnAddSurcharge.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnAddSurcharge.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddSurchargeActionPerformed(evt);
+                try {
+                    btnAddSurchargeActionPerformed(evt);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -787,13 +787,27 @@ public class PaymentMain extends javax.swing.JPanel {
             saveOrder();
             GlassPanePopup.closePopupAll();
 
-            byte[] filePdf = jaspersoftExportService.exportOrderToPdf(
-                    order,
-                    promotionStr,
-                    PaymentType.CASH.getName(),
-                    totalPricePayment,
-                    currentEmployee.getFullName()
-            );
+            Response response = null;
+            try {
+                response = jaspersoftExportService.exportOrderToPdf(
+                        order,
+                        promotionStr,
+                        PaymentType.CASH.getName(),
+                        totalPricePayment,
+                        currentEmployee.getFullName()
+                );
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi xuất hóa đơn. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            ExportOrderToPDFResponse exportOrderToPDFResponse = (ExportOrderToPDFResponse) response.getData();
+
+            byte[] filePdf = exportOrderToPDFResponse.getFileData();
             generateOrder(order, paymentDate, filePdf);
 
         });
@@ -949,13 +963,28 @@ public class PaymentMain extends javax.swing.JPanel {
                         String promotionStr = lblPromotion.getText();
                         currentOrder.setEmployeePayment(currentEmployee);
                         saveOrder();
-                        byte[] filePdf = jaspersoftExportService.exportOrderToPdf(
-                                order,
-                                promotionStr,
-                                PaymentType.E_WALLET.getName(),
-                                totalPricePayment,
-                                currentEmployee.getFullName()
-                        );
+                        Response res = null;
+                        try {
+                            res = jaspersoftExportService.exportOrderToPdf(
+                                    order,
+                                    promotionStr,
+                                    PaymentType.E_WALLET.getName(),
+                                    totalPricePayment,
+                                    currentEmployee.getFullName()
+                            );
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+
+                        if (res == null || res.getCode() != 200) {
+                            JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi xuất hóa đơn. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        ExportOrderToPDFResponse exportOrderToPDFResponse = (ExportOrderToPDFResponse) res.getData();
+
+                        byte[] filePdf = exportOrderToPDFResponse.getFileData();
+
                         generateOrder(order, paymentDate, filePdf);
                     } else {
                         CustomDialog.showMessage(null, "Đơn hàng: " + orderIdCheck + " chưa được thanh toán. Vui lòng kiểm tra lại!", "Thông báo", CustomDialog.MessageType.WARNING, 700, 200);
@@ -1111,7 +1140,7 @@ public class PaymentMain extends javax.swing.JPanel {
         // TODO add your handling code here:
     }// GEN-LAST:event_btnCompleteActionPerformed
 
-    private void btnAddSurchargeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAddSurchargeActionPerformed
+    private void btnAddSurchargeActionPerformed(java.awt.event.ActionEvent evt) throws Exception {// GEN-FIRST:event_btnAddSurchargeActionPerformed
         // Create dialog instead of GlassPanePopup for better mouse event handling
         JDialog dialog = new JDialog((java.awt.Frame) SwingUtilities.getWindowAncestor(this),
                 "Quản lý phụ phí", true);
@@ -1149,9 +1178,19 @@ public class PaymentMain extends javax.swing.JPanel {
                 400, 200);
     }
 
-    private SurchargeManagementPanel setupSurcharge(JDialog dialog) {
+    private SurchargeManagementPanel setupSurcharge(JDialog dialog) throws Exception {
         SurchargeManagementPanel surchargeManagementPanel = new SurchargeManagementPanel();
-        var availableSurcharges = surchargeService.getAllSurcharges();
+
+        Response response = surchargeService.getAllSurcharges();
+        if (response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tải phụ phí. Vui lòng thử lại sau.",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        var availableSurcharges = (List<SurchargeDTO>) response.getData();
 
         var selectedSurcharges = new ArrayList<SurchargeDTO>();
 
@@ -1219,7 +1258,11 @@ public class PaymentMain extends javax.swing.JPanel {
         lblTotalPrice.setText(Constants.VND_FORMAT.format(subtotal));
 
         // Get and apply promotion based on subtotal
-        setPromotion(subtotal);
+        try {
+            setPromotion(subtotal);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         // Calculate final total (subtotal - promotion - deposit)
         double promotionDiscount = Constants.parseVND(lblPromotion.getText());
@@ -1370,7 +1413,15 @@ public class PaymentMain extends javax.swing.JPanel {
 
         int countAfterNow = countAfterNow(checkOutDates);
         if (countAfterNow < 1) {
-            SurchargeDTO surchargeCheckOut = surchargeService.getSurchargeByName(SURCHARGE_CHECKOUT);
+
+            response = surchargeService.getSurchargeByName(SURCHARGE_CHECKOUT);
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(null, "Failed to fetch surcharge details: " + response.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            SurchargeDTO surchargeCheckOut = (SurchargeDTO) response.getData();
             if (surchargeCheckOut != null) {
                 SurchargeDTO dto = new SurchargeDTO();
                 dto.setSurchargeId(surchargeCheckOut.getSurchargeId());
@@ -1397,9 +1448,16 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
 
-    private void setPromotion(BigDecimal totalAmount) {
+    private void setPromotion(BigDecimal totalAmount) throws Exception {
 
-        promotion = promotionService.getActivePromotion(totalAmount);
+        Response response = promotionService.getActivePromotion(totalAmount);
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Failed to fetch promotion details: " + (response != null ? response.getMessage() : "No response"), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        promotion = (PromotionDTO) response.getData();
         if (promotion != null) {
             lblPromotionName.setText(promotion.getPromotionName());
             // Calculate discount amount based on percentage

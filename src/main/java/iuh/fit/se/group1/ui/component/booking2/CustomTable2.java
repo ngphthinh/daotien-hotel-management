@@ -366,7 +366,11 @@ public class CustomTable2 extends JTable {
                 fireEditingStopped();
 
                 if (quantityChangeListener != null) {
-                    quantityChangeListener.onQuantityChange(editingRow, currentValue);
+                    try {
+                        quantityChangeListener.onQuantityChange(editingRow, currentValue);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
 
@@ -378,7 +382,11 @@ public class CustomTable2 extends JTable {
                     fireEditingStopped();
 
                     if (quantityChangeListener != null) {
-                        quantityChangeListener.onQuantityChange(editingRow, currentValue);
+                        try {
+                            quantityChangeListener.onQuantityChange(editingRow, currentValue);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             });
@@ -425,6 +433,8 @@ public class CustomTable2 extends JTable {
                         if (text.isEmpty()) {
                             currentValue = 0;
                         }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                 }
 

@@ -3,9 +3,7 @@ package iuh.fit.se.group1.ui.component.custom;
 import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
-import iuh.fit.se.group1.network.client.service.AmenityServiceClient;
-import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
-import iuh.fit.se.group1.network.client.service.OrderServiceClient;
+import iuh.fit.se.group1.network.client.service.*;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
@@ -37,7 +35,6 @@ public class OrderEditDialog extends JDialog {
     // Color palette matching SurchargeManagementPanel
     private static final Color HEADER_COLOR = new Color(74, 144, 226);
     private static final Color ACCENT_COLOR = new Color(40, 167, 69);
-    private static final Color WARNING_COLOR = new Color(255, 193, 7);
     private static final Color DANGER_COLOR = new Color(220, 53, 69);
     private static final Color BACKGROUND_COLOR = Color.WHITE;
     private static final Color PANEL_BG = Color.WHITE;
@@ -336,7 +333,13 @@ public class OrderEditDialog extends JDialog {
         java.awt.Button btnAdd = createIconButton("+ Thêm", ACCENT_COLOR);
         java.awt.Button btnRemove = createIconButton("- Xóa", DANGER_COLOR);
 
-        btnAdd.addActionListener(e -> onAddSurcharge());
+        btnAdd.addActionListener(e -> {
+            try {
+                onAddSurcharge();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         btnRemove.addActionListener(e -> onRemoveSurcharge());
 
         toolbar.add(btnAdd);
@@ -675,15 +678,22 @@ public class OrderEditDialog extends JDialog {
         }
     }
 
-    private void onAddSurcharge() {
+    private void onAddSurcharge() throws Exception {
         JDialog dialog = new JDialog(this, "Chọn phụ phí", true);
         dialog.setLayout(new BorderLayout());
 
         SurchargeManagementPanel surchargePanel =
                 new SurchargeManagementPanel();
 
-        SurchargeService surchargeService = new SurchargeService();
-        java.util.List<SurchargeDTO> availableSurcharges = surchargeService.getAllSurcharges();
+        SurchargeServiceClient surchargeService = SocketFacade.getInstance().getSurcharge();
+
+        Response response = surchargeService.getAllSurcharges();
+        if (response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+            return;
+        }
+
+        java.util.List<SurchargeDTO> availableSurcharges = (List<SurchargeDTO>) response.getData();
 
         List<SurchargeDTO> existingSurcharges = new ArrayList<>();
         for (int i = 0; i < surchargeModel.getRowCount(); i++) {
@@ -896,11 +906,15 @@ public class OrderEditDialog extends JDialog {
                 response = null;
 
                 // Update room status to OCCUPIED
-                RoomService roomService = new RoomService();
+                RoomServiceClient roomService = SocketFacade.getInstance().getRoom();
                 List<Long> roomIds = order.getBookings().stream()
                         .map(b -> b.getRoom().getRoomId())
                         .toList();
-                roomService.updateRoomStatusBatch(roomIds, iuh.fit.se.group1.enums.RoomStatus.OCCUPIED);
+                response = roomService.updateRoomStatusBatch(roomIds, iuh.fit.se.group1.enums.RoomStatus.OCCUPIED);
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật trạng thái phòng: " + (response != null ? response.getMessage() : "No response"));
+                    return;
+                }
 
                 CustomDialog.showMessage(
                         this,

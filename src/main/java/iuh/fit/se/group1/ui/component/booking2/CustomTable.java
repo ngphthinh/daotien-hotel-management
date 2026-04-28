@@ -324,7 +324,11 @@ public class CustomTable extends JTable {
 
                     // 🔥 Gọi callback ra ngoài
                     if (quantityChangeListener != null) {
-                        quantityChangeListener.onQuantityChange(currentRow, currentValue);
+                        try {
+                            quantityChangeListener.onQuantityChange(currentRow, currentValue);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             });
@@ -342,7 +346,11 @@ public class CustomTable extends JTable {
 
                     // 🔥 Gọi callback ra ngoài
                     if (quantityChangeListener != null) {
-                        quantityChangeListener.onQuantityChange(currentRow, currentValue);
+                        try {
+                            quantityChangeListener.onQuantityChange(currentRow, currentValue);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             });

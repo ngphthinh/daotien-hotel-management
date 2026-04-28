@@ -13,6 +13,7 @@ import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.AuthServiceClient;
 import iuh.fit.se.group1.network.client.service.DenominationDetailServiceClient;
+import iuh.fit.se.group1.network.client.service.ShiftCloseServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.*;
@@ -36,7 +37,7 @@ public class CloseShift extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(CloseShift.class);
     private EmployeeShiftService employeeShiftService;
     private final DenominationDetailServiceClient denominationDetailService;
-    private final ShiftCloseService shiftCloseService;
+    private final ShiftCloseServiceClient shiftCloseService;
     private EmployeeShiftDTO currentEmployeeShift;
     private BigDecimal totalRevenue = BigDecimal.ZERO;
     private ConfirmInfoModal confirmModal;
@@ -51,7 +52,7 @@ public class CloseShift extends javax.swing.JPanel {
         this.authenticateService = SocketFacade.getInstance().getAuth();
         this.employeeShiftService = new EmployeeShiftService();
         this.denominationDetailService = SocketFacade.getInstance().getDenominationDetail();
-        this.shiftCloseService = new ShiftCloseService();
+        this.shiftCloseService = SocketFacade.getInstance().getShiftClose();
         this.confirmModal = new ConfirmInfoModal();
         initComponents();
         configureTextFields();
@@ -193,7 +194,14 @@ public class CloseShift extends javax.swing.JPanel {
                         LocalDateTime now = LocalDateTime.now();
                         shiftClose.setCreatedAt(now);
 
-                        ShiftCloseDTO savedShiftClose = shiftCloseService.saveShiftClose(shiftClose);
+                        Response response = shiftCloseService.saveShiftClose(shiftClose);
+                        if (response == null || response.getCode() != 200) {
+                            JOptionPane.showMessageDialog(this, "Lỗi khi đóng ca: " + (response != null ? response.getMessage() : "No response from server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+
+                        ShiftCloseDTO savedShiftClose = (ShiftCloseDTO) response.getData();
 
                         String formattedTime = now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
                         String differenceText = formatCurrency(savedShiftClose.getDifference());

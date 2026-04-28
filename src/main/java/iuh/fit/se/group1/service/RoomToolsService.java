@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.*;
-import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.mapper.RoomMapper;
 import iuh.fit.se.group1.util.Constants;
@@ -24,7 +23,6 @@ public class RoomToolsService {
     private final RoomService roomService;
     private final RoomTypeService roomTypeService;
     private final BookingService bookingService;
-//    private final RoomMapper roomMapper;
 
     public RoomToolsService() {
 //        this.roomMapper = new RoomMapper();
@@ -248,14 +246,18 @@ public class RoomToolsService {
 
         // Validate
         if (oldRooms.isEmpty() || newRooms.isEmpty()) {
-            result.success = false;
-            result.message = "Danh sách phòng cũ hoặc phòng mới trống";
+//            result.success = false;
+//            result.message = "Danh sách phòng cũ hoặc phòng mới trống";
+//            return result;
+            result.setSuccess(false);
+            result.setMessage("Danh sách phòng cũ hoặc phòng mới trống");
             return result;
         }
 
         // Tính phụ phí với duration
         long surcharge = calculateSurcharge(oldRooms, newRooms, bookingType, orderId);
-        result.surcharge = surcharge;
+//        result.surcharge = surcharge;
+        result.setSurcharge(surcharge);
 
         // Lấy danh sách ID
         List<Long> oldRoomIds = oldRooms.stream()
@@ -270,8 +272,11 @@ public class RoomToolsService {
         boolean transferSuccess = roomService.transferRooms(orderId, bookingType.name(), oldRoomIds, newRoomIds);
 
         if (!transferSuccess) {
-            result.success = false;
-            result.message = "Lỗi khi chuyển phòng trong database";
+//            result.success = false;
+//            result.message = "Lỗi khi chuyển phòng trong database";
+//            return result;
+            result.setSuccess(false);
+            result.setMessage("Lỗi khi chuyển phòng trong database");
             return result;
         }
 
@@ -283,8 +288,10 @@ public class RoomToolsService {
             }
         }
 
-        result.success = true;
-        result.message = "Chuyển phòng thành công";
+//        result.success = true;
+//        result.message = "Chuyển phòng thành công";
+        result.setSuccess(true);
+        result.setMessage("Chuyển phòng thành công");
         return result;
     }
 
@@ -298,21 +305,28 @@ public class RoomToolsService {
      * 5. 1 đơn → 1 đơn (đổi phòng cùng loại)
      * Các trường hợp khác đều KHÔNG hợp lệ
      */
+
     public ValidationResult validateTransfer(List<RoomViewDTO> oldRooms,
                                              List<RoomViewDTO> newRooms,
                                              BookingType bookingType) {
-        ValidationResult result = new ValidationResult();
 
         if (oldRooms.isEmpty()) {
-            result.valid = false;
-            result.message = "Chưa chọn phòng cũ";
-            return result;
+//            re
+            return ValidationResult.builder()
+                    .valid(false)
+                    .message("Chưa chọn phòng cũ")
+                    .build();
+
         }
 
         if (newRooms.isEmpty()) {
-            result.valid = false;
-            result.message = "Chưa chọn phòng mới";
-            return result;
+//            result.valid = false;
+//            result.message = "Chưa chọn phòng mới";
+//            return result;
+            return ValidationResult.builder()
+                    .valid(false)
+                    .message("Chưa chọn phòng mới")
+                    .build();
         }
 
         // Đếm số phòng đơn và đôi trong phòng cũ
@@ -334,46 +348,67 @@ public class RoomToolsService {
         // TRƯỜNG HỢP 1: 1 đôi → 2 đơn
         if (oldRooms.size() == 1 && oldDoubleCount == 1 &&
                 newRooms.size() == 2 && newSingleCount == 2) {
-            result.valid = true;
-            result.message = "Hợp lệ: 1 phòng đôi → 2 phòng đơn";
-            return result;
+//            result.valid = true;
+//            result.message = "Hợp lệ: 1 phòng đôi → 2 phòng đơn";
+//            return result;
+            return ValidationResult.builder()
+                    .valid(true)
+                    .message("Hợp lệ: 1 phòng đôi → 2 phòng đơn")
+                    .build();
         }
 
         // TRƯỜNG HỢP 2: 2 đơn → 1 đôi
         if (oldRooms.size() == 2 && oldSingleCount == 2 &&
                 newRooms.size() == 1 && newDoubleCount == 1) {
-            result.valid = true;
-            result.message = "Hợp lệ: 2 phòng đơn → 1 phòng đôi";
-            return result;
+//            result.valid = true;
+//            result.message = "Hợp lệ: 2 phòng đơn → 1 phòng đôi";
+//            return result;
+            return ValidationResult.builder()
+                    .valid(true)
+                    .message("Hợp lệ: 2 phòng đơn → 1 phòng đôi")
+                    .build();
         }
 
         // TRƯỜNG HỢP 3: 1 đôi → 1 đôi
         if (oldRooms.size() == 1 && oldDoubleCount == 1 &&
                 newRooms.size() == 1 && newDoubleCount == 1) {
-            result.valid = true;
-            result.message = "Hợp lệ: 1 phòng đôi → 1 phòng đôi";
-            return result;
+//            result.valid = true;
+//            result.message = "Hợp lệ: 1 phòng đôi → 1 phòng đôi";
+//            return result;
+            return ValidationResult.builder()
+                    .valid(true)
+                    .message("Hợp lệ: 1 phòng đôi → 1 phòng đôi")
+                    .build();
         }
 
         // TRƯỜNG HỢP 4: 1 đơn → 1 đôi
         if (oldRooms.size() == 1 && oldSingleCount == 1 &&
                 newRooms.size() == 1 && newDoubleCount == 1) {
-            result.valid = true;
-            result.message = "Hợp lệ: 1 phòng đơn → 1 phòng đôi";
-            return result;
+//            result.valid = true;
+//            result.message = "Hợp lệ: 1 phòng đơn → 1 phòng đôi";
+//            return result;
+            return ValidationResult.builder()
+                    .valid(true)
+                    .message("Hợp lệ: 1 phòng đơn → 1 phòng đôi")
+                    .build();
         }
 
         // TRƯỜNG HỢP 5: 1 đơn → 1 đơn
         if (oldRooms.size() == 1 && oldSingleCount == 1 &&
                 newRooms.size() == 1 && newSingleCount == 1) {
-            result.valid = true;
-            result.message = "Hợp lệ: 1 phòng đơn → 1 phòng đơn";
-            return result;
+//            result.valid = true;
+//            result.message = "Hợp lệ: 1 phòng đơn → 1 phòng đơn";
+//            return result;
+            return ValidationResult.builder()
+                    .valid(true)
+                    .message("Hợp lệ: 1 phòng đơn → 1 phòng đơn")
+                    .build();
         }
 
         // TẤT CẢ các trường hợp khác đều KHÔNG hợp lệ
-        result.valid = false;
-        result.message = String.format(
+        ValidationResult result = new ValidationResult();
+        result.setValid(false);
+        result.setMessage(String.format(
                 "<b><span style='color: red; font-size: 18px;'>Không hỗ trợ chuyển đổi này!</span></b><br>" +
                         "%d phòng cũ (%d đơn, %d đôi) → %d phòng mới (%d đơn, %d đôi)<br>" +
                         "<b>Các trường hợp được phép:</b><br>" +
@@ -383,25 +418,10 @@ public class RoomToolsService {
                         "1 phòng đơn → 1 phòng đôi<br>" +
                         "1 phòng đơn → 1 phòng đơn",
                 oldRooms.size(), oldSingleCount, oldDoubleCount,
-                newRooms.size(), newSingleCount, newDoubleCount);
+                newRooms.size(), newSingleCount, newDoubleCount));
         return result;
     }
 
-    public List<OrderDTO> findOrdersUnPendingByKeyWord(String keyword) {
-        return orderService.getOrdersUnPendingByKeyWord(keyword);
-    }
-
-    // Result classes
-    public static class TransferResult {
-        public boolean success;
-        public String message;
-        public long surcharge;
-    }
-
-    public static class ValidationResult {
-        public boolean valid;
-        public String message;
-    }
 
     public boolean cancelRoomBooking(Long orderId, Long roomId, BookingType bookingType) {
         try {

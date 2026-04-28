@@ -1,13 +1,8 @@
 package iuh.fit.se.group1.ui.component.booking2;
 
-import iuh.fit.se.group1.dto.RoomDTO;
-import iuh.fit.se.group1.dto.RoomSelection;
-import iuh.fit.se.group1.dto.RoomViewDTO;
-import iuh.fit.se.group1.entity.Room;
-import iuh.fit.se.group1.entity.RoomType;
-import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.service.RoomService;
-import iuh.fit.se.group1.service.RoomTypeService;
+import iuh.fit.se.group1.dto.*;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.service.RoomServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import iuh.fit.se.group1.util.Constants;
@@ -16,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -233,56 +229,56 @@ public class MainFlow2 extends javax.swing.JPanel {
         return 0L;
     }
 
-    public boolean updateRoomList(Map<RoomDTO, Long> availableRooms, int adults, int children, RoomService roomService, int bookingIndex, int timePlus) {
-        long singleQuantity = 0;
-        long doubleQuantity = 0;
+    public boolean updateRoomList(AvailableRoomCountResponse availableRooms, int adults, int children, RoomServiceClient roomService, int bookingIndex, int timePlus) {
 
-        for (Map.Entry<RoomDTO, Long> entry : availableRooms.entrySet()) {
-            RoomDTO room = entry.getKey();
-            Long quantity = entry.getValue();
 
-            if ("SINGLE".equals(room.getRoomType())) {
-                singleQuantity = quantity;
-            } else if ("DOUBLE".equals(room.getRoomType())) {
-                doubleQuantity = quantity;
-            }
+        long singleQuantity = availableRooms.getSingleAvailable();
+        long doubleQuantity = availableRooms.getDoubleAvailable();
+
+        RoomDTO singleRoomDTO = availableRooms.getSingleRoom();
+        RoomDTO doubleRoomDTO = availableRooms.getDoubleRoom();
+
+        Response response = null;
+        try {
+            response = roomService.optimizeRoomAllocation((int) singleQuantity, (int) doubleQuantity, adults, children);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        Map<String, Long> optimizeRoomAllocation = roomService.optimizeRoomAllocation((int) singleQuantity, (int) doubleQuantity, adults, children);
+        if (response == null || response.getCode() != 200) {
 
-        if (optimizeRoomAllocation.get("unaccommodatedGuests") > 0) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tối ưu phân bổ phòng: " + (response != null ? response.getMessage() : "Không có phản hồi"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        OptimizeRoomAllocationResponse optimizeRoomAllocation = (OptimizeRoomAllocationResponse) response.getData();
+        if (optimizeRoomAllocation.getUnaccommodatedGuests() > 0) {
             CustomDialog.showMessage(this, "Không đủ phòng để đáp ứng số lượng khách!", "Không đủ phòng", CustomDialog.MessageType.ERROR, 500, 200);
             return false;
         }
 
         var model = (CustomTable.CustomTableModel) tbl.getModel();
-        int row = 0;
-        for (Map.Entry<RoomDTO, Long> entry : availableRooms.entrySet()) {
-            RoomDTO roomDTO = entry.getKey();
-            Long quantity = entry.getValue();
-            model.setValueAt(roomDTO.getRoomType().equals("SINGLE") ? "Phòng đơn" : "Phòng đôi", row, 0);
-            model.setValueAt(roomDTO.getCapacity(), row, 1);
 
-            model.setValueAt(getPriceFromBookingTypeAndRoomType(bookingIndex, roomDTO, timePlus), row, 2);
+// Row 0 - SINGLE
+        model.setValueAt("Phòng đơn", 0, 0);
+        model.setValueAt(singleRoomDTO.getCapacity(), 0, 1);
+        model.setValueAt(getPriceFromBookingTypeAndRoomType(bookingIndex, singleRoomDTO, timePlus), 0, 2);
+        model.setValueAt(singleQuantity, 0, 4);
+        model.setValueAt(optimizeRoomAllocation.getUsedSingleRooms(), 0, 5);
 
-            // Cột 3 là tính tiền nên không set
+// Row 1 - DOUBLE
+        model.setValueAt("Phòng đôi", 1, 0);
+        model.setValueAt(doubleRoomDTO.getCapacity(), 1, 1);
+        model.setValueAt(getPriceFromBookingTypeAndRoomType(bookingIndex, doubleRoomDTO, timePlus), 1, 2);
+        model.setValueAt(doubleQuantity, 1, 4);
+        model.setValueAt(optimizeRoomAllocation.getUsedDoubleRooms(), 1, 5);
 
-            model.setValueAt(quantity, row, 4);
-
-            if (roomDTO.getRoomType().equals("SINGLE")) {
-                model.setValueAt(optimizeRoomAllocation.get("usedSingleRooms"), row, 5);
-            } else if (roomDTO.getRoomType().equals("DOUBLE")) {
-                model.setValueAt(optimizeRoomAllocation.get("usedDoubleRooms"), row, 5);
-            }
-            row++;
-        }
-
-        int unaccommodatedGuests = optimizeRoomAllocation.get("unaccommodatedGuests").intValue();
+        int unaccommodatedGuests = (int) optimizeRoomAllocation.getUnaccommodatedGuests();
 
         if (unaccommodatedGuests > 0) {
 
-            int unaccommodatedAdults = optimizeRoomAllocation.get("unaccommodatedAdults").intValue();
-            int unaccommodatedChildren = optimizeRoomAllocation.get("unaccommodatedChildren").intValue();
+            int unaccommodatedAdults = Math.toIntExact(optimizeRoomAllocation.getUnaccommodatedAdults());
+            int unaccommodatedChildren = Math.toIntExact(optimizeRoomAllocation.getUnaccommodatedChildren());
 
             String msg;
 
@@ -308,13 +304,21 @@ public class MainFlow2 extends javax.swing.JPanel {
         lblTotalRoom.setText(getTotalPriceRoom((Number) tbl.getValueAt(0, 3), (Number) tbl.getValueAt(1, 3)));
 
         tbl.setQuantityChangeListener((r, newQuantity) -> {
-            Map<String, Integer> rs = roomService.checkRoomCapacity(adults,
+            Response res = roomService.checkRoomCapacity(adults,
                     children,
                     (Number) tbl.getValueAt(0, 5),
                     (Number) tbl.getValueAt(1, 5));
 
-            int leftoverAdults = rs.get("leftoverAdults");
-            int leftoverChildren = rs.get("leftoverChildren");
+            if (res == null || res.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi kiểm tra khả năng phòng: " + (res != null ? res.getMessage() : "Không có phản hồi"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+
+            }
+
+            CheckRoomCapacityResponse rs = (CheckRoomCapacityResponse) res.getData();
+
+            int leftoverAdults = rs.getLeftoverAdults();
+            int leftoverChildren = rs.getLeftoverChildren();
             int leftoverTotal = leftoverAdults + leftoverChildren;
 
             String message;

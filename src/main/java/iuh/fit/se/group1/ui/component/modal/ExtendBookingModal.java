@@ -8,7 +8,9 @@ package iuh.fit.se.group1.ui.component.modal;
 import iuh.fit.se.group1.dto.OrderDTO;
 import iuh.fit.se.group1.dto.RoomViewDTO;
 import iuh.fit.se.group1.enums.BookingType;
-import iuh.fit.se.group1.service.RoomToolsService;
+import iuh.fit.se.group1.network.Response;
+import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.RoomToolsServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import raven.glasspanepopup.GlassPanePopup;
 
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
  */
 
 public class ExtendBookingModal extends JPanel {
-    private final RoomToolsService service;
+    private final RoomToolsServiceClient roomToolsService;
     private final OrderDTO currentBooking;
     private final List<RoomViewDTO> roomsToExtend;
     private final BookingType bookingType;
@@ -43,19 +45,23 @@ public class ExtendBookingModal extends JPanel {
 
     public ExtendBookingModal(OrderDTO currentBooking, List<RoomViewDTO> roomsToExtend,
                               BookingType bookingType, Runnable onSuccess, Runnable onCancel) {
-        this.service = new RoomToolsService();
+        this.roomToolsService = SocketFacade.getInstance().getRoomTools();
         this.currentBooking = currentBooking;
         this.roomsToExtend = roomsToExtend;
         this.bookingType = bookingType;
         this.onSuccess = onSuccess;
         this.onCancel = onCancel;
 
-        initComponents();
-        setupLayout();
-        calculateInitialAmount();
+        try {
+            initComponents();
+            setupLayout();
+            calculateInitialAmount();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void initComponents() {
+    private void initComponents() throws Exception {
         setBackground(Color.WHITE);
         setBorder(new LineBorder(new Color(229, 231, 235), 1, true));
         setPreferredSize(new Dimension(550, 650));
@@ -65,18 +71,36 @@ public class ExtendBookingModal extends JPanel {
         roomListPanel.setBackground(Color.WHITE);
         extendUnitCombo = new JComboBox<>();
         extendUnitCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        extendUnitCombo.addActionListener(e -> calculateInitialAmount());
+        extendUnitCombo.addActionListener(e -> {
+            try {
+                calculateInitialAmount();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         SpinnerModel spinnerModel = new SpinnerNumberModel(1, 1, 100, 1);
         extendSpinner = new JSpinner(spinnerModel);
         extendSpinner.setFont(new Font("Segoe UI", Font.BOLD, 14));
         ((JSpinner.DefaultEditor) extendSpinner.getEditor()).getTextField().setColumns(5);
-        extendSpinner.addChangeListener(e -> calculateInitialAmount());
+        extendSpinner.addChangeListener(e -> {
+            try {
+                calculateInitialAmount();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         totalAmountLabel = new JLabel("0đ");
         totalAmountLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         totalAmountLabel.setForeground(new Color(220, 38, 38));
         confirmBtn = createStyledButton("Xác nhận gia hạn", new Color(16, 185, 129));
         cancelBtn = createStyledButton("Hủy", new Color(156, 163, 175));
-        confirmBtn.addActionListener(e -> handleConfirm());
+        confirmBtn.addActionListener(e -> {
+            try {
+                handleConfirm();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         cancelBtn.addActionListener(e -> {
             if (onCancel != null) onCancel.run();
             GlassPanePopup.closePopup("ExtendBookingModal");
@@ -361,14 +385,27 @@ public class ExtendBookingModal extends JPanel {
         return button;
     }
 
-    private void updateRoomInfo() {
+    private void updateRoomInfo() throws Exception {
         roomListPanel.removeAll();
         roomListPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
         for (int i = 0; i < roomsToExtend.size(); i++) {
             RoomViewDTO room = roomsToExtend.get(i);
-            long currentPrice = service.getRoomPriceWithDuration(
+
+            Response response = roomToolsService.getRoomPriceWithDuration(
                     room, bookingType, currentBooking.getOrderId());
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Không thể lấy giá phòng: " + (response != null ? response.getMessage() : "No response from server"),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            long currentPrice = (long) response.getData();
 
             JPanel roomCard = createRoomCard(room, currentPrice, i);
             roomListPanel.add(roomCard);
@@ -425,7 +462,7 @@ public class ExtendBookingModal extends JPanel {
         return card;
     }
 
-    private void calculateInitialAmount() {
+    private void calculateInitialAmount() throws Exception {
         if (bookingType == BookingType.OVERNIGHT) {
             totalAmountLabel.setText("N/A");
             totalAmountLabel.setForeground(new Color(156, 163, 175));
@@ -433,14 +470,28 @@ public class ExtendBookingModal extends JPanel {
         }
 
         int extendValue = (Integer) extendSpinner.getValue();
-        BigDecimal totalAmount = service.calculateExtensionAmount(
+
+        Response response = roomToolsService.calculateExtensionAmount(
                 roomsToExtend, bookingType, extendValue);
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Không thể tính toán số tiền gia hạn: " + (response != null ? response.getMessage() : "No response from server"),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+
+        BigDecimal totalAmount = (BigDecimal) response.getData();
 
         totalAmountLabel.setText(String.format("%,dđ", totalAmount.longValue()));
         totalAmountLabel.setForeground(new Color(220, 38, 38));
     }
 
-    private void handleConfirm() {
+    private void handleConfirm() throws Exception {
         if (bookingType == BookingType.OVERNIGHT) {
             showOvernightError();
             return;
@@ -449,8 +500,20 @@ public class ExtendBookingModal extends JPanel {
         int extendValue = (Integer) extendSpinner.getValue();
 
         String unit = bookingType == BookingType.HOURLY ? "giờ" : "ngày";
-        BigDecimal amount = service.calculateExtensionAmount(
+
+        Response response = roomToolsService.calculateExtensionAmount(
                 roomsToExtend, bookingType, extendValue);
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Không thể tính toán số tiền gia hạn: " + (response != null ? response.getMessage() : "No response from server"),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        BigDecimal amount = (BigDecimal) response.getData();
 
         String message = String.format(
                 "<div style='line-height: 1.8;'>" +
@@ -488,17 +551,42 @@ public class ExtendBookingModal extends JPanel {
 
     private void performExtension(int extendValue) {
         try {
-            boolean success = service.extendRoomBooking(
+
+            Response response = roomToolsService.extendRoomBooking(
                     currentBooking.getOrderId(),
                     roomsToExtend,
                     extendValue,
                     bookingType
             );
 
-            if (success) {
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Không thể gia hạn phòng: " + (response != null ? response.getMessage() : "No response from server"),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+
+            if (true) {
                 String unit = bookingType == BookingType.HOURLY ? "giờ" : "ngày";
-                BigDecimal extensionAmount = service.calculateExtensionAmount(
+
+                response = roomToolsService.calculateExtensionAmount(
                         roomsToExtend, bookingType, extendValue);
+
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Không thể tính toán số tiền gia hạn: " + (response != null ? response.getMessage() : "No response from server"),
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                BigDecimal extensionAmount = (BigDecimal) response.getData();
 
                 long oldTotal = currentBooking.getTotalAmount().longValue();
                 long newTotal = oldTotal + extensionAmount.longValue();
@@ -537,7 +625,7 @@ public class ExtendBookingModal extends JPanel {
             } else {
                 CustomDialog.showMessage(
                         this,
-                        "<b style='color: #DC2626;'>❌ Không thể gia hạn phòng!</b><br><br>Vui lòng thử lại sau.",
+                        "<b style='color: #DC2626;'> Không thể gia hạn phòng!</b><br><br>Vui lòng thử lại sau.",
                         "Lỗi",
                         CustomDialog.MessageType.ERROR,
                         400,

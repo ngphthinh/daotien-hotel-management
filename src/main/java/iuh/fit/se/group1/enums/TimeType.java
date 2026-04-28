@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.enums;
 
-public enum TimeType {
+import java.io.Serializable;
+
+public enum TimeType implements Serializable {
     TODAY(1),
     DAYS_7(2),
     DAYS_30(3),

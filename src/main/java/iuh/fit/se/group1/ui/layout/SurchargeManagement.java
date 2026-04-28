@@ -8,7 +8,7 @@ import iuh.fit.se.group1.dto.SurchargeDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
-import iuh.fit.se.group1.service.SurchargeService;
+import iuh.fit.se.group1.network.client.service.SurchargeServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.SurchageModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -46,13 +46,41 @@ public class SurchargeManagement extends javax.swing.JPanel {
      * Creates new form SurchageManagement
      */
     private static final Logger log = LoggerFactory.getLogger(SurchargeManagement.class);
-    private final SurchargeService surchargeService;
+    private final SurchargeServiceClient surchargeService;
+
+    private static final int GET_ALL = 0;
+    private static final int GET_BY_KEYWORD = 1;
 
     public SurchargeManagement() {
         initComponents();
         custom();
-        surchargeService = new SurchargeService();
-        loadTable(surchargeService.getAllSurcharges());
+        surchargeService = SocketFacade.getInstance().getSurcharge();
+        loadTable(fetchData(GET_ALL, null));
+    }
+
+    private List<SurchargeDTO> fetchData(int type, String filter) {
+
+        try {
+
+            Response response = null;
+
+            if (type == GET_ALL) {
+                response = surchargeService.getAllSurcharges();
+            } else if (type == GET_BY_KEYWORD) {
+                response = surchargeService.getSurchargeByKeyword(filter);
+            }
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(null, "Lỗi khi tải dữ liệu phụ phí: " + (response != null ? response.getMessage() : "Không có phản hồi từ server"));
+                return List.of();
+            }
+
+            return (List<SurchargeDTO>) response.getData();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void loadTable(List<SurchargeDTO> allSurcharges) {
@@ -154,16 +182,28 @@ public class SurchargeManagement extends javax.swing.JPanel {
         modal.saveData(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                saveData(modal);
+                try {
+                    saveData(modal);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
 
-            private void saveData(SurchageModal modal) {
+            private void saveData(SurchageModal modal) throws Exception {
                 Valid result = getValid(modal);
                 if (result.valid()) {
-                    SurchargeDTO surchargeSave = surchargeService.createSurcharge(SurchargeDTO.builder()
+
+                    Response response = surchargeService.createSurcharge(SurchargeDTO.builder()
                             .name(result.name())
                             .price(result.price())
                             .build());
+
+                    if (response.getCode() != 200 || response == null) {
+                        JOptionPane.showMessageDialog(null, "Lỗi khi tạo phụ phí: " + (response != null ? response.getMessage() : "Không có phản hồi từ server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    SurchargeDTO surchargeSave = (SurchargeDTO) response.getData();
                     if (surchargeSave == null) {
                         Message.showMessage("Lỗi", "Phụ phí với tên '" + result.name() + "' đã tồn tại!");
                         return;
@@ -257,8 +297,8 @@ public class SurchargeManagement extends javax.swing.JPanel {
 
                     List<SurchargeDTO> imported = (List<SurchargeDTO>) response.getData();
                     if (imported != null && !imported.isEmpty()) {
-                        surchargeService.getAllSurcharges().addAll(imported);
-                        loadTable(surchargeService.getAllSurcharges());
+                        fetchData(GET_ALL, null).addAll(imported);
+                        loadTable(fetchData(GET_ALL, null));
                         Message.showMessage("Thành công", "Đã import " + imported.size() + " phụ phí!");
                     } else {
                         Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
@@ -307,24 +347,37 @@ public class SurchargeManagement extends javax.swing.JPanel {
                     String title = "Xác nhận cập nhật phụ phí";
                     String message = "Bạn có chắc chắn muốn cập nhật phụ phí này không?";
                     Message.showConfirm(title, message, () -> {
-                        var result = getValid(modal);
-                        if (!result.valid) {
-                            return;
+                        try {
+                            var result = getValid(modal);
+                            if (!result.valid) {
+                                return;
+                            }
+                            Object idValue = model.getValueAt(row, 0);
+                            System.out.println(">>> ID type: " + idValue.getClass() + " | value = " + idValue);
+
+                            Response response = surchargeService.updateSurcharge(
+                                    SurchargeDTO.builder()
+                                            .surchargeId((Long) idValue)
+                                            .price(result.price())
+                                            .name(result.name())
+                                            .build()
+                            );
+
+                            if (response == null || response.getCode() != 200) {
+                                JOptionPane.showMessageDialog(null, "Lỗi khi cập nhật phụ phí: " + (response != null ? response.getMessage() : "Không có phản hồi từ server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            SurchargeDTO entitySave = (SurchargeDTO) response.getData();
+
+                            model.setValueAt(entitySave.getName(), row, 1);
+                            model.setValueAt(Constants.VND_FORMAT.format(entitySave.getPrice()), row, 2);
+
+                            GlassPanePopup.closePopupLast();
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            throw new RuntimeException(ex);
                         }
-                        Object idValue = model.getValueAt(row, 0);
-                        System.out.println(">>> ID type: " + idValue.getClass() + " | value = " + idValue);
-                        SurchargeDTO entitySave = surchargeService.updateSurcharge(
-                                SurchargeDTO.builder()
-                                        .surchargeId((Long) idValue)
-                                        .price(result.price())
-                                        .name(result.name())
-                                        .build()
-                        );
-
-                        model.setValueAt(entitySave.getName(), row, 1);
-                        model.setValueAt(Constants.VND_FORMAT.format(entitySave.getPrice()), row, 2);
-
-                        GlassPanePopup.closePopupLast();
                     });
                 });
 
@@ -350,7 +403,15 @@ public class SurchargeManagement extends javax.swing.JPanel {
 
                         model.removeRow(rowDelete);
 
-                        surchargeService.deleteSurcharge(id);
+                        try {
+                            Response response = surchargeService.deleteSurcharge(id);
+                            if (response == null || response.getCode() != 200) {
+                                JOptionPane.showMessageDialog(null, "Lỗi khi xóa phụ phí: " + (response != null ? response.getMessage() : "Không có phản hồi từ server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(null, e.getMessage());
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
 

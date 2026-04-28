@@ -14,13 +14,14 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class SurchargeHandler implements RequestHandler {
-    public static final Logger log= LoggerFactory.getLogger(SurchargeHandler.class);
+    public static final Logger log = LoggerFactory.getLogger(SurchargeHandler.class);
     private final SurchargeService surchargeService;
+
     @Override
     public Response handle(Request request) {
         CommandType commandType = request.getCommandType();
         try {
-            return switch (commandType){
+            return switch (commandType) {
                 case SURCHARGE_GET_BY_ID -> handleGetById(request);
                 case SURCHARGE_GET_ALL -> handleGetAll();
                 case SURCHARGE_CREATE -> handleCreate(request);
@@ -43,15 +44,15 @@ public class SurchargeHandler implements RequestHandler {
     }
 
     private Response handleGetByName(Request request) {
-        String name= (String) request.getRequest();
-        if(name==null){
+        String name = (String) request.getRequest();
+        if (name == null) {
             return Response.builder()
                     .code(400)
                     .message("Surcharge name cannot be null or blank")
                     .build();
         }
-        SurchargeDTO surcharge= surchargeService.getSurchargeByName(name);
-        if(surcharge==null){
+        SurchargeDTO surcharge = surchargeService.getSurchargeByName(name);
+        if (surcharge == null) {
             return Response.builder()
                     .code(404)
                     .message("No surcharges found with name: " + name)
@@ -65,15 +66,15 @@ public class SurchargeHandler implements RequestHandler {
     }
 
     private Response handleGetByKeywords(Request request) {
-        String keyword= (String) request.getRequest();
-        if(keyword==null){
+        String keyword = (String) request.getRequest();
+        if (keyword == null) {
             return Response.builder()
                     .code(400)
                     .message("Keyword cannot be null or blank")
                     .build();
         }
-        List<SurchargeDTO> surcharges= surchargeService.getSurchargeByKeyword(keyword);
-        if(surcharges==null){
+        List<SurchargeDTO> surcharges = surchargeService.getSurchargeByKeyword(keyword);
+        if (surcharges == null) {
             return Response.builder()
                     .code(404)
                     .message("No surcharges found matching keyword: " + keyword)
@@ -87,21 +88,20 @@ public class SurchargeHandler implements RequestHandler {
     }
 
     private Response handleDelete(Request request) {
-       Long surchargeId= (Long) request.getRequest();
-         if(surchargeId==null){
-                return Response.builder()
-                        .code(400)
-                        .message("Surcharge ID cannot be null")
-                        .build();
-         }
-        try{
+        Long surchargeId = (Long) request.getRequest();
+        if (surchargeId == null) {
+            return Response.builder()
+                    .code(400)
+                    .message("Surcharge ID cannot be null")
+                    .build();
+        }
+        try {
             surchargeService.deleteSurcharge(surchargeId);
             return Response.builder()
                     .code(200)
                     .message("Surcharge deleted successfully")
                     .build();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Error deleting surcharge with ID: {}", surchargeId, e);
             return Response.builder()
                     .code(500)
@@ -111,21 +111,21 @@ public class SurchargeHandler implements RequestHandler {
     }
 
     private Response handleUpdate(Request request) {
-        SurchargeDTO surchargeDTO= (SurchargeDTO) request.getRequest();
-        if(surchargeDTO==null || surchargeDTO.getSurchargeId()==null){
+        SurchargeDTO surchargeDTO = (SurchargeDTO) request.getRequest();
+        if (surchargeDTO == null || surchargeDTO.getSurchargeId() == null) {
             return Response.builder()
                     .code(400)
                     .message("Surcharge data or ID cannot be null")
                     .build();
         }
-        try{
-            surchargeService.updateSurcharge(surchargeDTO);
+        try {
+
             return Response.builder()
                     .code(200)
                     .message("Surcharge updated successfully")
+                    .data(surchargeService.updateSurcharge(surchargeDTO))
                     .build();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Error updating surcharge with ID: {}", surchargeDTO.getSurchargeId(), e);
             return Response.builder()
                     .code(500)
@@ -135,28 +135,27 @@ public class SurchargeHandler implements RequestHandler {
     }
 
     private Response handleCreate(Request request) {
-        SurchargeDTO surchargeDTO= (SurchargeDTO) request.getRequest();
-        if(surchargeDTO==null){
+        SurchargeDTO surchargeDTO = (SurchargeDTO) request.getRequest();
+        if (surchargeDTO == null) {
             return Response.builder()
                     .code(400)
                     .message("Surcharge data cannot be null")
                     .build();
         }
-        try{
-            SurchargeDTO surchargeCreated= surchargeService.createSurcharge(surchargeDTO);
-            if(surchargeCreated==null){
+        try {
+            SurchargeDTO surchargeCreated = surchargeService.createSurcharge(surchargeDTO);
+            if (surchargeCreated == null) {
                 return Response.builder()
                         .code(500)
                         .message("Failed to create surcharge")
                         .build();
             }
             return Response.builder()
-                    .code(201)
+                    .code(200)
                     .message("Surcharge created successfully")
                     .data(surchargeCreated)
                     .build();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("Error creating surcharge: {}", surchargeDTO, e);
             return Response.builder()
                     .code(500)
@@ -166,8 +165,8 @@ public class SurchargeHandler implements RequestHandler {
     }
 
     private Response handleGetAll() {
-        List<SurchargeDTO> surcharges= surchargeService.getAllSurcharges();
-        if(surcharges==null||surcharges.isEmpty()){
+        List<SurchargeDTO> surcharges = surchargeService.getAllSurcharges();
+        if (surcharges == null || surcharges.isEmpty()) {
             return Response.builder()
                     .code(500)
                     .message("No surcharges found")
@@ -181,15 +180,15 @@ public class SurchargeHandler implements RequestHandler {
     }
 
     private Response handleGetById(Request request) {
-        Long surchargeId= (Long) request.getRequest();
-        if(surchargeId==null){
+        Long surchargeId = (Long) request.getRequest();
+        if (surchargeId == null) {
             return Response.builder()
                     .code(400)
                     .message("Surcharge ID cannot be null")
                     .build();
         }
-        SurchargeDTO surcharge= surchargeService.getSurchargeById(surchargeId);
-        if(surcharge==null){
+        SurchargeDTO surcharge = surchargeService.getSurchargeById(surchargeId);
+        if (surcharge == null) {
             return Response.builder()
                     .code(404)
                     .message("Surcharge not found with ID: " + surchargeId)

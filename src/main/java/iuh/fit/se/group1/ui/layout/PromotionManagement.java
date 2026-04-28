@@ -4,11 +4,12 @@
  */
 package iuh.fit.se.group1.ui.layout;
 
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.PromotionDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
-import iuh.fit.se.group1.service.PromotionService;
+import iuh.fit.se.group1.network.client.service.PromotionServiceClient;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.modal.InfoPromotionModal;
 import iuh.fit.se.group1.ui.component.table.TableActionEvent;
@@ -43,7 +44,10 @@ import raven.glasspanepopup.GlassPanePopup;
 public class PromotionManagement extends javax.swing.JPanel {
 
     private static final Logger log = LoggerFactory.getLogger(PromotionManagement.class);
-    private final PromotionService promotionService;
+    private final PromotionServiceClient promotionService;
+
+    private static final int GET_ALL = 0;
+    private static final int GET_BY_KEYWORD = 1;
 
     /**
      * Creates new form PromotionManagement
@@ -51,12 +55,32 @@ public class PromotionManagement extends javax.swing.JPanel {
     public PromotionManagement() {
         initComponents();
         custom();
-        promotionService = new PromotionService();
-        loadTable(promotionService.getAllPromotions());
+        promotionService = SocketFacade.getInstance().getPromotion();
+        loadTable(fetchData(GET_ALL, null));
     }
 
+    private List<PromotionDTO> fetchData(int type, String filter) {
+        try {
+            Response response = null;
+            if (type == GET_ALL) {
+                response = promotionService.getAllPromotions();
+
+            } else if (type == GET_BY_KEYWORD) {
+                response = promotionService.getPromotionByKeyword(filter);
+            }
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode());
+                return List.of();
+            }
+            return (List<PromotionDTO>) response.getData();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public void loadData() {
-        loadTable(promotionService.getAllPromotions());
+        loadTable(fetchData(GET_ALL, null));
     }
 
     private void loadTable(java.util.List<PromotionDTO> promotions) {
@@ -103,8 +127,8 @@ public class PromotionManagement extends javax.swing.JPanel {
 
                     List<PromotionDTO> imported = (List<PromotionDTO>) response.getData();
                     if (imported != null && !imported.isEmpty()) {
-                        promotionService.getAllPromotions().addAll(imported);
-                        loadTable(promotionService.getAllPromotions());
+                        fetchData(GET_ALL, null).addAll(imported);
+                        loadTable(fetchData(GET_ALL, null));
                         Message.showMessage("Thành công", "Đã import " + imported.size() + " khuyến mãi!");
                     } else {
                         Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
@@ -178,56 +202,77 @@ public class PromotionManagement extends javax.swing.JPanel {
         TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
-                Long id = (Long) model.getValueAt(row, 0);
-                PromotionDTO promotionFind = promotionService.getPromotionById(id);
+                try {
+                    DefaultTableModel model = (DefaultTableModel) tblPromotion.getTbl().getModel();
+                    Long id = (Long) model.getValueAt(row, 0);
+                    Response response = promotionService.getPromotionById(id);
+                    if (response == null || response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(PromotionManagement.this, "Server returned HTTP Status " + response.getCode() + "nMessage: " + response.getMessage(), "Lỗi lấy thông tin khuyến mãi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    PromotionDTO promotionFind = (PromotionDTO) response.getData();
 
-                InfoPromotionModal modal = new InfoPromotionModal();
-                modal.getLblTitle().setText("Cập nhật khuyến mãi");
-                modal.getBtnSave().setText("Cập nhật");
+                    InfoPromotionModal modal = new InfoPromotionModal();
+                    modal.getLblTitle().setText("Cập nhật khuyến mãi");
+                    modal.getBtnSave().setText("Cập nhật");
 
-                modal.getTxtName().setText(promotionFind.getPromotionName());
-                modal.getTxtPrice().setText(promotionFind.getMinOrderAmount().toString());
-                modal.getTxtDiscountPersent().setText(promotionFind.getDiscountPercent().toString());
-                modal.getTxtStarDate().setText(promotionFind.getStartDate().format(Constants.DATE_FORMATTER));
-                modal.getTxtEndDate().setText(promotionFind.getEndDate().format(Constants.DATE_FORMATTER));
+                    modal.getTxtName().setText(promotionFind.getPromotionName());
+                    modal.getTxtPrice().setText(promotionFind.getMinOrderAmount().toString());
+                    modal.getTxtDiscountPersent().setText(promotionFind.getDiscountPercent().toString());
+                    modal.getTxtStarDate().setText(promotionFind.getStartDate().format(Constants.DATE_FORMATTER));
+                    modal.getTxtEndDate().setText(promotionFind.getEndDate().format(Constants.DATE_FORMATTER));
 
-                modal.closeModel(ae -> GlassPanePopup.closePopupLast());
-                modal.saveData(ae -> {
-                    String title = "Xác nhận cập nhật khuyến mãi";
-                    String message = "Bạn có chắc chắn muốn cập nhật khuyến mãi này không?";
-                    Message.showConfirm(title, message, () -> {
-                        var result = getValid(modal);
-                        if (!result.valid) {
-                            return;
-                        }
+                    modal.closeModel(ae -> GlassPanePopup.closePopupLast());
+                    modal.saveData(ae -> {
+                        String title = "Xác nhận cập nhật khuyến mãi";
+                        String message = "Bạn có chắc chắn muốn cập nhật khuyến mãi này không?";
+                        Message.showConfirm(title, message, () -> {
+                            var result = getValid(modal);
+                            if (!result.valid) {
+                                return;
+                            }
 
-                        PromotionDTO promotion = new PromotionDTO();
-                        promotion.setPromotionId(id);
-                        promotion.setPromotionName(result.name);
-                        promotion.setMinOrderAmount(result.discountPrice);
-                        promotion.setDiscountPercent(result.discountPercent);
-                        promotion.setDescription(result.description);
-                        promotion.setStartDate(result.startDate);
-                        promotion.setEndDate(result.endDate);
+                            PromotionDTO promotion = new PromotionDTO();
+                            promotion.setPromotionId(id);
+                            promotion.setPromotionName(result.name);
+                            promotion.setMinOrderAmount(result.discountPrice);
+                            promotion.setDiscountPercent(result.discountPercent);
+                            promotion.setDescription(result.description);
+                            promotion.setStartDate(result.startDate);
+                            promotion.setEndDate(result.endDate);
 
-                        PromotionDTO entitySave = promotionService.updatePromotion(promotion);
+                            Response res = null;
+                            try {
+                                res = promotionService.updatePromotion(promotion);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
 
-                        if (entitySave == null) {
-                            Message.showMessage("Lỗi", "Không thể cập nhật khuyến mãi!");
-                            return;
-                        }
-                        loadData();
+                            if (res == null || res.getCode() != 200) {
+                                JOptionPane.showMessageDialog(PromotionManagement.this, "Server returned HTTP Status " + (res != null ? res.getCode() : "No response") + "nMessage: " + (res != null ? res.getMessage() : "No response"), "Lỗi cập nhật khuyến mãi", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            PromotionDTO entitySave = (PromotionDTO) res.getData();
+
+                            if (entitySave == null) {
+                                Message.showMessage("Lỗi", "Không thể cập nhật khuyến mãi!");
+                                return;
+                            }
+                            loadData();
 
 
-                        // Cột 6 là createdAt - không cập nhật
-                        // Cột 7 là action column
+                            // Cột 6 là createdAt - không cập nhật
+                            // Cột 7 là action column
 
-                        GlassPanePopup.closePopupLast();
+                            GlassPanePopup.closePopupLast();
+                        });
                     });
-                });
 
-                GlassPanePopup.showPopup(modal);
+                    GlassPanePopup.showPopup(modal);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override
@@ -247,7 +292,16 @@ public class PromotionManagement extends javax.swing.JPanel {
                     if (rowDelete >= 0) {
                         Long id = (Long) model.getValueAt(rowDelete, 0);
                         model.removeRow(rowDelete);
-                        promotionService.deletePromotion(id);
+                        try {
+                            Response response = promotionService.deletePromotion(id);
+                            if (response == null || response.getCode() != 200) {
+                                JOptionPane.showMessageDialog(PromotionManagement.this, "Server returned HTTP Status " + (response != null ? response.getCode() : "No response") + "nMessage: " + (response != null ? response.getMessage() : "No response"), "Lỗi xóa khuyến mãi", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             }
@@ -281,20 +335,20 @@ public class PromotionManagement extends javax.swing.JPanel {
             public void insertUpdate(DocumentEvent e) {
                 String text = headerCustom1.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(promotionService.getAllPromotions());
+                    loadTable(fetchData(GET_ALL, null));
                     return;
                 }
-                loadTable(promotionService.getPromotionByKeyword(text));
+                loadTable(fetchData(GET_BY_KEYWORD, text));
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 String text = headerCustom1.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(promotionService.getAllPromotions());
+                    loadTable(fetchData(GET_ALL, null));
                     return;
                 }
-                loadTable(promotionService.getPromotionByKeyword(text));
+                loadTable(fetchData(GET_BY_KEYWORD, text));
             }
 
             @Override
@@ -408,7 +462,14 @@ public class PromotionManagement extends javax.swing.JPanel {
             promotion.setStartDate(result.startDate);
             promotion.setEndDate(result.endDate);
 
-            PromotionDTO entitySave = promotionService.createPromotion(promotion);
+            Response response = promotionService.createPromotion(promotion);
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(PromotionManagement.this, "Server returned HTTP Status " + (response != null ? response.getCode() : "No response") + "nMessage: " + (response != null ? response.getMessage() : "No response"), "Lỗi thêm khuyến mãi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            PromotionDTO entitySave = response.getData() != null ? (PromotionDTO) response.getData() : null;
 
             if (entitySave == null) {
                 Message.showMessage("Lỗi", "Không thể thêm khuyến mãi!");

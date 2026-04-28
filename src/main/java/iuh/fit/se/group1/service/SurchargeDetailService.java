@@ -4,7 +4,6 @@ import iuh.fit.se.group1.config.AppLogger;
 import iuh.fit.se.group1.dto.SurchargeDetailDTO;
 import iuh.fit.se.group1.entity.SurchargeDetail;
 import iuh.fit.se.group1.mapper.SurchargeDetailMapper;
-import iuh.fit.se.group1.mapper.SurchargeMapper;
 import iuh.fit.se.group1.repository.jpa.SurchargeDetailRepositoryImpl;
 
 import java.util.List;

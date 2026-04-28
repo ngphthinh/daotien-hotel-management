@@ -8,13 +8,14 @@ import com.raven.datechooser.DateChooser;
 import com.raven.datechooser.SelectedAction;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.dto.EmployeeShiftDTO;
+import iuh.fit.se.group1.dto.ShiftCloseDTO;
 import iuh.fit.se.group1.dto.ShiftDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
+import iuh.fit.se.group1.network.client.service.ShiftCloseServiceClient;
+import iuh.fit.se.group1.network.client.service.ShiftServiceClient;
 import iuh.fit.se.group1.service.EmployeeShiftService;
-import iuh.fit.se.group1.service.ShiftCloseService;
-import iuh.fit.se.group1.service.ShiftService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.shift.ShiftCard;
 import iuh.fit.se.group1.ui.component.shift.ShiftList;
@@ -54,7 +55,7 @@ import static iuh.fit.se.group1.ui.layout.EmployeeManagement.GET_BY_KEYWORD;
 public class ShiftManagement extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(ShiftManagement.class);
     private DateChooser dateChooser;
-    private ShiftService shiftService;
+    private final ShiftServiceClient shiftService;
     private List<ShiftDTO> shifts;
     private EmployeeShiftService employeeShiftService;
     private EmployeeServiceClient employeeService;
@@ -64,7 +65,7 @@ public class ShiftManagement extends javax.swing.JPanel {
      */
     public ShiftManagement() {
         initComponents();
-        shiftService = new ShiftService();
+        shiftService = SocketFacade.getInstance().getShift();
         employeeShiftService = new EmployeeShiftService();
         employeeService = SocketFacade.getInstance().getEmployee();
         loadShiftsFromDatabase();
@@ -172,7 +173,15 @@ public class ShiftManagement extends javax.swing.JPanel {
     private void loadShiftsFromDatabase() {
         try {
             // Lấy tất cả shifts từ database
-            shifts = shiftService.getAllShifts();
+
+            Response response = shiftService.getAllShifts();
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                return;
+            }
+
+
+            shifts = (List<ShiftDTO>) response.getData();
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
             // Gán dữ liệu vào các ShiftCard tương ứng
@@ -424,9 +433,21 @@ public class ShiftManagement extends javax.swing.JPanel {
 
             // KIỂM TRA CA ĐÃ ĐÓNG CHƯA (KHÔNG CHO PHÉP UPDATE NẾU ĐÃ ĐÓNG)
             if (hasExistingEmployees) {
-                ShiftCloseService shiftCloseService = new ShiftCloseService();
+                ShiftCloseServiceClient shiftCloseService = SocketFacade.getInstance().getShiftClose();
                 boolean hasClosedShift = existingShifts.stream()
-                        .anyMatch(es -> !shiftCloseService.getShiftCloseByEmployeeShift(es.getEmployeeShiftId()).isEmpty());
+                        .anyMatch(es -> {
+                            try {
+                                Response response = shiftCloseService.getShiftCloseByEmployeeShift(es.getEmployeeShiftId());
+                                if (response == null || response.getCode() != 200) {
+                                    JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                                    return false;
+                                }
+                                List<ShiftCloseDTO> closedShifts = (List<ShiftCloseDTO>) response.getData();
+                                return !closedShifts.isEmpty();
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
 
                 if (hasClosedShift) {
                     Message.showMessageNoCancel("Không thể cập nhật",

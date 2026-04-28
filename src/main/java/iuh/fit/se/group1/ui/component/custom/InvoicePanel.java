@@ -6,6 +6,7 @@ import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.BookingServiceClient;
 import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
 import iuh.fit.se.group1.network.client.service.OrderDetailServiceClient;
+import iuh.fit.se.group1.network.client.service.PromotionServiceClient;
 import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.scroll.ScrollPaneWin11;
 import iuh.fit.se.group1.util.Constants;
@@ -39,7 +40,7 @@ public class InvoicePanel extends JPanel {
     private final BookingServiceClient bookingService = SocketFacade.getInstance().getBooking();
     private final OrderDetailServiceClient orderDetailService = SocketFacade.getInstance().getOrderDetail();
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
-    private final PromotionService promotionService = new PromotionService();
+    private final PromotionServiceClient promotionService = SocketFacade.getInstance().getPromotion();
     // Header components
     private JLabel lblInvoiceTitle;
     private JLabel lblInvoiceId;
@@ -372,7 +373,11 @@ public class InvoicePanel extends JPanel {
                     int row = e.getFirstRow();
                     if (row >= 0) {
                         updateRowTotal(amenityModel, row);
-                        updateSummaryFromTableTotals();
+                        try {
+                            updateSummaryFromTableTotals();
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
@@ -399,7 +404,11 @@ public class InvoicePanel extends JPanel {
                     int row = e.getFirstRow();
                     if (row >= 0) {
                         updateRowTotal(surchargeModel, row);
-                        updateSummaryFromTableTotals();
+                        try {
+                            updateSummaryFromTableTotals();
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
@@ -769,14 +778,23 @@ public class InvoicePanel extends JPanel {
         }
     }
 
-    private void updatePromotion() {
+    private void updatePromotion() throws Exception {
         if (order == null || order.getPromotion() == null || order.getPromotion().getPromotionId() == null) {
             lblPromotionName.setText("Không áp dụng");
             lblPromotionDiscount.setText("0%");
             return;
         }
 
-        PromotionDTO promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+        Response response = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Không thể tải thông tin khuyến mãi: " + (response != null ? response.getMessage() : "No response"),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+
+            return;
+        }
+
+        PromotionDTO promotion = (PromotionDTO) response.getData();
 
         if (promotion != null) {
             lblPromotionName.setText(promotion.getPromotionName() != null ? promotion.getPromotionName() : "Không áp dụng");
@@ -787,7 +805,7 @@ public class InvoicePanel extends JPanel {
         }
     }
 
-    private void updateSummary() {
+    private void updateSummary() throws Exception {
         // Default behavior: use order totals when not in edit mode
         if (!editMode) {
             if (order == null) return;
@@ -798,7 +816,16 @@ public class InvoicePanel extends JPanel {
             // Calculate promotion discount
             BigDecimal promotionAmount = BigDecimal.ZERO;
             if (order.getPromotion() != null && order.getPromotion().getPromotionId() != null) {
-                PromotionDTO promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+
+                Response response = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Không thể tải thông tin khuyến mãi: " + (response != null ? response.getMessage() : "No response"),
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                PromotionDTO promotion = (PromotionDTO) response.getData();
                 if (promotion != null) {
                     float discountPercent = promotion.getDiscountPercent();
                     promotionAmount = totalAmount.multiply(BigDecimal.valueOf(discountPercent / 100));
@@ -843,7 +870,7 @@ public class InvoicePanel extends JPanel {
         model.setValueAt(Constants.VND_FORMAT.format(total), row, 3);
     }
 
-    private void updateSummaryFromTableTotals() {
+    private void updateSummaryFromTableTotals() throws Exception {
         if (order == null) return;
 
         BigDecimal amenityTotal = BigDecimal.ZERO;
@@ -860,7 +887,16 @@ public class InvoicePanel extends JPanel {
 
         BigDecimal promotionAmount = BigDecimal.ZERO;
         if (order.getPromotion() != null && order.getPromotion().getPromotionId() != null) {
-            PromotionDTO promotion = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+
+            Response response = promotionService.getPromotionById(order.getPromotion().getPromotionId());
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Không thể tải thông tin khuyến mãi: " + (response != null ? response.getMessage() : "No response"),
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            PromotionDTO promotion = (PromotionDTO) response.getData();
             if (promotion != null) {
                 float discountPercent = promotion.getDiscountPercent();
                 promotionAmount = roomTotal.multiply(BigDecimal.valueOf(discountPercent / 100));

@@ -157,4 +157,19 @@ public class OrderServiceClient implements ServiceClient {
                         .build())
                 .build()).get();
     }
+
+    public Response getAllOrdersWithRelationshipAndCompleteYet() throws Exception {
+        return clientSocketManager.send(Request.builder()
+                .commandType(CommandType.ORDER_GET_ALL_WITH_RELATIONSHIP_COMPLETE_YET)
+                .build()).get();
+
+    }
+
+    public Response findOrdersUnPendingByKeyWord(String keyword) throws Exception {
+        return clientSocketManager.send(Request.builder()
+                .commandType(CommandType.ORDER_GET_UN_PENDING_BY_KEYWORD)
+                .request(keyword)
+                .build()).get();
+
+    }
 }

@@ -8,9 +8,9 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.OrderServiceClient;
-import iuh.fit.se.group1.service.RoomService;
+import iuh.fit.se.group1.network.client.service.RoomServiceClient;
+import iuh.fit.se.group1.network.client.service.SurchargeServiceClient;
 import iuh.fit.se.group1.service.SurchargeDetailService;
-import iuh.fit.se.group1.service.SurchargeService;
 import iuh.fit.se.group1.ui.component.booking2.CalendarUI;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow2;
 import iuh.fit.se.group1.ui.component.booking2.MainFlow3;
@@ -39,11 +39,11 @@ public class BookingPage extends javax.swing.JPanel {
 
     private final SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
     private List<RoomSelection> selectedRooms;
-    private final SurchargeService surchargeService = new SurchargeService();
+    private final SurchargeServiceClient surchargeService = SocketFacade.getInstance().getSurcharge();
     @Setter
     private EmployeeDTO currentEmployee;
     private final OrderServiceClient orderService = SocketFacade.getInstance().getOrder();
-    private RoomService roomService = new RoomService();
+    private RoomServiceClient roomService = SocketFacade.getInstance().getRoom();
     private MainFlow3 mainFlow3;
     private MainFlow2 mainFlow2;
     private MainFlow4 mainFlow4;
@@ -277,8 +277,18 @@ public class BookingPage extends javax.swing.JPanel {
         LocalDateTime checkIn = LocalDateTime.parse(mainFlow1.getTxtCheckInDate().getText(), formatter);
         LocalDateTime checkOut = LocalDateTime.parse(mainFlow1.getTxtCheckOutDate().getText(), formatter);
 
+        Response response = null;
+        try {
+            response = roomService.getAvailableRooms(checkIn, checkOut);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Lỗi khi lấy danh sách phòng trống: " + (response != null ? response.getMessage() : "Không có phản hồi từ server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        selectedRooms = mainFlow2.getSelectedRoom(roomService.getAvailableRooms(checkIn, checkOut));
+        selectedRooms = mainFlow2.getSelectedRoom((List<RoomViewDTO>) response.getData());
 
         mainFlow5.setInfoBooking(
                 mainFlow1.getTxtCheckInDate().getText(),
@@ -360,8 +370,20 @@ public class BookingPage extends javax.swing.JPanel {
             children = Integer.parseInt(childrenStr);
         }
 
+        Response response = null;
+        try {
+            response = roomService.countAvailableRooms(checkIn, checkOut);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null, "Lỗi khi kiểm tra số lượng phòng trống: " + (response != null ? response.getMessage() : "Không có phản hồi từ server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
         // Tìm phòng trống
-        var availableRooms = roomService.countAvailableRooms(checkIn, checkOut);
+        AvailableRoomCountResponse availableRooms = (AvailableRoomCountResponse) response.getData();
 //        // Cập nhật danh sách phòng trống lên mainFlow2
         return mainFlow2.updateRoomList(
                 availableRooms,

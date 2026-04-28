@@ -6,8 +6,8 @@ import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
-import iuh.fit.se.group1.service.RoomService;
-import iuh.fit.se.group1.service.RoomTypeService;
+import iuh.fit.se.group1.network.client.service.RoomServiceClient;
+import iuh.fit.se.group1.network.client.service.RoomTypeServiceClient;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.Combobox;
 import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
@@ -42,8 +42,8 @@ import iuh.fit.se.group1.ui.component.custom.message.Message;
 
 public class RoomManagement extends javax.swing.JPanel {
 
-    private RoomService roomService;
-    private RoomTypeService roomTypeService;
+    private RoomServiceClient roomService;
+    private RoomTypeServiceClient roomTypeService;
     private String currentTypeFilter = "Tất cả";
     private String currentStatusFilter = "Tất cả";
 
@@ -55,26 +55,51 @@ public class RoomManagement extends javax.swing.JPanel {
     private JTextField txtDoubleHour, txtDoubleNight, txtDoubleDay;
     private JLabel lblSingleFirstHour, lblDoubleFirstHour;
     private JTextField txtSingleFirstHour, txtDoubleFirstHour;
+    private static final int GET_ALL = 0;
+    private static final int GET_BY_KEYWORD = 1;
 
     public RoomManagement() {
         initServices();
         initComponents();
-        loadPricesFromFile();
-        custom();
-        loadTable(roomService.getAllRooms());
+
+        loadTable(fetchData(GET_ALL, null));
         try {
+            loadPricesFromFile();
+            custom();
             setupFixedPrices();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void initServices() {
-        roomService = new RoomService();
-        roomTypeService = new RoomTypeService();
+    private List<RoomViewDTO> fetchData(int type, String filter) {
+        try {
+            Response response = null;
+
+            if (type == GET_ALL) {
+                response = roomService.getAllRooms();
+            } else if (type == GET_BY_KEYWORD) {
+                response = roomService.getRoomByKeyword(filter);
+            }
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Lỗi tải dữ liệu: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+                return List.of();
+            }
+            return (List<RoomViewDTO>) response.getData();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi tải dữ liệu: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return List.of();
+        }
     }
 
-    private void custom() {
+
+    private void initServices() {
+        roomService = SocketFacade.getInstance().getRoom();
+        roomTypeService = SocketFacade.getInstance().getRoomType();
+    }
+
+    private void custom() throws Exception {
         headerCustom.getLblTitle().setText(
                 "<html><span style='color:white;'>Quản lý phòng</span>");
         headerCustom.getLblTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 20));
@@ -115,8 +140,8 @@ public class RoomManagement extends javax.swing.JPanel {
 
                     List<RoomViewDTO> imported = (List<RoomViewDTO>) response.getData();
                     if (imported != null && !imported.isEmpty()) {
-                        roomService.getAllRooms().addAll(imported);
-                        loadTable(roomService.getAllRooms());
+                        fetchData(GET_ALL, null).addAll(imported);
+                        loadTable(fetchData(GET_ALL, null));
                         Message.showMessage("Thành công", "Đã import " + imported.size() + " phòng!");
                     } else {
                         Message.showMessage("Lỗi", "Không có dữ liệu nào được import!");
@@ -220,11 +245,13 @@ public class RoomManagement extends javax.swing.JPanel {
                         "Giá phòng không hợp lệ! Vui lòng nhập số.", "Lỗi",
                         CustomDialog.MessageType.ERROR,
                         600, 200);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
         });
     }
 
-    private void savePricesToFile() {
+    private void savePricesToFile() throws Exception {
         RoomTypeDTO singleType = new RoomTypeDTO();
         singleType.setHourlyRate(new BigDecimal(txtSingleFirstHour.getText().trim()));
         singleType.setDailyRate(new BigDecimal(txtSingleDay.getText().trim()));
@@ -239,13 +266,35 @@ public class RoomManagement extends javax.swing.JPanel {
         doubleType.setAdditionalHourRate(new BigDecimal(txtDoubleHour.getText().trim()));
         doubleType.setRoomTypeId("DOUBLE");
 
-        roomTypeService.updateRoomType(singleType);
-        roomTypeService.updateRoomType(doubleType);
+        Response response = roomTypeService.updateRoomType(singleType);
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Lỗi cập nhật giá phòng SINGLE: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+
+            return;
+        }
+
+        response = roomTypeService.updateRoomType(doubleType);
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Lỗi cập nhật giá phòng DOUBLE: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+
+            return;
+        }
+
 
     }
 
-    private void loadPricesFromFile() {
-        var roomType = roomTypeService.getAllRoomTypes();
+    private void loadPricesFromFile() throws Exception {
+
+        Response response = roomTypeService.getAllRoomTypes();
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Lỗi tải giá phòng: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
+        var roomType = (List<RoomTypeDTO>) response.getData();
         RoomTypeDTO singleType = roomType.stream()
                 .filter(rt -> rt.getRoomTypeId().equals("SINGLE"))
                 .findFirst()
@@ -347,7 +396,19 @@ public class RoomManagement extends javax.swing.JPanel {
         System.out.println("Room data - ID: " + roomId + ", Number: " + number + ", Type: " + type + ", Status: " + status);
 
         // Kiểm tra phòng có trong hóa đơn loại 2 hoặc 3 không
-        if (!roomService.canDeleteRoom(roomId)) {
+        Response response = null;
+        try {
+            response = roomService.canDeleteRoom(roomId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Lỗi kiểm tra trạng thái phòng: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+
+        }
+
+        if (!(boolean) response.getData()) {
             CustomDialog.showMessage(this,
                     "<html><div style='width:400px;'>" +
                             "Không thể chỉnh sửa phòng này!<br><br>" +
@@ -383,9 +444,22 @@ public class RoomManagement extends javax.swing.JPanel {
 //                    return;
 //                }
 
-                RoomViewDTO updatedRoom = roomService.updateRoom(createRoomFromModal(roomId, numberNew, typeNew, statusNew));
+                Response res = null;
+                try {
+                    res = roomService.updateRoom(createRoomFromModal(roomId, numberNew, typeNew, statusNew));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (res == null || res.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Lỗi cập nhật phòng: " + (res != null ? res.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+
+                RoomViewDTO updatedRoom = (RoomViewDTO) res.getData();
                 if (updatedRoom != null) {
-                    loadTable(roomService.getAllRooms());
+                    loadTable(fetchData(GET_ALL, null));
                     GlassPanePopup.closePopupLast();
                     CustomDialog.showMessage(
                             this,
@@ -422,24 +496,40 @@ public class RoomManagement extends javax.swing.JPanel {
                 CustomDialog.MessageType.WARNING,
                 600, 200);
         if (confirm == JOptionPane.YES_OPTION) {
-            if (!roomService.canDeleteRoom(roomId)) {
-                CustomDialog.showMessage(this,
-                        "<html><div style='width:400px;'>" +
-                                "Không thể xóa phòng này!<br><br>" +
-                                "<b>Lý do:</b><br>" +
-                                "- Phòng đang được sử dụng trong hóa đơn hiện tại, HOẶC<br>" +
-                                "- Phòng được đặt trước nhưng không tìm thấy phòng thay thế cùng loại" +
-                                "</div></html>",
-                        "Không thể xóa",
-                        CustomDialog.MessageType.ERROR,
-                        600, 250);
-                return;
+            try {
+                Response response = null;
+                response = roomService.canDeleteRoom(roomId);
+
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Lỗi kiểm tra trạng thái phòng: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+
+                }
+                if (!(boolean) response.getData()) {
+                    CustomDialog.showMessage(this,
+                            "<html><div style='width:400px;'>" +
+                                    "Không thể xóa phòng này!<br><br>" +
+                                    "<b>Lý do:</b><br>" +
+                                    "- Phòng đang được sử dụng trong hóa đơn hiện tại, HOẶC<br>" +
+                                    "- Phòng được đặt trước nhưng không tìm thấy phòng thay thế cùng loại" +
+                                    "</div></html>",
+                            "Không thể xóa",
+                            CustomDialog.MessageType.ERROR,
+                            600, 250);
+                    return;
+                }
+                response = roomService.deleteRoom(roomId);
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Lỗi xóa phòng: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                loadTable(fetchData(GET_ALL, null));
+                CustomDialog.showMessage(this, "Xóa phòng thành công!", "Thành công",
+                        CustomDialog.MessageType.SUCCESS,
+                        500, 200);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            roomService.deleteRoom(roomId);
-            loadTable(roomService.getAllRooms());
-            CustomDialog.showMessage(this, "Xóa phòng thành công!", "Thành công",
-                    CustomDialog.MessageType.SUCCESS,
-                    500, 200);
         }
     }
 
@@ -457,7 +547,7 @@ public class RoomManagement extends javax.swing.JPanel {
             modal.getLblErrolNumberRoom().setText("Số phòng chỉ được chứa chữ số!");
             isValid = false;
         } else {
-            List<RoomViewDTO> existing = roomService.getRoomByKeyword(number);
+            List<RoomViewDTO> existing = fetchData(GET_BY_KEYWORD, number);
             if (existing.stream().anyMatch(r -> !roomId.equals(r.getRoomId()) && r.getRoomNumber().equals(number))) {
                 modal.getLblErrolNumberRoom().setText("Số phòng đã tồn tại!");
                 isValid = false;
@@ -467,9 +557,17 @@ public class RoomManagement extends javax.swing.JPanel {
         return isValid;
     }
 
-    private void setupHeaderFilters() {
+    private void setupHeaderFilters() throws Exception {
         var header = tblRoom.getTbl().getTableHeader();
-        List<RoomTypeDTO> types = roomTypeService.getAllRoomTypes();
+
+        Response response = roomTypeService.getAllRoomTypes();
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(this, "Lỗi tải loại phòng: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        List<RoomTypeDTO> types = (List<RoomTypeDTO>) response.getData();
         String[] typeItems = new String[types.size() + 1];
         typeItems[0] = "Tất cả";
         for (int i = 0; i < types.size(); i++) {
@@ -609,9 +707,9 @@ public class RoomManagement extends javax.swing.JPanel {
             public void insertUpdate(DocumentEvent e) {
                 String text = headerCustom.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(roomService.getAllRooms());
+                    loadTable(fetchData(GET_ALL, null));
                 } else {
-                    loadTable(roomService.getRoomByKeyword(text));
+                    loadTable(fetchData(GET_BY_KEYWORD, text));
                 }
             }
 
@@ -619,9 +717,9 @@ public class RoomManagement extends javax.swing.JPanel {
             public void removeUpdate(DocumentEvent e) {
                 String text = headerCustom.getSearchText();
                 if (text.isEmpty()) {
-                    loadTable(roomService.getAllRooms());
+                    loadTable(fetchData(GET_ALL, null));
                 } else {
-                    loadTable(roomService.getRoomByKeyword(text));
+                    loadTable(fetchData(GET_BY_KEYWORD, text));
                 }
             }
 
@@ -854,9 +952,22 @@ public class RoomManagement extends javax.swing.JPanel {
                 String statusStr = (String) modal.getCmbStatus().getSelectedItem();
 
                 RoomViewDTO newRoom = createRoomFromModal(null, number, typeStr, statusStr);
-                RoomViewDTO saved = roomService.createRoom(newRoom);
+                Response response = null;
+                try {
+                    response = roomService.createRoom(newRoom);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (response == null || response.getCode() != 200) {
+
+                    JOptionPane.showMessageDialog(this, "Lỗi tạo phòng: " + (response != null ? response.getMessage() : "No response from server"), "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                RoomViewDTO saved = (RoomViewDTO) response.getData();
                 if (saved != null) {
-                    loadTable(roomService.getAllRooms());
+                    loadTable(fetchData(GET_ALL, null));
                     GlassPanePopup.closePopupLast();
                     CustomDialog.showMessage(this, "Thêm phòng thành công!", "Thành công",
                             CustomDialog.MessageType.SUCCESS,
@@ -874,8 +985,12 @@ public class RoomManagement extends javax.swing.JPanel {
 
 
     public void loadData() {
-        loadTable(roomService.getAllRooms());
-        loadPricesFromFile();
+        loadTable(fetchData(GET_ALL, null));
+        try {
+            loadPricesFromFile();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {

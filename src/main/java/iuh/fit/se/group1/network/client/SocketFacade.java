@@ -19,6 +19,14 @@ public class SocketFacade {
     private final DashboardServiceClient dashboard;
     private final DenominationDetailServiceClient denominationDetail;
     private final ImportExportExcelServiceClient importExportExcel;
+    private final SurchargeServiceClient surcharge;
+    private final PromotionServiceClient promotion;
+    private final ShiftServiceClient shift;
+    private final ShiftCloseServiceClient shiftClose;
+    private final RoomTypeServiceClient roomType;
+    private final JaspersoftExportServiceClient jaspersoftExport;
+    private final RoomToolsServiceClient roomTools;
+    private final RoomServiceClient room;
 
     public SocketFacade(ClientSocketManager socket) {
         this.auth = new AuthServiceClient(socket);
@@ -33,6 +41,14 @@ public class SocketFacade {
         this.dashboard = new DashboardServiceClient(socket);
         this.denominationDetail = new DenominationDetailServiceClient(socket);
         this.importExportExcel = new ImportExportExcelServiceClient(socket);
+        this.surcharge = new SurchargeServiceClient(socket);
+        this.promotion = new PromotionServiceClient(socket);
+        this.shift = new ShiftServiceClient(socket);
+        this.shiftClose = new ShiftCloseServiceClient(socket);
+        this.roomType = new RoomTypeServiceClient(socket);
+        this.jaspersoftExport = new JaspersoftExportServiceClient(socket);
+        this.roomTools = new RoomToolsServiceClient(socket);
+        this.room = new RoomServiceClient(socket);
     }
 
     private static SocketFacade instance;

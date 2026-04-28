@@ -1,7 +1,6 @@
 package iuh.fit.se.group1.service;
 
-import iuh.fit.se.group1.dto.RoomDTO;
-import iuh.fit.se.group1.dto.RoomViewDTO;
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.entity.Room;
@@ -14,10 +13,7 @@ import iuh.fit.se.group1.util.Constants;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RoomService extends Service {
@@ -75,50 +71,159 @@ public class RoomService extends Service {
     }
 
 
-    public Map<RoomDTO, Long> countAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
+//    public Map<RoomDTO, Long> countAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
+//
+//        List<Room> rooms = doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE));
+//
+//        RoomType singleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, Constants.SINGLE_ROOM_TYPE));
+//        RoomType doubleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, Constants.DOUBLE_ROOM_TYPE));
+//
+//        RoomDTO doubleRoom = roomMapper.toRoomDTO(doubleRoomType);
+//        RoomDTO singleRoom = roomMapper.toRoomDTO(singleRoomType);
+//
+//        Long singleRooms = rooms.stream()
+//                .filter(room -> room.getRoomType().getRoomTypeId().equals(Constants.SINGLE_ROOM_TYPE))
+//                .count();
+//
+//        Long doubleRooms = rooms.stream()
+//                .filter(room -> room.getRoomType().getRoomTypeId().equals(Constants.DOUBLE_ROOM_TYPE))
+//                .count();
+//
+//        Map<RoomDTO, Long> map = new LinkedHashMap<>();
+//        map.put(singleRoom, singleRooms);
+//        map.put(doubleRoom, doubleRooms);
+//        return map;
+//    }
 
-        List<Room> rooms = doInTransaction(entityManager -> roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE));
+    public AvailableRoomCountResponse countAvailableRooms(
+            LocalDateTime checkIn,
+            LocalDateTime checkOut) {
 
-        RoomType singleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, Constants.SINGLE_ROOM_TYPE));
-        RoomType doubleRoomType = doInTransaction(entityManager -> roomTypeRepositoryImpl.findById(entityManager, Constants.DOUBLE_ROOM_TYPE));
+        List<Room> rooms = doInTransaction(entityManager ->
+                roomRepository.findAvailableRooms(entityManager, checkIn, checkOut, RoomStatus.AVAILABLE));
 
-        RoomDTO doubleRoom = roomMapper.toRoomDTO(doubleRoomType);
+        RoomType singleRoomType = doInTransaction(entityManager ->
+                roomTypeRepositoryImpl.findById(entityManager, Constants.SINGLE_ROOM_TYPE));
+
+        RoomType doubleRoomType = doInTransaction(entityManager ->
+                roomTypeRepositoryImpl.findById(entityManager, Constants.DOUBLE_ROOM_TYPE));
+
         RoomDTO singleRoom = roomMapper.toRoomDTO(singleRoomType);
+        RoomDTO doubleRoom = roomMapper.toRoomDTO(doubleRoomType);
 
-        Long singleRooms = rooms.stream()
-                .filter(room -> room.getRoomType().getRoomTypeId().equals(Constants.SINGLE_ROOM_TYPE))
+        long singleRooms = rooms.stream()
+                .filter(r -> r.getRoomType().getRoomTypeId().equals(Constants.SINGLE_ROOM_TYPE))
                 .count();
 
-        Long doubleRooms = rooms.stream()
-                .filter(room -> room.getRoomType().getRoomTypeId().equals(Constants.DOUBLE_ROOM_TYPE))
+        long doubleRooms = rooms.stream()
+                .filter(r -> r.getRoomType().getRoomTypeId().equals(Constants.DOUBLE_ROOM_TYPE))
                 .count();
 
-        Map<RoomDTO, Long> map = new LinkedHashMap<>();
-        map.put(singleRoom, singleRooms);
-        map.put(doubleRoom, doubleRooms);
-        return map;
+        return AvailableRoomCountResponse.builder()
+                .singleRoom(singleRoom)
+                .singleAvailable(singleRooms)
+                .doubleRoom(doubleRoom)
+                .doubleAvailable(doubleRooms)
+                .totalAvailable(singleRooms + doubleRooms)
+                .build();
     }
 
 
     /**
      * Optimize room allocation based on available rooms and guest requirements.
      *
-     * @param availableSingleRooms
-     * @param availableDoubleRooms
-     * @param adultGuests
-     * @param childGuests
      * @return Map with keys: "usedSingleRooms", "usedDoubleRooms", "totalRoomsUsed",
      * "accommodatedAdults", "accommodatedChildren", "unaccommodatedAdults",
      * "unaccommodatedChildren", "unaccommodatedGuests"
      */
-    public Map<String, Long> optimizeRoomAllocation(
-            int availableSingleRooms,
-            int availableDoubleRooms,
-            int adultGuests,
-            int childGuests) {
-
-        Map<String, Long> result = new HashMap<>();
-
+//    public Map<String, Long> optimizeRoomAllocation(
+//            int availableSingleRooms,
+//            int availableDoubleRooms,
+//            int adultGuests,
+//            int childGuests) {
+//
+//        Map<String, Long> result = new HashMap<>();
+//
+//        // Constants
+//        final int SINGLE_ADULT_CAPACITY = 2;
+//        final int SINGLE_CHILD_CAPACITY = 1;
+//        final int DOUBLE_ADULT_CAPACITY = 4;
+//        final int DOUBLE_CHILD_CAPACITY = 2;
+//
+//        int usedSingle = 0;
+//        int usedDouble = 0;
+//        int remainingAdults = adultGuests;
+//        int remainingChildren = childGuests;
+//
+//        // Continue until no guests left or no rooms left
+//        while ((remainingAdults > 0 || remainingChildren > 0) &&
+//                (usedSingle < availableSingleRooms || usedDouble < availableDoubleRooms)) {
+//
+//            boolean preferDouble;
+//
+//            // 🎯 RULE: tự động chọn theo số người lớn còn lại
+//            if (remainingAdults >= 3) {
+//                preferDouble = true;
+//            } else {
+//                preferDouble = false;
+//            }
+//
+//            // Nếu ưu tiên phòng đôi nhưng hết phòng đôi => dùng phòng đơn
+//            if (preferDouble && usedDouble >= availableDoubleRooms) {
+//                preferDouble = false;
+//            }
+//
+//            // Nếu ưu tiên phòng đơn nhưng hết phòng đơn => dùng phòng đôi
+//            if (!preferDouble && usedSingle >= availableSingleRooms) {
+//                preferDouble = true;
+//            }
+//
+//            // -------------------------------
+//            // Gán khách vào phòng đôi
+//            // -------------------------------
+//            if (preferDouble) {
+//                int adultsInRoom = Math.min(remainingAdults, DOUBLE_ADULT_CAPACITY);
+//                int childrenInRoom = Math.min(remainingChildren, DOUBLE_CHILD_CAPACITY);
+//
+//                if (adultsInRoom == 0 && childrenInRoom == 0) break;
+//
+//                remainingAdults -= adultsInRoom;
+//                remainingChildren -= childrenInRoom;
+//                usedDouble++;
+//            }
+//            // -------------------------------
+//            // Gán khách vào phòng đơn
+//            // -------------------------------
+//            else {
+//                int adultsInRoom = Math.min(remainingAdults, SINGLE_ADULT_CAPACITY);
+//                int childrenInRoom = Math.min(remainingChildren, SINGLE_CHILD_CAPACITY);
+//
+//                if (adultsInRoom == 0 && childrenInRoom == 0) break;
+//
+//                remainingAdults -= adultsInRoom;
+//                remainingChildren -= childrenInRoom;
+//                usedSingle++;
+//            }
+//        }
+//
+//        // Build result
+//        result.put("usedSingleRooms", (long) usedSingle);
+//        result.put("usedDoubleRooms", (long) usedDouble);
+//        result.put("totalRoomsUsed", (long) (usedSingle + usedDouble));
+//        result.put("accommodatedAdults", (long) (adultGuests - remainingAdults));
+//        result.put("accommodatedChildren", (long) (childGuests - remainingChildren));
+//        result.put("unaccommodatedAdults", (long) remainingAdults);
+//        result.put("unaccommodatedChildren", (long) remainingChildren);
+//        result.put("unaccommodatedGuests", (long) (remainingAdults + remainingChildren));
+//
+//        return result;
+//    }
+    public OptimizeRoomAllocationResponse optimizeRoomAllocation(
+            OptimizeRoomAllocationRequest optimizeRoomAllocationRequest) {
+        int availableSingleRooms = optimizeRoomAllocationRequest.getSingleQuantity();
+        int availableDoubleRooms = optimizeRoomAllocationRequest.getDoubleQuantity();
+        int adultGuests = optimizeRoomAllocationRequest.getAdults();
+        int childGuests = optimizeRoomAllocationRequest.getChildren();
         // Constants
         final int SINGLE_ADULT_CAPACITY = 2;
         final int SINGLE_CHILD_CAPACITY = 1;
@@ -130,32 +235,19 @@ public class RoomService extends Service {
         int remainingAdults = adultGuests;
         int remainingChildren = childGuests;
 
-        // Continue until no guests left or no rooms left
         while ((remainingAdults > 0 || remainingChildren > 0) &&
                 (usedSingle < availableSingleRooms || usedDouble < availableDoubleRooms)) {
 
-            boolean preferDouble;
+            boolean preferDouble = remainingAdults >= 3;
 
-            // 🎯 RULE: tự động chọn theo số người lớn còn lại
-            if (remainingAdults >= 3) {
-                preferDouble = true;
-            } else {
-                preferDouble = false;
-            }
-
-            // Nếu ưu tiên phòng đôi nhưng hết phòng đôi => dùng phòng đơn
             if (preferDouble && usedDouble >= availableDoubleRooms) {
                 preferDouble = false;
             }
 
-            // Nếu ưu tiên phòng đơn nhưng hết phòng đơn => dùng phòng đôi
             if (!preferDouble && usedSingle >= availableSingleRooms) {
                 preferDouble = true;
             }
 
-            // -------------------------------
-            // Gán khách vào phòng đôi
-            // -------------------------------
             if (preferDouble) {
                 int adultsInRoom = Math.min(remainingAdults, DOUBLE_ADULT_CAPACITY);
                 int childrenInRoom = Math.min(remainingChildren, DOUBLE_CHILD_CAPACITY);
@@ -165,11 +257,7 @@ public class RoomService extends Service {
                 remainingAdults -= adultsInRoom;
                 remainingChildren -= childrenInRoom;
                 usedDouble++;
-            }
-            // -------------------------------
-            // Gán khách vào phòng đơn
-            // -------------------------------
-            else {
+            } else {
                 int adultsInRoom = Math.min(remainingAdults, SINGLE_ADULT_CAPACITY);
                 int childrenInRoom = Math.min(remainingChildren, SINGLE_CHILD_CAPACITY);
 
@@ -181,41 +269,26 @@ public class RoomService extends Service {
             }
         }
 
-        // Build result
-        result.put("usedSingleRooms", (long) usedSingle);
-        result.put("usedDoubleRooms", (long) usedDouble);
-        result.put("totalRoomsUsed", (long) (usedSingle + usedDouble));
-        result.put("accommodatedAdults", (long) (adultGuests - remainingAdults));
-        result.put("accommodatedChildren", (long) (childGuests - remainingChildren));
-        result.put("unaccommodatedAdults", (long) remainingAdults);
-        result.put("unaccommodatedChildren", (long) remainingChildren);
-        result.put("unaccommodatedGuests", (long) (remainingAdults + remainingChildren));
-
-        return result;
+        return OptimizeRoomAllocationResponse.builder()
+                .usedSingleRooms(usedSingle)
+                .usedDoubleRooms(usedDouble)
+                .totalRoomsUsed(usedSingle + usedDouble)
+                .accommodatedAdults(adultGuests - remainingAdults)
+                .accommodatedChildren(childGuests - remainingChildren)
+                .unaccommodatedAdults(remainingAdults)
+                .unaccommodatedChildren(remainingChildren)
+                .unaccommodatedGuests(remainingAdults + remainingChildren)
+                .build();
     }
 
-    /**
-     * Kiểm tra xem số phòng đã dùng có đủ chỗ cho số người lớn và trẻ em không
-     *
-     * @param adults
-     * @param children
-     * @param usedSingleRoomsNum
-     * @param usedDoubleRoomsNum
-     * @return Map với các key: "usedSingleRooms", "usedDoubleRooms",
-     * "leftoverAdults", "leftoverChildren", "leftoverTotal"
-     */
-    public Map<String, Integer> checkRoomCapacity(
-            int adults,
-            int children,
-            Number usedSingleRoomsNum,
-            Number usedDoubleRoomsNum
-    ) {
-        // Updated capacity
+
+    public CheckRoomCapacityResponse checkRoomCapacity(CheckRoomCapacityRequest request) {
+
         final int SINGLE_A = 2, SINGLE_C = 1;
         final int DOUBLE_A = 4, DOUBLE_C = 2;
 
-        int usedSingleRooms = usedSingleRoomsNum.intValue();
-        int usedDoubleRooms = usedDoubleRoomsNum.intValue();
+        int usedSingleRooms = request.getUsedSingleRooms();
+        int usedDoubleRooms = request.getUsedDoubleRooms();
 
         int totalAdultCapacity =
                 usedSingleRooms * SINGLE_A +
@@ -225,18 +298,16 @@ public class RoomService extends Service {
                 usedSingleRooms * SINGLE_C +
                         usedDoubleRooms * DOUBLE_C;
 
-        // Remaining (nếu > 0 thì không đủ phòng)
-        int leftoverAdults = Math.max(0, adults - totalAdultCapacity);
-        int leftoverChildren = Math.max(0, children - totalChildCapacity);
+        int leftoverAdults = Math.max(0, request.getAdults() - totalAdultCapacity);
+        int leftoverChildren = Math.max(0, request.getChildren() - totalChildCapacity);
 
-        Map<String, Integer> result = new HashMap<>();
-        result.put("usedSingleRooms", usedSingleRooms);
-        result.put("usedDoubleRooms", usedDoubleRooms);
-        result.put("leftoverAdults", leftoverAdults);
-        result.put("leftoverChildren", leftoverChildren);
-        result.put("leftoverTotal", leftoverAdults + leftoverChildren);
-
-        return result;
+        return CheckRoomCapacityResponse.builder()
+                .usedSingleRooms(usedSingleRooms)
+                .usedDoubleRooms(usedDoubleRooms)
+                .leftoverAdults(leftoverAdults)
+                .leftoverChildren(leftoverChildren)
+                .leftoverTotal(leftoverAdults + leftoverChildren)
+                .build();
     }
 
     public List<RoomViewDTO> getAvailableRooms(LocalDateTime checkIn, LocalDateTime checkOut) {
@@ -351,7 +422,9 @@ public class RoomService extends Service {
         return doInTransaction(entityManager -> !roomRepository.isRoomInUse(entityManager, roomId));
     }
 
-    public void updateRoomStatusBatch(List<Long> roomIds, RoomStatus roomStatus) {
+    public void updateRoomStatusBatch(UpdateRoomStatusBatchRequest request) {
+        List<Long> roomIds = request.getRoomIds();
+        RoomStatus roomStatus = request.getRoomStatus();
 //        roomRepository.updateRoomStatusBatch(roomIds, roomStatus);
         doInTransactionVoid(entityManager -> roomRepository.updateRoomStatusBatch(entityManager, roomIds, roomStatus));
     }
