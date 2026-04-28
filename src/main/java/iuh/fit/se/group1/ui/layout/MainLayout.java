@@ -5,8 +5,8 @@ import iuh.fit.se.group1.dto.EmployeeShiftDTO;
 import iuh.fit.se.group1.dto.ShiftCloseDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
+import iuh.fit.se.group1.network.client.service.EmployeeShiftServiceClient;
 import iuh.fit.se.group1.network.client.service.ShiftCloseServiceClient;
-import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.menu.*;
@@ -223,17 +223,32 @@ public class MainLayout extends JPanel {
             Message.showMessage("Lỗi", "Không tìm thấy thông tin nhân viên!");
             return;
         }
-        EmployeeShiftService employeeShiftService = new EmployeeShiftService();
+        EmployeeShiftServiceClient employeeShiftService = SocketFacade.getInstance().getEmployeeShift();
         ShiftCloseServiceClient shiftCloseService = SocketFacade.getInstance().getShiftClose();
 
         //  THỜI GIAN DƯ SAU KHI KẾT THÚC CA (10 phút)
         final int BUFFER_MINUTES = 10;
 
         // LẤY TẤT CẢ CA TRONG NGÀY HÔM NAY
-        List<EmployeeShiftDTO> todayShifts = employeeShiftService.getShiftsByEmployeeAndDate(
-                currentEmployee.getEmployeeId(),
-                LocalDate.now()
-        );
+
+        Response response = null;
+        try {
+            response = employeeShiftService.getShiftsByEmployeeAndDate(
+                    currentEmployee.getEmployeeId(),
+                    LocalDate.now()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response == null || response.getCode() != 200) {
+            JOptionPane.showMessageDialog(null,
+                    "Lỗi kết nối đến dịch vụ ca làm việc!",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        List<EmployeeShiftDTO> todayShifts = (List<EmployeeShiftDTO>) response.getData();
 
         if (todayShifts.isEmpty()) {
             Message.showMessage("Thông báo",
@@ -245,16 +260,16 @@ public class MainLayout extends JPanel {
         //  LỌC RA CÁC CA CHƯA ĐÓNG
         List<EmployeeShiftDTO> openShifts = todayShifts.stream()
                 .filter(shift -> {
-                    Response response = null;
+                    Response res = null;
                     try {
-                        response = shiftCloseService.getShiftCloseByEmployeeShift(shift.getEmployeeShiftId());
+                        res = shiftCloseService.getShiftCloseByEmployeeShift(shift.getEmployeeShiftId());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                    if (response == null || response.getCode() != 200) {
+                    if (res == null || res.getCode() != 200) {
                         throw new RuntimeException("Lỗi kết nối đến dịch vụ kiểm tra ca làm việc!");
                     }
-                    return ((List<ShiftCloseDTO>) response.getData()).isEmpty();
+                    return ((List<ShiftCloseDTO>) res.getData()).isEmpty();
                 })
                 .sorted((s1, s2) -> {
                     // Parse string time để sắp xếp

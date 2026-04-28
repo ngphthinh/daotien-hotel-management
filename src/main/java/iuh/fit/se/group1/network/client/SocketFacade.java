@@ -27,6 +27,7 @@ public class SocketFacade {
     private final JaspersoftExportServiceClient jaspersoftExport;
     private final RoomToolsServiceClient roomTools;
     private final RoomServiceClient room;
+    private final EmployeeShiftServiceClient employeeShift;
 
     public SocketFacade(ClientSocketManager socket) {
         this.auth = new AuthServiceClient(socket);
@@ -49,6 +50,7 @@ public class SocketFacade {
         this.jaspersoftExport = new JaspersoftExportServiceClient(socket);
         this.roomTools = new RoomToolsServiceClient(socket);
         this.room = new RoomServiceClient(socket);
+        this.employeeShift = new EmployeeShiftServiceClient(socket);
     }
 
     private static SocketFacade instance;

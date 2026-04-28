@@ -39,6 +39,7 @@ public class TestServer {
         ShiftCloseService shiftCloseService = new ShiftCloseService();
         RoomTypeService roomTypeService = new RoomTypeService();
         RoomToolsService roomToolsService = new RoomToolsService();
+        EmployeeShiftService employeeShiftService = new EmployeeShiftService();
 
         RoomService roomService = new RoomService();
 
@@ -63,6 +64,7 @@ public class TestServer {
         RoomTypeHandler roomTypeHandler = new RoomTypeHandler(roomTypeService);
         JaspersoftExportHandler jaspersoftExportHandler = new JaspersoftExportHandler(jaspersoftExportService);
         RoomToolsHandler roomToolsHandler = new RoomToolsHandler(roomToolsService);
+        EmployeeShiftHandler employeeShiftHandler = new EmployeeShiftHandler(employeeShiftService);
 
         RoomHandler roomHandler = new RoomHandler(roomService);
 
@@ -88,9 +90,26 @@ public class TestServer {
         registerJaspersoftExport(registry, jaspersoftExportHandler);
         registerRoomTools(registry, roomToolsHandler);
         registerRoom(registry, roomHandler);
+        registerEmployeeShift(registry, employeeShiftHandler);
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
+    }
+
+    private static void registerEmployeeShift(HandlerRegistry registry, EmployeeShiftHandler employeeShiftHandler) {
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_BY_ID, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_ALL, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_CREATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_UPDATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_DELETE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_BY_EMPLOYEE_AND_DATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_SHIFT_BY_DATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_WITH_DETAILS, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_TOTAL_REVENUE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_ACTIVE_OPEN_SHIFTS, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_ALL_SHIFTS_BY_DATE, employeeShiftHandler);
+
+
     }
 
     private static void registerRoom(HandlerRegistry registry, RoomHandler roomHandler) {
@@ -120,8 +139,6 @@ public class TestServer {
         registry.register(CommandType.ROOM_TOOL_GET_ROOM_PRICE_BY_TYPE, roomToolsHandler);
         registry.register(CommandType.ROOM_TOOL_CALCULATE_NEW_ROOM_PRICE_WITH_BOOKING_DURATION, roomToolsHandler);
         registry.register(CommandType.ROOM_TOOL_TRANSFER_ROOMS, roomToolsHandler);
-
-
     }
 
     private static void registerJaspersoftExport(HandlerRegistry registry, JaspersoftExportHandler jaspersoftExportHandler) {

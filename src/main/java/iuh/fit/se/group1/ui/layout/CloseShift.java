@@ -13,8 +13,8 @@ import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.AuthServiceClient;
 import iuh.fit.se.group1.network.client.service.DenominationDetailServiceClient;
+import iuh.fit.se.group1.network.client.service.EmployeeShiftServiceClient;
 import iuh.fit.se.group1.network.client.service.ShiftCloseServiceClient;
-import iuh.fit.se.group1.service.*;
 import iuh.fit.se.group1.ui.component.custom.Button;
 import iuh.fit.se.group1.ui.component.custom.message.*;
 import iuh.fit.se.group1.ui.component.modal.ConfirmInfoModal;
@@ -35,7 +35,7 @@ import java.util.List;
 
 public class CloseShift extends javax.swing.JPanel {
     private static final Logger log = LoggerFactory.getLogger(CloseShift.class);
-    private EmployeeShiftService employeeShiftService;
+    private final EmployeeShiftServiceClient employeeShiftService;
     private final DenominationDetailServiceClient denominationDetailService;
     private final ShiftCloseServiceClient shiftCloseService;
     private EmployeeShiftDTO currentEmployeeShift;
@@ -44,13 +44,13 @@ public class CloseShift extends javax.swing.JPanel {
     private final AuthServiceClient authenticateService;
     // Timer
     private Timer autoRefreshTimer;
-    private BigDecimal openingCash = new BigDecimal("5000000");
+    private static final BigDecimal OPENING_CASH = new BigDecimal("5000000");
 
     private Runnable onCloseShiftSuccess;
 
     public CloseShift() {
         this.authenticateService = SocketFacade.getInstance().getAuth();
-        this.employeeShiftService = new EmployeeShiftService();
+        this.employeeShiftService = SocketFacade.getInstance().getEmployeeShift();
         this.denominationDetailService = SocketFacade.getInstance().getDenominationDetail();
         this.shiftCloseService = SocketFacade.getInstance().getShiftClose();
         this.confirmModal = new ConfirmInfoModal();
@@ -87,9 +87,17 @@ public class CloseShift extends javax.swing.JPanel {
     private void refreshRevenueData() {
         try {
             // Lấy lại tổng doanh thu mới nhất từ database
-            BigDecimal newRevenue = employeeShiftService.getTotalCashRevenueForShift(
+
+            Response response = employeeShiftService.getTotalCashRevenueForShift(
                     currentEmployeeShift.getEmployeeShiftId()
             );
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu doanh thu: " + (response != null ? response.getMessage() : "No response from server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            BigDecimal newRevenue = (BigDecimal) response.getData();
             if (!newRevenue.equals(totalRevenue)) {
                 log.info("Revenue changed: {} -> {}",
                         formatCurrency(totalRevenue),
@@ -282,17 +290,33 @@ public class CloseShift extends javax.swing.JPanel {
 
         if (employeeShift != null) {
             try {
-                EmployeeShiftDTO detailedShift = employeeShiftService.getEmployeeShiftWithDetails(
+
+                Response response = employeeShiftService.getEmployeeShiftWithDetails(
                         employeeShift.getEmployeeShiftId()
                 );
 
+                if (response == null || response.getCode() != 200) {
+                    JOptionPane.showMessageDialog(this, "Lỗi khi tải thông tin ca làm việc: " + (response != null ? response.getMessage() : "No response from server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                EmployeeShiftDTO detailedShift = (EmployeeShiftDTO) response.getData();
+
                 if (detailedShift != null) {
                     displayShiftInfo(detailedShift);
-                    txtMoneyOpenShift.setText(formatCurrency(openingCash));
+                    txtMoneyOpenShift.setText(formatCurrency(OPENING_CASH));
                     setDefaultMoneyDistribution();
-                    totalRevenue = employeeShiftService.getTotalCashRevenueForShift(
+
+                    response = employeeShiftService.getTotalCashRevenueForShift(
                             employeeShift.getEmployeeShiftId()
                     );
+
+                    if (response == null || response.getCode() != 200) {
+                        JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu doanh thu: " + (response != null ? response.getMessage() : "No response from server"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    totalRevenue = (BigDecimal) response.getData();
                     txtSystem.setText(formatCurrency(totalRevenue));
 
                     setupAutoCalculation();
@@ -391,7 +415,7 @@ public class CloseShift extends javax.swing.JPanel {
             BigDecimal reality = parseCurrency(txtReality.getText());
 
             // Công thức: Chênh lệch = Tiền thực tế - (Doanh thu + Tiền mở ca)
-            BigDecimal difference = reality.subtract(totalRevenue.add(openingCash));
+            BigDecimal difference = reality.subtract(totalRevenue.add(OPENING_CASH));
 
             txtMoneyDifference.setText(formatCurrency(difference));
             if (difference.compareTo(BigDecimal.ZERO) < 0) {
@@ -522,7 +546,7 @@ public class CloseShift extends javax.swing.JPanel {
 
         txtMoneyDifference.setText("0 VND");
         txtMoneyDifference.setForeground(Color.WHITE);
-        txtMoneyOpenShift.setText(formatCurrency(openingCash));
+        txtMoneyOpenShift.setText(formatCurrency(OPENING_CASH));
         txtSystem.setText("0 VND");
 
         totalRevenue = BigDecimal.ZERO;

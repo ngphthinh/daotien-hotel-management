@@ -13,9 +13,9 @@ import iuh.fit.se.group1.dto.ShiftDTO;
 import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.network.client.SocketFacade;
 import iuh.fit.se.group1.network.client.service.EmployeeServiceClient;
+import iuh.fit.se.group1.network.client.service.EmployeeShiftServiceClient;
 import iuh.fit.se.group1.network.client.service.ShiftCloseServiceClient;
 import iuh.fit.se.group1.network.client.service.ShiftServiceClient;
-import iuh.fit.se.group1.service.EmployeeShiftService;
 import iuh.fit.se.group1.ui.component.custom.message.Message;
 import iuh.fit.se.group1.ui.component.shift.ShiftCard;
 import iuh.fit.se.group1.ui.component.shift.ShiftList;
@@ -57,7 +57,7 @@ public class ShiftManagement extends javax.swing.JPanel {
     private DateChooser dateChooser;
     private final ShiftServiceClient shiftService;
     private List<ShiftDTO> shifts;
-    private EmployeeShiftService employeeShiftService;
+    private EmployeeShiftServiceClient employeeShiftService;
     private EmployeeServiceClient employeeService;
 
     /**
@@ -66,7 +66,7 @@ public class ShiftManagement extends javax.swing.JPanel {
     public ShiftManagement() {
         initComponents();
         shiftService = SocketFacade.getInstance().getShift();
-        employeeShiftService = new EmployeeShiftService();
+        employeeShiftService = SocketFacade.getInstance().getEmployeeShift();
         employeeService = SocketFacade.getInstance().getEmployee();
         loadShiftsFromDatabase();
         setupDateChooser();
@@ -261,7 +261,14 @@ public class ShiftManagement extends javax.swing.JPanel {
             }
 
             // Lấy danh sách EmployeeShift theo ngày
-            List<EmployeeShiftDTO> employeeShifts = employeeShiftService.getAllShiftsByDate(date);
+            Response response = employeeShiftService.getAllShiftsByDate(date);
+
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                return;
+            }
+
+            List<EmployeeShiftDTO> employeeShifts = (List<EmployeeShiftDTO>) response.getData();
             if (employeeShifts == null || employeeShifts.isEmpty()) {
                 // Ngày này không có nhân viên -> giữ mặc định
                 return;
@@ -280,7 +287,6 @@ public class ShiftManagement extends javax.swing.JPanel {
                 if (employeesInShift != null && !employeesInShift.isEmpty()) {
                     for (int j = 0; j < Math.min(2, employeesInShift.size()); j++) {
                         EmployeeShiftDTO es = employeesInShift.get(j);
-                        Response response = null;
                         try {
                             response = employeeService.getEmployeeById(es.getEmployee().getEmployeeId());
                         } catch (Exception e) {
@@ -424,10 +430,18 @@ public class ShiftManagement extends javax.swing.JPanel {
             ShiftDTO shift = shifts.get(shiftIndex);
 
             // KIỂM TRA XEM CA ĐÃ CÓ NHÂN VIÊN CHƯA
-            List<EmployeeShiftDTO> existingShifts = employeeShiftService.getAllShiftsByDate(shiftDate)
+
+            Response response = employeeShiftService.getAllShiftsByDate(shiftDate);
+            if (response == null || response.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
+                return;
+            }
+
+
+            List<EmployeeShiftDTO> existingShifts = ((List<EmployeeShiftDTO>) response.getData())
                     .stream()
                     .filter(es -> es.getShift().getShiftId().equals(shift.getShiftId()))
-                    .collect(Collectors.toList());
+                    .toList();
 
             boolean hasExistingEmployees = existingShifts != null && !existingShifts.isEmpty();
 
@@ -437,12 +451,12 @@ public class ShiftManagement extends javax.swing.JPanel {
                 boolean hasClosedShift = existingShifts.stream()
                         .anyMatch(es -> {
                             try {
-                                Response response = shiftCloseService.getShiftCloseByEmployeeShift(es.getEmployeeShiftId());
-                                if (response == null || response.getCode() != 200) {
+                                Response res = shiftCloseService.getShiftCloseByEmployeeShift(es.getEmployeeShiftId());
+                                if (res == null || res.getCode() != 200) {
                                     JOptionPane.showMessageDialog(null, "Server returned HTTP Status " + response.getCode() + ": " + response.getMessage());
                                     return false;
                                 }
-                                List<ShiftCloseDTO> closedShifts = (List<ShiftCloseDTO>) response.getData();
+                                List<ShiftCloseDTO> closedShifts = (List<ShiftCloseDTO>) res.getData();
                                 return !closedShifts.isEmpty();
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
