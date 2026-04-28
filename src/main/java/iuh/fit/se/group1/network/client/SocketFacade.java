@@ -28,6 +28,7 @@ public class SocketFacade {
     private final RoomToolsServiceClient roomTools;
     private final RoomServiceClient room;
     private final EmployeeShiftServiceClient employeeShift;
+    private final PaymentServiceClient payment;
 
     public SocketFacade(ClientSocketManager socket) {
         this.auth = new AuthServiceClient(socket);
@@ -51,6 +52,7 @@ public class SocketFacade {
         this.roomTools = new RoomToolsServiceClient(socket);
         this.room = new RoomServiceClient(socket);
         this.employeeShift = new EmployeeShiftServiceClient(socket);
+        this.payment = new PaymentServiceClient(socket);
     }
 
     private static SocketFacade instance;

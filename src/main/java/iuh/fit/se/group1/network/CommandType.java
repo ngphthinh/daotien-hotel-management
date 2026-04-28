@@ -162,4 +162,6 @@ public enum CommandType implements Serializable {
     EMPLOYEE_SHIFT_GET_ACTIVE_OPEN_SHIFTS,
     EMPLOYEE_SHIFT_GET_ALL_SHIFTS_BY_DATE,
 
+    PAYMENT_CREATE,
+    PAYMENT_QUERY,
 }

@@ -40,6 +40,8 @@ public class TestServer {
         RoomTypeService roomTypeService = new RoomTypeService();
         RoomToolsService roomToolsService = new RoomToolsService();
         EmployeeShiftService employeeShiftService = new EmployeeShiftService();
+        PaymentService paymentService = new PaymentService();
+
 
         RoomService roomService = new RoomService();
 
@@ -66,6 +68,7 @@ public class TestServer {
         RoomToolsHandler roomToolsHandler = new RoomToolsHandler(roomToolsService);
         EmployeeShiftHandler employeeShiftHandler = new EmployeeShiftHandler(employeeShiftService);
 
+        PaymentHandler paymentHandler = new PaymentHandler(paymentService);
         RoomHandler roomHandler = new RoomHandler(roomService);
 
         ShiftHandler shiftHandler = new ShiftHandler(shiftService);
@@ -91,9 +94,16 @@ public class TestServer {
         registerRoomTools(registry, roomToolsHandler);
         registerRoom(registry, roomHandler);
         registerEmployeeShift(registry, employeeShiftHandler);
+        registerPayment(registry, paymentHandler);
+
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
+    }
+
+    private static void registerPayment(HandlerRegistry registry, PaymentHandler paymentHandler) {
+        registry.register(CommandType.PAYMENT_CREATE, paymentHandler);
+        registry.register(CommandType.PAYMENT_QUERY, paymentHandler);
     }
 
     private static void registerEmployeeShift(HandlerRegistry registry, EmployeeShiftHandler employeeShiftHandler) {

@@ -45,6 +45,7 @@ public class PaymentMain extends javax.swing.JPanel {
     private JaspersoftExportServiceClient jaspersoftExportService = SocketFacade.getInstance().getJaspersoftExport();
     private final PromotionServiceClient promotionService = SocketFacade.getInstance().getPromotion();
     private static final String OUTPUT_DIR = getJarDirectory() + File.separator + "hoadon";
+    private static final String PAYMENT_SUCCESS = "0";
 
     private static String getJarDirectory() {
         try {
@@ -895,7 +896,7 @@ public class PaymentMain extends javax.swing.JPanel {
     }
 
     private void bntTranferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntTranferActionPerformed
-        PaymentService paymentService = new PaymentService();
+        PaymentServiceClient paymentService = SocketFacade.getInstance().getPayment();
         backStep3Action.run();
         try {
             if (!setupBookingPayment()) {
@@ -911,7 +912,13 @@ public class PaymentMain extends javax.swing.JPanel {
         currentOrder.setTotalAmount(BigDecimal.valueOf(Constants.parseVND(lblTotalPricePayment.getText())));
         currentOrder.setPaymentDate(LocalDate.now());
         try {
-            String response = paymentService.createPayment(currentOrder);
+            Response res = paymentService.createPayment(currentOrder);
+            if (res == null || res.getCode() != 200) {
+                JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi tạo đơn hàng thanh toán. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String response = ((PaymentResponse) res.getData()).getRaw();
             String payUrl = paymentService.extractJsonValue(response, "payUrl");
             String orderId = paymentService.extractJsonValue(response, "orderId");
             var modal = new TransferPaymentModal();
@@ -948,10 +955,18 @@ public class PaymentMain extends javax.swing.JPanel {
                         JOptionPane.showMessageDialog(null, "Chưa có đơn hàng nào!");
                         return;
                     }
-                    String responseCheck = paymentService.queryPayment(orderId);
+
+                    Response resCheck = paymentService.queryPayment(orderId);
+                    if (resCheck == null || resCheck.getCode() != 200) {
+                        JOptionPane.showMessageDialog(null, "Đã có lỗi xảy ra khi kiểm tra trạng thái thanh toán. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+
+                    String responseCheck = ((PaymentResponse) resCheck.getData()).getRaw();
                     String responseCodeCheck = paymentService.extractJsonValue(responseCheck, "resultCode");
                     String orderIdCheck = paymentService.extractJsonValue(responseCheck, "orderId");
-                    if ("0".equals(responseCodeCheck)) {
+                    if (!PAYMENT_SUCCESS.equals(responseCodeCheck)) {
                         CustomDialog.showMessage(null, "Thanh toán thành công cho đơn hàng: " + orderIdCheck, "Thông báo", CustomDialog.MessageType.SUCCESS, 380, 200);
                         GlassPanePopup.closePopupAll();
                         frame.dispose();
@@ -963,9 +978,10 @@ public class PaymentMain extends javax.swing.JPanel {
                         String promotionStr = lblPromotion.getText();
                         currentOrder.setEmployeePayment(currentEmployee);
                         saveOrder();
-                        Response res = null;
+                        Response resExport = null;
+
                         try {
-                            res = jaspersoftExportService.exportOrderToPdf(
+                            resExport = jaspersoftExportService.exportOrderToPdf(
                                     order,
                                     promotionStr,
                                     PaymentType.E_WALLET.getName(),
@@ -976,12 +992,12 @@ public class PaymentMain extends javax.swing.JPanel {
                             throw new RuntimeException(ex);
                         }
 
-                        if (res == null || res.getCode() != 200) {
+                        if (resExport == null || resExport.getCode() != 200) {
                             JOptionPane.showMessageDialog(this, "Đã có lỗi xảy ra khi xuất hóa đơn. Vui lòng thử lại sau!", "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
 
-                        ExportOrderToPDFResponse exportOrderToPDFResponse = (ExportOrderToPDFResponse) res.getData();
+                        ExportOrderToPDFResponse exportOrderToPDFResponse = (ExportOrderToPDFResponse) resExport.getData();
 
                         byte[] filePdf = exportOrderToPDFResponse.getFileData();
 
