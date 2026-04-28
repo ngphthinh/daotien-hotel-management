@@ -130,4 +130,6 @@ public enum CommandType implements Serializable {
         EMPLOYEE_SHIFT_GET_WITH_DETAILS,
         EMPLOYEE_SHIFT_GET_TOTAL_REVENUE,
         EMPLOYEE_SHIFT_GET_ACTIVE_OPEN_SHIFTS,
+
+    PAYMENT_CREATE,
 }
