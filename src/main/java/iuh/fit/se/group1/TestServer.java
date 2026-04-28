@@ -1,7 +1,11 @@
 package iuh.fit.se.group1;
 
+import iuh.fit.se.group1.config.InitData;
 import iuh.fit.se.group1.dispatcher.Dispatcher;
 import iuh.fit.se.group1.dispatcher.HandlerRegistry;
+import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.handler.*;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.network.CommandType;
@@ -9,15 +13,34 @@ import iuh.fit.se.group1.network.SocketServer;
 import iuh.fit.se.group1.service.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
+
 @Slf4j
 public class TestServer {
     public static void main(String[] args) {
 
         JPAUtil.getEntityManager();
-
+        System.out.println("Đang tải dữ liệu ứng dụng...");
+        EmployeeService employeeService = new EmployeeService();
+        if (employeeService.count() == 0) {
+            InitData.initAllData();
+            EmployeeDTO admin = new EmployeeDTO();
+            admin.setFullName("Quản Trị Viên Admin");
+            admin.setPhone("0123456789");
+            admin.setHireDate(LocalDate.now());
+            admin.setEmail("nguyenphuocthinh0710@gmail.com");
+            admin.setGender(false);
+            admin.setCitizenId("082205000819");
+            EmployeeDTO employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
+            if (employee == null) {
+                System.out.println("Không tạo được tài khoản");
+            } else {
+                System.out.println(employee);
+            }
+        }
+        InitData.initAllData();
         AuthenticateService authenticateService = new AuthenticateService();
         AccountService accountService = new AccountService();
-        EmployeeService employeeService = new EmployeeService();
         AmenityService amenityService = new AmenityService();
         OrderService orderService = new OrderService();
 
