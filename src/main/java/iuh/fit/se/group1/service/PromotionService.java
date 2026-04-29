@@ -19,14 +19,17 @@ public class PromotionService extends Service {
     }
 
     public PromotionDTO createPromotion(PromotionDTO promotionDTO) {
-//        return promotionRepositoryImpl.save(promotion);
-
         Promotion promotion = promotionMapper.toPromotion(promotionDTO);
+        String name = checkPromotionName(promotion.getPromotionName());
+        promotion.setPromotionName(name);
 
-        promotion.setCreatedAt(LocalDate.now());
-
-
-        return doInTransaction(entityManager -> promotionMapper.toDTO(promotionRepositoryImpl.save(entityManager, promotion)));
+        return doInTransaction(entityManager -> {
+            if (promotionRepositoryImpl.existsByPromotionName(entityManager, name, null)) {
+                throw new IllegalStateException("Tên khuyến mãi đã tồn tại");
+            }
+            promotion.setCreatedAt(LocalDate.now());
+            return promotionMapper.toDTO(promotionRepositoryImpl.save(entityManager, promotion));
+        });
     }
 
     public void deletePromotion(Long promotionId) {
@@ -47,8 +50,12 @@ public class PromotionService extends Service {
 
     public PromotionDTO updatePromotion(PromotionDTO promotionDTO) {
         Promotion promotion = promotionMapper.toPromotion(promotionDTO);
-//        return promotionRepositoryImpl.update(promotion);
-        return doInTransaction(entityManager -> promotionMapper.toDTO(promotionRepositoryImpl.update(entityManager, promotion)));
+        String name = checkPromotionName(promotion.getPromotionName());
+        promotion.setPromotionName(name);
+
+        return doInTransaction(entityManager ->
+            promotionMapper.toDTO(promotionRepositoryImpl.update(entityManager, promotion))
+        );
     }
 
     public List<PromotionDTO> getPromotionByKeyword(String keyword) {
@@ -77,4 +84,12 @@ public class PromotionService extends Service {
         return doInTransaction(entityManager -> promotionMapper.toDTO(promotionRepositoryImpl.findActivePromotion(entityManager, totalAmount)));
     }
 
+    private static String checkPromotionName(String promotionName) {
+        if (promotionName == null || promotionName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên khuyến mãi không được để trống");
+        }
+        return promotionName.trim();
+    }
+
 }
+

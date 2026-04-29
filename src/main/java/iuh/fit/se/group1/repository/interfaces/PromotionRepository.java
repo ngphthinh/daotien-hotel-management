@@ -9,6 +9,8 @@ import java.util.List;
 public interface PromotionRepository {
     List<Promotion> findByPromotionIdOrName(EntityManager em, String keyword);
 
+    boolean existsByPromotionName(EntityManager em, String promotionName, Long excludePromotionId);
+
     Promotion findAllWithDiscountPriceMax();
 
     Promotion findAllWithDiscountPercentMax();
