@@ -2,8 +2,9 @@ package iuh.fit.se.group1.service;
 
 import java.text.Normalizer;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import iuh.fit.se.group1.dto.AccountDTO;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
@@ -12,8 +13,7 @@ import iuh.fit.se.group1.mapper.EmployeeMapper;
 import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.util.PropertiesReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.persistence.EntityManager;
 
 public class EmployeeService extends Service {
     private final EmployeeRepositoryImpl employeeRepositoryImpl;
@@ -46,42 +46,43 @@ public class EmployeeService extends Service {
 
 
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO, String roleId) {
-
-        return doInTransaction(entityManager -> {
-
-            Employee employee = employeeMapper.toEmployee(employeeDTO);
-
-            Role role = roleService.getRoleEntityById(entityManager, roleId);
-            if (role == null) {
-                throw new IllegalArgumentException("Invalid role ID: " + roleId);
-            }
-
-            Account account = new Account();
-            account.setUsername("username");
-            account.setPassword(PropertiesReader.getInstance().get("daotien.password"));
-            account.setRole(role);
-
-            Account accountSave = accountService.createAccount(entityManager, account);
-
-            // set account trước khi save employee
-            employee.setAccount(accountSave);
-            Employee employeeSave = employeeRepositoryImpl.save(entityManager, employee);
+        return doInTransaction(em -> createEmployee(em, employeeDTO, roleId));
+    }
 
 
-            System.out.println("Sau khi luu employee" + employeeMapper.toDTO(employee));
-            System.out.println("Sau khi luu account" + accountSave);
-            // generate username
-            String username = generateUsername(employeeSave);
-            accountSave.setUsername(username);
+    public EmployeeDTO createEmployee(EntityManager em, EmployeeDTO employeeDTO, String roleId) {
+        Employee employee = employeeMapper.toEmployee(employeeDTO);
 
-            System.out.println("Username sau khi generate: " + accountSave.getUsername());
+        Role role = roleService.getRoleEntityById(em, roleId);
+        if (role == null) {
+            throw new IllegalArgumentException("Invalid role ID: " + roleId);
+        }
 
-            accountService.updateAccount(entityManager, accountSave);
+        Account account = new Account();
+        account.setUsername("username");
+        account.setPassword(PropertiesReader.getInstance().get("daotien.password"));
+        account.setRole(role);
 
-            System.out.println("Account sau khi update: " + accountSave);
+        Account accountSave = accountService.createAccount(em, account);
 
-            return employeeMapper.toDTO(employeeSave);
-        });
+        // set account trước khi save employee
+        employee.setAccount(accountSave);
+        Employee employeeSave = employeeRepositoryImpl.save(em, employee);
+
+
+        System.out.println("Sau khi luu employee" + employeeMapper.toDTO(employee));
+        System.out.println("Sau khi luu account" + accountSave);
+        // generate username
+        String username = generateUsername(employeeSave);
+        accountSave.setUsername(username);
+
+        System.out.println("Username sau khi generate: " + accountSave.getUsername());
+
+        accountService.updateAccount(em, accountSave);
+
+        System.out.println("Account sau khi update: " + accountSave);
+
+        return employeeMapper.toDTO(employeeSave);
     }
 
     private String generateUsername(Employee entitySave) {
@@ -144,4 +145,16 @@ public class EmployeeService extends Service {
     public EmployeeDTO getEmployeeByPhone(String phone) {
         return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByPhoneNumber(entityManager, phone)));
     }
+
+    public List<EmployeeDTO> createEmployees(Map<EmployeeDTO, String> employees) {
+        return doInTransaction(entityManager ->
+                employees.entrySet().stream().map(entry -> {
+                    EmployeeDTO employeeDTO = entry.getKey();
+                    String roleId = entry.getValue();
+
+                    return createEmployee(entityManager, employeeDTO, roleId);
+                }).toList()
+        );
+    }
+
 }

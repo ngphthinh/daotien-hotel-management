@@ -55,4 +55,11 @@ public class SurchargeService extends Service {
         return doInTransaction(entityManager -> surchargeMapper.toSurchargeDTO(surchargeRepositoryImpl.findById(entityManager, surchargeId)));
     }
 
+    public List<SurchargeDTO> createSurcharges(List<SurchargeDTO> surchargesDTO) {
+        List<Surcharge> surcharges = surchargesDTO.stream().map(surchargeMapper::toSurcharge).toList();
+
+
+        return doInTransaction(entityManager -> surchargeRepositoryImpl.saveAll(entityManager, surcharges)).stream().map(surchargeMapper::toSurchargeDTO).collect(Collectors.toList());
+
+    }
 }

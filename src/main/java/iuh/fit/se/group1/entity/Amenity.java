@@ -26,6 +26,7 @@ public class Amenity {
     private String nameAmenity;
     private BigDecimal price;
 	private boolean isDeleted;
+
     private LocalDate createdAt;
 
 	@OneToMany(mappedBy = "amenity")

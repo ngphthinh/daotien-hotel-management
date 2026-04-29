@@ -34,6 +34,8 @@ public class EmployeeShift {
     private BigDecimal actualAmount;
     private BigDecimal difference;
     private LocalDate shiftDate;
+    @Column(updatable = false)
+    
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "employeeShift")

@@ -26,6 +26,8 @@ public class Account {
     private String username;
     @Column(columnDefinition = "varchar(255)")
     private String password;
+    @Column(updatable = false)
+
     private LocalDate createdAt;
 
     private boolean isDeleted;

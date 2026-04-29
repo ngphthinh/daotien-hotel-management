@@ -54,4 +54,12 @@ public class SurchargeRepositoryImpl extends AbstractRepositoryImpl<Surcharge, L
         return em.createQuery(query, Surcharge.class).getResultList();
 
     }
+
+    public List<Surcharge> saveAll(EntityManager entityManager, List<Surcharge> surcharges) {
+        for (Surcharge surcharge : surcharges) {
+            entityManager.persist(surcharge);
+        }
+        entityManager.flush();
+        return surcharges;
+    }
 }

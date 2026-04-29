@@ -27,6 +27,8 @@ public class Surcharge {
     private String name;
     private boolean isDeleted;
     private BigDecimal price;
+    @Column(updatable = false)
+
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "surcharge")

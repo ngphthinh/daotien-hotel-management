@@ -31,6 +31,8 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "roomId")
     private Room room;
+    @Column(updatable = false)
+
     private LocalDate createdAt;
 
 

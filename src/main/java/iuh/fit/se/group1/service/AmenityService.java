@@ -60,4 +60,14 @@ public class AmenityService extends Service {
     public Amenity getAmenityEntityById(EntityManager em, Long amenityId) {
         return amenityRepositoryImpl.findById(em, amenityId);
     }
+
+    public List<AmenityDTO> createAmenities(List<AmenityDTO> amenities) {
+        List<Amenity> amenityEntities = amenities.stream()
+                .map(amenityMapper::toAmenity)
+                .toList();
+
+        return doInTransaction(entityManager -> amenityRepositoryImpl.saveAll(entityManager, amenityEntities)).stream()
+                .map(amenityMapper::toAmenityDTO)
+                .collect(Collectors.toList());
+    }
 }

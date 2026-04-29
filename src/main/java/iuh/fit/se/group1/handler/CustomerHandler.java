@@ -86,13 +86,13 @@ public class CustomerHandler implements RequestHandler {
 
     private Response handleDelete(Request request) {
         Long customerId = (Long) request.getRequest();
-        Response response = Response.builder()
+
+        customerService.deleteCustomer(customerId);
+
+        return Response.builder()
                 .code(200)
                 .message("Customer with ID " + customerId + " deleted")
                 .build();
-
-
-        return response;
     }
 
     private Response handleUpdate(Request request) {

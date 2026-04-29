@@ -26,6 +26,7 @@ public class Shift {
     private String startTime;
     @Column(columnDefinition = "varchar(10)")
     private String endTime;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "shift")

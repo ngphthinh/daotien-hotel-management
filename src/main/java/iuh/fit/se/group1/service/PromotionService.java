@@ -18,8 +18,20 @@ public class PromotionService extends Service {
         this.promotionRepositoryImpl = new PromotionRepositoryImpl();
     }
 
+
+    public List<PromotionDTO> createPromotions(List<PromotionDTO> promotionsDTO) {
+
+        List<Promotion> promotions = promotionsDTO.stream()
+                .map(promotionMapper::toPromotion)
+                .toList();
+
+        return doInTransaction(entityManager -> promotionRepositoryImpl.saveAll(entityManager, promotions)).stream()
+                .map(promotionMapper::toDTO)
+                .toList();
+
+    }
+
     public PromotionDTO createPromotion(PromotionDTO promotionDTO) {
-//        return promotionRepositoryImpl.save(promotion);
 
         Promotion promotion = promotionMapper.toPromotion(promotionDTO);
 

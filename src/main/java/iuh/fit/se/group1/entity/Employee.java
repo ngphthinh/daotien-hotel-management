@@ -38,6 +38,8 @@ public class Employee {
     private Account account;
     @Lob
     private byte[] avt;
+    @Column(updatable = false)
+    
     private LocalDate createdAt;
     @OneToMany(mappedBy = "employee")
     private Set<Order> orders;

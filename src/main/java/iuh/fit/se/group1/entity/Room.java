@@ -29,6 +29,7 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "roomTypeId")
     private RoomType roomType;
+    @Column(updatable = false)
     private LocalDate createdAt;
     @Enumerated(EnumType.STRING)
     private RoomStatus roomStatus;

@@ -65,9 +65,21 @@ public class CustomerRepositoryImpl extends AbstractRepositoryImpl<Customer, Lon
     @Override
     public List<Customer> findAll(EntityManager em) {
         String query = """
-               Select c from Customer c
-               where c.isDeleted = false
-           """;
+                    Select c from Customer c
+                    where c.isDeleted = false
+                """;
         return em.createQuery(query, entityClass).getResultList();
+    }
+
+    public List<Customer> saveAll(EntityManager entityManager, List<Customer> customersToSave) {
+        for (Customer customer : customersToSave) {
+            if (customer.getCustomerId() == null) {
+                entityManager.persist(customer);
+            }
+        };
+
+        entityManager.flush();
+
+        return customersToSave;
     }
 }

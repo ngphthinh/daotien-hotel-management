@@ -41,6 +41,7 @@ public class ShiftClose {
     @ManyToOne
     @JoinColumn(name = "managerId")
     private Employee manager;
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
 }

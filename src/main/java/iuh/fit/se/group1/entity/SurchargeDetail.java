@@ -27,6 +27,7 @@ public class SurchargeDetail {
     @JoinColumn(name = "surchargerId")
     private Surcharge surcharge;
     private int quantity;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
 

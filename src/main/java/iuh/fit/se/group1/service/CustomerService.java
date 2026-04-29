@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import iuh.fit.se.group1.dto.CustomerDTO;
+import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.mapper.CustomerMapper;
 import iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
@@ -66,6 +67,20 @@ public class CustomerService extends Service {
 
     public CustomerDTO getCustomerByCitizenId(String citizenId) {
         return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.findByCitizenId(entityManager, citizenId)));
+    }
+
+    public List<CustomerDTO> createCustomers(List<CustomerDTO> customers) {
+        List<Customer> customersToSave = customers.stream()
+                .filter(customerDTO -> (getCustomerByCitizenId(customerDTO.getCitizenId()) == null))
+                .map(customerMapper::toCustomer)
+                .toList();
+
+        return doInTransaction(entityManager -> {
+            List<Customer> savedCustomers = customerRepository.saveAll(entityManager, customersToSave);
+            return savedCustomers.stream()
+                    .map(customerMapper::toDTO)
+                    .collect(Collectors.toList());
+        });
     }
 
 }

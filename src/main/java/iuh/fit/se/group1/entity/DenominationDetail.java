@@ -25,6 +25,8 @@ public class DenominationDetail {
     @ManyToOne
     @JoinColumn(name = "employeeShiftId")
     private EmployeeShift employeeShift;
+    @Column(updatable = false)
+    
     private LocalDate createdAt;
 
 

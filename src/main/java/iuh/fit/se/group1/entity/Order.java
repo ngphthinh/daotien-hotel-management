@@ -51,6 +51,8 @@ public class Order {
     private Promotion promotion;
 
     private BigDecimal deposit;
+    @Column(updatable = false)
+    
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)

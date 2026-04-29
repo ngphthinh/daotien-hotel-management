@@ -32,6 +32,7 @@ public class Promotion {
     private BigDecimal minOrderAmount;
     private LocalDate startDate;
     private LocalDate endDate;
+    @Column(updatable = false)
     private LocalDate createdAt;
     @OneToMany(mappedBy = "promotion")
     private Set<Order> orders;

@@ -450,4 +450,8 @@ public class RoomService extends Service {
         return doInTransaction(entityManager -> roomRepository.transferRooms(entityManager, orderId, bookingType, oldRoomIds, newRoomIds));
     }
 
+    public List<RoomViewDTO> createRooms(List<RoomViewDTO> roomsDTO) {
+        List<Room> rooms = roomsDTO.stream().map(roomMapper::toRoom).toList();
+        return doInTransaction(entityManager -> roomRepository.saveAll(entityManager, rooms)).stream().map(roomMapper::toRoomDTO).toList();
+    }
 }

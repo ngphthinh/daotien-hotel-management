@@ -313,4 +313,14 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
             throw new RuntimeException("Error transferring rooms", e);
         }
     }
+
+    public List<Room> saveAll(EntityManager entityManager, List<Room> rooms) {
+        for (Room room : rooms) {
+            if (room.getRoomId() == null) {
+                entityManager.persist(room);
+            }
+        }
+        entityManager.flush();
+        return rooms;
+    }
 }

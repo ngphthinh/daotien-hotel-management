@@ -44,7 +44,7 @@
                   <resource>jasperreports_extension.properties</resource>
                 </transformer>
                 <transformer>
-                  <mainClass>iuh.fit.se.group1.TestServer</mainClass>
+                  <mainClass>iuh.fit.se.group1.Server</mainClass>
                 </transformer>
               </transformers>
               <filters>

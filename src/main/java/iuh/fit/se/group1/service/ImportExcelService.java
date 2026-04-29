@@ -1,76 +1,93 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.*;
-import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.enums.RoomStatus;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ImportExcelService {
 
+    private static final Logger log = LoggerFactory.getLogger(ImportExcelService.class);
     private final CustomerService customerService = new CustomerService();
     private final AmenityService amenityService = new AmenityService();
-    PromotionService promotionService = new PromotionService();
-    RoomService roomService = new RoomService();
+    private final PromotionService promotionService = new PromotionService();
+    private final RoomService roomService = new RoomService();
+    private final RoomTypeService roomTypeService = new RoomTypeService();
+    private final SurchargeService surchargeService = new SurchargeService();
+    private final EmployeeService employeeService = new EmployeeService();
 
     public List<CustomerDTO> importCustomersFromExcel(File file) {
         List<CustomerDTO> customers = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        try (FileInputStream fis = new FileInputStream(file);
+             Workbook workbook = new XSSFWorkbook(fis)) {
 
             Sheet sheet = workbook.getSheetAt(0);
-            if (sheet == null) {
-                return customers;
-            }
+            if (sheet == null) return customers;
 
             Row header = sheet.getRow(0);
             int startCol = 0;
+
             if (header != null && header.getCell(0) != null) {
-                String firstHeader = header.getCell(0).getStringCellValue().trim();
-                if (firstHeader.equalsIgnoreCase("STT")) {
+                String firstHeader = getCellValue(header.getCell(0));
+                if ("STT".equalsIgnoreCase(firstHeader)) {
                     startCol = 1;
                 }
             }
 
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) {
-                    continue;
-                }
+                if (row == null) continue;
 
-                String fullName = getCellValue(row.getCell(startCol + 1));
-                if (fullName.isEmpty()) {
-                    continue;
-                }
+                String fullName = getCellValue(row.getCell(startCol + 0));
+                String genderStr = getCellValue(row.getCell(startCol + 1));
+                String email = getCellValue(row.getCell(startCol + 2));
+                String citizenId = getCellValue(row.getCell(startCol + 3));
+                String phone = getCellValue(row.getCell(startCol + 4));
+                String dobStr = getCellValue(row.getCell(startCol + 5));
+
+                if (fullName.isEmpty()) continue;
 
                 CustomerDTO c = new CustomerDTO();
-
+                c.setCustomerId(null);
                 c.setFullName(fullName);
-                c.setGender("Nam".equalsIgnoreCase(getCellValue(row.getCell(startCol + 2))));
-                c.setEmail(getCellValue(row.getCell(startCol + 3)));
-                c.setCitizenId(getCellValue(row.getCell(startCol + 4)));
-                c.setPhone(getCellValue(row.getCell(startCol + 5)));
+                c.setGender(!"Nam".equalsIgnoreCase(genderStr));
+                c.setEmail(email);
+                c.setCitizenId(citizenId.replace("'", ""));
+                c.setPhone(phone.replace("'", ""));
 
-                c.setDateOfBirth(LocalDate.now());
-
-                CustomerDTO saved = customerService.createCustomer(c);
-                if (saved != null) {
-                    customers.add(saved);
-                } else {
-                    throw new RuntimeException("Failed to save customer: " + fullName);
+                try {
+                    if (!dobStr.isEmpty()) {
+                        c.setDateOfBirth(LocalDate.parse(dobStr, formatter));
+                    } else {
+                        c.setDateOfBirth(LocalDate.now());
+                    }
+                } catch (Exception e) {
+                    c.setDateOfBirth(LocalDate.now());
                 }
+
+                customers.add(c);
             }
+
+            return customerService.createCustomers(customers);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return customers;
     }
 
@@ -125,12 +142,11 @@ public class ImportExcelService {
                 amenity.setNameAmenity(amenityName);
                 amenity.setPrice(amenityPrice);
 
-                AmenityDTO savedAmenity = amenityService.createAmenity(amenity);
-                if (savedAmenity != null) {
-                    amenities.add(savedAmenity);
-                }
+                amenity.setAmenityId(null);
+                amenities.add(amenity);
             }
 
+            return amenityService.createAmenities(amenities);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -209,12 +225,7 @@ public class ImportExcelService {
                 PromotionDTO promotion = new PromotionDTO();
                 promotion.setDescription("Không có mô tả");
 
-                try {
-                    if (!promotionIdStr.isEmpty()) {
-                        promotion.setPromotionId(Long.parseLong(promotionIdStr));
-                    }
-                } catch (NumberFormatException ignored) {
-                }
+                promotion.setPromotionId(null);
 
                 promotion.setPromotionName(promotionName);
 
@@ -260,11 +271,10 @@ public class ImportExcelService {
                     promotion.setCreatedAt(LocalDate.now());
                 }
 
-                PromotionDTO savedPromotion = promotionService.createPromotion(promotion);
-                if (savedPromotion != null) {
-                    promotions.add(savedPromotion);
-                }
+                promotions.add(promotion);
             }
+
+            return promotionService.createPromotions(promotions);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -315,81 +325,77 @@ public class ImportExcelService {
     }
 
     public List<EmployeeDTO> importEmployeesFromExcel(File file) {
-        List<EmployeeDTO> employees = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
+        Map<EmployeeDTO, String> employeeRoleMap = new LinkedHashMap<>();
+
+        try (FileInputStream fis = new FileInputStream(file);
+             Workbook workbook = new XSSFWorkbook(fis)) {
 
             Sheet sheet = workbook.getSheetAt(0);
-            if (sheet == null) {
-                return employees;
-            }
+            if (sheet == null) return new ArrayList<>();
 
             Row header = sheet.getRow(0);
             boolean hasSttColumn = false;
+
             if (header != null && header.getCell(0) != null) {
-                String firstHeader = header.getCell(0).getStringCellValue().trim();
-                if (firstHeader.equalsIgnoreCase("STT")) {
+                String firstHeader = getCellValue(header.getCell(0));
+                if ("STT".equalsIgnoreCase(firstHeader)) {
                     hasSttColumn = true;
                 }
             }
 
             int startCol = hasSttColumn ? 1 : 0;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-            EmployeeService employeeService = new EmployeeService();
 
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) {
-                    continue;
-                }
+                if (row == null) continue;
 
-                String employeeCodeStr = getCellValue(row.getCell(startCol));
-                String fullName = getCellValue(row.getCell(startCol + 1));
-                String genderStr = getCellValue(row.getCell(startCol + 2));
-                String roleName = getCellValue(row.getCell(startCol + 3));
+                String fullName = getCellValue(row.getCell(startCol + 0));
+                String genderStr = getCellValue(row.getCell(startCol + 1));
+                String email = getCellValue(row.getCell(startCol + 2));
+                String citizenId = getCellValue(row.getCell(startCol + 3));
                 String phone = getCellValue(row.getCell(startCol + 4));
+                String hireDateStr = getCellValue(row.getCell(startCol + 5));
+                String roleName = getCellValue(row.getCell(startCol + 6));
 
-                if (fullName.isEmpty() || phone.isEmpty()) {
-                    continue;
-                }
-
-                Long employeeId = null;
-                try {
-                    if (!employeeCodeStr.isEmpty()) {
-                        employeeId = Long.parseLong(employeeCodeStr.replaceAll("\\D", ""));
-                    }
-                } catch (NumberFormatException ex) {
-                    System.err.println("️Mã nhân viên không hợp lệ ở dòng " + (i + 1) + ": " + employeeCodeStr);
-                }
+                if (fullName.isEmpty() || phone.isEmpty()) continue;
 
                 EmployeeDTO e = new EmployeeDTO();
-                if (employeeId != null) {
-                    e.setEmployeeId(employeeId);
-                }
+                e.setEmployeeId(null); // luôn insert mới
                 e.setFullName(fullName);
-                e.setGender("Nữ".equalsIgnoreCase(genderStr));
-                e.setPhone(phone);
-                e.setHireDate(LocalDate.now());
-                e.setEmail("");
-                e.setCitizenId("");
+                e.setGender(!"Nam".equalsIgnoreCase(genderStr));
+                e.setEmail(email);
+                e.setCitizenId(citizenId.replace("'", ""));
+                e.setPhone(phone.replace("'", ""));
 
-                String roleId = Role.RECEPTIONIST.toString();
-                if (roleName.equalsIgnoreCase("Quản lý") || roleName.equalsIgnoreCase("Manager")) {
-                    roleId = Role.MANAGER.toString();
+                // parse ngày
+                try {
+                    if (!hireDateStr.isEmpty()) {
+                        e.setHireDate(LocalDate.parse(hireDateStr, formatter));
+                    } else {
+                        e.setHireDate(LocalDate.now());
+                    }
+                } catch (Exception ex) {
+                    e.setHireDate(LocalDate.now());
                 }
 
-                EmployeeDTO saved = employeeService.createEmployee(e, roleId);
-                if (saved != null) {
-                    employees.add(saved);
+                // role mapping
+                String roleId = Role.RECEPTIONIST.name();
+                if (roleName.toLowerCase().contains("quản lý")  || roleName.toLowerCase().contains("quản lí") || roleName.toLowerCase().contains("manager")) {
+                    roleId = Role.MANAGER.name();
                 }
+
+                employeeRoleMap.put(e, roleId);
+
             }
-
+            return employeeService.createEmployees(employeeRoleMap);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to import employees from Excel", e);
         }
-        return employees;
     }
 
-    private RoomTypeService roomTypeService = new RoomTypeService();
 
     public List<RoomViewDTO> importRoomsFromExcel(File file) {
         List<RoomViewDTO> rooms = new ArrayList<>();
@@ -446,13 +452,11 @@ public class ImportExcelService {
                 room.setRoomStatus(status);
 
 
-                RoomViewDTO savedRoom = roomService.createRoom(room);
-                if (savedRoom != null) {
-                    rooms.add(savedRoom);
-                    System.out.println("Thêm phòng: " + roomNumber + " - " + roomTypeName + " - " + status);
-                }
+                room.setRoomId(null);
+                rooms.add(room);
             }
 
+            return roomService.createRooms(rooms);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -472,7 +476,6 @@ public class ImportExcelService {
         };
     }
 
-    SurchargeService surchargeService = new SurchargeService();
 
     public List<SurchargeDTO> importSurchargesFromExcel(File file) {
         List<SurchargeDTO> surcharges = new ArrayList<>();
@@ -528,12 +531,10 @@ public class ImportExcelService {
                 surcharge.setName(surchargeName);
                 surcharge.setPrice(price);
 
-                SurchargeDTO savedSurcharge = surchargeService.createSurcharge(surcharge);
-                if (savedSurcharge != null) {
-                    surcharges.add(savedSurcharge);
-                }
+                surcharge.setSurchargeId(null);
+                surcharges.add(surcharge);
             }
-
+            return surchargeService.createSurcharges(surcharges);
         } catch (Exception e) {
             e.printStackTrace();
         }

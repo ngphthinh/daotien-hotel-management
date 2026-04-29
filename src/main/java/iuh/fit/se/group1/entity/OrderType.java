@@ -24,6 +24,7 @@ public class OrderType {
 
     @Enumerated(EnumType.STRING)
     private OrderBookStatus name;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
     public OrderType(Long orderTypeId) {

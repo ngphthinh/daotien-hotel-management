@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.repository.jpa;
 
+import iuh.fit.se.group1.dto.PromotionDTO;
 import iuh.fit.se.group1.entity.Promotion;
 import iuh.fit.se.group1.repository.interfaces.PromotionRepository;
 import jakarta.persistence.EntityManager;
@@ -91,5 +92,13 @@ public class PromotionRepositoryImpl extends AbstractRepositoryImpl<Promotion, L
                 """;
         return em.createQuery(query, Promotion.class).getResultList();
 
+    }
+
+    public List<Promotion> saveAll(EntityManager entityManager, List<Promotion> promotions) {
+        for (Promotion promotion : promotions) {
+            entityManager.persist(promotion);
+        }
+        entityManager.flush();
+        return promotions;
     }
 }

@@ -4,7 +4,6 @@ import iuh.fit.se.group1.config.InitData;
 import iuh.fit.se.group1.dispatcher.Dispatcher;
 import iuh.fit.se.group1.dispatcher.HandlerRegistry;
 import iuh.fit.se.group1.dto.EmployeeDTO;
-import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.handler.*;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
@@ -16,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
 
 @Slf4j
-public class TestServer {
+public class Server {
     public static void main(String[] args) {
 
         JPAUtil.getEntityManager();

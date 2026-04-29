@@ -1,6 +1,7 @@
 package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Amenity;
+import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.repository.interfaces.AmenityRepository;
 import jakarta.persistence.EntityManager;
 
@@ -54,6 +55,17 @@ public class AmenityRepositoryImpl extends AbstractRepositoryImpl<Amenity, Long>
                     ORDER BY a.amenityId ASC, a.nameAmenity ASC
                 """;
         return em.createQuery(query, Amenity.class).getResultList();
+
+    }
+
+    public List<Amenity> saveAll(EntityManager entityManager, List<Amenity> amenityEntities) {
+        for (Amenity amenity : amenityEntities) {
+            if (amenity.getAmenityId() == null) {
+                entityManager.persist(amenity);
+            }
+        }
+        entityManager.flush();
+        return amenityEntities;
 
     }
 }

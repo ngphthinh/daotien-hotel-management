@@ -25,6 +25,7 @@ public class RoomType {
     private BigDecimal dailyRate;
     private BigDecimal overnightRate;
     private BigDecimal additionalHourRate;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "roomType")

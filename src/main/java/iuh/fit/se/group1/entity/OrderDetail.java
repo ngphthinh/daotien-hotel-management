@@ -27,6 +27,8 @@ public class OrderDetail {
     @JoinColumn(name = "amenityId")
     private Amenity amenity;
     private int quantity;
+    @Column(updatable = false)
+
     private LocalDate createdAt;
 
 

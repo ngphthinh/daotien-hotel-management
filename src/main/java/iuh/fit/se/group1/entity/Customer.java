@@ -30,6 +30,8 @@ public class Customer {
     private String citizenId;
     private boolean gender;
     private LocalDate dateOfBirth;
+    @Column(updatable = false)
+    
     private LocalDate createdAt;
     @OneToMany(mappedBy = "customer")
     private Set<Order> orders;
