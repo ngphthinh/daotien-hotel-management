@@ -3,6 +3,7 @@ package iuh.fit.se.group1.handler;
 import iuh.fit.se.group1.dispatcher.RequestHandler;
 import iuh.fit.se.group1.dto.EmployeeCreateRequest;
 import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.network.ClientHandler;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -23,22 +24,32 @@ public class EmployeeHandler implements RequestHandler {
         CommandType commandType = request.getCommandType();
 
         try {
-            return switch (commandType) {
-                case EMPLOYEE_GET_BY_ID -> handleGetById(request);
-                case EMPLOYEE_GET_BY_ACCOUNT_ID -> handleGetByAccountId(request);
-                case EMPLOYEE_GET_ALL -> handleGetAll();
-                case EMPLOYEE_GET_BY_KEYWORDS -> handleGetByKeywords(request);
-                case EMPLOYEE_GET_BY_CITIZEN_ID -> handleGetByCitizenId(request);
-                case EMPLOYEE_GET_BY_ROLE_ID -> handleGetByRoleId(request);
-                case EMPLOYEE_CREATE -> handleCreate(request);
-                case EMPLOYEE_UPDATE -> handleUpdate(request);
-                case EMPLOYEE_DELETE -> handleDelete(request);
-                case EMPLOYEE_GET_BY_PHONE -> handleGetByPhone(request);
-                default -> Response.builder()
+            Response response;
+
+            switch (commandType) {
+                case EMPLOYEE_GET_BY_ID -> response = handleGetById(request);
+                case EMPLOYEE_GET_BY_ACCOUNT_ID -> response = handleGetByAccountId(request);
+                case EMPLOYEE_GET_ALL -> response = handleGetAll();
+                case EMPLOYEE_GET_BY_KEYWORDS -> response = handleGetByKeywords(request);
+                case EMPLOYEE_GET_BY_CITIZEN_ID -> response = handleGetByCitizenId(request);
+                case EMPLOYEE_GET_BY_ROLE_ID -> response = handleGetByRoleId(request);
+                case EMPLOYEE_CREATE -> response = handleCreate(request);
+                case EMPLOYEE_UPDATE -> response = handleUpdate(request);
+                case EMPLOYEE_DELETE -> response = handleDelete(request);
+                case EMPLOYEE_GET_BY_PHONE -> response = handleGetByPhone(request);
+                default -> response = Response.builder()
                         .code(400)
                         .message("Invalid command")
                         .build();
-            };
+            }
+
+
+            if (isWriteCommand(commandType) && response.getCode() == 200) {
+                String message = getMessage(commandType);
+                ClientHandler.broadcast(message, CommandType.EMPLOYEE_REFRESH);
+            }
+
+            return response;
         } catch (Exception e) {
             log.error("Error handling employee request: {}", commandType, e);
             return Response.builder()
@@ -46,6 +57,22 @@ public class EmployeeHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private String getMessage(CommandType commandType) {
+        return switch (commandType) {
+            case EMPLOYEE_CREATE -> "Employee created";
+            case EMPLOYEE_UPDATE -> "Employee updated";
+            case EMPLOYEE_DELETE -> "Employee deleted";
+            default -> "Employee has been changed";
+        };
+    }
+
+    private boolean isWriteCommand(CommandType commandType) {
+        return switch (commandType) {
+            case EMPLOYEE_CREATE, EMPLOYEE_UPDATE, EMPLOYEE_DELETE -> true;
+            default -> false;
+        };
     }
 
     private Response handleGetByPhone(Request request) {
@@ -233,13 +260,12 @@ public class EmployeeHandler implements RequestHandler {
 
         try {
             EmployeeDTO created = employeeService.createEmployee(employeeDTO, roleId);
-            
+
             Response response = Response.builder()
                     .code(200)
                     .message("Employee created successfully")
                     .data(created)
                     .build();
-
 
 
             return response;
@@ -263,13 +289,12 @@ public class EmployeeHandler implements RequestHandler {
 
         try {
             EmployeeDTO updated = employeeService.updateEmployee(employeeDTO);
-            
+
             Response response = Response.builder()
                     .code(200)
                     .message("Employee updated successfully")
                     .data(updated)
                     .build();
-
 
 
             return response;
@@ -293,12 +318,11 @@ public class EmployeeHandler implements RequestHandler {
 
         try {
             employeeService.deleteEmployee(employeeId);
-            
+
             Response response = Response.builder()
                     .code(200)
                     .message("Employee deleted successfully")
                     .build();
-
 
 
             return response;

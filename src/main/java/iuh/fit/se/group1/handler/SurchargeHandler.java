@@ -37,11 +37,11 @@ public class SurchargeHandler implements RequestHandler {
                         .build();
             }
 
-
-            if (isWriteCommand(commandType) && response.getCode() == 200) {
-                String message = getMessage(commandType);
-                ClientHandler.broadcast(message, CommandType.SURCHARGE_REFRESH);
-            }
+    
+                if (isWriteCommand(commandType) && response.getCode() == 200) {
+                    String message = getMessage(commandType);
+                    ClientHandler.broadcast(message, CommandType.SURCHARGE_REFRESH);
+                }
 
             return response;
 

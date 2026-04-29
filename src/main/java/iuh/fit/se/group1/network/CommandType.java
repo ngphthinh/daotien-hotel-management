@@ -177,7 +177,7 @@ public enum CommandType implements Serializable {
     PROMOTION_REFRESH,
     SURCHARGE_REFRESH,
     ORDER_REFRESH,
-
-
+    EMPLOYEE_REFRESH,
+    CUSTOMER_REFRESH,
 
 }

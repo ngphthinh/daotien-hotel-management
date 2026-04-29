@@ -2,6 +2,7 @@ package iuh.fit.se.group1.handler;
 
 import iuh.fit.se.group1.dispatcher.RequestHandler;
 import iuh.fit.se.group1.dto.CustomerDTO;
+import iuh.fit.se.group1.network.ClientHandler;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -18,26 +19,50 @@ public class CustomerHandler implements RequestHandler {
     public Response handle(Request request) {
         CommandType commandType = request.getCommandType();
         try {
-            return switch (commandType) {
-                case CUSTOMER_CREATE -> handleCreate(request);
-                case CUSTOMER_GET_BY_ID -> handleGetById(request);
-                case CUSTOMER_GET_ALL -> handleGetAll(request);
-                case CUSTOMER_UPDATE -> handleUpdate(request);
-                case CUSTOMER_DELETE -> handleDelete(request);
-                case CUSTOMER_GET_BY_KEYWORDS -> handleGetByKeywords(request);
-                case CUSTOMER_GET_BY_CITIZEN -> handleGetByCitizenId(request);
+            Response response;
+            switch (commandType) {
+                case CUSTOMER_CREATE -> response = handleCreate(request);
+                case CUSTOMER_GET_BY_ID -> response = handleGetById(request);
+                case CUSTOMER_GET_ALL -> response = handleGetAll(request);
+                case CUSTOMER_UPDATE -> response = handleUpdate(request);
+                case CUSTOMER_DELETE -> response = handleDelete(request);
+                case CUSTOMER_GET_BY_KEYWORDS -> response = handleGetByKeywords(request);
+                case CUSTOMER_GET_BY_CITIZEN -> response = handleGetByCitizenId(request);
 
-                default -> Response.builder()
+                default -> response = Response.builder()
                         .code(400)
                         .message("Invalid command")
                         .build();
-            };
+            }
+
+
+            if (isWriteCommand(commandType) && response.getCode() == 200) {
+                String message = getMessage(commandType);
+                ClientHandler.broadcast(message, CommandType.CUSTOMER_REFRESH);
+            }
+            return response;
         } catch (Exception e) {
             return Response.builder()
                     .code(500)
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private String getMessage(CommandType commandType) {
+        return switch (commandType) {
+            case CUSTOMER_CREATE -> "Customer created";
+            case CUSTOMER_UPDATE -> "Customer updated";
+            case CUSTOMER_DELETE -> "Customer deleted";
+            default -> "Customer has been changed";
+        };
+    }
+
+    private boolean isWriteCommand(CommandType commandType) {
+        return switch (commandType) {
+            case CUSTOMER_CREATE, CUSTOMER_UPDATE, CUSTOMER_DELETE -> true;
+            default -> false;
+        };
     }
 
     private Response handleGetByCitizenId(Request request) {
@@ -67,7 +92,6 @@ public class CustomerHandler implements RequestHandler {
                 .build();
 
 
-
         return response;
     }
 
@@ -80,7 +104,6 @@ public class CustomerHandler implements RequestHandler {
                 .message("Customer with ID " + customerDTO.getCustomerId() + " updated")
                 .data(updated)
                 .build();
-
 
 
         return response;

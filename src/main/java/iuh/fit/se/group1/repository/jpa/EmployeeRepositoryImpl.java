@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.repository.jpa;
 
+import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.entity.Role;
 import iuh.fit.se.group1.repository.interfaces.EmployeeRepository;
 import iuh.fit.se.group1.util.PasswordUtil;
 import jakarta.persistence.EntityManager;
@@ -28,7 +30,14 @@ public class EmployeeRepositoryImpl extends AbstractRepositoryImpl<Employee, Lon
         managed.setCitizenId(entity.getCitizenId());
         managed.setGender(entity.isGender());
         managed.setAvt(entity.getAvt());
-        managed.setAccount(entity.getAccount());
+        Account acc = em.find(Account.class, entity.getAccount().getAccountId());
+
+        if (entity.getAccount().getRole() != null) {
+            Role role = em.find(Role.class, entity.getAccount().getRole().getRoleId());
+            acc.setRole(role);
+        }
+
+        managed.setAccount(acc);
 
         return managed;
     }
