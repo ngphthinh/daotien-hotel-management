@@ -12,11 +12,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class ClientHandler implements Runnable {
-    private static final List<ClientHandler> clientHandlers = new ArrayList<ClientHandler>();
+    private static final List<ClientHandler> clientHandlers =
+            java.util.Collections.synchronizedList(new ArrayList<>());
     private final Socket socket;
 
 
@@ -49,6 +49,7 @@ public class ClientHandler implements Runnable {
 
                 out.writeObject(response);
                 out.flush();
+                out.reset();
             }
 
         } catch (EOFException e) {
@@ -57,6 +58,9 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         } finally {
             try {
+                if (objectOutputStream != null) {
+                    objectOutputStream.close();
+                }
                 socket.close();
             } catch (Exception ignored) {
             }
@@ -65,21 +69,28 @@ public class ClientHandler implements Runnable {
                 ActiveUsersManager.getInstance().registerLogout(username);
             }
             clientHandlers.remove(this);
+
         }
     }
 
     public static void broadcast(String message, CommandType commandType) {
-        for (ClientHandler clientHandler : clientHandlers) {
-            try {
-                clientHandler.objectOutputStream.writeObject(Response.builder()
-                        .code(999)
-                        .message(message)
-                        .requestId(null)
-                        .commandType(commandType)
-                        .build());
-                clientHandler.objectOutputStream.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
+        synchronized (clientHandlers) {
+            var iterator = clientHandlers.iterator();
+
+            while (iterator.hasNext()) {
+                ClientHandler clientHandler = iterator.next();
+                try {
+                    clientHandler.objectOutputStream.writeObject(Response.builder()
+                            .code(999)
+                            .message(message)
+                            .requestId(null)
+                            .commandType(commandType)
+                            .build());
+                    clientHandler.objectOutputStream.flush();
+                } catch (Exception e) {
+                    // remove client chết
+                    iterator.remove();
+                }
             }
         }
     }
