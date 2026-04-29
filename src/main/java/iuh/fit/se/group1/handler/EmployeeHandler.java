@@ -317,6 +317,7 @@ public class EmployeeHandler implements RequestHandler {
         }
 
         try {
+            EmployeeDTO employeeDTO = employeeService.getEmployeeById(employeeId);
             employeeService.deleteEmployee(employeeId);
 
             Response response = Response.builder()
@@ -324,6 +325,12 @@ public class EmployeeHandler implements RequestHandler {
                     .message("Employee deleted successfully")
                     .build();
 
+            ClientHandler.sendToUser(employeeDTO.getAccount().getUsername(), Response.builder()
+                    .code(1000)
+                    .message("Your account has been deleted by admin")
+                    .requestId(null)
+                    .commandType(CommandType.ACCOUNT_DELETED)
+                    .build());
 
             return response;
         } catch (IllegalStateException e) {

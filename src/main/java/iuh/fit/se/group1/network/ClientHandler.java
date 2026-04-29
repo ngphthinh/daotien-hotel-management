@@ -10,87 +10,112 @@ import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 public class ClientHandler implements Runnable {
-    private static final List<ClientHandler> clientHandlers =
-            java.util.Collections.synchronizedList(new ArrayList<>());
+
+    private static final Map<String, ClientHandler> clients = new ConcurrentHashMap<>();
+
     private final Socket socket;
-
-
     private final Dispatcher dispatcher;
+
     @Getter
     private String username;
 
-    private ObjectOutputStream objectOutputStream;
+    private ObjectOutputStream out;
 
     @Override
     public void run() {
         try (
-                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
         ) {
-            this.objectOutputStream = out;
-
-            clientHandlers.add(this);
+            this.out = oos;
 
             while (true) {
-                Request request = (Request) in.readObject();
+                Request request = (Request) ois.readObject();
 
                 Response response = dispatcher.dispatch(request);
                 response.setRequestId(request.getRequestId());
 
+                // LOGIN
+                if (response.getCode() == 200
+                        && request.getCommandType() == CommandType.AUTH_LOGIN) {
 
-                if (response.getCode() == 200 && request.getCommandType() == CommandType.AUTH_LOGIN) {
-                    username = response.getData() != null ? ((AccountDTO) response.getData()).getUsername() : null;
+                    username = response.getData() != null
+                            ? ((AccountDTO) response.getData()).getUsername()
+                            : null;
+
+                    if (username != null) {
+                        clients.put(username, this);
+                    }
                 }
 
-                out.writeObject(response);
-                out.flush();
-                out.reset();
+                sendResponse(response);
             }
 
         } catch (EOFException e) {
-            System.out.println("Client disconnected");
+            System.out.println("Client disconnected: " + username);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (objectOutputStream != null) {
-                    objectOutputStream.close();
-                }
-                socket.close();
-            } catch (Exception ignored) {
-            }
-
-            if (username != null) {
-                ActiveUsersManager.getInstance().registerLogout(username);
-            }
-            clientHandlers.remove(this);
-
+            cleanup();
         }
     }
 
-    public static void broadcast(String message, CommandType commandType) {
-        synchronized (clientHandlers) {
-            var iterator = clientHandlers.iterator();
+    private void cleanup() {
+        try {
+            if (out != null) out.close();
+            socket.close();
+        } catch (Exception ignored) {}
 
-            while (iterator.hasNext()) {
-                ClientHandler clientHandler = iterator.next();
-                try {
-                    clientHandler.objectOutputStream.writeObject(Response.builder()
-                            .code(999)
-                            .message(message)
-                            .requestId(null)
-                            .commandType(commandType)
-                            .build());
-                    clientHandler.objectOutputStream.flush();
-                } catch (Exception e) {
-                    // remove client chết
-                    iterator.remove();
-                }
+        if (username != null) {
+            ActiveUsersManager.getInstance().registerLogout(username);
+            clients.remove(username);
+        }
+    }
+
+    // ===== SEND RESPONSE (thread-safe) =====
+    public synchronized void sendResponse(Response response) {
+        try {
+            out.writeObject(response);
+            out.flush();
+            out.reset();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean sendToUser(String username, Response response) {
+        ClientHandler client = clients.get(username);
+
+        if (client == null) return false;
+
+        try {
+            client.sendResponse(response);
+            return true;
+        } catch (Exception e) {
+            clients.remove(username);
+            return false;
+        }
+    }
+
+    // ===== BROADCAST =====
+    public static void broadcast(String message, CommandType commandType) {
+        Response response = Response.builder()
+                .code(999)
+                .message(message)
+                .commandType(commandType)
+                .requestId(null)
+                .build();
+
+        for (var entry : clients.entrySet()) {
+            try {
+                entry.getValue().sendResponse(response);
+            } catch (Exception e) {
+                clients.remove(entry.getKey());
             }
         }
     }

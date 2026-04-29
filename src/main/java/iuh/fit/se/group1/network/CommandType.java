@@ -9,6 +9,7 @@ public enum CommandType implements Serializable {
     AUTH_VALIDATE_MANAGER,
     AUTH_CHANGE_PASSWORD,
 
+    ACCOUNT_DELETED,
 
     EMPLOYEE_GET_BY_ID,
     EMPLOYEE_GET_BY_ACCOUNT_ID,
