@@ -2,6 +2,7 @@ package iuh.fit.se.group1.handler;
 
 import iuh.fit.se.group1.dispatcher.RequestHandler;
 import iuh.fit.se.group1.dto.*;
+import iuh.fit.se.group1.network.ClientHandler;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -16,31 +17,62 @@ public class RoomHandler implements RequestHandler {
     @Override
     public Response handle(Request request) {
         CommandType commandType = request.getCommandType();
-        try {
-            return switch (commandType) {
-                case ROOM_OPTIMIZE_ROOM_ALLOCATION -> handleOptimizeRoomAllocation(request);
-                case ROOM_CHECK_ROOM_CAPACITY -> handleCheckRoomCapacity(request);
-                case ROOM_GET_AVAILABLE_ROOMS -> handleGetAvailableRooms(request);
-                case ROOM_GET_BY_KEYWORD -> handleGetByKeyword(request);
-                case ROOM_CAN_DELETE -> handleCanDelete(request);
-                case ROOM_DELETE -> handleDelete(request);
-                case ROOM_CREATE -> handleCreate(request);
-                case ROOM_UPDATE -> handleUpdate(request);
-                case ROOM_GET_ALL -> handleGetAll(request);
-                case ROOM_UPDATE_ROOM_STATUS_BATCH -> handleUpdateRoomStatusBatch(request);
-                case ROOM_COUNT_AVAILABLE_ROOMS -> handleCountAvailableRooms(request);
+        Response response;
 
-                default -> Response.builder()
-                        .code(400)
-                        .message("Invalid command")
-                        .build();
-            };
+        try {
+            switch (commandType) {
+                case ROOM_CREATE -> response = handleCreate(request);
+                case ROOM_UPDATE -> response = handleUpdate(request);
+                case ROOM_DELETE -> response = handleDelete(request);
+                case ROOM_GET_ALL -> response = handleGetAll(request);
+                case ROOM_GET_BY_KEYWORD -> response = handleGetByKeyword(request);
+                case ROOM_CHECK_ROOM_CAPACITY -> response = handleCheckRoomCapacity(request);
+                case ROOM_OPTIMIZE_ROOM_ALLOCATION -> response = handleOptimizeRoomAllocation(request);
+                case ROOM_UPDATE_ROOM_STATUS_BATCH -> response = handleUpdateRoomStatusBatch(request);
+                case ROOM_COUNT_AVAILABLE_ROOMS -> response = handleCountAvailableRooms(request);
+                case ROOM_CAN_DELETE -> response = handleCanDelete(request);
+                case ROOM_GET_AVAILABLE_ROOMS -> response = handleGetAvailableRooms(request);
+
+                default -> {
+                    response = Response.builder()
+                            .code(400)
+                            .message("Invalid command")
+                            .build();
+                }
+            }
+
+            // ===== xử lý thêm sau khi có response =====
+
+            if (isWriteCommand(commandType) && response.getCode() == 200) {
+                String message = getMessage(commandType);
+                ClientHandler.broadcast(message, CommandType.ROOM_REFRESH);
+            }
+
+            return response;
+
         } catch (Exception e) {
             return Response.builder()
                     .code(500)
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private static String getMessage(CommandType commandType) {
+        return switch (commandType) {
+            case ROOM_CREATE -> "A new room has been created.";
+            case ROOM_UPDATE -> "A room has been updated.";
+            case ROOM_DELETE -> "A room has been deleted.";
+            case ROOM_UPDATE_ROOM_STATUS_BATCH -> "Room statuses have been updated in batch.";
+            default -> "Rooms have been updated.";
+        };
+    }
+
+    private boolean isWriteCommand(CommandType type) {
+        return switch (type) {
+            case ROOM_CREATE, ROOM_UPDATE, ROOM_DELETE, ROOM_UPDATE_ROOM_STATUS_BATCH -> true;
+            default -> false;
+        };
     }
 
     private Response handleGetByKeyword(Request request) {

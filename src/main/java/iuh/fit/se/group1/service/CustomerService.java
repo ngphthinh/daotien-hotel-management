@@ -61,7 +61,7 @@ public class CustomerService extends Service {
     }
 
     public CustomerDTO updateCustomer(CustomerDTO customer) {
-        return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.save(entityManager, customerMapper.toCustomer(customer))));
+        return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.update(entityManager, customerMapper.toCustomer(customer))));
     }
 
     public CustomerDTO getCustomerByCitizenId(String citizenId) {

@@ -33,6 +33,7 @@ public class EmployeeHandler implements RequestHandler {
                 case EMPLOYEE_CREATE -> handleCreate(request);
                 case EMPLOYEE_UPDATE -> handleUpdate(request);
                 case EMPLOYEE_DELETE -> handleDelete(request);
+                case EMPLOYEE_GET_BY_PHONE -> handleGetByPhone(request);
                 default -> Response.builder()
                         .code(400)
                         .message("Invalid command")
@@ -45,6 +46,31 @@ public class EmployeeHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private Response handleGetByPhone(Request request) {
+        String phone = request.getRequest().toString();
+        if (phone == null || phone.isEmpty()) {
+            return Response.builder()
+                    .code(400)
+                    .message("Phone number cannot be null or empty")
+                    .build();
+        }
+
+        EmployeeDTO employee = employeeService.getEmployeeByPhone(phone);
+        if (employee == null) {
+            return Response.builder()
+                    .code(404)
+                    .message("Employee not found with phone: " + phone)
+                    .build();
+        }
+
+        return Response.builder()
+                .code(200)
+                .message("Get employee by phone successfully")
+                .data(employee)
+                .build();
+
     }
 
     private Response handleGetById(Request request) {

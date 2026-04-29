@@ -162,7 +162,7 @@ public class ImportExportHandler implements RequestHandler {
 
 
             ExportResponse exportResponse = ExportResponse.builder()
-                    .fileData(exportExcelService.exportTableToExcel(exportRequest.getTable(), exportRequest.getTitle(), exportRequest.isExcludeLastColumn()))
+                    .fileData(exportExcelService.exportTableToExcel(exportRequest.getColumnHeaders(), exportRequest.getData(), exportRequest.getTitle(), exportRequest.isExcludeLastColumn()))
                     .build();
 
 

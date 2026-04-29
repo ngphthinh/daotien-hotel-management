@@ -38,7 +38,6 @@ public class TestServer {
                 System.out.println(employee);
             }
         }
-        InitData.initAllData();
         AuthenticateService authenticateService = new AuthenticateService();
         AccountService accountService = new AccountService();
         AmenityService amenityService = new AmenityService();
@@ -296,6 +295,7 @@ public class TestServer {
         registry.register(CommandType.EMPLOYEE_CREATE, employeeHandler);
         registry.register(CommandType.EMPLOYEE_UPDATE, employeeHandler);
         registry.register(CommandType.EMPLOYEE_DELETE, employeeHandler);
+        registry.register(CommandType.EMPLOYEE_GET_BY_PHONE, employeeHandler);
     }
 
     private static void registerAmenity(HandlerRegistry registry, AmenityHandler amenityHandler) {
@@ -316,7 +316,6 @@ public class TestServer {
         registry.register(CommandType.ORDER_SEARCH_BY_KEYWORD, orderHandler);
         registry.register(CommandType.ORDER_CREATE, orderHandler);
         registry.register(CommandType.ORDER_UPDATE_STATUS_PAID, orderHandler);
-        registry.register(CommandType.ORDER_UPDATE_DEPOSIT, orderHandler);
         registry.register(CommandType.ORDER_DELETE, orderHandler);
 
         registry.register(CommandType.ORDER_GET_REVENUE_BETWEEN_DATES_BY_ROOM_TYPE, orderHandler);

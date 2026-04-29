@@ -20,6 +20,7 @@ public enum CommandType implements Serializable {
     EMPLOYEE_CREATE,
     EMPLOYEE_UPDATE,
     EMPLOYEE_DELETE,
+    EMPLOYEE_GET_BY_PHONE,
 
     AMENITY_GET_BY_ID,
     AMENITY_GET_ALL,
@@ -170,6 +171,12 @@ public enum CommandType implements Serializable {
     SURCHARGE_DETAIL_UPDATE,
     SURCHARGE_DETAIL_DELETE,
     SURCHARGE_DETAIL_CREATE_LIST,
+    // refresh data
+    ROOM_REFRESH,
+    AMENITY_REFRESH,
+    PROMOTION_REFRESH,
+    SURCHARGE_REFRESH,
+    ORDER_REFRESH,
 
 
 

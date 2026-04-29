@@ -1,26 +1,17 @@
 package iuh.fit.se.group1.service;
 
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
-import java.awt.Component;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-/**
- * Service class để xuất dữ liệu từ JTable ra file Excel
- * Có thể tái sử dụng cho nhiều module khác nhau
- */
 public class ExportExcelService {
 
-    public byte[] exportTableToExcel(JTable table, String sheetName, boolean excludeLastColumn) {
+    public byte[] exportTableToExcel(List<String> columns,
+                                     List<List<Object>> data,
+                                     String sheetName,
+                                     boolean excludeLastColumn) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
@@ -29,34 +20,44 @@ public class ExportExcelService {
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dataStyle = createDataStyle(workbook);
 
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
-            int columnCount = model.getColumnCount();
-
+            int columnCount = columns.size();
             if (excludeLastColumn) columnCount--;
 
-            // Header
+            // ===== Header =====
             Row headerRow = sheet.createRow(0);
+
             Cell sttCell = headerRow.createCell(0);
             sttCell.setCellValue("STT");
             sttCell.setCellStyle(headerStyle);
 
             for (int i = 0; i < columnCount; i++) {
                 Cell cell = headerRow.createCell(i + 1);
-                cell.setCellValue(table.getColumnName(i));
+                cell.setCellValue(columns.get(i));
                 cell.setCellStyle(headerStyle);
             }
 
-            // Data
-            for (int i = 0; i < table.getRowCount(); i++) {
+            // ===== Data =====
+            for (int i = 0; i < data.size(); i++) {
                 Row row = sheet.createRow(i + 1);
 
-                row.createCell(0).setCellValue(i + 1);
+                // STT
+                Cell sttValue = row.createCell(0);
+                sttValue.setCellValue(i + 1);
+                sttValue.setCellStyle(dataStyle);
 
                 for (int j = 0; j < columnCount; j++) {
-                    Object value = table.getValueAt(i, j);
-                    row.createCell(j + 1)
-                            .setCellValue(value != null ? value.toString() : "");
+                    Object value = data.get(i).get(j);
+
+                    Cell cell = row.createCell(j + 1);
+                    cell.setCellValue(value != null ? value.toString() : "");
+                    cell.setCellStyle(dataStyle);
                 }
+            }
+
+            // Auto size
+            for (int i = 0; i <= columnCount; i++) {
+                sheet.autoSizeColumn(i);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
             }
 
             workbook.write(out);
@@ -67,152 +68,39 @@ public class ExportExcelService {
         }
     }
 
-
-
-
-    /**
-     * Thực hiện xuất dữ liệu ra file Excel
-     */
-    private void exportData(JTable table, String filePath, String sheetName) throws IOException {
-        exportData(table, filePath, sheetName, true); // Mặc định bỏ cột cuối
-    }
-
-    /**
-     * Thực hiện xuất dữ liệu ra file Excel với tùy chọn
-     */
-    private void exportData(JTable table, String filePath, String sheetName,
-                            boolean excludeLastColumn) throws IOException {
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet(sheetName);
-
-        // Tạo style cho header
-        CellStyle headerStyle = createHeaderStyle(workbook);
-
-        // Tạo style cho data cells
-        CellStyle dataStyle = createDataStyle(workbook);
-
-        // Lấy model từ table
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        int columnCount = model.getColumnCount();
-        int rowCount = model.getRowCount();
-
-        // Điều chỉnh số cột nếu cần bỏ cột cuối
-        if (excludeLastColumn) {
-            columnCount--;
-        }
-
-        // Tạo header row
-        Row headerRow = sheet.createRow(0);
-        headerRow.setHeightInPoints(30);
-
-        Font bodyFont = workbook.createFont();
-        bodyFont.setFontHeightInPoints((short) 16);
-        bodyFont.setFontName("Times New Roman");
-
-        CellStyle bodyStyle = workbook.createCellStyle();
-        bodyStyle.setFont(bodyFont);
-        bodyStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        // Thêm cột STT
-        Cell sttCell = headerRow.createCell(0);
-        sttCell.setCellValue("STT");
-        sttCell.setCellStyle(headerStyle);
-
-        // Thêm các cột từ table
-        for (int i = 0; i < columnCount; i++) {
-            Cell cell = headerRow.createCell(i + 1);
-            cell.setCellValue(table.getColumnName(i));
-            cell.setCellStyle(headerStyle);
-        }
-
-        // Ghi data
-        CellStyle centerStyle = workbook.createCellStyle();
-        centerStyle.cloneStyleFrom(bodyStyle);
-        centerStyle.setAlignment(HorizontalAlignment.CENTER);
-        for (int i = 0; i < table.getRowCount(); i++) {
-            Row dataRow = sheet.createRow(i + 1);
-            dataRow.setHeightInPoints(22);
-
-            // STT
-            Cell sttValueCell = dataRow.createCell(0);
-            sttValueCell.setCellValue(i + 1);
-            sttValueCell.setCellStyle(bodyStyle);
-            sttValueCell.setCellStyle(centerStyle);
-
-
-            for (int j = 0; j < columnCount; j++) {
-                Cell cell = dataRow.createCell(j + 1);
-                Object value = table.getValueAt(i, j);
-                cell.setCellValue(value != null ? value.toString() : "");
-                if (j == 0) {
-                    cell.setCellStyle(centerStyle);
-                } else {
-                    cell.setCellStyle(bodyStyle);
-                }
-            }
-
-        }
-
-        for (int i = 0; i <= columnCount; i++) {
-            sheet.autoSizeColumn(i);
-
-            sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 1000);
-        }
-        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-            workbook.write(fileOut);
-        }
-        sheet.setColumnWidth(0, 256 * 15);
-        sheet.setColumnWidth(1, 256 * 15);
-
-        workbook.close();
-    }
-
-    /**
-     * Tạo style cho header
-     */
     private CellStyle createHeaderStyle(Workbook workbook) {
-        CellStyle headerStyle = workbook.createCellStyle();
+        CellStyle style = workbook.createCellStyle();
 
-        // Font
-        Font headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setFontHeightInPoints((short) 16);
-        headerFont.setFontName("Times New Roman");
-        headerStyle.setFont(headerFont);
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 14);
+        font.setFontName("Times New Roman");
 
-        // Background color
-        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
 
-        // Alignment
-        headerStyle.setAlignment(HorizontalAlignment.CENTER);
-        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        // Borders
-        headerStyle.setBorderBottom(BorderStyle.THIN);
-        headerStyle.setBorderTop(BorderStyle.THIN);
-        headerStyle.setBorderRight(BorderStyle.THIN);
-        headerStyle.setBorderLeft(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
 
-        return headerStyle;
+        return style;
     }
 
-    /**
-     * Tạo style cho data cells
-     */
     private CellStyle createDataStyle(Workbook workbook) {
-        CellStyle dataStyle = workbook.createCellStyle();
+        CellStyle style = workbook.createCellStyle();
 
-        // Borders
-        dataStyle.setBorderBottom(BorderStyle.THIN);
-        dataStyle.setBorderTop(BorderStyle.THIN);
-        dataStyle.setBorderRight(BorderStyle.THIN);
-        dataStyle.setBorderLeft(BorderStyle.THIN);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
 
-        // Alignment
-        dataStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
 
-        return dataStyle;
+        return style;
     }
-
-
 }

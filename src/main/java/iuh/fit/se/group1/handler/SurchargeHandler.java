@@ -2,6 +2,7 @@ package iuh.fit.se.group1.handler;
 
 import iuh.fit.se.group1.dispatcher.RequestHandler;
 import iuh.fit.se.group1.dto.SurchargeDTO;
+import iuh.fit.se.group1.network.ClientHandler;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -21,19 +22,29 @@ public class SurchargeHandler implements RequestHandler {
     public Response handle(Request request) {
         CommandType commandType = request.getCommandType();
         try {
-            return switch (commandType) {
-                case SURCHARGE_GET_ALL -> handleGetAll();
-                case SURCHARGE_GET_BY_ID -> handleGetById(request);
-                case SURCHARGE_CREATE -> handleCreate(request);
-                case SURCHARGE_UPDATE -> handleUpdate(request);
-                case SURCHARGE_DELETE -> handleDelete(request);
-                case SURCHARGE_GET_BY_KEYWORDS -> handleGetByKeywords(request);
-                case SURCHARGE_GET_BY_NAME -> handleGetByName(request);
-                default -> Response.builder()
+            Response response;
+            switch (commandType) {
+                case SURCHARGE_GET_ALL -> response = handleGetAll();
+                case SURCHARGE_GET_BY_ID -> response = handleGetById(request);
+                case SURCHARGE_CREATE -> response = handleCreate(request);
+                case SURCHARGE_UPDATE -> response = handleUpdate(request);
+                case SURCHARGE_DELETE -> response = handleDelete(request);
+                case SURCHARGE_GET_BY_KEYWORDS -> response = handleGetByKeywords(request);
+                case SURCHARGE_GET_BY_NAME -> response = handleGetByName(request);
+                default -> response = Response.builder()
                         .code(400)
                         .message("Invalid command")
                         .build();
-            };
+            }
+
+
+            if (isWriteCommand(commandType) && response.getCode() == 200) {
+                String message = getMessage(commandType);
+                ClientHandler.broadcast(message, CommandType.SURCHARGE_REFRESH);
+            }
+
+            return response;
+
         } catch (Exception e) {
             log.error("Error handling surcharge request: {}", commandType, e);
             return Response.builder()
@@ -41,6 +52,22 @@ public class SurchargeHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private boolean isWriteCommand(CommandType commandType) {
+        return switch (commandType) {
+            case SURCHARGE_CREATE, SURCHARGE_UPDATE, SURCHARGE_DELETE -> true;
+            default -> false;
+        };
+    }
+
+    private String getMessage(CommandType commandType) {
+        return switch (commandType) {
+            case SURCHARGE_CREATE -> "Surcharge created";
+            case SURCHARGE_UPDATE -> "Surcharge updated";
+            case SURCHARGE_DELETE -> "Surcharge deleted";
+            default -> "Surcharge has been changed";
+        };
     }
 
     private Response handleGetByName(Request request) {
@@ -97,12 +124,11 @@ public class SurchargeHandler implements RequestHandler {
         }
         try {
             surchargeService.deleteSurcharge(surchargeId);
-            
+
             Response response = Response.builder()
                     .code(200)
                     .message("Surcharge deleted successfully")
                     .build();
-
 
 
             return response;
@@ -125,7 +151,7 @@ public class SurchargeHandler implements RequestHandler {
         }
         try {
             SurchargeDTO updated = surchargeService.updateSurcharge(surchargeDTO);
-            
+
             Response response = Response.builder()
                     .code(200)
                     .message("Surcharge updated successfully")
@@ -161,13 +187,12 @@ public class SurchargeHandler implements RequestHandler {
                         .message("Failed to create surcharge")
                         .build();
             }
-            
+
             Response response = Response.builder()
                     .code(200)
                     .message("Surcharge created successfully")
                     .data(surchargeCreated)
                     .build();
-
 
 
             return response;

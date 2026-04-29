@@ -20,4 +20,5 @@ public interface EmployeeRepository extends Repository<Employee, Long> {
     Employee findByAccountId(EntityManager em, String accountId);
 
 
+    Employee findByPhoneNumber(EntityManager entityManager, String phone);
 }

@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EmployeeService extends Service {
-    private static final Logger log = LoggerFactory.getLogger(EmployeeService.class);
     private final EmployeeRepositoryImpl employeeRepositoryImpl;
     private final AccountService accountService;
     private final RoleService roleService;
@@ -142,4 +141,7 @@ public class EmployeeService extends Service {
     }
 
 
+    public EmployeeDTO getEmployeeByPhone(String phone) {
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByPhoneNumber(entityManager, phone)));
+    }
 }

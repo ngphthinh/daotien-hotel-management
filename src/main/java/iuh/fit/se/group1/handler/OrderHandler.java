@@ -2,6 +2,7 @@ package iuh.fit.se.group1.handler;
 
 import iuh.fit.se.group1.dispatcher.RequestHandler;
 import iuh.fit.se.group1.dto.*;
+import iuh.fit.se.group1.network.ClientHandler;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -26,32 +27,43 @@ public class OrderHandler implements RequestHandler {
         CommandType commandType = request.getCommandType();
 
         try {
-            return switch (commandType) {
-                case ORDER_GET_BY_ID -> handleGetById(request);
-                case ORDER_GET_ALL -> handleGetAll();
-                case ORDER_GET_ALL_WITH_RELATIONSHIP -> handleGetAllWithRelationship();
-                case ORDER_GET_UNPAID -> handleGetUnpaid();
-                case ORDER_GET_UNPAID_BY_KEYWORD -> handleGetUnpaidByKeyword(request);
-                case ORDER_SEARCH_BY_KEYWORD -> handleSearchByKeyword(request);
-                case ORDER_CREATE -> handleCreate(request);
-                case ORDER_UPDATE_STATUS_PAID -> handleUpdateStatusPaid(request);
-                case ORDER_UPDATE_DEPOSIT -> handleUpdateDeposit(request);
-                case ORDER_DELETE -> handleDelete(request);
-                case ORDER_GET_REVENUE_BETWEEN_DATES -> handleGetRevenueBetweenDates(request);
-                case ORDER_GET_REVENUE_BETWEEN_DATES_BY_ROOM_TYPE -> handleGetRevenueBetweenDatesByRoomType(request);
-                case ORDER_GET_REVENUE_BETWEEN_DATES_BOOKING_COUNT -> handleGetRevenueBetweenDatesBookingCount(request);
-                case ORDER_CREATE_RECORD -> handleCreateRecord(request);
-                case ORDER_UPDATE_TOTAL_PRICE -> handleUpdateTotalPrice(request);
-                case ORDER_MOVE_BOOKING_TO_ORDER -> handleMoveBookingToOrder(request);
-                case ORDER_RE_CALCULATE_TOTAL_PRICE -> handleReCalculateTotalPrice(request);
-                case ORDER_UPDATE_ORDER_TYPE -> handleUpdateOrderType(request);
-                case ORDER_GET_ALL_WITH_RELATIONSHIP_COMPLETE_YET -> handleGetAllWithRelationshipAndCompleteYet();
-                case ORDER_GET_UN_PENDING_BY_KEYWORD -> handleGetOrdersUnPendingByKeyWord(request);
-                default -> Response.builder()
+            Response response;
+            switch (commandType) {
+                case ORDER_GET_BY_ID -> response = handleGetById(request);
+                case ORDER_GET_ALL -> response = handleGetAll();
+                case ORDER_GET_ALL_WITH_RELATIONSHIP -> response = handleGetAllWithRelationship();
+                case ORDER_GET_UNPAID -> response = handleGetUnpaid();
+                case ORDER_GET_UNPAID_BY_KEYWORD -> response = handleGetUnpaidByKeyword(request);
+                case ORDER_SEARCH_BY_KEYWORD -> response = handleSearchByKeyword(request);
+                case ORDER_CREATE -> response = handleCreate(request);
+                case ORDER_UPDATE_STATUS_PAID -> response = handleUpdateStatusPaid(request);
+                case ORDER_UPDATE_DEPOSIT -> response = handleUpdateDeposit(request);
+                case ORDER_DELETE -> response = handleDelete(request);
+                case ORDER_GET_REVENUE_BETWEEN_DATES -> response = handleGetRevenueBetweenDates(request);
+                case ORDER_GET_REVENUE_BETWEEN_DATES_BY_ROOM_TYPE ->
+                        response = handleGetRevenueBetweenDatesByRoomType(request);
+                case ORDER_GET_REVENUE_BETWEEN_DATES_BOOKING_COUNT ->
+                        response = handleGetRevenueBetweenDatesBookingCount(request);
+                case ORDER_CREATE_RECORD -> response = handleCreateRecord(request);
+                case ORDER_UPDATE_TOTAL_PRICE -> response = handleUpdateTotalPrice(request);
+                case ORDER_MOVE_BOOKING_TO_ORDER -> response = handleMoveBookingToOrder(request);
+                case ORDER_RE_CALCULATE_TOTAL_PRICE -> response = handleReCalculateTotalPrice(request);
+                case ORDER_UPDATE_ORDER_TYPE -> response = handleUpdateOrderType(request);
+                case ORDER_GET_ALL_WITH_RELATIONSHIP_COMPLETE_YET ->
+                        response = handleGetAllWithRelationshipAndCompleteYet();
+                case ORDER_GET_UN_PENDING_BY_KEYWORD -> response = handleGetOrdersUnPendingByKeyWord(request);
+                default -> response = Response.builder()
                         .code(400)
                         .message("Invalid command")
                         .build();
-            };
+            }
+
+            if (isWriteCommand(commandType) && response.getCode() == 200) {
+                String message = getMessage(commandType);
+                ClientHandler.broadcast(message, CommandType.ORDER_REFRESH);
+            }
+
+            return response;
         } catch (Exception e) {
             log.error("Error handling order request: {}", commandType, e);
             return Response.builder()
@@ -59,6 +71,30 @@ public class OrderHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private String getMessage(CommandType commandType) {
+        return switch (commandType) {
+            case ORDER_CREATE -> "Order created";
+            case ORDER_UPDATE_STATUS_PAID -> "Order status updated to paid";
+            case ORDER_UPDATE_DEPOSIT -> "Order deposit updated";
+            case ORDER_DELETE -> "Order deleted";
+            case ORDER_UPDATE_TOTAL_PRICE -> "Order total price updated";
+            case ORDER_MOVE_BOOKING_TO_ORDER -> "Booking moved to order";
+            case ORDER_RE_CALCULATE_TOTAL_PRICE -> "Order total price recalculated";
+            case ORDER_UPDATE_ORDER_TYPE -> "Order type updated";
+            case ORDER_CREATE_RECORD -> "Order record created";
+            default -> "Order has been changed";
+        };
+    }
+
+    private boolean isWriteCommand(CommandType commandType) {
+        return switch (commandType) {
+            case ORDER_CREATE, ORDER_UPDATE_STATUS_PAID, ORDER_UPDATE_DEPOSIT, ORDER_DELETE, ORDER_UPDATE_TOTAL_PRICE,
+                 ORDER_MOVE_BOOKING_TO_ORDER, ORDER_RE_CALCULATE_TOTAL_PRICE, ORDER_UPDATE_ORDER_TYPE,
+                 ORDER_CREATE_RECORD -> true;
+            default -> false;
+        };
     }
 
     private Response handleGetOrdersUnPendingByKeyWord(Request request) {

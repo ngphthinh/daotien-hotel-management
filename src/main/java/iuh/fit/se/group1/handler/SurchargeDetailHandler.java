@@ -76,13 +76,11 @@ public class SurchargeDetailHandler implements RequestHandler {
             long orderId = surchargeDetails.getOrderId();
             surchargeDetailService.saveWithOrderId(orderId, surchargeDetails.getSurcharges());
 
-            Response response = Response.builder()
+
+            return Response.builder()
                     .code(200)
                     .message("Surcharge details saved successfully for Order ID " + orderId)
                     .build();
-
-
-            return response;
         } catch (Exception e) {
             return Response.builder()
                     .code(500)
