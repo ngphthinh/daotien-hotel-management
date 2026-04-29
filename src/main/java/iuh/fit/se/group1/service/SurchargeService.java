@@ -28,12 +28,10 @@ public class SurchargeService extends Service {
     }
 
     public void deleteSurcharge(Long surchargeId) {
-//        surchargeRepositoryImpl.deleteById(surchargeId);
         doInTransactionVoid(entityManager -> surchargeRepositoryImpl.deleteById(entityManager, surchargeId));
     }
 
     public List<SurchargeDTO> getAllSurcharges() {
-//        return surchargeRepositoryImpl.findAll();
         return doInTransaction(surchargeRepositoryImpl::findAll).stream().map(surchargeMapper::toSurchargeDTO).collect(Collectors.toList());
     }
 
@@ -49,7 +47,6 @@ public class SurchargeService extends Service {
     }
 
     public SurchargeDTO getSurchargeByName(String name) {
-//        return surchargeRepositoryImpl.findBySurchargeName(name);
         return doInTransaction(entityManager -> surchargeMapper.toSurchargeDTO(surchargeRepositoryImpl.findBySurchargeName(entityManager, name)));
     }
 
@@ -58,6 +55,4 @@ public class SurchargeService extends Service {
         return doInTransaction(entityManager -> surchargeMapper.toSurchargeDTO(surchargeRepositoryImpl.findById(entityManager, surchargeId)));
     }
 
-//    public List<Surcharge> getSurchargeDetailsByOrderId(Long orderId) {
-//    }
 }

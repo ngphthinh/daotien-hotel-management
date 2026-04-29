@@ -153,4 +153,37 @@ public class EmployeeRepositoryImpl extends AbstractRepositoryImpl<Employee, Lon
                 """;
         return em.createQuery(query, Employee.class).getResultList();
     }
+
+    @Override
+    public Employee findByPhoneNumber(EntityManager entityManager, String phone) {
+        String jpql = """
+                    SELECT e
+                    FROM Employee e
+                    JOIN FETCH e.account a
+                    JOIN FETCH a.role
+                    WHERE e.phone = :phone AND e.isDeleted = false AND a.isDeleted = false
+                """;
+        return entityManager.createQuery(jpql, Employee.class)
+                .setParameter("phone", phone)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public Employee findById(EntityManager em, Long id) {
+        String jpql = """
+                    SELECT e
+                    FROM Employee e
+                    JOIN FETCH e.account a
+                    JOIN FETCH a.role
+                    WHERE e.employeeId = :id AND e.isDeleted = false AND a.isDeleted = false
+                """;
+        return em.createQuery(jpql, Employee.class)
+                .setParameter("id", id)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+
+    }
 }

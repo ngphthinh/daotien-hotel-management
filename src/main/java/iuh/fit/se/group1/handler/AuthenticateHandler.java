@@ -5,6 +5,7 @@ import iuh.fit.se.group1.dto.AccountChangePassword;
 import iuh.fit.se.group1.dto.AccountDTO;
 import iuh.fit.se.group1.dto.AuthenticateRequest;
 import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.network.ClientHandler;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -69,7 +70,7 @@ public class AuthenticateHandler implements RequestHandler {
     private Response handleLogout(Request request) {
         String username = request.getRequest().toString();
         activeUsersManager.registerLogout(username);
-        
+
         return Response.builder()
                 .code(200)
                 .message("Logout successful")
@@ -107,7 +108,7 @@ public class AuthenticateHandler implements RequestHandler {
     private Response handleLogin(Request request) {
         AuthenticateRequest authenticateRequest = (AuthenticateRequest) request.getRequest();
         String username = authenticateRequest.getUsername();
-        
+
         if (activeUsersManager.isUserLoggedIn(username)) {
             log.warn("Login attempt from user '{}' who is already logged in", username);
             return Response.builder()
@@ -115,12 +116,13 @@ public class AuthenticateHandler implements RequestHandler {
                     .message("User already logged in from another session")
                     .build();
         }
-        
+
         AccountDTO authenticated = authenticateService.authenticate(username, authenticateRequest.getPassword());
-        
+
         if (authenticated != null) {
             // Register user as logged in
             if (activeUsersManager.registerLogin(username)) {
+
                 return Response.builder()
                         .code(200)
                         .data(authenticated)

@@ -3,8 +3,10 @@ package iuh.fit.se.group1.enums;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @Getter
-public enum OrderBookStatus {
+public enum OrderBookStatus implements Serializable {
     COMPLETED("Đã hoàn thành"),
     PROCESSING("Đang xử lý"),
     RESERVED("Đặt trước"),

@@ -24,8 +24,10 @@ public class AmenityService extends Service {
             return null;
         }
 
+        Amenity amenityEntity = amenityMapper.toAmenity(amenity);
+        amenityEntity.setCreatedAt(java.time.LocalDate.now());
         return doInTransaction(entityManager ->
-                amenityMapper.toAmenityDTO(amenityRepositoryImpl.save(entityManager, amenityMapper.toAmenity(amenity)))
+                amenityMapper.toAmenityDTO(amenityRepositoryImpl.save(entityManager, amenityEntity))
         );
     }
 

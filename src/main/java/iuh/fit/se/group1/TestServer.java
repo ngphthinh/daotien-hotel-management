@@ -1,22 +1,45 @@
 package iuh.fit.se.group1;
 
+import iuh.fit.se.group1.config.InitData;
 import iuh.fit.se.group1.dispatcher.Dispatcher;
 import iuh.fit.se.group1.dispatcher.HandlerRegistry;
+import iuh.fit.se.group1.dto.EmployeeDTO;
+import iuh.fit.se.group1.entity.Employee;
+import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.handler.*;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.SocketServer;
-import iuh.fit.se.group1.network.client.service.ImportExportExcelServiceClient;
 import iuh.fit.se.group1.service.*;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
+
+@Slf4j
 public class TestServer {
     public static void main(String[] args) {
 
         JPAUtil.getEntityManager();
-
+        System.out.println("Đang tải dữ liệu ứng dụng...");
+        EmployeeService employeeService = new EmployeeService();
+        if (employeeService.count() == 0) {
+            InitData.initAllData();
+            EmployeeDTO admin = new EmployeeDTO();
+            admin.setFullName("Quản Trị Viên Admin");
+            admin.setPhone("0123456789");
+            admin.setHireDate(LocalDate.now());
+            admin.setEmail("nguyenphuocthinh0710@gmail.com");
+            admin.setGender(false);
+            admin.setCitizenId("082205000819");
+            EmployeeDTO employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
+            if (employee == null) {
+                System.out.println("Không tạo được tài khoản");
+            } else {
+                System.out.println(employee);
+            }
+        }
         AuthenticateService authenticateService = new AuthenticateService();
         AccountService accountService = new AccountService();
-        EmployeeService employeeService = new EmployeeService();
         AmenityService amenityService = new AmenityService();
         OrderService orderService = new OrderService();
 
@@ -24,6 +47,7 @@ public class TestServer {
         BookingService bookingService = new BookingService();
         CustomerService customerService = new CustomerService();
 
+        JaspersoftExportService jaspersoftExportService = new JaspersoftExportService();
         OrderDetailService orderDetailService = new OrderDetailService();
         RoleService roleService = new RoleService();
         DenominationDetailService denominationDetailService = new DenominationDetailService();
@@ -31,7 +55,18 @@ public class TestServer {
 
         ImportExcelService importExcelService = new ImportExcelService();
         ExportExcelService exportExcelService = new ExportExcelService();
+        SurchargeService surchargeService = new SurchargeService();
+        PromotionService promotionService = new PromotionService();
+        ShiftService shiftService = new ShiftService();
+        ShiftCloseService shiftCloseService = new ShiftCloseService();
+        RoomTypeService roomTypeService = new RoomTypeService();
+        RoomToolsService roomToolsService = new RoomToolsService();
+        EmployeeShiftService employeeShiftService = new EmployeeShiftService();
+        PaymentService paymentService = new PaymentService();
+        SurchargeDetailService surchargeDetailService = new SurchargeDetailService();
 
+
+        RoomService roomService = new RoomService();
 
         HandlerRegistry registry = new HandlerRegistry();
 
@@ -48,6 +83,20 @@ public class TestServer {
         OrderDetailHandler orderDetailHandler = new OrderDetailHandler(orderDetailService);
         RoleHandler roleHandler = new RoleHandler(roleService);
         ImportExportHandler exportHandler = new ImportExportHandler(exportExcelService, importExcelService);
+        SurchargeHandler surchargeHandler = new SurchargeHandler(surchargeService);
+        PromotionHandler promotionHandler = new PromotionHandler(promotionService);
+        ShiftCloseHandler shiftCloseHandler = new ShiftCloseHandler(shiftCloseService);
+        RoomTypeHandler roomTypeHandler = new RoomTypeHandler(roomTypeService);
+        JaspersoftExportHandler jaspersoftExportHandler = new JaspersoftExportHandler(jaspersoftExportService);
+        RoomToolsHandler roomToolsHandler = new RoomToolsHandler(roomToolsService);
+        EmployeeShiftHandler employeeShiftHandler = new EmployeeShiftHandler(employeeShiftService);
+        SurchargeDetailHandler surchargeDetailHandler = new SurchargeDetailHandler(surchargeDetailService);
+
+        PaymentHandler paymentHandler = new PaymentHandler(paymentService);
+        RoomHandler roomHandler = new RoomHandler(roomService);
+
+        ShiftHandler shiftHandler = new ShiftHandler(shiftService);
+
         registerAuth(registry, authenticateHandler);
         registerEmployee(registry, employeeHandler);
         registerAmenity(registry, amenityHandler);
@@ -60,9 +109,131 @@ public class TestServer {
         registerDashboard(registry, dashboardHandler);
         registerDenominationDetail(registry, denominationDetailHandler);
         registerImportExport(registry, exportHandler);
+        registerSurcharge(registry, surchargeHandler);
+        registerPromotion(registry, promotionHandler);
+        registerShift(registry, shiftHandler);
+        registerShiftClose(registry, shiftCloseHandler);
+        registerRoomType(registry, roomTypeHandler);
+        registerJaspersoftExport(registry, jaspersoftExportHandler);
+        registerRoomTools(registry, roomToolsHandler);
+        registerRoom(registry, roomHandler);
+        registerEmployeeShift(registry, employeeShiftHandler);
+        registerPayment(registry, paymentHandler);
+        registerSurchargeDetail(registry, surchargeDetailHandler);
+
 
         Dispatcher dispatcher = new Dispatcher(registry);
         new SocketServer(dispatcher).start();
+    }
+
+    private static void registerSurchargeDetail(HandlerRegistry registry, SurchargeDetailHandler surchargeDetailHandler) {
+        registry.register(CommandType.SURCHARGE_DETAIL_GET_BY_ORDER, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_CREATE, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_UPDATE, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_DELETE, surchargeDetailHandler);
+        registry.register(CommandType.SURCHARGE_DETAIL_CREATE_LIST, surchargeDetailHandler);
+    }
+
+    private static void registerPayment(HandlerRegistry registry, PaymentHandler paymentHandler) {
+        registry.register(CommandType.PAYMENT_CREATE, paymentHandler);
+        registry.register(CommandType.PAYMENT_QUERY, paymentHandler);
+    }
+
+    private static void registerEmployeeShift(HandlerRegistry registry, EmployeeShiftHandler employeeShiftHandler) {
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_BY_ID, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_ALL, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_CREATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_UPDATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_DELETE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_BY_EMPLOYEE_AND_DATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_SHIFT_BY_DATE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_WITH_DETAILS, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_TOTAL_REVENUE, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_ACTIVE_OPEN_SHIFTS, employeeShiftHandler);
+        registry.register(CommandType.EMPLOYEE_SHIFT_GET_ALL_SHIFTS_BY_DATE, employeeShiftHandler);
+
+
+    }
+
+    private static void registerRoom(HandlerRegistry registry, RoomHandler roomHandler) {
+        registry.register(CommandType.ROOM_OPTIMIZE_ROOM_ALLOCATION, roomHandler);
+        registry.register(CommandType.ROOM_CHECK_ROOM_CAPACITY, roomHandler);
+        registry.register(CommandType.ROOM_GET_AVAILABLE_ROOMS, roomHandler);
+        registry.register(CommandType.ROOM_COUNT_AVAILABLE_ROOMS, roomHandler);
+        registry.register(CommandType.ROOM_UPDATE_ROOM_STATUS_BATCH, roomHandler);
+        registry.register(CommandType.ROOM_GET_ALL, roomHandler);
+        registry.register(CommandType.ROOM_GET_BY_KEYWORD, roomHandler);
+        registry.register(CommandType.ROOM_CAN_DELETE, roomHandler);
+        registry.register(CommandType.ROOM_DELETE, roomHandler);
+        registry.register(CommandType.ROOM_UPDATE, roomHandler);
+        registry.register(CommandType.ROOM_CREATE, roomHandler);
+
+    }
+
+    private static void registerRoomTools(HandlerRegistry registry, RoomToolsHandler roomToolsHandler) {
+        registry.register(CommandType.ROOM_TOOL_ROOM_PRICE_WITH_DURATION, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_CALCULATE_EXTENSION_AMOUNT, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_EXTEND_ROOM_BOOKING, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_VALIDATE_TRANSFER, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_CALCULATE_SURCHARGE, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_CANCEL_ROOM_BOOKING, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_GET_ROOMS_BY_ORDER_AND_TYPE, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_GET_AVAILABLE_ROOMS_BY_TYPE, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_GET_ROOM_PRICE_BY_TYPE, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_CALCULATE_NEW_ROOM_PRICE_WITH_BOOKING_DURATION, roomToolsHandler);
+        registry.register(CommandType.ROOM_TOOL_TRANSFER_ROOMS, roomToolsHandler);
+    }
+
+    private static void registerJaspersoftExport(HandlerRegistry registry, JaspersoftExportHandler jaspersoftExportHandler) {
+        registry.register(CommandType.JASPERSOFT_EXPORT_ORDER_TO_PDF, jaspersoftExportHandler);
+    }
+
+    private static void registerRoomType(HandlerRegistry registry, RoomTypeHandler roomTypeHandler) {
+        registry.register(CommandType.ROOM_TYPE_GET_BY_ID, roomTypeHandler);
+        registry.register(CommandType.ROOM_TYPE_GET_ALL, roomTypeHandler);
+        registry.register(CommandType.ROOM_TYPE_CREATE, roomTypeHandler);
+        registry.register(CommandType.ROOM_TYPE_UPDATE, roomTypeHandler);
+        registry.register(CommandType.ROOM_TYPE_DELETE, roomTypeHandler);
+    }
+
+    private static void registerShiftClose(HandlerRegistry registry, ShiftCloseHandler shiftCloseHandler) {
+        registry.register(CommandType.SHIFT_CLOSE_CREATE, shiftCloseHandler);
+        registry.register(CommandType.SHIFT_CLOSE_GET_BY_ID, shiftCloseHandler);
+        registry.register(CommandType.SHIFT_CLOSE_DELETE, shiftCloseHandler);
+        registry.register(CommandType.SHIFT_CLOSE_UPDATE, shiftCloseHandler);
+        registry.register(CommandType.SHIFT_CLOSE_GET_TOTAL_REVENUE, shiftCloseHandler);
+        registry.register(CommandType.SHIFT_CLOSE_GET_BY_EMPLOYEE_SHIFT, shiftCloseHandler);
+        registry.register(CommandType.SHIFT_CLOSE_GET_ALL, shiftCloseHandler);
+    }
+
+    private static void registerShift(HandlerRegistry registry, ShiftHandler shiftHandler) {
+        registry.register(CommandType.SHIFT_GET_ALL, shiftHandler);
+        registry.register(CommandType.SHIFT_GET_BY_ID, shiftHandler);
+        registry.register(CommandType.SHIFT_CREATE, shiftHandler);
+        registry.register(CommandType.SHIFT_UPDATE, shiftHandler);
+        registry.register(CommandType.SHIFT_DELETE, shiftHandler);
+    }
+
+    private static void registerPromotion(HandlerRegistry registry, PromotionHandler promotionHandler) {
+        registry.register(CommandType.PROMOTION_GET_BY_ID, promotionHandler);
+        registry.register(CommandType.PROMOTION_GET_ACTIVE, promotionHandler);
+        registry.register(CommandType.PROMOTION_GET_ALL, promotionHandler);
+        registry.register(CommandType.PROMOTION_GET_BY_KEYWORDS, promotionHandler);
+        registry.register(CommandType.PROMOTION_CREATE, promotionHandler);
+        registry.register(CommandType.PROMOTION_DELETE, promotionHandler);
+        registry.register(CommandType.PROMOTION_UPDATE, promotionHandler);
+
+    }
+
+    private static void registerSurcharge(HandlerRegistry registry, SurchargeHandler surchargeHandler) {
+        registry.register(CommandType.SURCHARGE_GET_BY_ID, surchargeHandler);
+        registry.register(CommandType.SURCHARGE_GET_BY_NAME, surchargeHandler);
+        registry.register(CommandType.SURCHARGE_GET_ALL, surchargeHandler);
+        registry.register(CommandType.SURCHARGE_GET_BY_KEYWORDS, surchargeHandler);
+        registry.register(CommandType.SURCHARGE_CREATE, surchargeHandler);
+        registry.register(CommandType.SURCHARGE_UPDATE, surchargeHandler);
+        registry.register(CommandType.SURCHARGE_DELETE, surchargeHandler);
+
     }
 
     private static void registerImportExport(HandlerRegistry registry, ImportExportHandler exportHandler) {
@@ -124,6 +295,7 @@ public class TestServer {
         registry.register(CommandType.EMPLOYEE_CREATE, employeeHandler);
         registry.register(CommandType.EMPLOYEE_UPDATE, employeeHandler);
         registry.register(CommandType.EMPLOYEE_DELETE, employeeHandler);
+        registry.register(CommandType.EMPLOYEE_GET_BY_PHONE, employeeHandler);
     }
 
     private static void registerAmenity(HandlerRegistry registry, AmenityHandler amenityHandler) {
@@ -144,7 +316,6 @@ public class TestServer {
         registry.register(CommandType.ORDER_SEARCH_BY_KEYWORD, orderHandler);
         registry.register(CommandType.ORDER_CREATE, orderHandler);
         registry.register(CommandType.ORDER_UPDATE_STATUS_PAID, orderHandler);
-        registry.register(CommandType.ORDER_UPDATE_DEPOSIT, orderHandler);
         registry.register(CommandType.ORDER_DELETE, orderHandler);
 
         registry.register(CommandType.ORDER_GET_REVENUE_BETWEEN_DATES_BY_ROOM_TYPE, orderHandler);
@@ -157,6 +328,8 @@ public class TestServer {
         registry.register(CommandType.ORDER_MOVE_BOOKING_TO_ORDER, orderHandler);
         registry.register(CommandType.ORDER_RE_CALCULATE_TOTAL_PRICE, orderHandler);
         registry.register(CommandType.ORDER_UPDATE_ORDER_TYPE, orderHandler);
+        registry.register(CommandType.ORDER_GET_ALL_WITH_RELATIONSHIP_COMPLETE_YET, orderHandler);
+        registry.register(CommandType.ORDER_GET_UN_PENDING_BY_KEYWORD, orderHandler);
 
 
     }

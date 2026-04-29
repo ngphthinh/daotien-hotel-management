@@ -36,6 +36,7 @@ public class EmployeeShiftHandler implements RequestHandler {
                 case EMPLOYEE_SHIFT_GET_WITH_DETAILS -> handleGetWithDetails(request);
                 case EMPLOYEE_SHIFT_GET_TOTAL_REVENUE -> handleGetTotalRevenue(request);
                 case EMPLOYEE_SHIFT_GET_ACTIVE_OPEN_SHIFTS -> handleGetActiveOpenShifts(request);
+                case EMPLOYEE_SHIFT_GET_ALL_SHIFTS_BY_DATE -> handleGetAllShiftByDate(request);
                 default -> Response.builder()
                         .code(400)
                         .message("Invalid command")
@@ -48,6 +49,28 @@ public class EmployeeShiftHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private Response handleGetAllShiftByDate(Request request) {
+        try {
+            LocalDate localDate = (LocalDate) request.getRequest();
+
+            return Response.builder()
+                    .code(200)
+                    .message("Success")
+                    .data(employeeShiftService.getAllShiftsByDate(localDate))
+
+                    .build();
+
+
+        } catch (Exception e) {
+            return Response.builder()
+                    .code(500)
+                    .message("Server error: " + e.getMessage())
+                    .build();
+        }
+
+
     }
 
     private Response handleGetTotalRevenue(Request request) {
@@ -67,6 +90,7 @@ public class EmployeeShiftHandler implements RequestHandler {
                     .build();
         }
     }
+
     private Response handleGetActiveOpenShifts(Request request) {
         EmployeeShiftActiveRequest req = (EmployeeShiftActiveRequest) request.getRequest();
         if (req == null) {
@@ -82,7 +106,7 @@ public class EmployeeShiftHandler implements RequestHandler {
         }
         try {
             EmployeeShiftDTO shifts = employeeShiftService.getActiveOpenShift(employeeId, date);
-            if (shifts == null ) {
+            if (shifts == null) {
                 return Response.builder()
                         .code(404)
                         .message("No active open shifts found")
@@ -236,7 +260,7 @@ public class EmployeeShiftHandler implements RequestHandler {
                         .build();
             }
             return Response.builder()
-                    .code(201)
+                    .code(200)
                     .message("Employee shift created successfully")
                     .data(createdEmployeeShift)
                     .build();

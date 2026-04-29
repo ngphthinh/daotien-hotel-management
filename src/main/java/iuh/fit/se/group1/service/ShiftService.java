@@ -9,8 +9,6 @@ import iuh.fit.se.group1.dto.ShiftDTO;
 import iuh.fit.se.group1.entity.Shift;
 import iuh.fit.se.group1.mapper.ShiftMapper;
 import iuh.fit.se.group1.repository.jpa.ShiftRepositoryImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
  */
 
 public class ShiftService extends Service {
-    private static final Logger log = LoggerFactory.getLogger(ShiftService.class);
 
     private final ShiftRepositoryImpl shiftRepositoryImpl;
     private final ShiftMapper shiftMapper = new ShiftMapper();

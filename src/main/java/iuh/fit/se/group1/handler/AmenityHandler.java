@@ -2,6 +2,7 @@ package iuh.fit.se.group1.handler;
 
 import iuh.fit.se.group1.dispatcher.RequestHandler;
 import iuh.fit.se.group1.dto.AmenityDTO;
+import iuh.fit.se.group1.network.ClientHandler;
 import iuh.fit.se.group1.network.CommandType;
 import iuh.fit.se.group1.network.Request;
 import iuh.fit.se.group1.network.Response;
@@ -12,10 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * Handler for Amenity-related requests
- * Processes commands: GET_BY_ID, GET_BY_ALL, GET_BY_KEYWORDS, CREATE, UPDATE, DELETE
- */
 @RequiredArgsConstructor
 public class AmenityHandler implements RequestHandler {
     private static final Logger log = LoggerFactory.getLogger(AmenityHandler.class);
@@ -26,18 +23,26 @@ public class AmenityHandler implements RequestHandler {
         CommandType commandType = request.getCommandType();
 
         try {
-            return switch (commandType) {
-                case AMENITY_GET_BY_ID -> handleGetById(request);
-                case AMENITY_GET_ALL -> handleGetAll();
-                case AMENITY_GET_BY_KEYWORDS -> handleGetByKeywords(request);
-                case AMENITY_CREATE -> handleCreate(request);
-                case AMENITY_UPDATE -> handleUpdate(request);
-                case AMENITY_DELETE -> handleDelete(request);
-                default -> Response.builder()
+            Response response = null;
+            switch (commandType) {
+                case AMENITY_GET_BY_ID -> response = handleGetById(request);
+                case AMENITY_GET_ALL -> response = handleGetAll();
+                case AMENITY_GET_BY_KEYWORDS -> response = handleGetByKeywords(request);
+                case AMENITY_CREATE -> response = handleCreate(request);
+                case AMENITY_UPDATE -> response = handleUpdate(request);
+                case AMENITY_DELETE -> response = handleDelete(request);
+                default -> response = Response.builder()
                         .code(400)
                         .message("Invalid command")
                         .build();
-            };
+            }
+
+            if (isWriteCommand(commandType) && response.getCode() == 200) {
+                String message = getMessage(commandType);
+                ClientHandler.broadcast(message, CommandType.AMENITY_REFRESH);
+            }
+
+            return response;
         } catch (Exception e) {
             log.error("Error handling amenity request: {}", commandType, e);
             return Response.builder()
@@ -45,6 +50,22 @@ public class AmenityHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private String getMessage(CommandType commandType) {
+        return switch (commandType) {
+            case AMENITY_CREATE -> "Amenity created";
+            case AMENITY_UPDATE -> "Amenity updated";
+            case AMENITY_DELETE -> "Amenity deleted";
+            default -> "Amenity has been changed";
+        };
+    }
+
+    private boolean isWriteCommand(CommandType commandType) {
+        return switch (commandType) {
+            case AMENITY_CREATE, AMENITY_UPDATE, AMENITY_DELETE -> true;
+            default -> false;
+        };
     }
 
     private Response handleGetById(Request request) {
@@ -127,16 +148,16 @@ public class AmenityHandler implements RequestHandler {
 
         try {
             AmenityDTO created = amenityService.createAmenity(amenityDTO);
-            
+
             if (created == null) {
                 return Response.builder()
                         .code(400)
                         .message("Amenity with name '" + amenityDTO.getNameAmenity() + "' already exists")
                         .build();
             }
-            
+
             return Response.builder()
-                    .code(201)
+                    .code(200)
                     .message("Amenity created successfully")
                     .data(created)
                     .build();

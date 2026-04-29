@@ -1,9 +1,6 @@
 package iuh.fit.se.group1.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -21,6 +18,7 @@ public class EmployeeDTO  implements Serializable {
     private String citizenId;
     private LocalDate hireDate;
     private AccountDTO account;
+    @ToString.Exclude
     private byte[] avt;
 
 }

@@ -33,6 +33,7 @@ public class EmployeeHandler implements RequestHandler {
                 case EMPLOYEE_CREATE -> handleCreate(request);
                 case EMPLOYEE_UPDATE -> handleUpdate(request);
                 case EMPLOYEE_DELETE -> handleDelete(request);
+                case EMPLOYEE_GET_BY_PHONE -> handleGetByPhone(request);
                 default -> Response.builder()
                         .code(400)
                         .message("Invalid command")
@@ -45,6 +46,31 @@ public class EmployeeHandler implements RequestHandler {
                     .message("Internal server error: " + e.getMessage())
                     .build();
         }
+    }
+
+    private Response handleGetByPhone(Request request) {
+        String phone = request.getRequest().toString();
+        if (phone == null || phone.isEmpty()) {
+            return Response.builder()
+                    .code(400)
+                    .message("Phone number cannot be null or empty")
+                    .build();
+        }
+
+        EmployeeDTO employee = employeeService.getEmployeeByPhone(phone);
+        if (employee == null) {
+            return Response.builder()
+                    .code(404)
+                    .message("Employee not found with phone: " + phone)
+                    .build();
+        }
+
+        return Response.builder()
+                .code(200)
+                .message("Get employee by phone successfully")
+                .data(employee)
+                .build();
+
     }
 
     private Response handleGetById(Request request) {
@@ -165,29 +191,32 @@ public class EmployeeHandler implements RequestHandler {
     }
 
     private Response handleGetByRoleId(Request request) {
-        String roleId = request.getRequest().toString();
-        if (roleId == null || roleId.isEmpty()) {
-            return Response.builder()
-                    .code(400)
-                    .message("Role ID cannot be null or empty")
-                    .build();
-        }
+        try {
+            String roleId = (String) request.getRequest();
 
-        List<EmployeeDTO> employees = employeeService.findAllByRoleId(roleId);
+            if (roleId == null || roleId.isEmpty()) {
+                return Response.builder()
+                        .code(400)
+                        .message("Role ID cannot be null or empty")
+                        .build();
+            }
 
-        if (employees == null || employees.isEmpty()) {
+            List<EmployeeDTO> employees = employeeService.findAllByRoleId(roleId);
+
             return Response.builder()
                     .code(200)
-                    .message("No employees found with Role ID: " + roleId)
-                    .data(List.of())
+                    .message(employees.isEmpty()
+                            ? "No employees found with Role ID: " + roleId
+                            : "Get employees by role ID successfully")
+                    .data(employees)
+                    .build();
+
+        } catch (Exception e) {
+            return Response.builder()
+                    .code(500)
+                    .message("Error: " + e.getMessage())
                     .build();
         }
-
-        return Response.builder()
-                .code(200)
-                .message("Get employees by role ID successfully")
-                .data(employees)
-                .build();
     }
 
     private Response handleCreate(Request request) {
@@ -204,11 +233,16 @@ public class EmployeeHandler implements RequestHandler {
 
         try {
             EmployeeDTO created = employeeService.createEmployee(employeeDTO, roleId);
-            return Response.builder()
-                    .code(201)
+            
+            Response response = Response.builder()
+                    .code(200)
                     .message("Employee created successfully")
                     .data(created)
                     .build();
+
+
+
+            return response;
         } catch (IllegalArgumentException e) {
             return Response.builder()
                     .code(400)
@@ -229,11 +263,16 @@ public class EmployeeHandler implements RequestHandler {
 
         try {
             EmployeeDTO updated = employeeService.updateEmployee(employeeDTO);
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Employee updated successfully")
                     .data(updated)
                     .build();
+
+
+
+            return response;
         } catch (Exception e) {
             return Response.builder()
                     .code(400)
@@ -254,10 +293,15 @@ public class EmployeeHandler implements RequestHandler {
 
         try {
             employeeService.deleteEmployee(employeeId);
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Employee deleted successfully")
                     .build();
+
+
+
+            return response;
         } catch (IllegalStateException e) {
             return Response.builder()
                     .code(400)

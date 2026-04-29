@@ -4,13 +4,15 @@ import lombok.*;
 
 import javax.swing.*;
 import java.io.Serializable;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class ExportRequest implements Serializable {
-    private JTable table;
+    private List<List<Object>> data;
     private String title;
     private boolean excludeLastColumn;
+    private List<String> columnHeaders;
 }

@@ -16,4 +16,5 @@ public class Response implements Serializable {
     private int code;
     private String message;
     private Object data;
+    private CommandType commandType;
 }

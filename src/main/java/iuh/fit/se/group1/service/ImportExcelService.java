@@ -4,7 +4,6 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.Role;
 import iuh.fit.se.group1.enums.RoomStatus;
-import iuh.fit.se.group1.ui.component.custom.message.CustomDialog;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -65,7 +64,7 @@ public class ImportExcelService {
                 if (saved != null) {
                     customers.add(saved);
                 } else {
-                    CustomDialog.showMessage(null, "Khách hàng đã tồn tại", "Lỗi khi thêm khách hàng", CustomDialog.MessageType.ERROR, 500, 200);
+                    throw new RuntimeException("Failed to save customer: " + fullName);
                 }
             }
 
@@ -445,7 +444,6 @@ public class ImportExcelService {
                     }
                 }
                 room.setRoomStatus(status);
-
 
 
                 RoomViewDTO savedRoom = roomService.createRoom(room);

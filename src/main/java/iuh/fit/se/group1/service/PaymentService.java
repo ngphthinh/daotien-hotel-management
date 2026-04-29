@@ -33,9 +33,6 @@ public class PaymentService {
 
     private static final Gson gson = new Gson();
 
-    public PaymentService() {
-
-    }
 
     public String createPayment(OrderDTO order) throws Exception {
 
@@ -67,7 +64,7 @@ public class PaymentService {
         jsonRequest.addProperty("partnerName", "Dao Tien Hotel");
         jsonRequest.addProperty("storeId", "defaultStore");
         jsonRequest.addProperty("requestId", requestId);
-        jsonRequest.addProperty("amount", amount);   // <── Dùng đúng amount
+        jsonRequest.addProperty("amount", amount);
         jsonRequest.addProperty("orderId", orderId);
         jsonRequest.addProperty("orderInfo", orderInfo);
         jsonRequest.addProperty("redirectUrl", redirectUrl);
@@ -80,7 +77,9 @@ public class PaymentService {
         return sendPost(ENDPOINT_CREATE, gson.toJson(jsonRequest));
     }
 
-    /** Tạo chữ ký HMAC-SHA256 */
+    /**
+     * Tạo chữ ký HMAC-SHA256
+     */
     private String hmacSHA256(String key, String data) throws Exception {
         Mac sha256Hmac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
@@ -97,8 +96,10 @@ public class PaymentService {
         return hexString.toString();
     }
 
-    /** Gửi POST request */
-    private String sendPost(String endpoint,String jsonRequest) throws IOException {
+    /**
+     * Gửi POST request
+     */
+    private String sendPost(String endpoint, String jsonRequest) throws IOException {
         System.out.println("=== [MoMo REQUEST] ===");
         System.out.println("Endpoint: " + endpoint);
         System.out.println("Payload: " + jsonRequest);
@@ -128,7 +129,9 @@ public class PaymentService {
         }
     }
 
-    /** Trích giá trị từ JSON (cách đơn giản không dùng parser) */
+    /**
+     * Trích giá trị từ JSON (cách đơn giản không dùng parser)
+     */
     public String extractJsonValue(String json, String key) {
         try {
             String searchKey = "\"" + key + "\":";
@@ -176,6 +179,6 @@ public class PaymentService {
                 + "\"signature\":\"" + signature + "\""
                 + "}";
 
-        return sendPost(ENDPOINT_QUERY,jsonRequest);
+        return sendPost(ENDPOINT_QUERY, jsonRequest);
     }
 }

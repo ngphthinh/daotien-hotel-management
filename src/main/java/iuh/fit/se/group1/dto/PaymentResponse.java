@@ -14,10 +14,5 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class PaymentResponse implements Serializable {
-    private Long orderId;
-    private String message;
-    private String paymentStatus;
-    private BigDecimal totalAmount;
-    private LocalDate paymentDate;
-    private Long employeePaymentId;
+    private String raw;
 }

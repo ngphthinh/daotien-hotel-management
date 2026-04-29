@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.config.AppLogger;
+import iuh.fit.se.group1.dto.ExportOrderToPDFResponse;
+import iuh.fit.se.group1.dto.ExportOrderToPdfRequest;
 import iuh.fit.se.group1.dto.OrderDTO;
 import iuh.fit.se.group1.entity.Order;
 import iuh.fit.se.group1.util.Constants;
@@ -98,7 +100,12 @@ public class JaspersoftExportService {
         }
     }
 
-    public byte[] exportOrderToPdf(Long orderId, String promotion, String paymentType, String totalPricePayment, String employeeName) {
+    public ExportOrderToPDFResponse exportOrderToPdf(ExportOrderToPdfRequest request) {
+        Long orderId = request.getOrder();
+        String promotion = request.getPromotionStr();
+        String paymentType = request.getPaymentType();
+        String totalPricePayment = request.getTotalPricePayment();
+        String employeeName = request.getEmployeeCurrentFullName();
         OrderDTO order = orderService.getOrderById(orderId);
         System.out.println(order);
         String rooms = order.getBookings().stream()
@@ -157,7 +164,9 @@ public class JaspersoftExportService {
             String filePath = OUTPUT_DIR + File.separator + fileName;
 
 //            JasperExportManager.exportReportToPdfFile(print, filePath);
-            return JasperExportManager.exportReportToPdf(print);
+            return ExportOrderToPDFResponse.builder()
+                    .fileData(JasperExportManager.exportReportToPdf(print))
+                    .build();
 //            AppLogger.info("Invoice exported successfully to: {}", filePath);
 
         } catch (Exception e) {

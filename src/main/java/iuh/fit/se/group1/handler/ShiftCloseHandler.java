@@ -208,7 +208,7 @@ public class ShiftCloseHandler implements RequestHandler {
         try {
             ShiftCloseDTO createdShiftClose = shiftCloseService.saveShiftClose(shiftCloseDTO);
             return Response.builder()
-                    .code(201)
+                    .code(200)
                     .message("Shift close created successfully")
                     .data(createdShiftClose)
                     .build();

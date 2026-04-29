@@ -51,10 +51,15 @@ public class RoomTypeHandler implements RequestHandler {
 
         try {
             roomTypeService.deleteRoomType(id);
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Room type deleted successfully")
                     .build();
+
+
+
+            return response;
         } catch (Exception e) {
             log.error("Error deleting room type with ID {}: {}", id, e.getMessage(), e);
             return Response.builder()
@@ -81,11 +86,15 @@ public class RoomTypeHandler implements RequestHandler {
                         .message("No room type found with ID: " + roomTypeDTO.getRoomTypeId())
                         .build();
             }
-            return Response.builder()
+            
+            Response response = Response.builder()
                     .code(200)
                     .message("Room type updated successfully")
                     .data(updated)
                     .build();
+
+
+            return response;
         } catch (Exception e){
             log.error("Error updating room type: {}", roomTypeDTO, e);
             return Response.builder()
@@ -111,11 +120,15 @@ public class RoomTypeHandler implements RequestHandler {
                         .message("Failed to create room type")
                         .build();
             }
-            return Response.builder()
-                .code(201)
+            
+            Response response = Response.builder()
+                .code(200)
                 .message("Room type created successfully")
                 .data(created)
                 .build();
+
+
+            return response;
         } catch (Exception e){
             log.error("Error creating room type: {}", roomTypeDTO, e);
             return Response.builder()
