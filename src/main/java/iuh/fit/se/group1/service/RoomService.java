@@ -445,9 +445,10 @@ public class RoomService extends Service {
         return doInTransaction(entityManager -> roomRepository.getAvailableRoomsByType(entityManager, roomTypeId)).stream().map(roomMapper::toRoomDTO).toList();
     }
 
-    public boolean transferRooms(long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds) {
+    public boolean transferRooms(long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds,
+                                 java.time.LocalDateTime transferAt) {
 //        return roomRepository.transferRooms(orderId, bookingType, oldRoomIds, newRoomIds);
-        return doInTransaction(entityManager -> roomRepository.transferRooms(entityManager, orderId, bookingType, oldRoomIds, newRoomIds));
+        return doInTransaction(entityManager -> roomRepository.transferRooms(entityManager, orderId, bookingType, oldRoomIds, newRoomIds, transferAt));
     }
 
 }

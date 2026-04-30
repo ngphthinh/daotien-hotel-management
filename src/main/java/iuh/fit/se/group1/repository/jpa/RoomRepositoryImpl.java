@@ -238,7 +238,8 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
 
     @Override
     public boolean transferRooms(EntityManager em, long orderId, String bookingType,
-                                 List<Long> oldRoomIds, List<Long> newRoomIds) {
+                                 List<Long> oldRoomIds, List<Long> newRoomIds,
+                                 LocalDateTime transferAt) {
 
         try {
             // 1. Lấy booking gốc
@@ -258,17 +259,11 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
 
             if (bookingInfo == null) return false;
 
-            // 2. Update phòng cũ -> AVAILABLE
-            em.createQuery("""
-                            UPDATE Room r
-                            SET r.roomStatus = :status
-                            WHERE r.roomId IN :ids
-                            """)
-                    .setParameter("status", RoomStatus.AVAILABLE)
-                    .setParameter("ids", oldRoomIds)
-                    .executeUpdate();
+            if (transferAt == null) {
+                transferAt = LocalDateTime.now();
+            }
 
-            // 3. Xóa booking cũ
+            // 2. XÓA booking cũ (không chỉ cập nhật checkOutDate)
             em.createQuery("""
                             DELETE FROM Booking b
                             WHERE b.order.orderId = :orderId
@@ -280,7 +275,16 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
                     .setParameter("ids", oldRoomIds)
                     .executeUpdate();
 
-            // 4. Insert booking mới
+            // 3. Update phòng cũ -> AVAILABLE
+            em.createQuery("""
+                            UPDATE Room r
+                            SET r.roomStatus = :status
+                            WHERE r.roomId IN :ids
+                            """)
+                    .setParameter("status", RoomStatus.AVAILABLE)
+                    .setParameter("ids", oldRoomIds)
+                    .executeUpdate();
+
             Order orderRef = em.getReference(Order.class, orderId);
 
             for (Long roomId : newRoomIds) {
@@ -289,7 +293,7 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
                 Booking newBooking = new Booking();
                 newBooking.setOrder(orderRef);
                 newBooking.setRoom(roomRef);
-                newBooking.setCheckInDate(bookingInfo.getCheckInDate());
+                newBooking.setCheckInDate(transferAt);
                 newBooking.setCheckOutDate(bookingInfo.getCheckOutDate());
                 newBooking.setBookingType(BookingType.valueOf(bookingType));
                 newBooking.setCreatedAt(LocalDate.now());

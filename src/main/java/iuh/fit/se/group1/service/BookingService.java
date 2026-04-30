@@ -11,6 +11,7 @@ import jakarta.persistence.EntityManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +62,9 @@ public class BookingService extends Service {
                 // VD: 08/12 14:00 -> 12/12 12:00 = 3 ngày
                 // 08/12 14:00 -> 12/12 14:00 = 4 ngày
                 long days = ChronoUnit.DAYS.between(checkIn.toLocalDate(), checkOut.toLocalDate());
+                if (checkOut.toLocalTime().isAfter(LocalTime.NOON)) {
+                    days += 1;
+                }
 
                 return Math.max(1, days);
 

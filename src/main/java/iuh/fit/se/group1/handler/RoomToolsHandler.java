@@ -50,19 +50,20 @@ public class RoomToolsHandler implements RequestHandler {
 
     private Response handleCalculateSurcharge(Request request) {
         try {
-            TransferRoomRequest transferRoomRequest = (TransferRoomRequest) request.getRequest();
+            CalculateSurchargeRequest surchargeRequest = (CalculateSurchargeRequest) request.getRequest();
 
-            TransferResult transferResult = roomToolsService.transferRooms(
-                    transferRoomRequest.getOrderId(),
-                    transferRoomRequest.getSelectedOldRooms(),
-                    transferRoomRequest.getSelectedNewRooms(),
-                    transferRoomRequest.getCurrentBookingType()
+            long surcharge = roomToolsService.calculateSurcharge(
+                    surchargeRequest.getSelectedOldRooms(),
+                    surchargeRequest.getSelectedNewRooms(),
+                    surchargeRequest.getCurrentBookingType(),
+                    surchargeRequest.getOrderId(),
+                    java.time.LocalDateTime.now()
             );
 
             return Response.builder()
                     .code(200)
                     .message("Surcharge calculated successfully")
-                    .data(transferResult)
+                    .data(surcharge)
                     .build();
 
         } catch (Exception e) {
