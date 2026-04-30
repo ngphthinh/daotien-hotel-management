@@ -37,7 +37,8 @@ public interface RoomRepository {
 
     List<Room> getAvailableRoomsByType(EntityManager em, String roomTypeId);
 
-    boolean transferRooms(EntityManager em, long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds);
+    boolean transferRooms(EntityManager em, long orderId, String bookingType, List<Long> oldRoomIds, List<Long> newRoomIds,
+                          java.time.LocalDateTime transferAt);
 
 
 }

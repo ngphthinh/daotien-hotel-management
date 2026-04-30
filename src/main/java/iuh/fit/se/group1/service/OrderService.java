@@ -280,8 +280,10 @@ public class OrderService extends Service {
 
             BigDecimal totalRoom = BigDecimal.valueOf(bookings.stream().mapToDouble(e -> bookingService.getPriceFromBooking(bookingMapper.toDTO(e))).sum());
 
-            // lấy tổng tiền dịch vu
-            BigDecimal totalAmenity = orderDetailsService.getOrderDetailsByOrderId(orderId).stream().map(OrderDetailDTO::getUnitPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            // lấy tổng tiền dịch vụ (đơn giá * số lượng)
+            BigDecimal totalAmenity = orderDetailsService.getOrderDetailsByOrderId(orderId).stream()
+                    .map(e -> e.getUnitPrice().multiply(BigDecimal.valueOf(e.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             // lấy tổng tiền phụ phí
             BigDecimal totalSurcharge = surchargeDetailService.getSurchargeDetailsByOrderId(orderId).stream().map(e -> e.getSurcharge().getPrice().multiply(BigDecimal.valueOf(e.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -319,43 +321,19 @@ public class OrderService extends Service {
     public List<InvoiceItem> getInvoiceItems(OrderDTO order) {
 
         List<BookingViewDTO> bookings = order.getBookings();
-        String unitBookingType = getUnitBookingType(bookings.get(0).getBookingType());
         List<InvoiceItem> items = new ArrayList<>();
         int index = 1;
-        int singleRooms = (int) bookings.stream()
-                .filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
-                .count();
-
-        int doubleRooms = (int) bookings.stream()
-                .filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
-                .count();
-
-        if (singleRooms > 0) {
-            double unitPrice = bookings.stream().filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(SINGLE_ROOM_TYPE))
-                    .findFirst()
-                    .map(bookingService::getPriceFromBooking).orElse(0.0);
-            InvoiceItem singleRoomItem = new InvoiceItem(
+        for (BookingViewDTO booking : bookings) {
+            double roomPrice = bookingService.getPriceFromBooking(booking);
+            InvoiceItem roomItem = new InvoiceItem(
                     index++,
-                    "Phòng đơn",
-                    unitBookingType,
-                    Constants.VND_FORMAT.format(unitPrice),
-                    singleRooms,
-                    Constants.VND_FORMAT.format((unitPrice * singleRooms)));
-            items.add(singleRoomItem);
-        }
-
-        if (doubleRooms > 0) {
-            double unitPrice = bookings.stream().filter(e -> e.getRoom().getRoomType().getRoomTypeId().equals(DOUBLE_ROOM_TYPE))
-                    .findFirst()
-                    .map(bookingService::getPriceFromBooking).orElse(0.0);
-            InvoiceItem doubleRoomItem = new InvoiceItem(
-                    index++,
-                    "Phòng đôi",
-                    unitBookingType,
-                    Constants.VND_FORMAT.format(unitPrice),
-                    doubleRooms,
-                    Constants.VND_FORMAT.format((unitPrice * doubleRooms)));
-            items.add(doubleRoomItem);
+                    "Phòng " + booking.getRoom().getRoomNumber() + " (" + booking.getRoom().getRoomType().getName() + ")",
+                    getUnitBookingType(booking.getBookingType()),
+                    Constants.VND_FORMAT.format(roomPrice),
+                    1,
+                    Constants.VND_FORMAT.format(roomPrice)
+            );
+            items.add(roomItem);
         }
 
         List<OrderDetailDTO> orderDetails = this.orderDetailsService.getOrderDetailsByOrderId(order.getOrderId());
