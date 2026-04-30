@@ -120,19 +120,31 @@ public class PromotionHandler implements RequestHandler {
                     .message("Promotion data cannot be null")
                     .build();
         }
-        PromotionDTO updatedPromotion = promotionService.updatePromotion(promotionDTO);
-        if (updatedPromotion == null) {
+        try {
+            PromotionDTO updatedPromotion = promotionService.updatePromotion(promotionDTO);
+            if (updatedPromotion == null) {
+                return Response.builder()
+                        .code(404)
+                        .message("Promotion not found with ID: " + promotionDTO.getPromotionId())
+                        .build();
+            }
+            Response response = Response.builder()
+                    .code(200)
+                    .message("Promotion updated successfully")
+                    .data(updatedPromotion)
+                    .build();
+            return response;
+        } catch (IllegalStateException e) {
             return Response.builder()
-                    .code(404)
-                    .message("Promotion not found with ID: " + promotionDTO.getPromotionId())
+                    .code(409)
+                    .message(e.getMessage())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return Response.builder()
+                    .code(400)
+                    .message(e.getMessage())
                     .build();
         }
-        Response response = Response.builder()
-                .code(200)
-                .message("Promotion updated successfully")
-                .data(updatedPromotion)
-                .build();
-        return response;
     }
 
     private Response handleDelete(Request request) {
@@ -186,6 +198,16 @@ public class PromotionHandler implements RequestHandler {
                     .build();
 
             return response;
+        } catch (IllegalStateException e) {
+            return Response.builder()
+                    .code(409)
+                    .message(e.getMessage())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return Response.builder()
+                    .code(400)
+                    .message(e.getMessage())
+                    .build();
         } catch (Exception e) {
             log.error("Error creating promotion: {}", promotionDTO, e);
             return Response.builder()

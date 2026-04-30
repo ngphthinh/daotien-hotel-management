@@ -33,6 +33,29 @@ public class PromotionRepositoryImpl extends AbstractRepositoryImpl<Promotion, L
     }
 
     @Override
+    public boolean existsByPromotionName(EntityManager em, String promotionName, Long excludePromotionId) {
+        String jpql = """
+                SELECT COUNT(p)
+                FROM Promotion p
+                WHERE p.isDeleted = false
+                  AND LOWER(TRIM(p.promotionName)) = LOWER(TRIM(:promotionName))
+                """;
+
+        if (excludePromotionId != null) {
+            jpql += " AND p.promotionId <> :excludePromotionId";
+        }
+
+        var query = em.createQuery(jpql, Long.class)
+                .setParameter("promotionName", promotionName);
+
+        if (excludePromotionId != null) {
+            query.setParameter("excludePromotionId", excludePromotionId);
+        }
+
+        return query.getSingleResult() > 0;
+    }
+
+    @Override
     public Promotion findAllWithDiscountPriceMax() {
         return null;
     }

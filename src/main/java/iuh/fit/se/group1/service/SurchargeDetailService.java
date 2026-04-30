@@ -30,8 +30,6 @@ public class SurchargeDetailService extends Service {
             return null;
         }
 
-//        return surchargeDetailRepositoryImpl.save(surchargeDetail, orderId);
-
         SurchargeDetail surchargeDetail = surchargeDetailMapper.toSurchargeDetail(surchargeDetailDTO);
 
         return doInTransaction(entityManager -> surchargeDetailMapper.toDTO(surchargeDetailRepositoryImpl.save(entityManager, surchargeDetail, orderId)));
@@ -39,20 +37,11 @@ public class SurchargeDetailService extends Service {
     }
 
     public List<SurchargeDetailDTO> getSurchargeDetailsByOrderId(Long orderId) {
-//        return surchargeDetailRepositoryImpl.findSurchargeDetailsByOrderId(orderId);
         return doInTransaction(entityManager -> surchargeDetailRepositoryImpl.findSurchargeDetailsByOrderId(entityManager, orderId)).stream().map(surchargeDetailMapper::toDTO)
                 .toList();
     }
 
     public void saveWithOrderId(Long orderId, List<SurchargeDetailDTO> surchargesToSaveDtos) {
-//        for (SurchargeDetail surchargeDetail : surchargesToSave) {
-//            if (!surchargeDetailRepositoryImpl.existsBySurchargeIdAndOrderId(surchargeDetail.getSurcharge().getSurchargeId(), orderId)) {
-//                surchargeDetailRepositoryImpl.save(surchargeDetail, orderId);
-//            } else {
-//                AppLogger.info("SurchargeDetail with Surcharge ID " + surchargeDetail.getSurcharge().getSurchargeId() +
-//                        " already exists for Order ID " + orderId);
-//            }
-//        }
         List<SurchargeDetail> surchargesToSave = surchargesToSaveDtos.stream().map(surchargeDetailMapper::toSurchargeDetail).toList();
 
         doInTransactionVoid(entityManager -> {
@@ -78,7 +67,7 @@ public class SurchargeDetailService extends Service {
         return doInTransaction(entityManager -> surchargeDetailRepositoryImpl.saveByOrderId(entityManager, orderId, surchargeDetails));
     }
 
-    public void deleteById(long surchargeId, Long orderId) {
+    public void deleteById(Long surchargeId, Long orderId) {
 //        surchargeDetailRepositoryImpl.deleteById(surchargeId, orderId);
         doInTransactionVoid(entityManager -> surchargeDetailRepositoryImpl.deleteById(entityManager, surchargeId, orderId));
     }
