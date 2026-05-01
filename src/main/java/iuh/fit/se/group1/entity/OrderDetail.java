@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
+@Builder
 @IdClass(OrderDetail.OrderDetailId.class)
 public class OrderDetail {
     private BigDecimal unitPrice;
@@ -26,6 +27,8 @@ public class OrderDetail {
     @JoinColumn(name = "amenityId")
     private Amenity amenity;
     private int quantity;
+    @Column(updatable = false)
+
     private LocalDate createdAt;
 
 
@@ -54,5 +57,8 @@ public class OrderDetail {
         private Long amenity;
 
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

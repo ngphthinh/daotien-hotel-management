@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.enums;
 
-public enum Role {
+import java.io.Serializable;
+
+public enum Role implements Serializable {
     MANAGER,
     RECEPTIONIST
     ;

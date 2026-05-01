@@ -1,5 +1,6 @@
 package iuh.fit.se.group1.service;
 
+import iuh.fit.se.group1.dto.EmailRequest;
 import iuh.fit.se.group1.util.PropertiesReader;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
@@ -42,7 +43,9 @@ public class EmailSenderService {
         });
     }
 
-    /** 📨 Gửi email văn bản thuần */
+    /**
+     * 📨 Gửi email văn bản thuần
+     */
     public void sendMail(String to, String subject, String content) {
         try {
             Message message = new MimeMessage(getSession());
@@ -57,16 +60,19 @@ public class EmailSenderService {
         }
     }
 
-    /** Gửi email HTML */
-    public void sendHtmlMail(String to, String subject, String htmlContent) {
+    /**
+     * Gửi email HTML
+     */
+    public void sendHtmlMail(EmailRequest emailRequest) {
         try {
+
             Message message = new MimeMessage(getSession());
             message.setFrom(new InternetAddress(username, senderName));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setSubject(subject);
-            message.setContent(htmlContent, "text/html; charset=" + mailProps.getProperty("mail.smtp.charset", "UTF-8"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailRequest.getTo()));
+            message.setSubject(emailRequest.getSubject());
+            message.setContent(emailRequest.getEmail(), "text/html; charset=" + mailProps.getProperty("mail.smtp.charset", "UTF-8"));
             Transport.send(message);
-            log.info("Send email to: {}", to);
+            log.info("Send email to: {}", emailRequest.getTo());
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException("Failed to send HTML email: " + e.getMessage(), e);
         }

@@ -2,52 +2,66 @@ package iuh.fit.se.group1.repository.interfaces;
 
 import iuh.fit.se.group1.dto.BookingDTO;
 import iuh.fit.se.group1.dto.BookingDisplayDTO;
+import iuh.fit.se.group1.dto.PeakHourDto;
 import iuh.fit.se.group1.entity.Booking;
 import iuh.fit.se.group1.entity.Order;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository {
-    boolean isExistsByRoomAndDate(Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate);
 
-    void saveAllBookingsForOrder(Order savedOrder, List<Booking> bookings);
+    int countBookings(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
 
-    void removeBookingsFromOrder(Order currentOrder, List<Booking> result);
+    int countLateCheckout(EntityManager em,
+                          LocalDateTime start,
+                          LocalDateTime now,
+                          LocalDateTime standardCheckout);
 
-    void moveBookingsToOrder(Long targetOrderId, List<Long> bookingIds);
+    int countCheckedOutToday(EntityManager em, LocalDateTime start, LocalDateTime end);
 
-    void updateBookingDates(Long bookingId, LocalDateTime checkIn, LocalDateTime checkOut);
+    List<Object[]> getPeakHours(EntityManager entityManager, LocalDateTime startDate, LocalDateTime endDate);
 
-    void deleteByOrderId(Long id);
+    boolean isExistsByRoomAndDate(EntityManager em, Long roomId, LocalDateTime checkInDate, LocalDateTime checkOutDate);
 
-    List<Booking> findByOrderId(Long orderId);
+    void saveAllBookingsForOrder(EntityManager em, Order savedOrder, List<Booking> bookings);
 
-    int countRoomsNearExpiry(LocalDateTime fromTime, LocalDateTime toTime);
+    void removeBookingsFromOrder(EntityManager em, Order currentOrder, List<Booking> result);
 
-    int countCheckIns(LocalDateTime startDate, LocalDateTime endDate);
+    void moveBookingsToOrder(EntityManager em, Long targetOrderId, List<Long> bookingIds);
 
-    int countCheckOuts(LocalDateTime startDate, LocalDateTime endDate);
+    void updateBookingDates(EntityManager em, Long bookingId, LocalDateTime checkIn, LocalDateTime checkOut);
 
-    int countCheckedOutRooms(LocalDateTime startDate, LocalDateTime endDate);
+    void deleteByOrderId(EntityManager em, Long id);
 
-    int countLateCheckOuts(LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime);
+    List<Booking> findByOrderId(EntityManager em, Long orderId);
 
-    List<BookingDisplayDTO> findAllBookingDisplay();
+    int countRoomsNearExpiry(EntityManager em, LocalDateTime fromTime, LocalDateTime toTime);
 
-    List<BookingDTO> getAllBookings();
+    int countCheckIns(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
 
-    Booking getBookingById(long bookingId, long roomId);
+    int countCheckOuts(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
 
-    boolean extendRoomBooking(Long orderId, List<Long> roomIds,
+    int countCheckedOutRooms(EntityManager em, LocalDateTime startDate, LocalDateTime endDate);
+
+    int countLateCheckOuts(EntityManager em, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime deadlineTime);
+
+    List<BookingDisplayDTO> findAllBookingDisplay(EntityManager em);
+
+    List<BookingDTO> getAllBookings(EntityManager em);
+
+    Booking getBookingById(EntityManager em, long bookingId, long roomId);
+
+    boolean extendRoomBooking(EntityManager em, Long orderId, List<Long> roomIds,
                               int extendValue, String bookingType);
 
 
-    boolean cancelRoomBooking(Long orderId, Long roomId, String bookingType);
+    boolean cancelRoomBooking(EntityManager em, Long orderId, Long roomId, String bookingType);
 
 
-    Booking getBookingByOrderIdAndType(long orderId, String bookingType, long roomId);
+    Booking getBookingByOrderIdAndType(EntityManager em, long orderId, String bookingType, long roomId);
 
-    List<BookingDTO> searchBookingsByCitizenId(String citizenId);
+    List<BookingDTO> searchBookingsByCitizenId(EntityManager em, String citizenId);
 
 }

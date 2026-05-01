@@ -17,17 +17,17 @@ import java.util.Set;
 @ToString(exclude = {"surchargeDetails"})
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Surcharge SET isDeleted = true WHERE surchargeId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Surcharge SET isDeleted = 1 WHERE surchargeId = ?")
 public class Surcharge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long surchargeId;
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(columnDefinition = "nvarchar(255)", unique = true)
     private String name;
     private boolean isDeleted;
     private BigDecimal price;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "surcharge")
@@ -45,7 +45,10 @@ public class Surcharge {
         this.price = price;
     }
 
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
     public Surcharge(long surchargeId) {
         this.surchargeId = surchargeId;
     }

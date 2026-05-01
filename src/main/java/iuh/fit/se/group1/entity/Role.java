@@ -20,6 +20,7 @@ public class Role {
     private String roleId;
     @Column(columnDefinition = "nvarchar(100)")
     private String roleName;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "role")
@@ -28,5 +29,8 @@ public class Role {
     public Role(String roleId) {
         this.roleId = roleId;
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

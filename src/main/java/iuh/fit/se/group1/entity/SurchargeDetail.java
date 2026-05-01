@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Getter
 @ToString
 @Entity
+@Builder
 @IdClass(SurchargeDetail.SurchargeDetailID.class)
 public class SurchargeDetail {
 
@@ -26,9 +27,13 @@ public class SurchargeDetail {
     @JoinColumn(name = "surchargerId")
     private Surcharge surcharge;
     private int quantity;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
     public SurchargeDetail(Surcharge surcharge, int quantity, LocalDate createdAt) {
         this.surcharge = surcharge;
         this.quantity = quantity;

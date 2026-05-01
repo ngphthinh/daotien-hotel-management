@@ -2,6 +2,8 @@ package iuh.fit.se.group1.repository.jpa;
 
 import iuh.fit.se.group1.entity.Customer;
 import iuh.fit.se.group1.repository.interfaces.CustomerRepository;
+import jakarta.persistence.EntityManager;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.util.List;
 
@@ -10,53 +12,89 @@ public class CustomerRepositoryImpl extends AbstractRepositoryImpl<Customer, Lon
         super(Customer.class);
     }
 
-    @Override
-    public List<Customer> findByCustomerNameOrId(String keyword) {
-        return callInTransaction(em -> {
+    public boolean isUniqueCustomer(EntityManager em, Customer dto) {
+        Long count = em.createQuery("""
+            SELECT COUNT(c) FROM Customer c
+            WHERE c.citizenId = :citizenId
+               OR c.phone = :phone
+               OR c.email = :email
+            """, Long.class)
+                .setParameter("citizenId", dto.getCitizenId())
+                .setParameter("phone", dto.getPhone())
+                .setParameter("email", dto.getEmail())
+                .getSingleResult();
 
-            String jpql = """
-                        SELECT c
-                        FROM Customer c
-                        WHERE (
-                            LOWER(c.fullName) LIKE LOWER(:kw)
-                            OR CAST(c.customerId AS string) LIKE :kw
-                        )
-                        ORDER BY c.customerId ASC, c.fullName ASC
-                    """;
-
-            return em.createQuery(jpql, Customer.class)
-                    .setParameter("kw", "%" + keyword + "%")
-                    .getResultList();
-        });
+        return count == 0;
     }
 
     @Override
-    public boolean isCitizenIdExists(String citizenId) {
-        return callInTransaction(em ->
+    public List<Customer> findByCustomerNameOrId(EntityManager em, String keyword) {
+
+
+        String jpql = """
+                    SELECT c
+                    FROM Customer c
+                    WHERE (
+                        LOWER(c.fullName) LIKE LOWER(:kw)
+                        OR CAST(c.customerId AS string) LIKE :kw
+                
+                    )AND  c.isDeleted = false
+                    ORDER BY c.customerId ASC, c.fullName ASC
+                """;
+
+        return em.createQuery(jpql, Customer.class)
+                .setParameter("kw", "%" + keyword + "%")
+                .getResultList();
+
+    }
+
+    @Override
+    public boolean isCitizenIdExists(EntityManager em, String citizenId) {
+        return
                 em.createQuery(
-                                "SELECT 1 FROM Employee e WHERE e.citizenId = :cid",
+                                "SELECT 1 FROM Customer e WHERE e.citizenId = :cid AND  e.isDeleted = false",
                                 Integer.class
                         )
                         .setParameter("cid", citizenId)
                         .getSingleResult() > 0
-        );
+                ;
     }
 
     @Override
-    public Customer findByCitizenId(String citizenId) {
-        return callInTransaction(em -> {
+    public Customer findByCitizenId(EntityManager em, String citizenId) {
 
-            String jpql = """
-                        SELECT c
-                        FROM Customer c
-                        WHERE c.citizenId = :cid
-                    """;
 
-            return em.createQuery(jpql, Customer.class)
-                    .setParameter("cid", citizenId)
-                    .getResultStream()
-                    .findFirst()
-                    .orElse(null);
-        });
+        String jpql = """
+                    SELECT c
+                    FROM Customer c
+                    WHERE c.citizenId = :cid AND c.isDeleted = false
+                """;
+
+        return em.createQuery(jpql, Customer.class)
+                .setParameter("cid", citizenId)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public List<Customer> findAll(EntityManager em) {
+        String query = """
+                    Select c from Customer c
+                    where c.isDeleted = false
+                """;
+        return em.createQuery(query, entityClass).getResultList();
+    }
+
+    public List<Customer> saveAll(EntityManager entityManager, List<Customer> customersToSave) {
+        for (Customer customer : customersToSave) {
+            if (customer.getCustomerId() == null) {
+                entityManager.persist(customer);
+            }
+        };
+
+        entityManager.flush();
+
+        return customersToSave;
     }
 }

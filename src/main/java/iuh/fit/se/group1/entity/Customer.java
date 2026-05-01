@@ -2,8 +2,7 @@ package iuh.fit.se.group1.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -16,8 +15,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = "customerId")
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Customer SET isDeleted = true WHERE customerId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Customer SET isDeleted = 1 WHERE customerId = ?")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +30,14 @@ public class Customer {
     private String citizenId;
     private boolean gender;
     private LocalDate dateOfBirth;
+    @Column(updatable = false)
+    
     private LocalDate createdAt;
     @OneToMany(mappedBy = "customer")
     private Set<Order> orders;
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
     private boolean isDeleted;
 }

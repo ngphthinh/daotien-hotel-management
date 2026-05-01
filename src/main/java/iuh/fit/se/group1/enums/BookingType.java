@@ -1,6 +1,8 @@
 package iuh.fit.se.group1.enums;
 
-public enum BookingType {
+import java.io.Serializable;
+
+public enum BookingType implements Serializable {
     HOURLY("Theo giờ"),
     OVERNIGHT("Qua đêm"),
     DAILY("Theo ngày"),

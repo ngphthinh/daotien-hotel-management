@@ -1,57 +1,88 @@
 package iuh.fit.se.group1.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import iuh.fit.se.group1.dto.CustomerDTO;
 import iuh.fit.se.group1.entity.Customer;
+import iuh.fit.se.group1.mapper.CustomerMapper;
 import iuh.fit.se.group1.repository.jpa.CustomerRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 
-public class CustomerService {
+public class CustomerService extends Service {
     private final CustomerRepositoryImpl customerRepository;
+    private final OrderRepositoryImpl orderRepository;
+
+    private final CustomerMapper customerMapper;
 
     public CustomerService() {
+        this.customerMapper = new CustomerMapper();
+        this.orderRepository = new OrderRepositoryImpl();
         this.customerRepository = new CustomerRepositoryImpl();
     }
 
-    public Customer createCustomer(Customer customer) {
+    public CustomerDTO createCustomer(CustomerDTO customer) {
         if (getCustomerByCitizenId(customer.getCitizenId()) != null) {
             return null;
         }
-        return customerRepository.save(customer);
+        return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.save(entityManager, customerMapper.toCustomer(customer))));
     }
 
-    public void deleteCustomer(Long customerId) {
-        customerRepository.deleteById(customerId);
+    public boolean deleteCustomer(Long customerId) {
+
+        return doInTransaction(entityManager ->
+                {
+
+                    boolean exists = orderRepository.existsByCustomerIdAndCompleteYet(entityManager, customerId);
+                    if (exists) {
+                        return false;
+                    }
+
+                    customerRepository.deleteById(entityManager, customerId);
+                    return true;
+                }
+        );
     }
 
 
-    public List<Customer> getAllCustomer() {
-        return customerRepository.findAll();
+    public List<CustomerDTO> getAllCustomer() {
+        return doInTransaction(customerRepository::findAll).stream().map(customerMapper::toDTO).collect(Collectors.toList());
     }
 
 
-    public Customer updateAmenity(Customer customer) {
-        return customerRepository.update(customer);
+    public List<CustomerDTO> getCustomerByKeyword(String keyword) {
+        return doInTransaction(entityManager -> customerRepository.findByCustomerNameOrId(entityManager, keyword).stream().map(customerMapper::toDTO).collect(Collectors.toList()));
     }
 
-    public List<Customer> getAmenityByKeyword(String keyword) {
-        return customerRepository.findByCustomerNameOrId(keyword);
+    public CustomerDTO getCustomerById(Long id) {
+
+        return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.findById(entityManager, id)));
+
+
     }
 
-    public Customer getCustomerById(String idStr) {
-        try {
-            Long id = Long.parseLong(idStr);
-            return customerRepository.findById(id);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+    public CustomerDTO updateCustomer(CustomerDTO customer) {
+        return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.update(entityManager, customerMapper.toCustomer(customer))));
     }
 
-    public Customer updateCustomer(Customer customer) {
-        return customerRepository.update(customer);
+    public CustomerDTO getCustomerByCitizenId(String citizenId) {
+        return doInTransaction(entityManager -> customerMapper.toDTO(customerRepository.findByCitizenId(entityManager, citizenId)));
     }
 
-    public Customer getCustomerByCitizenId(String citizenId) {
-        return customerRepository.findByCitizenId(citizenId);
+    public List<CustomerDTO> createCustomers(List<CustomerDTO> customers) {
+
+        return doInTransaction(em -> {
+
+            List<Customer> customersToSave = customers.stream()
+                    .filter(c -> customerRepository.isUniqueCustomer(em, customerMapper.toCustomer(c)))
+                    .map(customerMapper::toCustomer)
+                    .collect(Collectors.toList());
+
+            return customerRepository.saveAll(em, customersToSave)
+                    .stream()
+                    .map(customerMapper::toDTO)
+                    .collect(Collectors.toList());
+        });
     }
 
 }

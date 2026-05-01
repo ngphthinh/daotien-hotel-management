@@ -8,6 +8,8 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -15,8 +17,8 @@ import java.time.LocalDate;
 @ToString
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Room SET isDeleted = true WHERE roomId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Room SET isDeleted = 1 WHERE roomId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +29,7 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "roomTypeId")
     private RoomType roomType;
+    @Column(updatable = false)
     private LocalDate createdAt;
     @Enumerated(EnumType.STRING)
     private RoomStatus roomStatus;
@@ -55,5 +58,8 @@ public class Room {
             return roomType.getRoomTypeId();  // Giả sử RoomType có method getRoomTypeId()
         }
         return null;
+    }@PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
     }
 }

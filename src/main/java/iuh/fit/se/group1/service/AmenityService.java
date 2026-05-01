@@ -2,61 +2,72 @@ package iuh.fit.se.group1.service;
 
 import iuh.fit.se.group1.dto.AmenityDTO;
 import iuh.fit.se.group1.entity.Amenity;
+import iuh.fit.se.group1.mapper.AmenityMapper;
 import iuh.fit.se.group1.repository.jpa.AmenityRepositoryImpl;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class AmenityService {
+public class AmenityService extends Service {
     private final AmenityRepositoryImpl amenityRepositoryImpl;
+    private final AmenityMapper amenityMapper;
 
     public AmenityService() {
+        this.amenityMapper = new AmenityMapper();
         this.amenityRepositoryImpl = new AmenityRepositoryImpl();
     }
 
-    public Amenity createAmenity(Amenity amenity) {
+    public AmenityDTO createAmenity(AmenityDTO amenity) {
 
         if (getAmenityByName(amenity.getNameAmenity()) != null) {
             return null;
         }
 
-        return amenityRepositoryImpl.save(amenity);
-    }
-
-    private Amenity getAmenityByName(String nameAmenity) {
-        return amenityRepositoryImpl.findByAmenityName(nameAmenity);
-    }
-
-    public void deleteAmenity(Long amenityId) {
-        amenityRepositoryImpl.deleteById(amenityId);
-    }
-
-    public List<Amenity> getAllAmenities() {
-        return amenityRepositoryImpl.findAll();
-    }
-
-
-    public Amenity updateAmenity(Amenity amenity) {
-        return amenityRepositoryImpl.update(amenity);
-    }
-
-    public List<Amenity> getAmenityByKeyword(String keyword) {
-        return amenityRepositoryImpl.findByAmenityNameOrId(keyword);
-    }
-
-
-    public AmenityDTO toAmenityDTO(Amenity amenity) {
-        if (amenity == null) {
-            return null;
-        }
-
-        return new AmenityDTO(
-                amenity.getAmenityId(),
-                amenity.getNameAmenity(),
-                amenity.getPrice().doubleValue(), 0
+        Amenity amenityEntity = amenityMapper.toAmenity(amenity);
+        amenityEntity.setCreatedAt(java.time.LocalDate.now());
+        return doInTransaction(entityManager ->
+                amenityMapper.toAmenityDTO(amenityRepositoryImpl.save(entityManager, amenityEntity))
         );
     }
 
-    public Amenity getAmenityById(Long amenityId) {
-        return amenityRepositoryImpl.findById(amenityId);
+    private AmenityDTO getAmenityByName(String nameAmenity) {
+        return doInTransaction(entityManager -> amenityMapper.toAmenityDTO(amenityRepositoryImpl.findByAmenityName(entityManager, nameAmenity)));
+    }
+
+    public void deleteAmenity(Long amenityId) {
+        doInTransactionVoid(entityManager -> amenityRepositoryImpl.deleteById(entityManager, amenityId));
+    }
+
+    public List<AmenityDTO> getAllAmenities() {
+        return doInTransaction(amenityRepositoryImpl::findAll).stream().map(amenityMapper::toAmenityDTO).collect(Collectors.toList());
+    }
+
+
+    public AmenityDTO updateAmenity(AmenityDTO amenity) {
+        return doInTransaction(entityManager -> amenityMapper.toAmenityDTO(amenityRepositoryImpl.update(entityManager, amenityMapper.toAmenity(amenity))));
+    }
+
+    public List<AmenityDTO> getAmenityByKeyword(String keyword) {
+        return doInTransaction(entityManager -> amenityRepositoryImpl.findByAmenityNameOrId(entityManager, keyword).stream().map(amenityMapper::toAmenityDTO).collect(Collectors.toList()));
+    }
+
+
+    public AmenityDTO getAmenityById(Long amenityId) {
+        return doInTransaction(entityManager -> amenityMapper.toAmenityDTO(amenityRepositoryImpl.findById(entityManager, amenityId)));
+    }
+
+    public Amenity getAmenityEntityById(EntityManager em, Long amenityId) {
+        return amenityRepositoryImpl.findById(em, amenityId);
+    }
+
+    public List<AmenityDTO> createAmenities(List<AmenityDTO> amenities) {
+        List<Amenity> amenityEntities = amenities.stream()
+                .map(amenityMapper::toAmenity)
+                .toList();
+
+        return doInTransaction(em -> amenityRepositoryImpl.saveAll(em,amenityEntities)).stream()
+                .map(amenityMapper::toAmenityDTO)
+                .toList();
     }
 }

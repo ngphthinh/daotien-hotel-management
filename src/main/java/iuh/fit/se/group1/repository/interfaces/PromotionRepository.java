@@ -1,12 +1,15 @@
 package iuh.fit.se.group1.repository.interfaces;
 
 import iuh.fit.se.group1.entity.Promotion;
+import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface PromotionRepository {
-    List<Promotion> findByPromotionIdOrName(String keyword);
+    List<Promotion> findByPromotionIdOrName(EntityManager em, String keyword);
+
+    boolean existsByPromotionName(EntityManager em, String promotionName, Long excludePromotionId);
 
     Promotion findAllWithDiscountPriceMax();
 
@@ -14,5 +17,5 @@ public interface PromotionRepository {
 
     Promotion findByPrice(BigDecimal price);
 
-    Promotion findActivePromotion(BigDecimal totalAmount);
+    Promotion findActivePromotion(EntityManager em,BigDecimal totalAmount);
 }

@@ -17,22 +17,26 @@ import java.util.Set;
 @ToString(exclude = {"orderDetails"})
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Amenity SET isDeleted = true WHERE amenityId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Amenity SET isDeleted = 1 WHERE amenityId = ?")
 public class Amenity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long amenityId;
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(columnDefinition = "nvarchar(255)", unique = true)
     private String nameAmenity;
     private BigDecimal price;
 	private boolean isDeleted;
+
+	@Column(updatable = false)
     private LocalDate createdAt;
 
 	@OneToMany(mappedBy = "amenity")
 	private Set<OrderDetail> orderDetails;
 
-
+	@PrePersist
+	public void prePersist() {
+		this.createdAt = LocalDate.now();
+	}
 	public Amenity(Long amenityId, String nameAmenity, BigDecimal price) {
 		this.amenityId = amenityId;
 		this.nameAmenity = nameAmenity;

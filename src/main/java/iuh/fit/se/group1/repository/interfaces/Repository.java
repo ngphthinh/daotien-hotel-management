@@ -1,15 +1,17 @@
 package iuh.fit.se.group1.repository.interfaces;
 
+import jakarta.persistence.EntityManager;
+
 import java.util.List;
 
 public interface Repository<T, ID> {
-    T save(T entity);
+    T save(EntityManager em, T entity);
 
-    T findById(ID id);
+    T findById(EntityManager em,ID id);
 
-    void deleteById(ID id);
+    void deleteById(EntityManager em,ID id);
 
-    List<T> findAll();
+    List<T> findAll(EntityManager em);
 
-    T update(T entity);
+    T update(EntityManager em,T entity);
 }

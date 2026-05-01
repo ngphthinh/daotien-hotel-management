@@ -13,11 +13,11 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @ToString(exclude = {"account", "orders", "orderPayment", "employeeShifts"})
 @EqualsAndHashCode(of = "employeeId")
 @Entity
-@SQLDelete(sql = "UPDATE Employee SET isDeleted = true WHERE employeeId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Employee SET isDeleted = 1 WHERE employeeId = ?")
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,12 +25,12 @@ public class Employee {
     private Long employeeId;
     @Column(columnDefinition = "nvarchar(255)")
     private String fullName;
-    @Column(columnDefinition = "varchar(10)")
+    @Column(columnDefinition = "varchar(10)", unique = true)
     private String phone;
-    @Column(columnDefinition = "varchar(255)")
+    @Column(columnDefinition = "varchar(255)", unique = true)
     private String email;
     private boolean gender;
-    @Column(columnDefinition = "varchar(12)")
+    @Column(columnDefinition = "varchar(12)", unique = true)
     private String citizenId;
     private LocalDate hireDate;
     @OneToOne
@@ -38,6 +38,7 @@ public class Employee {
     private Account account;
     @Lob
     private byte[] avt;
+    @Column(updatable = false)
     private LocalDate createdAt;
     @OneToMany(mappedBy = "employee")
     private Set<Order> orders;
@@ -53,5 +54,8 @@ public class Employee {
     public Employee(Long employeeId) {
         this.employeeId = employeeId;
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

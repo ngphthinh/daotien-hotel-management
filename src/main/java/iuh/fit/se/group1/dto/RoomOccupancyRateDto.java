@@ -1,9 +1,11 @@
 package iuh.fit.se.group1.dto;
 
+import java.io.Serializable;
+
 /**
  * DTO cho tỉ lệ lấp đầy phòng
  */
-public class RoomOccupancyRateDto {
+public class RoomOccupancyRateDto  implements Serializable {
     private int totalRooms;
     private int occupiedRooms;
     private double occupancyRate;

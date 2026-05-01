@@ -18,8 +18,7 @@ import java.util.Set;
 @ToString(exclude = {"orders"})
 @Entity
 @Builder
-@SQLDelete(sql = "UPDATE Promotion SET isDeleted = true WHERE promotionId = ?")
-@SQLRestriction("isDeleted = false")
+@SQLDelete(sql = "UPDATE Promotion SET isDeleted = 1 WHERE promotionId = ?")
 public class Promotion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +32,7 @@ public class Promotion {
     private BigDecimal minOrderAmount;
     private LocalDate startDate;
     private LocalDate endDate;
+    @Column(updatable = false)
     private LocalDate createdAt;
     @OneToMany(mappedBy = "promotion")
     private Set<Order> orders;
@@ -62,5 +62,8 @@ public class Promotion {
     public int hashCode() {
         return Objects.hashCode(promotionId);
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

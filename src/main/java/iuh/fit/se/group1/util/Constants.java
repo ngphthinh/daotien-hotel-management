@@ -25,6 +25,9 @@ public class Constants {
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
+    public static final String SINGLE_ROOM_TYPE = "SINGLE";
+    public static final String DOUBLE_ROOM_TYPE = "DOUBLE";
+
     public static final DecimalFormat VND_FORMAT = new DecimalFormat("#,##0.## VND");
     public static final int HEIGHT_FRAME = 800;
     public static final int WIDTH_FRAME = 1400;

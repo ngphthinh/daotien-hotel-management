@@ -1,11 +1,12 @@
 package iuh.fit.se.group1.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * DTO cho nguồn doanh thu theo loại booking
  */
-public class RevenueSourceDto {
+public class RevenueSourceDto  implements Serializable {
     private String source;
     private BigDecimal amount;
     private double percentage;

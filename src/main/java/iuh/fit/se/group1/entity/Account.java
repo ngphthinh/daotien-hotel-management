@@ -14,17 +14,19 @@ import java.util.Objects;
 @NoArgsConstructor
 @ToString
 @Entity
-@SQLDelete(sql = "UPDATE Account SET isDeleted = true WHERE accountId = ?")
-@SQLRestriction("isDeleted = false")
+@Builder
+@SQLDelete(sql = "UPDATE Account SET isDeleted = 1 WHERE accountId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String accountId;
 
-    @Column(columnDefinition = "varchar(50)")
+    @Column(columnDefinition = "varchar(50)", unique = true)
     private String username;
     @Column(columnDefinition = "varchar(255)")
     private String password;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
     private boolean isDeleted;
@@ -32,4 +34,9 @@ public class Account {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "roleId")
     private Role role;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

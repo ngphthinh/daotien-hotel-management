@@ -6,7 +6,10 @@
 package iuh.fit.se.group1.service;
 
 
+import iuh.fit.se.group1.dto.EmployeeShiftDTO;
 import iuh.fit.se.group1.entity.EmployeeShift;
+import iuh.fit.se.group1.mapper.EmployeeShiftMapper;
+import iuh.fit.se.group1.repository.interfaces.EmployeeRepository;
 import iuh.fit.se.group1.repository.jpa.EmployeeShiftRepositoryImpl;
 import iuh.fit.se.group1.repository.jpa.ShiftCloseRepositoryImpl;
 import iuh.fit.se.group1.repository.interfaces.ShiftCloseRepository;
@@ -28,72 +31,86 @@ import java.util.stream.Collectors;
  * @created: 30/10/2025
  */
 
-public class EmployeeShiftService {
+public class EmployeeShiftService extends Service {
     private static final Logger log = LoggerFactory.getLogger(EmployeeShiftService.class);
     private final EmployeeShiftRepositoryImpl employeeShiftRepository;
+    private final ShiftCloseService shiftCloseService = new ShiftCloseService();
+    private final EmployeeShiftMapper employeeShiftMapper = new EmployeeShiftMapper();
 
     public EmployeeShiftService() {
         this.employeeShiftRepository = new EmployeeShiftRepositoryImpl();
     }
 
-    public EmployeeShift addEmployeeShift(EmployeeShift employeeShift) {
-        if (employeeShift.getCreatedAt() == null) {
-            employeeShift.setCreatedAt(LocalDate.now());
+    public EmployeeShiftDTO addEmployeeShift(EmployeeShiftDTO employeeShiftDTO) {
+        if (employeeShiftDTO.getCreatedAt() == null) {
+            employeeShiftDTO.setCreatedAt(LocalDate.now());
         }
 
-        if (employeeShift.getShiftDate() == null) {
-            employeeShift.setShiftDate(LocalDate.now());
+        if (employeeShiftDTO.getShiftDate() == null) {
+            employeeShiftDTO.setShiftDate(LocalDate.now());
         }
-        return employeeShiftRepository.save(employeeShift);
+        EmployeeShift employeeShift = employeeShiftMapper.toEmployeeShift(employeeShiftDTO);
+        return doInTransaction(entityManager -> employeeShiftMapper.toEmployeeShiftDTO(employeeShiftRepository.save(entityManager, employeeShift)));
     }
 
-    public EmployeeShift updateEmployeeShift(EmployeeShift employeeShift) {
-        log.info("Updating EmployeeShift {}", employeeShift.getEmployeeShiftId());
-        return employeeShiftRepository.update(employeeShift);
+    public EmployeeShiftDTO updateEmployeeShift(EmployeeShiftDTO employeeShift) {
+//        return employeeShiftRepository.update(employeeShift);
+        return doInTransaction(entityManager -> employeeShiftMapper.toEmployeeShiftDTO(employeeShiftRepository.update(entityManager, employeeShiftMapper.toEmployeeShift(employeeShift))));
     }
 
     public void deleteEmployeeShift(Long employeeShiftId) {
         log.info("Deleting EmployeeShift {}", employeeShiftId);
-        employeeShiftRepository.deleteById(employeeShiftId);
+//        employeeShiftRepository.deleteById(employeeShiftId);
+        doInTransactionVoid(entityManager -> employeeShiftRepository.deleteById(entityManager, employeeShiftId));
     }
 
-    public EmployeeShift findEmployeeShiftById(Long employeeShiftId) {
+    public EmployeeShiftDTO findEmployeeShiftById(Long employeeShiftId) {
         log.info("Finding EmployeeShift by ID {}", employeeShiftId);
-        return employeeShiftRepository.findById(employeeShiftId);
+//        return employeeShiftRepository.findById(employeeShiftId);
+        return doInTransaction(entityManager -> employeeShiftMapper.toEmployeeShiftDTO(employeeShiftRepository.findById(entityManager, employeeShiftId)));
     }
 
-    public List<EmployeeShift> getAllEmployeeShifts() {
+    public List<EmployeeShiftDTO> getAllEmployeeShifts() {
         log.info("Fetching all EmployeeShifts");
-        return employeeShiftRepository.findAll();
-    }
-
-    public List<EmployeeShift> getShiftsByEmployeeAndDate(Long employeeId, LocalDate date) {
-        log.info("Fetching shifts for employee {} on date {}", employeeId, date);
-        List<EmployeeShift> allShifts = employeeShiftRepository.findByShiftDate(date);
-        return allShifts.stream()
-                .filter(es -> es.getEmployee().getEmployeeId().equals(employeeId))
+//        return employeeShiftRepository.findAll();
+        return doInTransaction(employeeShiftRepository::findAll).stream()
+                .map(employeeShiftMapper::toEmployeeShiftDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<EmployeeShift> getAllShiftsByDate(LocalDate date) {
-        log.info("Fetching all shifts on date {}", date);
-        return employeeShiftRepository.findByShiftDate(date);
+    public List<EmployeeShiftDTO> getShiftsByEmployeeAndDate(Long employeeId, LocalDate date) {
+        log.info("Fetching shifts for employee {} on date {}", employeeId, date);
+//        List<EmployeeShift> allShifts = employeeShiftRepository.findByShiftDate(date);
+        List<EmployeeShift> allShifts = doInTransaction(entityManager -> employeeShiftRepository.findByShiftDate(entityManager, date));
+        return allShifts.stream()
+                .filter(es -> es.getEmployee().getEmployeeId().equals(employeeId))
+                .map(employeeShiftMapper::toEmployeeShiftDTO)
+                .collect(Collectors.toList());
     }
 
-    public EmployeeShift getEmployeeShiftWithDetails(Long employeeShiftId) {
-        EmployeeShiftRepositoryImpl repository = new EmployeeShiftRepositoryImpl();
-        return repository.findByIdWithDetails(employeeShiftId);
+    public List<EmployeeShiftDTO> getAllShiftsByDate(LocalDate date) {
+        log.info("Fetching all shifts on date {}", date);
+//        return employeeShiftRepository.findByShiftDate(date);
+        return doInTransaction(entityManager -> employeeShiftRepository.findByShiftDate(entityManager, date)).stream()
+                .map(employeeShiftMapper::toEmployeeShiftDTO)
+                .collect(Collectors.toList());
+
+    }
+
+    public EmployeeShiftDTO getEmployeeShiftWithDetails(Long employeeShiftId) {
+//        return repository.findByIdWithDetails(employeeShiftId);
+        return doInTransaction(entityManager -> employeeShiftMapper.toEmployeeShiftDTO(employeeShiftRepository.findByIdWithDetails(entityManager, employeeShiftId)));
     }
 
     /**
      * Lấy tổng doanh thu của ca làm việc
      */
     public BigDecimal getTotalCashRevenueForShift(Long employeeShiftId) {
-        ShiftCloseRepository shiftCloseRepo = new ShiftCloseRepositoryImpl();
-        return shiftCloseRepo.getTotalCashRevenueForShift(employeeShiftId);
+
+        return shiftCloseService.getTotalCashRevenueForShift(employeeShiftId);
     }
 
-    public boolean isShiftActive(EmployeeShift shift) {
+    public boolean isShiftActive(EmployeeShiftDTO shift) {
         try {
             if (shift == null || shift.getShift() == null) {
                 log.warn("Shift or shift info is null");
@@ -131,14 +148,14 @@ public class EmployeeShiftService {
     /**
      * Lấy ca làm việc đang mở (chưa đóng) và đang trong thời gian làm việc
      */
-    public EmployeeShift getActiveOpenShift(Long employeeId, LocalDate date) {
+    public EmployeeShiftDTO getActiveOpenShift(Long employeeId, LocalDate date) {
         log.info("Finding active open shift for employee {} on date {}", employeeId, date);
 
         ShiftCloseService shiftCloseService = new ShiftCloseService();
-        List<EmployeeShift> todayShifts = getShiftsByEmployeeAndDate(employeeId, date);
+        List<EmployeeShiftDTO> todayShifts = getShiftsByEmployeeAndDate(employeeId, date);
 
         return todayShifts.stream()
-                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift).isEmpty()) // Chưa đóng
+                .filter(shift -> shiftCloseService.getShiftCloseByEmployeeShift(shift.getEmployeeShiftId()).isEmpty()) // Chưa đóng
                 .filter(this::isShiftActive) // Đang trong giờ làm việc
                 .findFirst()
                 .orElse(null);

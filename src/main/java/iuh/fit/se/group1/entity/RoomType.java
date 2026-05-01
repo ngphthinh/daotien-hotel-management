@@ -25,11 +25,15 @@ public class RoomType {
     private BigDecimal dailyRate;
     private BigDecimal overnightRate;
     private BigDecimal additionalHourRate;
+    @Column(updatable = false)
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "roomType")
     private Set<Room> rooms;
     public RoomType(String roomTypeId) {
         this.roomTypeId = roomTypeId;
+    }@PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
     }
 }

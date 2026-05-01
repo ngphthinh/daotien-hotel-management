@@ -24,8 +24,9 @@ import java.util.List;
 @EqualsAndHashCode(of = "orderId")
 @Table(name = "Orders")
 @Entity
-@SQLDelete(sql = "UPDATE Orders SET isDeleted = true WHERE orderId = ?")
-@SQLRestriction("isDeleted = false")
+@Builder
+@SQLDelete(sql = "UPDATE Orders SET isDeleted = 1 WHERE orderId = ?")
+@SQLRestriction("isDeleted = 0")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +51,8 @@ public class Order {
     private Promotion promotion;
 
     private BigDecimal deposit;
+    @Column(updatable = false)
+    
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
@@ -74,7 +77,10 @@ public class Order {
         booking.setOrder(this);
         this.bookings.add(booking);
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }
 
 

@@ -1,40 +1,99 @@
 package iuh.fit.se.group1.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
+import iuh.fit.se.group1.dto.PromotionDTO;
 import iuh.fit.se.group1.entity.Promotion;
+import iuh.fit.se.group1.mapper.PromotionMapper;
 import iuh.fit.se.group1.repository.jpa.PromotionRepositoryImpl;
 
-public class PromotionService {
+public class PromotionService extends Service {
     private final PromotionRepositoryImpl promotionRepositoryImpl;
+
+    private final PromotionMapper promotionMapper = new PromotionMapper();
 
     public PromotionService() {
         this.promotionRepositoryImpl = new PromotionRepositoryImpl();
     }
 
-    public Promotion createPromotion(Promotion promotion) {
-        return promotionRepositoryImpl.save(promotion);
+
+    public List<PromotionDTO> createPromotions(List<PromotionDTO> promotionsDTO) {
+
+        List<Promotion> promotions = promotionsDTO.stream()
+                .map(promotionMapper::toPromotion)
+                .toList();
+
+        return doInTransaction(entityManager -> promotionRepositoryImpl.saveAll(entityManager, promotions)).stream()
+                .map(promotionMapper::toDTO)
+                .toList();
+
+    }
+
+    public PromotionDTO createPromotion(PromotionDTO promotionDTO) {
+
+        Promotion promotion = promotionMapper.toPromotion(promotionDTO);
+        String name = checkPromotionName(promotion.getPromotionName());
+        promotion.setPromotionName(name);
+
+        return doInTransaction(entityManager -> {
+            if (promotionRepositoryImpl.existsByPromotionName(entityManager, name, null)) {
+                throw new IllegalStateException("Tên khuyến mãi đã tồn tại");
+            }
+            promotion.setCreatedAt(LocalDate.now());
+            return promotionMapper.toDTO(promotionRepositoryImpl.save(entityManager, promotion));
+        });
     }
 
     public void deletePromotion(Long promotionId) {
-        promotionRepositoryImpl.deleteById(promotionId);
+//        promotionRepositoryImpl.deleteById(promotionId);
+        doInTransactionVoid(entityManager -> promotionRepositoryImpl.deleteById(entityManager, promotionId));
     }
 
-    public Promotion getPromotionById(Long promotionId) {
-        return promotionRepositoryImpl.findById(promotionId);
+    public PromotionDTO getPromotionById(Long promotionId) {
+//        return promotionRepositoryImpl.findById(promotionId);
+        return doInTransaction(entityManager -> promotionMapper.toDTO(promotionRepositoryImpl.findById(entityManager, promotionId)));
     }
 
-    public List<Promotion> getAllPromotions() {
-        return promotionRepositoryImpl.findAll();
+    public List<PromotionDTO> getAllPromotions() {
+        return doInTransaction(promotionRepositoryImpl::findAll).stream()
+                .map(promotionMapper::toDTO)
+                .toList();
     }
 
-    public Promotion updatePromotion(Promotion promotion) {
-        return promotionRepositoryImpl.update(promotion);
+    public PromotionDTO updatePromotion(PromotionDTO promotionDTO) {
+        Promotion promotion = promotionMapper.toPromotion(promotionDTO);
+        String name = checkPromotionName(promotion.getPromotionName());
+        promotion.setPromotionName(name);
+
+        return doInTransaction(entityManager -> {
+            // Load existing promotion to check whether the name actually changed.
+            Promotion existing = promotionRepositoryImpl.findById(entityManager, promotion.getPromotionId());
+            if (existing == null) {
+                return null; // not found
+            }
+
+            String existingName = existing.getPromotionName() == null ? "" : existing.getPromotionName().trim();
+            if (existingName.equalsIgnoreCase(name)) {
+                // Name unchanged -> no need to acquire lock or check duplicates
+                return promotionMapper.toDTO(promotionRepositoryImpl.update(entityManager, promotion));
+            }
+
+            // Name changed -> acquire lock and check duplicates to avoid race conditions
+            if (promotionRepositoryImpl.existsByPromotionName(entityManager, name, promotion.getPromotionId())) {
+                throw new IllegalStateException("Tên khuyến mãi đã tồn tại");
+            }
+            return promotionMapper.toDTO(promotionRepositoryImpl.update(entityManager, promotion));
+        });
     }
 
-    public List<Promotion> getPromotionByKeyword(String keyword) {
-        return promotionRepositoryImpl.findByPromotionIdOrName(keyword);
+    public List<PromotionDTO> getPromotionByKeyword(String keyword) {
+//        return promotionRepositoryImpl.findByPromotionIdOrName(keyword);
+        return doInTransaction(entityManager -> promotionRepositoryImpl.findByPromotionIdOrName(entityManager, keyword)).stream()
+                .map(promotionMapper::toDTO)
+                .toList();
+
     }
 
 //    public Promotion getPromotionByPrice(BigDecimal price) {
@@ -50,8 +109,18 @@ public class PromotionService {
 //        return promotionRepositoryImpl.findAllWithDiscountPercentMax();
 //    }
 
-    public Promotion getActivePromotion(BigDecimal totalAmount) {
-        return promotionRepositoryImpl.findActivePromotion(totalAmount);
+    public PromotionDTO getActivePromotion(BigDecimal totalAmount) {
+//        return promotionRepositoryImpl.findActivePromotion(totalAmount);
+        return doInTransaction(entityManager -> promotionMapper.toDTO(promotionRepositoryImpl.findActivePromotion(entityManager, totalAmount)));
     }
 
+    private static String checkPromotionName(String promotionName) {
+        if (promotionName == null || promotionName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên khuyến mãi không được để trống");
+        }
+        return promotionName.trim();
+    }
+
+
 }
+

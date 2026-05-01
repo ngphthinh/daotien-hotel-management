@@ -2,11 +2,14 @@ package iuh.fit.se.group1.enums;
 
 import iuh.fit.se.group1.config.AppLogger;
 
-public enum RoomStatus {
+import java.io.Serializable;
+
+public enum RoomStatus implements Serializable {
     AVAILABLE("Phòng trống"),
     OCCUPIED("Đang sử dụng"),
     OUT_OF_ORDER("Phòng hỏng");
     private final String displayName;
+
     RoomStatus(String displayName) {
         this.displayName = displayName;
     }

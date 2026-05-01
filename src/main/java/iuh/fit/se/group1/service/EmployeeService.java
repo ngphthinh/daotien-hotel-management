@@ -1,35 +1,61 @@
 package iuh.fit.se.group1.service;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import iuh.fit.se.group1.dto.EmployeeCreateRequest;
+import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
 import iuh.fit.se.group1.entity.Role;
+import iuh.fit.se.group1.mapper.EmployeeMapper;
 import iuh.fit.se.group1.repository.jpa.EmployeeRepositoryImpl;
+import iuh.fit.se.group1.repository.jpa.OrderRepositoryImpl;
 import iuh.fit.se.group1.util.PropertiesReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.persistence.EntityManager;
 
-public class EmployeeService {
-    private static final Logger log = LoggerFactory.getLogger(EmployeeService.class);
+public class EmployeeService extends Service {
     private final EmployeeRepositoryImpl employeeRepositoryImpl;
     private final AccountService accountService;
     private final RoleService roleService;
 
+    private final EmployeeMapper employeeMapper;
+
+    private final OrderRepositoryImpl orderRepository;
+
+
     public EmployeeService() {
+        this.employeeMapper = new EmployeeMapper();
         this.accountService = new AccountService();
         this.roleService = new RoleService();
         this.employeeRepositoryImpl = new EmployeeRepositoryImpl();
+        this.orderRepository = new OrderRepositoryImpl();
     }
 
     public int count() {
-        return employeeRepositoryImpl.count();
+        return doInTransaction(employeeRepositoryImpl::count);
+    }
+
+    public EmployeeDTO getEmployeeByAccountId(String accountId) {
+        if (accountId == null) {
+            return null;
+        }
+        return doInTransaction(em -> employeeMapper.toDTO(employeeRepositoryImpl.findByAccountId(em, accountId)));
     }
 
 
-    public Employee createEmployee(Employee employee, String roleId) {
-        Role role = roleService.getRoleById(roleId);
+    public EmployeeDTO createEmployee(EmployeeDTO employeeDTO, String roleId) {
+        return doInTransaction(em -> createEmployee(em, employeeDTO, roleId));
+    }
+
+
+    public EmployeeDTO createEmployee(EntityManager em, EmployeeDTO employeeDTO, String roleId) {
+        Employee employee = employeeMapper.toEmployee(employeeDTO);
+        employee.setCreatedAt(LocalDate.now());
+        Role role = roleService.getRoleEntityById(em, roleId);
         if (role == null) {
             throw new IllegalArgumentException("Invalid role ID: " + roleId);
         }
@@ -39,23 +65,26 @@ public class EmployeeService {
         account.setPassword(PropertiesReader.getInstance().get("daotien.password"));
         account.setRole(role);
 
-        Account accountSave = accountService.createAccount(account);
+        Account accountSave = accountService.createAccount(em, account);
 
         // set account trước khi save employee
         employee.setAccount(accountSave);
-        Employee employeeSave = employeeRepositoryImpl.save(employee);
+        Employee employeeSave = employeeRepositoryImpl.save(em, employee);
 
+
+        System.out.println("Sau khi luu employee" + employeeMapper.toDTO(employee));
+        System.out.println("Sau khi luu account" + accountSave);
         // generate username
         String username = generateUsername(employeeSave);
         accountSave.setUsername(username);
 
-        accountService.updateAccount(accountSave);
+        System.out.println("Username sau khi generate: " + accountSave.getUsername());
 
-        return employeeSave; // ✔ không update lại employee nữa
-    }
+        accountService.updateAccount(em, accountSave);
 
-    public Employee getEmployeeByCitizenId(String citizenId) {
-        return employeeRepositoryImpl.findByCitizenId(citizenId);
+        System.out.println("Account sau khi update: " + accountSave);
+
+        return employeeMapper.toDTO(employeeSave);
     }
 
     private String generateUsername(Employee entitySave) {
@@ -71,28 +100,62 @@ public class EmployeeService {
     }
 
     public void deleteEmployee(Long employeeId) {
-        employeeRepositoryImpl.deleteById(employeeId);
+        doInTransactionVoid(entityManager -> {
+            Employee employee = employeeRepositoryImpl.findById(entityManager, employeeId);
+            if (employee == null) {
+                throw new IllegalArgumentException("Employee not found with ID: " + employeeId);
+            }
+
+            boolean exists = orderRepository.existsByEmployeeIdAndCompleteYet(entityManager, employeeId);
+            if (exists) {
+                throw new IllegalStateException("Cannot delete employee with active orders");
+            }
+
+
+            employeeRepositoryImpl.deleteById(entityManager, employeeId);
+        });
     }
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepositoryImpl.findAll();
+    public List<EmployeeDTO> getAllEmployees() {
+        return doInTransaction(employeeRepositoryImpl::findAll).stream().map(employeeMapper::toDTO).toList();
     }
 
 
-    public Employee updateEmployee(Employee employee) {
+    public EmployeeDTO updateEmployee(EmployeeDTO employee) {
 
-        return employeeRepositoryImpl.update(employee);
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.update(entityManager, employeeMapper.toEmployee(employee))));
     }
 
-    public List<Employee> getEmployeeByKeyword(String keyword) {
-        return employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(keyword);
+    public List<EmployeeDTO> getEmployeeByKeyword(String keyword) {
+        return doInTransaction(entityManager -> employeeRepositoryImpl.findByIdOrNameOrPhoneNumber(entityManager, keyword)).stream().map(employeeMapper::toDTO).toList();
     }
 
-    public Employee getEmployeeById(Long employeeId) {
-        return employeeRepositoryImpl.findById(employeeId);
+    public EmployeeDTO getEmployeeById(Long employeeId) {
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findById(entityManager, employeeId)));
     }
 
-    public Employee existsByCitizenId(String citizenId) {
-        return employeeRepositoryImpl.findByCitizenId(citizenId);
+    public EmployeeDTO getEmployeeByCitizenId(String citizenId) {
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByCitizenId(entityManager, citizenId)));
     }
+
+
+    public List<EmployeeDTO> findAllByRoleId(String string) {
+        return doInTransaction(entityManager -> employeeRepositoryImpl.findAllByRoleId(entityManager, string)).stream().map(employeeMapper::toDTO).toList();
+    }
+
+
+    public EmployeeDTO getEmployeeByPhone(String phone) {
+        return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByPhoneNumber(entityManager, phone)));
+    }
+
+    public List<EmployeeDTO> createEmployees(List<EmployeeCreateRequest> employees) {
+        return doInTransaction(em ->
+
+                employees.stream()
+                        .filter(req -> employeeRepositoryImpl.isUniqueEmployee(em, employeeMapper.toEmployee(req.getEmployee())))
+                        .map(req -> createEmployee(em, req.getEmployee(), req.getRoleId()))
+                        .collect(Collectors.toList())
+        );
+    }
+
 }
