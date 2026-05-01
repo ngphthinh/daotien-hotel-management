@@ -44,5 +44,8 @@ public class EmployeeShift {
     public EmployeeShift(Employee employee, Shift shift) {
         this.employee = employee;
         this.shift = shift;
+    }@PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
     }
 }

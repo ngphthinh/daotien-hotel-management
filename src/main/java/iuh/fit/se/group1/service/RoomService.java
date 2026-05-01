@@ -31,6 +31,10 @@ public class RoomService extends Service {
         return doInTransaction(entityManager -> {
             Room room = roomMapper.toRoom(roomViewDTO);
 
+            if (existsByRoomNumber(room.getRoomNumber())) {
+                throw new RuntimeException("Room number already exists");
+            }
+
             RoomType roomType = roomTypeRepositoryImpl.findById(entityManager, room.getRoomType().getRoomTypeId()); // ensure room type exists
 
 

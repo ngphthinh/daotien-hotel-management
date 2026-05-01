@@ -91,6 +91,7 @@ public class CustomerHandler implements RequestHandler {
 
         return Response.builder()
                 .code(200)
+                .data(customerService.deleteCustomer(customerId))
                 .message("Customer with ID " + customerId + " deleted")
                 .build();
     }

@@ -77,7 +77,10 @@ public class Order {
         booking.setOrder(this);
         this.bookings.add(booking);
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }
 
 

@@ -45,7 +45,10 @@ public class Surcharge {
         this.price = price;
     }
 
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
     public Surcharge(long surchargeId) {
         this.surchargeId = surchargeId;
     }

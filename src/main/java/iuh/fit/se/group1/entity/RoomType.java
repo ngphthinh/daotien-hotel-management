@@ -32,5 +32,8 @@ public class RoomType {
     private Set<Room> rooms;
     public RoomType(String roomTypeId) {
         this.roomTypeId = roomTypeId;
+    }@PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
     }
 }

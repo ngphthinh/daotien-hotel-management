@@ -34,7 +34,10 @@ public class Booking {
     @Column(updatable = false)
 
     private LocalDate createdAt;
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 
     public Booking(Order order) {
         this.order = order;

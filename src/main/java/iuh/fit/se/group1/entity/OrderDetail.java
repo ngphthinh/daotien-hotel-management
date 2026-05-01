@@ -57,5 +57,8 @@ public class OrderDetail {
         private Long amenity;
 
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

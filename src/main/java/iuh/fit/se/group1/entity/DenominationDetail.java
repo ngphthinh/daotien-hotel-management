@@ -28,6 +28,9 @@ public class DenominationDetail {
     @Column(updatable = false)
     
     private LocalDate createdAt;
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 
 }

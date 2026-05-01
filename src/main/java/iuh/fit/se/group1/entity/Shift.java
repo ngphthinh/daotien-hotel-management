@@ -30,5 +30,8 @@ public class Shift {
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "shift")
-    private Set<EmployeeShift> employeeShifts;
+    private Set<EmployeeShift> employeeShifts;@PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

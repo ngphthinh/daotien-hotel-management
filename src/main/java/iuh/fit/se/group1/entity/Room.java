@@ -58,5 +58,8 @@ public class Room {
             return roomType.getRoomTypeId();  // Giả sử RoomType có method getRoomTypeId()
         }
         return null;
+    }@PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
     }
 }

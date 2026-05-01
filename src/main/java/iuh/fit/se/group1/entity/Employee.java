@@ -54,5 +54,8 @@ public class Employee {
     public Employee(Long employeeId) {
         this.employeeId = employeeId;
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

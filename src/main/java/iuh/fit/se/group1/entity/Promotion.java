@@ -62,5 +62,8 @@ public class Promotion {
     public int hashCode() {
         return Objects.hashCode(promotionId);
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

@@ -33,7 +33,10 @@ public class Amenity {
 	@OneToMany(mappedBy = "amenity")
 	private Set<OrderDetail> orderDetails;
 
-
+	@PrePersist
+	public void prePersist() {
+		this.createdAt = LocalDate.now();
+	}
 	public Amenity(Long amenityId, String nameAmenity, BigDecimal price) {
 		this.amenityId = amenityId;
 		this.nameAmenity = nameAmenity;

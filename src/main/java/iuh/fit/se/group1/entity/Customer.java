@@ -35,6 +35,9 @@ public class Customer {
     private LocalDate createdAt;
     @OneToMany(mappedBy = "customer")
     private Set<Order> orders;
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
     private boolean isDeleted;
 }

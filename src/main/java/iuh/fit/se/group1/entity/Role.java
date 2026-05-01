@@ -29,5 +29,8 @@ public class Role {
     public Role(String roleId) {
         this.roleId = roleId;
     }
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
 }

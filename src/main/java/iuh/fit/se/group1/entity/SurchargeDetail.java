@@ -30,7 +30,10 @@ public class SurchargeDetail {
     @Column(updatable = false)
     private LocalDate createdAt;
 
-
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDate.now();
+    }
     public SurchargeDetail(Surcharge surcharge, int quantity, LocalDate createdAt) {
         this.surcharge = surcharge;
         this.quantity = quantity;
