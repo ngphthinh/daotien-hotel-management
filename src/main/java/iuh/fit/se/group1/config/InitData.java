@@ -1,15 +1,21 @@
 package iuh.fit.se.group1.config;
 
+import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.entity.*;
+import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.OrderBookStatus;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
+import iuh.fit.se.group1.service.OrderService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -25,6 +31,64 @@ public class InitData {
         initRoom();
         initPromotion();
         initCustomer();
+//        initOrderTest();
+    }
+
+    public static void initOrderTest() {
+        List<BookingViewDTO> bookings = List.of(
+                BookingViewDTO.builder()
+                        .checkInDate(LocalDateTime.of(2026, 4, 3, 14, 0))
+                        .checkOutDate(LocalDateTime.of(2026, 5, 10, 12, 0))
+                        .bookingType(BookingType.DAILY)
+                        .room(RoomViewDTO.builder()
+                                .roomId(1L)
+                                .roomNumber("201")
+                                .build())
+                        .build()
+        );
+        OrderDTO order = OrderDTO.builder()
+                .orderDate(LocalDateTime.of(2026, 5, 10, 10, 0))
+                .totalAmount(BigDecimal.valueOf(9700000.0))
+                .deposit(BigDecimal.valueOf(2880000.0))
+
+                .employee(EmployeeDTO.builder()
+                        .employeeId(1L)
+                        .fullName("Quản Trị Viên Admin")
+                        .phone("0123456789")
+                        .email("nguyenphuocthinh0710@gmail.com")
+                        .gender(false)
+                        .citizenId("082205000819")
+                        .hireDate(LocalDate.of(2026, 5, 1))
+                        .account(AccountDTO.builder()
+                                .accountId("f6c8feb8-394a-4472-a680-5c20a123bbe5")
+                                .username("admin1")
+                                .role(RoleDTO.builder()
+                                        .roleId("MANAGER")
+                                        .roleName("Nhân viên quản lí")
+                                        .build())
+                                .build())
+                        .build())
+
+                .orderType(OrderTypeDTO.builder()
+                        .orderTypeId(3L)
+                        .name(null)
+                        .build())
+
+                .customer(CustomerDTO.builder()
+                        .fullName("Nguyen Van Ban")
+                        .phone("0987676515")
+                        .citizenId("B5234567")
+                        .gender(false)
+                        .dateOfBirth(LocalDate.of(2003, 7, 17))
+                        .build())
+
+                // ===== QUAN TRỌNG: 3 booking segment =====
+                .bookings(bookings)
+
+                .build();
+
+        OrderService orderService = new OrderService();
+        orderService.createOrder(order, new ArrayList<>());
     }
 
     private static void doInTransaction(Consumer<EntityManager> consumer) {

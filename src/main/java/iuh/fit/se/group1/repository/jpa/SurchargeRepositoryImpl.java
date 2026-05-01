@@ -4,7 +4,10 @@ import iuh.fit.se.group1.entity.Surcharge;
 import iuh.fit.se.group1.repository.interfaces.SurchargeRepository;
 import jakarta.persistence.EntityManager;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SurchargeRepositoryImpl extends AbstractRepositoryImpl<Surcharge, Long> implements SurchargeRepository {
     public SurchargeRepositoryImpl() {
@@ -55,11 +58,28 @@ public class SurchargeRepositoryImpl extends AbstractRepositoryImpl<Surcharge, L
 
     }
 
-    public List<Surcharge> saveAll(EntityManager entityManager, List<Surcharge> surcharges) {
-        for (Surcharge surcharge : surcharges) {
-            entityManager.persist(surcharge);
+    public List<Surcharge> saveAll(EntityManager em, List<Surcharge> surcharges) {
+        List<Surcharge> result = new ArrayList<>();
+        Map<String, Surcharge> existingMap = em.createQuery(
+                        "SELECT sc FROM Surcharge sc", Surcharge.class)
+                .getResultList()
+                .stream()
+                .collect(Collectors.toMap(
+                        sc -> sc.getName().toLowerCase(),
+                        sc -> sc
+                ));
+        for (Surcharge s : surcharges) {
+            Surcharge existing = existingMap.get(s.getName().toLowerCase());
+
+            if (existing != null) {
+                existing.setPrice(s.getPrice());
+                result.add(existing);
+            } else {
+                s.setSurchargeId(null);
+                em.persist(s);
+                result.add(s);
+            }
         }
-        entityManager.flush();
-        return surcharges;
+        return result;
     }
 }

@@ -38,7 +38,6 @@ public class PromotionService extends Service {
         promotion.setPromotionName(name);
 
         return doInTransaction(entityManager -> {
-            acquirePromotionNameLock(entityManager, name);
             if (promotionRepositoryImpl.existsByPromotionName(entityManager, name, null)) {
                 throw new IllegalStateException("Tên khuyến mãi đã tồn tại");
             }
@@ -82,7 +81,6 @@ public class PromotionService extends Service {
             }
 
             // Name changed -> acquire lock and check duplicates to avoid race conditions
-            acquirePromotionNameLock(entityManager, name);
             if (promotionRepositoryImpl.existsByPromotionName(entityManager, name, promotion.getPromotionId())) {
                 throw new IllegalStateException("Tên khuyến mãi đã tồn tại");
             }
@@ -123,23 +121,6 @@ public class PromotionService extends Service {
         return promotionName.trim();
     }
 
-    private static void acquirePromotionNameLock(jakarta.persistence.EntityManager entityManager, String name) {
-        Number lockResult = (Number) entityManager.createNativeQuery("""
-                DECLARE @result INT;
-                EXEC @result = sp_getapplock
-                    @Resource = :resource,
-                    @LockMode = 'Exclusive',
-                    @LockOwner = 'Transaction',
-                    @LockTimeout = 10000;
-                SELECT @result;
-                """)
-                .setParameter("resource", "PROMOTION_NAME_" + name.toLowerCase())
-                .getSingleResult();
-
-        if (lockResult == null || lockResult.intValue() < 0) {
-            throw new IllegalStateException("Không thể khóa dữ liệu khuyến mãi, vui lòng thử lại");
-        }
-    }
 
 }
 

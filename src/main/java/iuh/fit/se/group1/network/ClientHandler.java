@@ -5,14 +5,17 @@ import iuh.fit.se.group1.dto.AccountDTO;
 import iuh.fit.se.group1.handler.ActiveUsersManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ClientHandler implements Runnable {
 
@@ -69,7 +72,8 @@ public class ClientHandler implements Runnable {
         try {
             if (out != null) out.close();
             socket.close();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         if (username != null) {
             ActiveUsersManager.getInstance().registerLogout(username);
@@ -83,7 +87,20 @@ public class ClientHandler implements Runnable {
             out.writeObject(response);
             out.flush();
             out.reset();
-        } catch (Exception e) {
+        } catch (IOException e) {
+            System.out.println("Client disconnected: " + username);
+
+            // cleanup
+            try {
+                socket.close();
+            } catch (Exception ignored) {
+            }
+
+            if (username != null) {
+                clients.remove(username);
+                ActiveUsersManager.getInstance().registerLogout(username);
+            }
+
             throw new RuntimeException(e);
         }
     }
@@ -111,6 +128,7 @@ public class ClientHandler implements Runnable {
                 .requestId(null)
                 .build();
 
+        log.info("Broadcasting message: {} to {} clients", message, clients.size());
         for (var entry : clients.entrySet()) {
             try {
                 entry.getValue().sendResponse(response);

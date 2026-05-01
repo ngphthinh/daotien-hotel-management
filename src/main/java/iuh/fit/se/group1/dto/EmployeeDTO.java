@@ -18,6 +18,8 @@ public class EmployeeDTO  implements Serializable {
     private String citizenId;
     private LocalDate hireDate;
     private AccountDTO account;
+    private LocalDate createdAt;
+
     @ToString.Exclude
     private byte[] avt;
 

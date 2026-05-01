@@ -14,6 +14,22 @@ public class EmployeeRepositoryImpl extends AbstractRepositoryImpl<Employee, Lon
         super(Employee.class);
     }
 
+    public boolean isUniqueEmployee(EntityManager em, Employee e) {
+
+        boolean exists = em.createQuery("""
+                        SELECT COUNT(e) FROM Employee e
+                        WHERE e.phone = :phone
+                           OR e.email = :email
+                           OR e.citizenId = :citizenId
+                        """, Long.class)
+                .setParameter("phone", e.getPhone())
+                .setParameter("email", e.getEmail())
+                .setParameter("citizenId", e.getCitizenId())
+                .getSingleResult() > 0;
+
+        return !exists;
+    }
+
     @Override
     public Employee update(EntityManager em, Employee entity) {
 

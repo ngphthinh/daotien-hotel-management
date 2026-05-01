@@ -6,6 +6,7 @@ import org.hibernate.annotations.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -20,4 +21,6 @@ public class CustomerDTO implements Serializable {
     private String citizenId;
     private boolean gender;
     private LocalDate dateOfBirth;
+    private LocalDate createdAt;
+
 }

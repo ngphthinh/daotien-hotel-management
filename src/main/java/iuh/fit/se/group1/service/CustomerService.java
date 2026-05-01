@@ -70,14 +70,16 @@ public class CustomerService extends Service {
     }
 
     public List<CustomerDTO> createCustomers(List<CustomerDTO> customers) {
-        List<Customer> customersToSave = customers.stream()
-                .filter(customerDTO -> (getCustomerByCitizenId(customerDTO.getCitizenId()) == null))
-                .map(customerMapper::toCustomer)
-                .toList();
 
-        return doInTransaction(entityManager -> {
-            List<Customer> savedCustomers = customerRepository.saveAll(entityManager, customersToSave);
-            return savedCustomers.stream()
+        return doInTransaction(em -> {
+
+            List<Customer> customersToSave = customers.stream()
+                    .filter(c -> customerRepository.isUniqueCustomer(em, customerMapper.toCustomer(c)))
+                    .map(customerMapper::toCustomer)
+                    .collect(Collectors.toList());
+
+            return customerRepository.saveAll(em, customersToSave)
+                    .stream()
                     .map(customerMapper::toDTO)
                     .collect(Collectors.toList());
         });

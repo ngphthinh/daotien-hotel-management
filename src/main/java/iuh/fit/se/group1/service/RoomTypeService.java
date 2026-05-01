@@ -19,7 +19,6 @@ public class RoomTypeService extends Service {
 
 
     public RoomTypeDTO createRoomType(RoomTypeDTO roomType) {
-//        return roomTypeRepositoryImpl.save(roomType);
 
         RoomType roomTypeEntity = roomTypeMapper.toRoomType(roomType);
 

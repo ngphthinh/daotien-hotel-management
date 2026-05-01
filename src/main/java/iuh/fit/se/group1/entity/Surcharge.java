@@ -23,12 +23,11 @@ public class Surcharge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long surchargeId;
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(columnDefinition = "nvarchar(255)", unique = true)
     private String name;
     private boolean isDeleted;
     private BigDecimal price;
     @Column(updatable = false)
-
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "surcharge")

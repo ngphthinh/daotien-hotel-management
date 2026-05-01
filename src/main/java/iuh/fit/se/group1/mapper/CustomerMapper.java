@@ -15,6 +15,7 @@ public class CustomerMapper {
                 .gender(customer.isGender())
                 .citizenId(customer.getCitizenId())
                 .fullName(customer.getFullName())
+                .createdAt(customer.getCreatedAt())
                 .build();
     }
 
@@ -29,6 +30,7 @@ public class CustomerMapper {
                 .gender(customerDTO.isGender())
                 .citizenId(customerDTO.getCitizenId())
                 .fullName(customerDTO.getFullName())
+                .createdAt(customerDTO.getCreatedAt())
                 .build();
     }
 }

@@ -22,11 +22,12 @@ public class Amenity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long amenityId;
-    @Column(columnDefinition = "nvarchar(255)")
+    @Column(columnDefinition = "nvarchar(255)", unique = true)
     private String nameAmenity;
     private BigDecimal price;
 	private boolean isDeleted;
 
+	@Column(updatable = false)
     private LocalDate createdAt;
 
 	@OneToMany(mappedBy = "amenity")

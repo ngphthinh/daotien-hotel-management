@@ -8,9 +8,12 @@ import iuh.fit.se.group1.network.Response;
 import iuh.fit.se.group1.dto.RoomPriceByTypeRequest;
 import iuh.fit.se.group1.service.RoomToolsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 public class RoomToolsHandler implements RequestHandler {
 
@@ -52,13 +55,15 @@ public class RoomToolsHandler implements RequestHandler {
         try {
             CalculateSurchargeRequest surchargeRequest = (CalculateSurchargeRequest) request.getRequest();
 
-            long surcharge = roomToolsService.calculateSurcharge(
+            double surcharge = roomToolsService.calculateSurcharge(
                     surchargeRequest.getSelectedOldRooms(),
                     surchargeRequest.getSelectedNewRooms(),
                     surchargeRequest.getCurrentBookingType(),
                     surchargeRequest.getOrderId(),
                     java.time.LocalDateTime.now()
             );
+
+            log.info("Calculated surcharge: {}", surcharge);
 
             return Response.builder()
                     .code(200)
@@ -163,11 +168,11 @@ public class RoomToolsHandler implements RequestHandler {
         try {
 
             String roomType = request.getRequest().toString();
-
+            List<RoomViewDTO> availableRooms = roomToolsService.getAvailableRoomsByType(roomType);
             return Response.builder()
                     .code(200)
                     .message("Available rooms retrieved successfully")
-                    .data(roomToolsService.getAvailableRoomsByType(roomType))
+                    .data(availableRooms)
                     .build();
 
         } catch (

@@ -22,12 +22,11 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String accountId;
 
-    @Column(columnDefinition = "varchar(50)")
+    @Column(columnDefinition = "varchar(50)", unique = true)
     private String username;
     @Column(columnDefinition = "varchar(255)")
     private String password;
     @Column(updatable = false)
-
     private LocalDate createdAt;
 
     private boolean isDeleted;

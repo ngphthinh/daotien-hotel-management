@@ -66,8 +66,8 @@ public class AmenityService extends Service {
                 .map(amenityMapper::toAmenity)
                 .toList();
 
-        return doInTransaction(entityManager -> amenityRepositoryImpl.saveAll(entityManager, amenityEntities)).stream()
+        return doInTransaction(em -> amenityRepositoryImpl.saveAll(em,amenityEntities)).stream()
                 .map(amenityMapper::toAmenityDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

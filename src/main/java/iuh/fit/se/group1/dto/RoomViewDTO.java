@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,5 +19,6 @@ public class RoomViewDTO implements Serializable
     private String roomNumber;
     private RoomTypeDTO roomType;
     private RoomStatus roomStatus;
+    private LocalDate createdAt;
 
 }

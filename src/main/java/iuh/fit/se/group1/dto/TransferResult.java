@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class TransferResult implements java.io.Serializable {
+public class    TransferResult implements java.io.Serializable {
     private boolean success;
     private String message;
-    private long surcharge;
+    private double surcharge;
 }

@@ -1,10 +1,12 @@
 package iuh.fit.se.group1.service;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import iuh.fit.se.group1.dto.EmployeeCreateRequest;
 import iuh.fit.se.group1.dto.EmployeeDTO;
 import iuh.fit.se.group1.entity.Account;
 import iuh.fit.se.group1.entity.Employee;
@@ -52,7 +54,7 @@ public class EmployeeService extends Service {
 
     public EmployeeDTO createEmployee(EntityManager em, EmployeeDTO employeeDTO, String roleId) {
         Employee employee = employeeMapper.toEmployee(employeeDTO);
-
+        employee.setCreatedAt(LocalDate.now());
         Role role = roleService.getRoleEntityById(em, roleId);
         if (role == null) {
             throw new IllegalArgumentException("Invalid role ID: " + roleId);
@@ -146,14 +148,13 @@ public class EmployeeService extends Service {
         return doInTransaction(entityManager -> employeeMapper.toDTO(employeeRepositoryImpl.findByPhoneNumber(entityManager, phone)));
     }
 
-    public List<EmployeeDTO> createEmployees(Map<EmployeeDTO, String> employees) {
-        return doInTransaction(entityManager ->
-                employees.entrySet().stream().map(entry -> {
-                    EmployeeDTO employeeDTO = entry.getKey();
-                    String roleId = entry.getValue();
+    public List<EmployeeDTO> createEmployees(List<EmployeeCreateRequest> employees) {
+        return doInTransaction(em ->
 
-                    return createEmployee(entityManager, employeeDTO, roleId);
-                }).toList()
+                employees.stream()
+                        .filter(req -> employeeRepositoryImpl.isUniqueEmployee(em, employeeMapper.toEmployee(req.getEmployee())))
+                        .map(req -> createEmployee(em, req.getEmployee(), req.getRoleId()))
+                        .collect(Collectors.toList())
         );
     }
 

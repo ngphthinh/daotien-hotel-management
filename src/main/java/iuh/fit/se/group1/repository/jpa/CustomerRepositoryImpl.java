@@ -12,6 +12,21 @@ public class CustomerRepositoryImpl extends AbstractRepositoryImpl<Customer, Lon
         super(Customer.class);
     }
 
+    public boolean isUniqueCustomer(EntityManager em, Customer dto) {
+        Long count = em.createQuery("""
+            SELECT COUNT(c) FROM Customer c
+            WHERE c.citizenId = :citizenId
+               OR c.phone = :phone
+               OR c.email = :email
+            """, Long.class)
+                .setParameter("citizenId", dto.getCitizenId())
+                .setParameter("phone", dto.getPhone())
+                .setParameter("email", dto.getEmail())
+                .getSingleResult();
+
+        return count == 0;
+    }
+
     @Override
     public List<Customer> findByCustomerNameOrId(EntityManager em, String keyword) {
 

@@ -22,8 +22,9 @@ public class Server {
         System.out.println("Đang tải dữ liệu ứng dụng...");
         EmployeeService employeeService = new EmployeeService();
         if (employeeService.count() == 0) {
-            InitData.initAllData();
+
             EmployeeDTO admin = new EmployeeDTO();
+            InitData.initAllData();
             admin.setFullName("Quản Trị Viên Admin");
             admin.setPhone("0123456789");
             admin.setHireDate(LocalDate.now());
@@ -36,6 +37,8 @@ public class Server {
             } else {
                 System.out.println(employee);
             }
+            InitData.initOrderTest();
+
         }
         AuthenticateService authenticateService = new AuthenticateService();
         AccountService accountService = new AccountService();

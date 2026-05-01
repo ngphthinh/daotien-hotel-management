@@ -45,6 +45,7 @@ public class OrderService extends Service {
             if (order == null) return null;
 
             System.out.println(order);
+            order.getBookings().forEach(booking -> System.out.println(booking.displayName()));
 
             if (order.getEmployee() == null || order.getCustomer() == null
                     || order.getBookings() == null || order.getBookings().isEmpty()) {

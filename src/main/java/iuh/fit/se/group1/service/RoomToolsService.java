@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RoomToolsService {
@@ -111,11 +112,14 @@ public class RoomToolsService {
     /**
      * Tính phụ phí chuyển phòng với thông tin booking
      */
-    public long calculateSurcharge(List<RoomViewDTO> oldRooms, List<RoomViewDTO> newRooms,
-                                   BookingType bookingType, long orderId, LocalDateTime transferAt) {
-        // Validate input lists
-        if (oldRooms == null || oldRooms.isEmpty() || newRooms == null || newRooms.isEmpty()) {
-            log.warn("Empty room lists provided for surcharge calculation");
+    public double calculateSurcharge(List<RoomViewDTO> oldRooms,
+                                     List<RoomViewDTO> newRooms,
+                                     BookingType bookingType,
+                                     long orderId,
+                                     LocalDateTime transferAt) {
+
+        if (oldRooms == null || oldRooms.isEmpty() ||
+                newRooms == null || newRooms.isEmpty()) {
             return 0;
         }
 
@@ -123,58 +127,59 @@ public class RoomToolsService {
             transferAt = LocalDateTime.now();
         }
 
-        // Lấy thông tin booking để biết thời gian thuê
+        OrderDTO dto = orderService.getOrderById(orderId);
+        OrderTypeDTO orderTypeDTO = dto.getOrderType();
+
         BookingViewDTO bookingInfo = bookingService.getBookingByOrderIdAndType(
                 orderId, bookingType.name(), oldRooms.get(0).getRoomId());
 
-        if (bookingInfo == null) {
-            log.error("Cannot find booking info for orderId={}, bookingType={}", orderId, bookingType);
-            return 0;
-        }
+        if (bookingInfo == null) return 0;
 
-        if (!transferAt.isBefore(bookingInfo.getCheckOutDate())) {
-            log.info("Transfer time {} is at/after checkout {}, surcharge = 0", transferAt, bookingInfo.getCheckOutDate());
-            return 0;
-        }
+        if (!transferAt.isBefore(bookingInfo.getCheckOutDate())) return 0;
 
-        // Tính số lượng thời gian còn lại sau thời điểm chuyển phòng
+        // cùng loại phòng → không tính
+        if (isSameRoomType(oldRooms, newRooms)) return 0;
+
+        LocalDateTime start = transferAt.isAfter(bookingInfo.getCheckInDate())
+                ? transferAt
+                : bookingInfo.getCheckInDate();
+
         long duration = calculateRemainingBookingDuration(
-                transferAt,
+                orderTypeDTO,
+                start,
                 bookingInfo.getCheckOutDate(),
-                bookingType);
+                bookingType
+        );
 
-        log.info("Remaining booking duration: {} {} for bookingType={} from transferAt={}",
-                duration, bookingType.getDisplayName(), bookingType, transferAt);
+        if (duration <= 0) return 0;
 
-        // Tính chênh lệch giữa phòng cũ và phòng mới cho phần thời gian còn lại
-        long oldTotal = calculateTotalPrice(oldRooms, bookingType, (int) duration);
-        long newTotal = calculateTotalPrice(newRooms, bookingType, (int) duration);
+        double oldTotal = calculateTotalPrice(oldRooms, bookingType, (int) duration);
+        double newTotal = calculateTotalPrice(newRooms, bookingType, (int) duration);
 
-        log.info("Old total: {}, New total: {}, Surcharge: {}",
-                oldTotal, newTotal, newTotal - oldTotal);
-
-        return newTotal - oldTotal;
+        return Math.max(newTotal - oldTotal, 0);
     }
 
     /**
      * Tính duration còn lại sau khi chuyển phòng.
      * Khác với duration của booking ban đầu: không tính dư 1 ngày ở mốc checkout.
      */
-    private long calculateRemainingBookingDuration(LocalDateTime transferAt,
-                                                   LocalDateTime checkOut,
-                                                   BookingType bookingType) {
+    private long calculateRemainingBookingDuration(
+            OrderTypeDTO orderTypeDTO,
+            LocalDateTime transferAt,
+            LocalDateTime checkOut,
+            BookingType bookingType) {
+
         switch (bookingType) {
+
             case HOURLY:
-                long hours = Duration.between(transferAt, checkOut).toHours();
-                long minutes = Duration.between(transferAt, checkOut).toMinutes() % 60;
-                return minutes > 0 ? hours + 1 : hours;
+                long totalMinutes = Duration.between(transferAt, checkOut).toMinutes();
+                return Math.max(1, (totalMinutes + 59) / 60);
 
             case DAILY:
-                long days = ChronoUnit.DAYS.between(transferAt.toLocalDate(), checkOut.toLocalDate());
-                if (transferAt.toLocalTime().isBefore(LocalTime.NOON)
-                        && !checkOut.toLocalTime().isBefore(LocalTime.NOON)) {
-                    days += 1;
-                }
+                long days = ChronoUnit.DAYS.between(
+                        transferAt.toLocalDate(),
+                        checkOut.toLocalDate()
+                );
                 return Math.max(1, days);
 
             case OVERNIGHT:
@@ -188,7 +193,7 @@ public class RoomToolsService {
     /**
      * Tính tổng giá phòng theo loại thuê và duration
      */
-    private long calculateTotalPrice(List<RoomViewDTO> rooms, BookingType bookingType, int duration) {
+    private double calculateTotalPrice(List<RoomViewDTO> rooms, BookingType bookingType, int duration) {
         int bookingTypeIndex = BookingType.toIndex(bookingType);
 
         RoomTypeDTO singleRoomType = roomTypeService.getRoomTypeById(Constants.SINGLE_ROOM_TYPE);
@@ -205,7 +210,7 @@ public class RoomToolsService {
                 .filter(room -> DOUBLE_ROOM_TYPE.equals(room.getRoomType().getRoomTypeId()))
                 .count();
 
-        long totalPrice = 0L;
+        double totalPrice = 0L;
         if (singleCount > 0) {
             totalPrice += calculatePriceByTypeAndDuration(bookingTypeIndex, singleRoomDTO, duration) * singleCount;
         }
@@ -215,6 +220,7 @@ public class RoomToolsService {
 
         return totalPrice;
     }
+
 
     /**
      * Lấy giá phòng theo loại thuê (đơn giá cơ bản)
@@ -283,23 +289,22 @@ public class RoomToolsService {
 
         TransferResult result = new TransferResult();
 
-        // Validate
-        if (oldRooms.isEmpty() || newRooms.isEmpty()) {
-//            result.success = false;
-//            result.message = "Danh sách phòng cũ hoặc phòng mới trống";
-//            return result;
+        if (oldRooms == null || oldRooms.isEmpty() ||
+                newRooms == null || newRooms.isEmpty()) {
             result.setSuccess(false);
             result.setMessage("Danh sách phòng cũ hoặc phòng mới trống");
             return result;
         }
 
-        // Tính phụ phí với duration
         LocalDateTime transferAt = LocalDateTime.now();
 
-        long surcharge = calculateSurcharge(oldRooms, newRooms, bookingType, orderId, transferAt);
+        // chỉ tính khi khác loại phòng
+        double surcharge = 0;
+        if (!isSameRoomType(oldRooms, newRooms)) {
+            surcharge = calculateSurcharge(oldRooms, newRooms, bookingType, orderId, transferAt);
+        }
         result.setSurcharge(surcharge);
 
-        // Lấy danh sách ID
         List<Long> oldRoomIds = oldRooms.stream()
                 .map(RoomViewDTO::getRoomId)
                 .collect(Collectors.toList());
@@ -308,26 +313,37 @@ public class RoomToolsService {
                 .map(RoomViewDTO::getRoomId)
                 .collect(Collectors.toList());
 
-        // Thực hiện chuyển phòng với orderId và bookingType
-        boolean transferSuccess = roomService.transferRooms(orderId, bookingType.name(), oldRoomIds, newRoomIds, transferAt);
+        boolean success = roomService.transferRooms(
+                orderId,
+                bookingType.name(),
+                oldRoomIds,
+                newRoomIds,
+                transferAt
+        );
 
-        if (!transferSuccess) {
-//            result.success = false;
-//            result.message = "Lỗi khi chuyển phòng trong database";
-//            return result;
+        if (!success) {
             result.setSuccess(false);
             result.setMessage("Lỗi khi chuyển phòng trong database");
             return result;
         }
 
-        // Booking đã được tách tại thời điểm chuyển phòng, nên chỉ cần tính lại tổng order
         orderService.recalculateOrderTotal(orderId);
 
-//        result.success = true;
-//        result.message = "Chuyển phòng thành công";
         result.setSuccess(true);
         result.setMessage("Chuyển phòng thành công");
         return result;
+    }
+
+    private boolean isSameRoomType(List<RoomViewDTO> oldRooms, List<RoomViewDTO> newRooms) {
+        Set<String> oldTypes = oldRooms.stream()
+                .map(e -> e.getRoomType().getRoomTypeId())
+                .collect(Collectors.toSet());
+
+        Set<String> newTypes = newRooms.stream()
+                .map(e -> e.getRoomType().getRoomTypeId())
+                .collect(Collectors.toSet());
+
+        return oldTypes.equals(newTypes);
     }
 
     /**

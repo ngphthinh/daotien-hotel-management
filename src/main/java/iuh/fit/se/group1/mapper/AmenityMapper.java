@@ -15,6 +15,7 @@ public class AmenityMapper {
                 .amenityId(amenity.getAmenityId())
                 .nameAmenity(amenity.getNameAmenity())
                 .price(amenity.getPrice())
+                .createdAt(amenity.getCreatedAt())
                 .build();
     }
 
@@ -27,6 +28,7 @@ public class AmenityMapper {
                 .amenityId(amenityDTO.getAmenityId())
                 .nameAmenity(amenityDTO.getNameAmenity())
                 .price(amenityDTO.getPrice())
+                .createdAt(amenityDTO.getCreatedAt())
                 .build();
     }
 }

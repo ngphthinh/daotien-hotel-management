@@ -5,6 +5,7 @@ import iuh.fit.se.group1.entity.Room;
 import iuh.fit.se.group1.repository.interfaces.AmenityRepository;
 import jakarta.persistence.EntityManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AmenityRepositoryImpl extends AbstractRepositoryImpl<Amenity, Long> implements AmenityRepository {
@@ -57,16 +58,31 @@ public class AmenityRepositoryImpl extends AbstractRepositoryImpl<Amenity, Long>
         return em.createQuery(query, Amenity.class).getResultList();
 
     }
+    public List<Amenity> saveAll(EntityManager em, List<Amenity> amenityEntities) {
+        List<Amenity> result = new ArrayList<>();
 
-    public List<Amenity> saveAll(EntityManager entityManager, List<Amenity> amenityEntities) {
         for (Amenity amenity : amenityEntities) {
-            if (amenity.getAmenityId() == null) {
-                entityManager.persist(amenity);
+
+
+            Amenity existing = em.createQuery(
+                            "SELECT a FROM Amenity a WHERE a.nameAmenity = :name", Amenity.class)
+                    .setParameter("name", amenity.getNameAmenity())
+                    .getResultStream()
+                    .findFirst()
+                    .orElse(null);
+
+            if (existing != null) {
+
+                existing.setPrice(amenity.getPrice());
+                result.add(existing);
+            } else {
+                amenity.setAmenityId(null);
+                em.persist(amenity);
+                result.add(amenity);
             }
         }
-        entityManager.flush();
-        return amenityEntities;
 
+        return result;
     }
 }
 

@@ -19,6 +19,8 @@ public class AmenityDTO implements Serializable {
     private String nameAmenity;
     private BigDecimal price;
     private int quantity;
+    private LocalDate createdAt;
+
 
     @Override
     public String toString() {

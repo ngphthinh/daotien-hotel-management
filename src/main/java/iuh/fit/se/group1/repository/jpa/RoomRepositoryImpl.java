@@ -237,20 +237,29 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
     }
 
     @Override
-    public boolean transferRooms(EntityManager em, long orderId, String bookingType,
-                                 List<Long> oldRoomIds, List<Long> newRoomIds,
+    public boolean transferRooms(EntityManager em,
+                                 long orderId,
+                                 String bookingType,
+                                 List<Long> oldRoomIds,
+                                 List<Long> newRoomIds,
                                  LocalDateTime transferAt) {
 
         try {
+            if (transferAt == null) {
+                transferAt = LocalDateTime.now();
+            }
+
+            BookingType type = BookingType.valueOf(bookingType);
+
             // 1. Lấy booking gốc
             Booking bookingInfo = em.createQuery("""
-                            SELECT b FROM Booking b
-                            WHERE b.order.orderId = :orderId
-                              AND b.bookingType = :bookingType
-                              AND b.room.roomId = :roomId
-                            """, Booking.class)
+                SELECT b FROM Booking b
+                WHERE b.order.orderId = :orderId
+                  AND b.bookingType = :bookingType
+                  AND b.room.roomId = :roomId
+                """, Booking.class)
                     .setParameter("orderId", orderId)
-                    .setParameter("bookingType", BookingType.valueOf(bookingType))
+                    .setParameter("bookingType", type)
                     .setParameter("roomId", oldRoomIds.get(0))
                     .setMaxResults(1)
                     .getResultStream()
@@ -259,34 +268,34 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
 
             if (bookingInfo == null) return false;
 
-            if (transferAt == null) {
-                transferAt = LocalDateTime.now();
-            }
-
-            // 2. XÓA booking cũ (không chỉ cập nhật checkOutDate)
+            // ===== FIX: KHÔNG DELETE =====
+            // 2. Cắt booking cũ tại transferAt
             em.createQuery("""
-                            DELETE FROM Booking b
-                            WHERE b.order.orderId = :orderId
-                              AND b.bookingType = :bookingType
-                              AND b.room.roomId IN :ids
-                            """)
+                UPDATE Booking b
+                SET b.checkOutDate = :transferAt
+                WHERE b.order.orderId = :orderId
+                  AND b.bookingType = :bookingType
+                  AND b.room.roomId IN :ids
+                """)
+                    .setParameter("transferAt", transferAt)
                     .setParameter("orderId", orderId)
-                    .setParameter("bookingType", BookingType.valueOf(bookingType))
+                    .setParameter("bookingType", type)
                     .setParameter("ids", oldRoomIds)
                     .executeUpdate();
 
             // 3. Update phòng cũ -> AVAILABLE
             em.createQuery("""
-                            UPDATE Room r
-                            SET r.roomStatus = :status
-                            WHERE r.roomId IN :ids
-                            """)
+                UPDATE Room r
+                SET r.roomStatus = :status
+                WHERE r.roomId IN :ids
+                """)
                     .setParameter("status", RoomStatus.AVAILABLE)
                     .setParameter("ids", oldRoomIds)
                     .executeUpdate();
 
             Order orderRef = em.getReference(Order.class, orderId);
 
+            // 4. Tạo booking mới (từ transferAt → checkout cũ)
             for (Long roomId : newRoomIds) {
                 Room roomRef = em.getReference(Room.class, roomId);
 
@@ -295,7 +304,7 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
                 newBooking.setRoom(roomRef);
                 newBooking.setCheckInDate(transferAt);
                 newBooking.setCheckOutDate(bookingInfo.getCheckOutDate());
-                newBooking.setBookingType(BookingType.valueOf(bookingType));
+                newBooking.setBookingType(type);
                 newBooking.setCreatedAt(LocalDate.now());
 
                 em.persist(newBooking);
@@ -303,10 +312,10 @@ public class RoomRepositoryImpl extends AbstractRepositoryImpl<Room, Long> imple
 
             // 5. Update phòng mới -> OCCUPIED
             em.createQuery("""
-                            UPDATE Room r
-                            SET r.roomStatus = :status
-                            WHERE r.roomId IN :ids
-                            """)
+                UPDATE Room r
+                SET r.roomStatus = :status
+                WHERE r.roomId IN :ids
+                """)
                     .setParameter("status", RoomStatus.OCCUPIED)
                     .setParameter("ids", newRoomIds)
                     .executeUpdate();

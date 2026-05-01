@@ -13,13 +13,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ImportExcelService {
 
-    private static final Logger log = LoggerFactory.getLogger(ImportExcelService.class);
     private final CustomerService customerService = new CustomerService();
     private final AmenityService amenityService = new AmenityService();
     private final PromotionService promotionService = new PromotionService();
@@ -79,6 +76,7 @@ public class ImportExcelService {
                     c.setDateOfBirth(LocalDate.now());
                 }
 
+                c.setCreatedAt(LocalDate.now());
                 customers.add(c);
             }
 
@@ -142,6 +140,7 @@ public class ImportExcelService {
                 amenity.setNameAmenity(amenityName);
                 amenity.setPrice(amenityPrice);
 
+                amenity.setCreatedAt(LocalDate.now());
                 amenity.setAmenityId(null);
                 amenities.add(amenity);
             }
@@ -325,7 +324,7 @@ public class ImportExcelService {
     }
 
     public List<EmployeeDTO> importEmployeesFromExcel(File file) {
-        Map<EmployeeDTO, String> employeeRoleMap = new LinkedHashMap<>();
+        List<EmployeeCreateRequest> employeeCreateRequests = new ArrayList<>();
 
         try (FileInputStream fis = new FileInputStream(file);
              Workbook workbook = new XSSFWorkbook(fis)) {
@@ -386,10 +385,13 @@ public class ImportExcelService {
                     roleId = Role.MANAGER.name();
                 }
 
-                employeeRoleMap.put(e, roleId);
+               employeeCreateRequests.add(EmployeeCreateRequest.builder()
+                               .employee(e)
+                               .roleId(roleId)
+                       .build());
 
             }
-            return employeeService.createEmployees(employeeRoleMap);
+            return employeeService.createEmployees(employeeCreateRequests);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to import employees from Excel", e);
@@ -430,7 +432,6 @@ public class ImportExcelService {
                     roomType.setRoomTypeId(roomTypeId);
                     roomType.setName(roomTypeName);
                     roomType = roomTypeService.createRoomType(roomType);
-                    System.out.println("ℹ️ Tạo RoomType mới: " + roomTypeName);
                 }
 
                 RoomViewDTO room = new RoomViewDTO();
@@ -451,7 +452,7 @@ public class ImportExcelService {
                 }
                 room.setRoomStatus(status);
 
-
+                room.setCreatedAt(LocalDate.now());
                 room.setRoomId(null);
                 rooms.add(room);
             }
@@ -530,7 +531,7 @@ public class ImportExcelService {
 
                 surcharge.setName(surchargeName);
                 surcharge.setPrice(price);
-
+                surcharge.setCreatedAt(LocalDate.now());
                 surcharge.setSurchargeId(null);
                 surcharges.add(surcharge);
             }

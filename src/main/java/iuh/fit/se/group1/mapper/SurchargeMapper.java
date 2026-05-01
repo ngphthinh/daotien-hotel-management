@@ -11,6 +11,7 @@ public class SurchargeMapper {
                 .surchargeId(surchargeDTO.getSurchargeId())
                 .name(surchargeDTO.getName())
                 .price(surchargeDTO.getPrice())
+                .createdAt(surchargeDTO.getCreatedAt())
                 .build();
     }
 
@@ -21,6 +22,7 @@ public class SurchargeMapper {
                 .surchargeId(surcharge.getSurchargeId())
                 .name(surcharge.getName())
                 .price(surcharge.getPrice())
+                .createdAt(surcharge.getCreatedAt())
                 .build();
     }
 }
