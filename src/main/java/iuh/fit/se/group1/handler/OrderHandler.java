@@ -320,12 +320,6 @@ public class OrderHandler implements RequestHandler {
 
     private Response handleGetUnpaidByKeyword(Request request) {
         String keyword = request.getRequest().toString();
-        if (keyword == null || keyword.isEmpty()) {
-            return Response.builder()
-                    .code(400)
-                    .message("Keyword cannot be null or empty")
-                    .build();
-        }
 
         List<OrderDTO> orders = orderService.getUnpaidOrdersByKeyword(keyword);
 
@@ -346,12 +340,6 @@ public class OrderHandler implements RequestHandler {
 
     private Response handleSearchByKeyword(Request request) {
         String keyword = request.getRequest().toString();
-        if (keyword == null || keyword.isEmpty()) {
-            return Response.builder()
-                    .code(400)
-                    .message("Keyword cannot be null or empty")
-                    .build();
-        }
 
         List<OrderDTO> orders = orderService.searchOrdersByKeyword(keyword);
 

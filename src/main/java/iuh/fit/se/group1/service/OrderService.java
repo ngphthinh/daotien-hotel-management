@@ -44,8 +44,6 @@ public class OrderService extends Service {
         return doInTransaction(entityManager -> {
             if (order == null) return null;
 
-            System.out.println(order);
-            order.getBookings().forEach(booking -> System.out.println(booking.displayName()));
 
             if (order.getEmployee() == null || order.getCustomer() == null
                     || order.getBookings() == null || order.getBookings().isEmpty()) {
@@ -80,29 +78,7 @@ public class OrderService extends Service {
     private static final String DOUBLE_ROOM_TYPE = "DOUBLE";
 
     public Order createOrderFromOrder(Order order) {
-//        if (order == null) {
-//            AppLogger.info("Order is null");
-//            return null;
-//        }
-//
-//        if (order.getEmployee() == null || order.getCustomer() == null || order.getBookings() == null || order.getBookings().isEmpty()) {
-//            System.out.println("Employee :" + order.getEmployee());
-//            System.out.println("Customer :" + order.getCustomer());
-//            System.out.println("Bookings :" + order.getBookings());
-//            AppLogger.info(getClass() + " Order is missing required fields ");
-//            return null;
-//        }
-//
-//
-//        Order savedOrder = orderRepositoryImpl.save(order);
-//        if (savedOrder == null) {
-//            AppLogger.info("Failed to save order");
-//            return null;
-//        }
-//
-//        bookingRepository.saveAllBookingsForOrder(savedOrder, order.getBookings());
-//        AppLogger.info("Order created successfully");
-//        return savedOrder;
+
         return doInTransaction(entityManager -> {
             if (order == null) {
                 AppLogger.info("Order is null");
@@ -110,9 +86,6 @@ public class OrderService extends Service {
             }
 
             if (order.getEmployee() == null || order.getCustomer() == null || order.getBookings() == null || order.getBookings().isEmpty()) {
-                System.out.println("Employee :" + order.getEmployee());
-                System.out.println("Customer :" + order.getCustomer());
-                System.out.println("Bookings :" + order.getBookings());
                 AppLogger.info(getClass() + " Order is missing required fields ");
                 return null;
             }

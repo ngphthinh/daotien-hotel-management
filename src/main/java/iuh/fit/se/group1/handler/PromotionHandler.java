@@ -92,12 +92,7 @@ public class PromotionHandler implements RequestHandler {
 
     private Response handleGetByKeywords(Request request) {
         String keyword = (String) request.getRequest();
-        if (keyword == null) {
-            return Response.builder()
-                    .code(400)
-                    .message("Keyword cannot be null or blank")
-                    .build();
-        }
+
         List<PromotionDTO> promotionDTO = promotionService.getPromotionByKeyword(keyword);
         if (promotionDTO == null) {
             return Response.builder()

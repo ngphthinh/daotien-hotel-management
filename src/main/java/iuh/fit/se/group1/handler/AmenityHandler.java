@@ -112,12 +112,6 @@ public class AmenityHandler implements RequestHandler {
 
     private Response handleGetByKeywords(Request request) {
         String keyword = request.getRequest().toString();
-        if (keyword == null || keyword.isEmpty()) {
-            return Response.builder()
-                    .code(400)
-                    .message("Keyword cannot be null or empty")
-                    .build();
-        }
 
         List<AmenityDTO> amenities = amenityService.getAmenityByKeyword(keyword);
 

@@ -4,9 +4,14 @@ import iuh.fit.se.group1.dto.*;
 import iuh.fit.se.group1.entity.*;
 import iuh.fit.se.group1.enums.BookingType;
 import iuh.fit.se.group1.enums.OrderBookStatus;
+import iuh.fit.se.group1.enums.PaymentType;
 import iuh.fit.se.group1.enums.RoomStatus;
 import iuh.fit.se.group1.infrastructure.JPAUtil;
-import iuh.fit.se.group1.service.OrderService;
+import iuh.fit.se.group1.mapper.BookingMapper;
+import iuh.fit.se.group1.mapper.CustomerMapper;
+import iuh.fit.se.group1.mapper.EmployeeMapper;
+import iuh.fit.se.group1.mapper.OrderMapper;
+import iuh.fit.se.group1.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +36,144 @@ public class InitData {
         initRoom();
         initPromotion();
         initCustomer();
-//        initOrderTest();
+        initEmployee();
+        initOrdersComplete();
+        initOrdersPending();
     }
+
+
+
+
+
+    private static void initEmployee() {
+        try {
+            EmployeeService employeeService = new EmployeeService();
+            
+            // Check if already exist
+            if (employeeService.count() >= 5) {
+                log.info("5 employees already exist, skipping initialization");
+                return;
+            }
+            
+            // Create 5 employees: 3 managers + 2 receptionists
+            String[] names = {"Quản trị viên admin", "Trần Minh Hoàng", "Phạm Đức Anh", "Lê Thị Mai", "Vũ Văn Nam"};
+            String[] phones = {"0901234567", "0902345678", "0903456789", "0904567890", "0905678901"};
+            String[] emails = {"thinh@hotel.com", "hoang@hotel.com", "anh@hotel.com", "mai@hotel.com", "nam@hotel.com"};
+            String[] citizenIds = {"082205000819", "079201001234", "079201001235", "079201001236", "079201001237"};
+            String[] roleIds = {"MANAGER", "MANAGER", "MANAGER", "RECEPTIONIST", "RECEPTIONIST"};
+
+            for (int i = 0; i < 5; i++) {
+                EmployeeDTO employeeDTO = EmployeeDTO.builder()
+                        .fullName(names[i])
+                        .phone(phones[i])
+                        .email(emails[i])
+                        .gender(i % 2 == 0)
+                        .citizenId(citizenIds[i])
+                        .hireDate(LocalDate.of(2025, 12, 1).minusMonths(i % 3))
+                        .build();
+                
+                employeeService.createEmployee(employeeDTO, roleIds[i]);
+                log.info("Created employee: {}", names[i]);
+            }
+            
+            log.info("5 employees created successfully");
+        } catch (Exception e) {
+            log.error("Error initializing employees", e);
+        }
+    }
+
+    private static void initOrdersComplete() {
+        initOrdersBatch(true);
+    }
+
+    private static void initOrdersPending() {
+        initOrdersBatch(false);
+    }
+
+    private static void initOrdersBatch(boolean isComplete) {
+        try {
+            OrderService orderService = new OrderService();
+            EmployeeService employeeService = new EmployeeService();
+            CustomerService customerService = new CustomerService();
+            RoomService roomService = new RoomService();
+            
+            String statusName = isComplete ? "COMPLETED" : "PROCESSING";
+            OrderBookStatus bookingStatus = isComplete ? OrderBookStatus.COMPLETED : OrderBookStatus.PROCESSING;
+            
+            // Get all data
+            List<EmployeeDTO> employees = employeeService.getAllEmployees();
+            List<CustomerDTO> customers = customerService.getAllCustomer();
+            List<RoomViewDTO> rooms = roomService.getAllRooms();
+            
+            if (employees.size() < 2 || customers.isEmpty() || rooms.size() < 20) {
+                log.warn("Not enough data to create {} orders: employees={}, customers={}, rooms={}",
+                        statusName, employees.size(), customers.size(), rooms.size());
+                return;
+            }
+            
+            // Get order type from database
+            OrderTypeDTO orderType = doInTransactionDTO(em -> {
+                OrderType ot = em.createQuery(
+                        "select ot from OrderType ot where ot.name = ?1",
+                        OrderType.class
+                ).setParameter(1, bookingStatus)
+                 .getSingleResult();
+                
+                return OrderTypeDTO.builder()
+                        .orderTypeId(ot.getOrderTypeId())
+                        .name(ot.getName())
+                        .build();
+            });
+            
+            if (orderType == null) {
+                log.warn("OrderType not found for {}", bookingStatus);
+                return;
+            }
+            
+            // Create 20 orders
+            for (int i = 0; i < 20; i++) {
+                EmployeeDTO employee = employees.get(i % employees.size());
+                CustomerDTO customer = customers.get(i % customers.size());
+                RoomViewDTO room = rooms.get(i % rooms.size());
+                
+                LocalDateTime baseDate = isComplete
+                        ? LocalDateTime.now().minusMonths(3 - (i % 3)).withHour(14).withMinute(0)
+                        : LocalDateTime.now().minusDays(5 - (i % 5)).withHour(14).withMinute(0);
+                
+                // Create booking DTO
+                BookingViewDTO bookingDTO = BookingViewDTO.builder()
+                        .checkInDate(baseDate)
+                        .checkOutDate(baseDate.plusDays(3))
+                        .bookingType(BookingType.DAILY)
+                        .room(room)
+                        .build();
+                
+                // Create order DTO
+                OrderDTO orderDTO = OrderDTO.builder()
+                        .orderDate(baseDate)
+                        .employee(employee)
+                        .orderType(orderType)
+                        .customer(customer)
+                        .totalAmount(BigDecimal.valueOf(500000 + (i * 50000)))
+                        .deposit(BigDecimal.valueOf(150000 + (i * 10000)))
+                        .bookings(List.of(bookingDTO))
+                        .paymentDate(isComplete ? baseDate.toLocalDate().plusDays(7) : null)
+                        .paymentType(isComplete ? PaymentType.CASH : null)
+                        .employeePayment(isComplete ? employees.get((i + 1) % employees.size()) : null)
+                        .build();
+                
+                orderService.createOrder(orderDTO, new ArrayList<>());
+                log.debug("Created {} order #{}", statusName, i + 1);
+            }
+            
+            log.info("Successfully created 20 {} orders", statusName);
+        } catch (Exception e) {
+            log.error("Error initializing {} orders", isComplete ? "complete" : "pending", e);
+        }
+    }
+
+
+
 
     public static void initOrderTest() {
         List<BookingViewDTO> bookings = List.of(
@@ -113,6 +254,34 @@ public class InitData {
         } finally {
             if (entityManager != null && entityManager.isOpen()) {
                 entityManager.close(); // đóng ở đây
+            }
+        }
+    }
+
+    private static <T> T doInTransactionDTO(java.util.function.Function<EntityManager, T> function) {
+        EntityManager entityManager = null;
+        EntityTransaction transaction = null;
+
+        try {
+            entityManager = JPAUtil.getEntityManager();
+            transaction = entityManager.getTransaction();
+
+            transaction.begin();
+
+            T result = function.apply(entityManager);
+
+            transaction.commit();
+            
+            return result;
+
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw new RuntimeException(e);
+        } finally {
+            if (entityManager != null && entityManager.isOpen()) {
+                entityManager.close();
             }
         }
     }

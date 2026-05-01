@@ -94,12 +94,7 @@ public class SurchargeHandler implements RequestHandler {
 
     private Response handleGetByKeywords(Request request) {
         String keyword = (String) request.getRequest();
-        if (keyword == null) {
-            return Response.builder()
-                    .code(400)
-                    .message("Keyword cannot be null or blank")
-                    .build();
-        }
+
         List<SurchargeDTO> surcharges = surchargeService.getSurchargeByKeyword(keyword);
         if (surcharges == null) {
             return Response.builder()

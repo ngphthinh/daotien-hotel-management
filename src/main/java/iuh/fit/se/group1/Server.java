@@ -23,21 +23,21 @@ public class Server {
         EmployeeService employeeService = new EmployeeService();
         if (employeeService.count() == 0) {
 
-            EmployeeDTO admin = new EmployeeDTO();
+//            EmployeeDTO admin = new EmployeeDTO();
             InitData.initAllData();
-            admin.setFullName("Quản Trị Viên Admin");
-            admin.setPhone("0123456789");
-            admin.setHireDate(LocalDate.now());
-            admin.setEmail("nguyenphuocthinh0710@gmail.com");
-            admin.setGender(false);
-            admin.setCitizenId("082205000819");
-            EmployeeDTO employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
-            if (employee == null) {
-                System.out.println("Không tạo được tài khoản");
-            } else {
-                System.out.println(employee);
-            }
-            InitData.initOrderTest();
+//            admin.setFullName("Quản Trị Viên Admin");
+//            admin.setPhone("0123456789");
+//            admin.setHireDate(LocalDate.now());
+//            admin.setEmail("nguyenphuocthinh0710@gmail.com");
+//            admin.setGender(false);
+//            admin.setCitizenId("082205000819");
+//            EmployeeDTO employee = employeeService.createEmployee(admin, Role.MANAGER.toString());
+//            if (employee == null) {
+//                System.out.println("Không tạo được tài khoản");
+//            } else {
+//                System.out.println(employee);
+//            }
+//            InitData.initOrderTest();
 
         }
         AuthenticateService authenticateService = new AuthenticateService();
