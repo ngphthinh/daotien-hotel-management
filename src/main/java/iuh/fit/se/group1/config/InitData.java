@@ -38,7 +38,7 @@ public class InitData {
         initCustomer();
         initEmployee();
         initOrdersComplete();
-        initOrdersPending();
+//        initOrdersPending();
     }
 
 
